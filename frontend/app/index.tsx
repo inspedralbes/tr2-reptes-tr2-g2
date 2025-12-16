@@ -1,15 +1,10 @@
 import { Text, View } from "react-native";
+import "../global.css"
 
 export default function Index() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+    <View>
+      <Text className="color-slate-500 text-center font-bold">Biel Puta</Text>
     </View>
   );
 }
