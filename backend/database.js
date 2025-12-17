@@ -8,8 +8,9 @@ const uri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.M
 const client = new MongoClient(uri);
 let dbConnection;
 
-module.export = {
-    conectToDb: async (callback) => {
+//Cambios leves en la ortografia
+module.exports = {
+    connectToDb: async (callback) => {
         try {
             await client.connect();
             console.log("Conexión exitosa a MongoDB");
