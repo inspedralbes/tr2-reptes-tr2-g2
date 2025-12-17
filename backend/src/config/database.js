@@ -1,14 +1,13 @@
 const {MongoClient} = require("mongodb");
 const path = require("path");
 
-require("dotenv").config({ path: path.resolve(__dirname, ".env.dev") });
+require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 
-const uri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@localhost:${process.env.MONGO_PORT}/?authSource=admin`;
+const uri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.DB_HOST}:${process.env.MONGO_PORT}/?authSource=admin`;
 
 const client = new MongoClient(uri);
 let dbConnection;
 
-//Cambios leves en la ortografia
 module.exports = {
     connectToDb: async (callback) => {
         try {

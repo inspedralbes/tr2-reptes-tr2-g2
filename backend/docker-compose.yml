@@ -1,16 +1,34 @@
+# yaml-language-server: $schema=https://json.schemastore.org/docker-compose
+
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: enginy_backend
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=mongodb
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - mongodb
+    networks:
+      - enginy-network
+    command: npm run dev
+
   mongodb:
     image: mongo:latest
     container_name: enginy_db
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     ports:
       - "${MONGO_PORT}:27017"
     env_file:
-      - .env.dev
+      - .env
     volumes:
       - mongo_enginy_data:/data/db
     networks:
@@ -22,8 +40,9 @@ services:
     restart: always
     ports:
       - "27018:8081"
+    
     env_file:
-    - .env.dev
+      - .env
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
