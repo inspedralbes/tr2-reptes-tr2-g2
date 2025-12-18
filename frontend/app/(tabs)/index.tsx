@@ -1,10 +1,10 @@
-import { Text, View } from "react-native";
-import "../../global.css"
+import { View, Text, TouchableOpacity } from 'react-native';
+import { Link, Stack } from 'expo-router';
 
 export default function Index() {
   return (
-    <View>
-      <Text className="color-slate-500 text-center font-bold">Biel Puta</Text>
+    <View className="flex-1 items-center justify-center bg-gray-50">
+      <Text>hola que tal</Text>
     </View>
   );
 }
