@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "seed": "node src/scripts/seed.js",
-    "dev": "node src/scripts/seed.js && nodemon -L --watch src src/index.js"
+    "seed": "node scripts/seed.js",
+    "dev": "node scripts/seed.js && nodemon -L --watch src src/index.js"
   },
   "keywords": [],
   "author": "",
