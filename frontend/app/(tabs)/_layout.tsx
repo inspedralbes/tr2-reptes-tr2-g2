@@ -4,13 +4,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, usePathname, Href, Slot } from 'expo-router'; // Importamos Slot
 import { FontAwesome } from '@expo/vector-icons';
 
+//Cambiios en los nombres y pasarlos a Catala
 const TABS = [
-  { name: 'Consortium', label: 'The Consortium', path: '/' },
-  { name: 'Workshops', label: 'Workshops', path: '/workshops' }, // Añadido para navegación
-  { name: 'Students', label: 'Students & Families', path: '/students' },
-  { name: 'Teachers', label: 'Teachers & PAS', path: '/teachers' },
-  { name: 'Centres', label: 'Educational Centres', path: '/centres' },
-  { name: 'Workshops', label: 'Workshops', path: '/workshops' }, // Añadido para navegación
+  { name: 'Index', label: 'Inici', path: '/' },
+  { name: 'Workshops', label: 'Tallers', path: '/workshops' },
+  { name: 'Students', label: 'Alumnes', path: '/students' },
+  { name: 'Calendar', label: 'Calendari', path: '/calendar' },
+  { name: 'Profile', label: "Perfil", path: '/profile' },
 ];
 
 export default function TabLayout() {
@@ -35,7 +35,7 @@ export default function TabLayout() {
 
               return (
                 <TouchableOpacity
-                  key={tab.name}
+                  key={tab.path}
                   onPress={() => router.push(tab.path as Href)}
                   activeOpacity={0.8}
                   className={`
