@@ -1,5 +1,6 @@
 import { View, Text, Modal, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 interface Workshop {
     id: string;
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export default function WorkshopDetail({ visible, onClose, selectedWorkshop }: Props) {
+    const router = useRouter();
     return (
         <Modal
             animationType="slide"
@@ -90,7 +92,10 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop }: P
                                         </TouchableOpacity>
 
                                         <TouchableOpacity
-                                            onPress={() => console.log('Go to Form')}
+                                            onPress={() => {
+                                                onClose();
+                                                router.push('/statistics' as any);
+                                            }}
                                             className="flex-1 bg-[#00426b] flex-row items-center justify-center p-3 rounded-lg"
                                         >
                                             <Ionicons name="clipboard-outline" size={20} color="white" style={{ marginRight: 8 }} />
