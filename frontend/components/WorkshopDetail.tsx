@@ -1,22 +1,12 @@
-import { View, Text, Modal, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, Modal, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-
-interface Workshop {
-    id: string;
-    title: string;
-    description: string;
-    count: string;
-    image: string;
-    teachers: string;
-    startDate: string;
-    location: string;
-}
+import { Taller } from '../services/tallerService';
 
 interface Props {
     visible: boolean;
     onClose: () => void;
-    selectedWorkshop: Workshop | null;
+    selectedWorkshop: Taller | null;
 }
 
 export default function WorkshopDetail({ visible, onClose, selectedWorkshop }: Props) {
@@ -32,54 +22,56 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop }: P
                 <View className="bg-white h-full overflow-hidden">
                     {selectedWorkshop && (
                         <ScrollView className="flex-1">
-                            <View className="relative">
-                                <Image
-                                    source={{ uri: selectedWorkshop.image }}
-                                    className="w-full h-64 bg-slate-200"
-                                    resizeMode="cover"
-                                />
-
-                                {/* Boton para cerrar */}
+                            <View className="p-6 pt-8">
                                 <TouchableOpacity
                                     onPress={onClose}
-                                    className="absolute top-4 right-4 bg-black/20 backdrop-blur-md p-2 rounded-full"
+                                    className="absolute top-4 right-4 bg-slate-100 p-2 rounded-full z-10"
                                 >
-                                    <Ionicons name="close" size={24} color="white" />
+                                    <Ionicons name="close" size={24} color="#334155" />
                                 </TouchableOpacity>
-                            </View>
 
-                            <View className="p-6">
-                                <Text className="text-[#00426b] text-3xl font-bold mb-4">{selectedWorkshop.title}</Text>
+                                <Text className="text-[#00426b] text-3xl font-bold mb-4 pr-10">{selectedWorkshop.titol}</Text>
 
-                                <View className="flex-row items-center mb-6">
-                                    <View className="bg-blue-100 px-3 py-1 rounded-full mr-3">
-                                        <Text className="text-blue-800 font-bold">{selectedWorkshop.count} Plazas</Text>
+                                <View className="flex-row items-center mb-6 flex-wrap">
+                                    <View className="bg-blue-100 px-3 py-1 rounded-full mr-3 mb-2">
+                                        {/* CORREGIDO: Añadido optional chaining (?.) y valor por defecto (??) */}
+                                        <Text className="text-blue-800 font-bold">
+                                            {selectedWorkshop.detalls_tecnics?.places_maximes ?? 0} Plazas
+                                        </Text>
                                     </View>
-                                    <View className="bg-green-100 px-3 py-1 rounded-full">
-                                        <Text className="text-green-800 font-bold">{selectedWorkshop.startDate}</Text>
+                                    <View className="bg-green-100 px-3 py-1 rounded-full mb-2">
+                                        <Text className="text-green-800 font-bold">{selectedWorkshop.trimestre} Trimestre</Text>
                                     </View>
                                 </View>
 
                                 <View className="space-y-4">
                                     <View className="flex-row items-start">
-                                        <Ionicons name="location-outline" size={24} color="#00426b" style={{ marginRight: 10 }} />
+                                        <Ionicons name="location-outline" size={24} color="#00426b" style={{ marginRight: 10, top: 4 }} />
                                         <View>
                                             <Text className="text-slate-500 font-bold text-xs uppercase">Ubicación</Text>
-                                            <Text className="text-slate-800 text-lg">{selectedWorkshop.location}</Text>
+                                            {/* CORREGIDO: Añadido optional chaining (?.) y valor por defecto (??) */}
+                                            <Text className="text-slate-800 text-lg">
+                                                {selectedWorkshop.detalls_tecnics?.ubicacio_defecte ?? 'No disponible'}
+                                            </Text>
                                         </View>
                                     </View>
 
                                     <View className="flex-row items-start">
-                                        <Ionicons name="people-outline" size={24} color="#00426b" style={{ marginRight: 10 }} />
+                                        <Ionicons name="people-outline" size={24} color="#00426b" style={{ marginRight: 10, top: 4 }} />
                                         <View>
-                                            <Text className="text-slate-500 font-bold text-xs uppercase">Profesores</Text>
-                                            <Text className="text-slate-800 text-lg">{selectedWorkshop.teachers}</Text>
+                                            <Text className="text-slate-500 font-bold text-xs uppercase">Referentes</Text>
+                                            <Text className="text-slate-800 text-lg">
+                                                {(selectedWorkshop.referents_assignats?.length ?? 0) > 0 ? selectedWorkshop.referents_assignats.join(', ') : 'No asignados'}
+                                            </Text>
                                         </View>
                                     </View>
 
                                     <View className="mt-4">
                                         <Text className="text-slate-500 font-bold text-xs uppercase mb-2">Descripción</Text>
-                                        <Text className="text-slate-600 text-lg leading-7">{selectedWorkshop.description}</Text>
+                                        {/* CORREGIDO: Añadido optional chaining (?.) y valor por defecto (??) */}
+                                        <Text className="text-slate-600 text-lg leading-7">
+                                            {selectedWorkshop.detalls_tecnics?.descripcio ?? 'No disponible.'}
+                                        </Text>
                                     </View>
 
                                     <View className="mt-6 flex-row gap-4 mb-4">
