@@ -10,5 +10,4 @@ COPY . .
 
 EXPOSE 3000
 
-# Comando por defecto: ejecuta tu script 'dev' que tiene el seed + nodemon
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]
