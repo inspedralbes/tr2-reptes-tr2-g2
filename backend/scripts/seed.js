@@ -1,7 +1,7 @@
-const { MongoClient } = require('mongodb');
-const path = require('path');
+const { MongoClient } = require("mongodb");
+const path = require("path");
 
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const uri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.DB_HOST}:${process.env.MONGO_PORT}/?authSource=admin`;
 const client = new MongoClient(uri);
@@ -13,7 +13,7 @@ async function seed() {
     const db = client.db(process.env.MONGO_INITDB_DATABASE);
 
     // --- 1. COLECCIÓN TALLERS ---
-    const colTallers = db.collection('tallers');
+    const colTallers = db.collection("tallers");
     await colTallers.deleteMany({});
 
     const tallersData = [
@@ -26,10 +26,10 @@ async function seed() {
           descripcio: "Exploració a través de la construcció d'un producte.",
           durada_hores: 20,
           places_maximes: 16,
-          ubicacio_defecte: "Tallers externs ciutat"
+          ubicacio_defecte: "Tallers externs ciutat",
         },
-        referents_assignats: [], 
-        dies_execucio: ["dijous"] 
+        referents_assignats: [],
+        dies_execucio: ["dijous"],
       },
       {
         titol: "Imatge personal per a tothom",
@@ -37,13 +37,14 @@ async function seed() {
         modalitat: "B",
         trimestre: "2n",
         detalls_tecnics: {
-          descripcio: "Formació específica sobre atenció al client i benestar personal.",
+          descripcio:
+            "Formació específica sobre atenció al client i benestar personal.",
           durada_hores: 20,
           places_maximes: 20,
-          ubicacio_defecte: "Al propi centre"
+          ubicacio_defecte: "Al propi centre",
         },
         referents_assignats: [],
-        dies_execucio: ["dimarts"]
+        dies_execucio: ["dimarts"],
       },
       {
         titol: "Energies Renovables",
@@ -51,21 +52,22 @@ async function seed() {
         modalitat: "C",
         trimestre: "2n",
         detalls_tecnics: {
-          descripcio: "Descoberta de perfils professionals vinculats a la sostenibilitat.",
+          descripcio:
+            "Descoberta de perfils professionals vinculats a la sostenibilitat.",
           durada_hores: 30,
           places_maximes: 16,
-          ubicacio_defecte: "Institut de Sostenibilitat (ISMAB)"
+          ubicacio_defecte: "Institut de Sostenibilitat (ISMAB)",
         },
         referents_assignats: [],
-        dies_execucio: ["dijous"]
-      }
+        dies_execucio: ["dijous"],
+      },
     ];
-    
+
     await colTallers.insertMany(tallersData);
     console.log(`${tallersData.length} Talleres insertados.`);
 
     // --- 2. COLECCIÓN CENTRES ---
-    const colCentres = db.collection('centres');
+    const colCentres = db.collection("centres");
     await colCentres.deleteMany({});
 
     const centresData = [
@@ -75,8 +77,8 @@ async function seed() {
         tipus: "Public",
         contacte: {
           nom_coordinador: "Coord. Brossa",
-          email: "brossa@xtec.cat"
-        }
+          email: "brossa@xtec.cat",
+        },
       },
       {
         nom: "INS Milà i Fontanals",
@@ -84,19 +86,18 @@ async function seed() {
         tipus: "Public",
         contacte: {
           nom_coordinador: "Coord. Milà",
-          email: "mila@xtec.cat"
-        }
-      }
+          email: "mila@xtec.cat",
+        },
+      },
     ];
 
     await colCentres.insertMany(centresData);
     console.log(`${centresData.length} Centros insertados.`);
 
     // --- 3. COLECCIÓN SOLICITUDS ---
-    const colSolicituds = db.collection('solicituds');
+    const colSolicituds = db.collection("solicituds");
     await colSolicituds.deleteMany({});
     console.log("Colección de Solicitudes limpiada.");
-
   } catch (err) {
     console.error("Error en el seed:", err);
   } finally {
