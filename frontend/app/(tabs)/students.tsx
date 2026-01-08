@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ListadoUsuarios from '../../components/ListadoUsuarios';
+import UserTable from '../../components/UserTable';
 
 export default function StudentsPage() {
   return (
@@ -10,7 +10,7 @@ export default function StudentsPage() {
         <Text className="text-gray-500">Listado completo de alumnos</Text>
       </View>
       <View className="flex-1 px-2">
-        <ListadoUsuarios />
+        <UserTable />
       </View>
     </SafeAreaView>
   );
