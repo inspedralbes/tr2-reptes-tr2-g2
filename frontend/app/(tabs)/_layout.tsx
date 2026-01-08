@@ -5,12 +5,12 @@ import { useRouter, usePathname, Href, Slot } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 
 // Definición de las pestañas de navegación
+// He eliminado 'Profile' de esta lista como pediste
 const TABS = [
   { name: 'Index', label: 'Inici', path: '/' },
   { name: 'Workshops', label: 'Tallers', path: '/workshops' },
   { name: 'Students', label: 'Alumnes', path: '/students' },
   { name: 'Calendar', label: 'Calendari', path: '/calendar' },
-  { name: 'Profile', label: "Perfil", path: '/profile' },
 ];
 
 export default function TabLayout() {
@@ -57,23 +57,20 @@ export default function TabLayout() {
             })}
           </ScrollView>
 
-          {/* Icono de búsqueda a la derecha */}
+          {/* Icono de perfil a la derecha (Mantenido) */}
           <View className="px-4 bg-gray-100 h-full justify-center border-l border-gray-300">
-            <TouchableOpacity className="p-2">
-              <FontAwesome name="search" size={18} color="#64748b" />
+            <TouchableOpacity 
+              className="p-2"
+              onPress={() => router.push('/profile')}
+            >
+              <FontAwesome name="user-circle" size={20} color="#64748b" />
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      {/* --- ÁREA DE CONTENIDO PRINCIPAL (Responsiva) --- */}
+      {/* --- ÁREA DE CONTENIDO PRINCIPAL --- */}
       <View className="flex-1 items-center bg-gray-50">
-        {/* 
-          Este contenedor interior gestiona el ancho.
-          - `w-full`: Ocupa todo el ancho disponible.
-          - `max-w-7xl`: En pantallas grandes, limita el ancho para que no sea excesivo.
-          - `p-4 md:p-6`: Padding responsivo (pequeño en móvil, más grande en tabletas y web).
-        */}
         <View className="w-full max-w-7xl p-4 md:p-6">
           <Slot />
         </View>
