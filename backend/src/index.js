@@ -8,7 +8,11 @@ const routes = require('./routes');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [process.env.EXPO_PUBLIC_API_URL, 'http://localhost:8081', 'http://localhost:19006'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
+}));
 app.use(express.json());
 
 // Mount the routes

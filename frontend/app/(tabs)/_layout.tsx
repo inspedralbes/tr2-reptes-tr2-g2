@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, usePathname, Href, Slot } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 
-// Definición de las pestañas de navegación
 const TABS = [
   { name: 'Index', label: 'Inici', path: '/' },
   { name: 'Workshops', label: 'Tallers', path: '/workshops' },
@@ -20,16 +19,20 @@ export default function TabLayout() {
 
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
-      {/* --- CABECERA SUPERIOR (Navbar) --- */}
+      
+      {/* Nav Bar */}
       <View style={{ paddingTop: insets.top }} className="bg-gray-100 shadow-sm z-10">
+        
+        {/* Contenedor Fila */}
         <View className="flex-row items-center border-b border-gray-300">
+          
           <ScrollView
+            className="flex-1" 
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingLeft: 0 }}
           >
             {TABS.map((tab, index) => {
-              // Comprueba si la ruta actual coincide con la pestaña
               const isActive = pathname === tab.path || (tab.path !== '/' && pathname.startsWith(tab.path));
               const isLast = index === TABS.length - 1;
 
@@ -39,8 +42,8 @@ export default function TabLayout() {
                   onPress={() => router.push(tab.path as Href)}
                   activeOpacity={0.8}
                   className={`
-                    p-4
-                    ${!isLast ? 'border-r border-gray-300' : ''}
+                    px-5 py-4
+                    border-r border-gray-300
                     ${isActive ? 'bg-[#006996]' : 'bg-gray-100'}
                   `}
                 >
@@ -57,26 +60,17 @@ export default function TabLayout() {
             })}
           </ScrollView>
 
-          {/* Icono de búsqueda a la derecha */}
-          <View className="px-4 bg-gray-100 h-full justify-center border-l border-gray-300">
-            <TouchableOpacity className="p-2">
+          <View className="border-l border-gray-300 bg-gray-100">
+            <TouchableOpacity className="p-4 items-center justify-center">
               <FontAwesome name="search" size={18} color="#64748b" />
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      {/* --- ÁREA DE CONTENIDO PRINCIPAL (Responsiva) --- */}
-      <View className="flex-1 items-center bg-gray-50">
-        {/* 
-          Este contenedor interior gestiona el ancho.
-          - `w-full`: Ocupa todo el ancho disponible.
-          - `max-w-7xl`: En pantallas grandes, limita el ancho para que no sea excesivo.
-          - `p-4 md:p-6`: Padding responsivo (pequeño en móvil, más grande en tabletas y web).
-        */}
-        <View className="w-full max-w-7xl p-4 md:p-6">
-          <Slot />
-        </View>
+      {/* --- Body --- */}
+      <View className="flex-1 bg-gray-50">
+        <Slot />
       </View>
     </View>
   );

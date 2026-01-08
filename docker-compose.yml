@@ -13,8 +13,6 @@ services:
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
-    depends_on:
-      - mongodb
     networks:
       - enginy-network
     command: npm run dev
@@ -25,7 +23,7 @@ services:
       dockerfile: Dockerfile
     container_name: enginy_frontend
     ports:
-      - "8081:8081" # Expo dev server runs on 8081
+      - "8081:8081"
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -35,6 +33,9 @@ services:
     tty: true
     env_file:
       - .env
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - EXPO_PUBLIC_API_URL=${EXPO_PUBLIC_API_URL}
 
   mongodb:
     image: mongo:latest
@@ -58,13 +59,26 @@ services:
     env_file:
       - .env
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/
+      - PORT=8081
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - ME_CONFIG_MONGODB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/
     networks:
       - enginy-network
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    container_name: enginy_ngrok
+    command: http backend:3000
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    networks:
+      - enginy-network
+    ports:
+      - "4040:4040"
     depends_on:
-      - mongodb
+      - backend
 
 volumes:
   mongo_enginy_data:

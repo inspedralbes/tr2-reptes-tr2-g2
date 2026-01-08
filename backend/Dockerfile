@@ -2,14 +2,13 @@ FROM node:22-alpine
 
 WORKDIR /usr/src/app
 
-# Install bun
-RUN npm install -g bun
+# Copia los archivos de dependencias
+COPY package.json package-lock.json ./
 
-COPY package.json bun.lock ./
+# Instala las dependencias
+RUN npm install --frozen-lockfile
 
-# Install dependencies using bun
-RUN bun install --frozen-lockfile
-
+# Copia el resto de la aplicación
 COPY . .
 
 EXPOSE 3000

@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { Stack } from 'expo-router';
 
-// Mock Data
 const SUMMARY_CARDS = [
     { label: 'Assignats', value: 2 },
     { label: 'Sol·licitats', value: 5 },
@@ -13,7 +12,6 @@ const WORKSHOP_DATA = [
     { id: '1', workshop: 'Mecànica bàsica bicicleta', status: 'Assignat', assignation: 'Dijous 9-12h (06/05/2025)' },
     { id: '2', workshop: 'Mecànica bàsica bicicleta', status: "Pendent d'assignació", assignation: 'Dijous 9-12h (06/05/2025)' },
     { id: '3', workshop: 'Jardineria Urbana', status: "Llista d'espera", assignation: 'Dijous 9-12h (06/05/2025)' },
-    // Adding random ones
     { id: '4', workshop: 'Cuina de mercat', status: 'Assignat', assignation: 'Dilluns 10-13h (15/05/2025)' },
     { id: '5', workshop: 'Fusteria creativa', status: "Pendent d'assignació", assignation: 'Divendres 16-19h (20/05/2025)' },
 ];

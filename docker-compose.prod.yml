@@ -10,7 +10,7 @@ services:
       - .env.prod
     networks:
       - enginy-network-prod
-    command: bun start
+    command: npm run start
 
   frontend:
     build:
