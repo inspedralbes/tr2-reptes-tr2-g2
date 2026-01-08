@@ -2,8 +2,6 @@
 
 Este documento es la guía central para el desarrollo del proyecto. Su objetivo es alinear al equipo en cuanto a tecnologías, flujos de trabajo y los próximos pasos a seguir.
 
----
-
 ## 1. Stack Tecnológico
 
 A continuación se describe el conjunto de tecnologías seleccionadas para cada parte de la aplicación.
@@ -21,8 +19,6 @@ A continuación se describe el conjunto de tecnologías seleccionadas para cada 
 -   **Estado:** **Por Definir.**
 -   **Propuesta:** Se recomienda utilizar un framework moderno como **React**, **Vue** o **Svelte** para construir una Single Page Application (SPA). La elección final debe ser una de las primeras decisiones del equipo.
 -   **Librería de Estilos:** Se podría usar **Tailwind CSS** para un desarrollo ágil o una librería de componentes como **Material-UI** (si se usa React) o **Bootstrap**.
-
----
 
 ## 2. Flujo de Trabajo (Workflow)
 
@@ -48,9 +44,54 @@ Para tener un historial de cambios legible y automatizable, se **debe** seguir l
     -   `docs(readme): update project workflow section`
 -   **Tipos comunes:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`.
 
----
 
-## 3. Roadmap y Tareas Pendientes
+## 3. Infraestructura y Acceso a Datos
+
+El entorno de bases de datos se encuentra alojado en un servidor **Proxmox** privado. Para garantizar la seguridad sin sacrificar la comodidad del equipo, utilizamos **Cloudflare Zero Trust** (Túneles TCP) con autenticación vía **GitHub**.
+
+### 🔑 Requisitos de Acceso
+
+1. Tener instalado `cloudflared` en tu máquina local.
+* **Arch Linux:** `sudo pacman -S cloudflared`
+* **macOS:** `brew install cloudflare/cloudflare/cloudflared`
+* **Windows:** `winget install Cloudflare.cloudflared`
+
+
+2. Estar en la lista de correos autorizados (contactar con el administrador).
+
+### 🚀 Cómo conectarse
+
+Para acceder a las bases de datos desde herramientas locales (**TablePlus**, **MongoDB Compass**, **DBeaver**), debes abrir un túnel local en tu terminal:
+
+#### Para MariaDB (SQL)
+
+```bash
+cloudflared access tcp --hostname database-sql.kore29.com --listener localhost:3306
+
+```
+
+#### Para MongoDB (NoSQL)
+
+```bash
+cloudflared access tcp --hostname database-no-sql.kore29.com --listener localhost:27017
+
+```
+
+> **Nota:** Al ejecutar el comando, se abrirá una ventana en tu navegador. Inicia sesión con tu cuenta de **GitHub**. Una vez autorizado, la terminal mostrará `Ingress established`.
+
+### ⚙️ Configuración en Clientes de DB
+
+Una vez el túnel esté activo, configura tu cliente con estos parámetros:
+
+| Parámetro | Valor |
+| --- | --- |
+| **Host** | `127.0.0.1` |
+| **Puerto** | `27017` |
+| **Usuario** | *Proporcionado por el administrador* |
+| **Contraseña** | *Proporcionada por el administrador* |
+
+
+## 4. Roadmap y Tareas Pendientes
 
 Esta es una lista de tareas estructurales que **necesitamos abordar** para construir una base sólida para el proyecto.
 
