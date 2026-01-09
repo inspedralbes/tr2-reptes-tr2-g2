@@ -5,7 +5,6 @@ import { useRouter, usePathname, Href, Slot } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 
 // Definición de las pestañas de navegación
-// He eliminado 'Profile' de esta lista como pediste
 const TABS = [
   { name: 'Index', label: 'Inici', path: '/' },
   { name: 'Workshops', label: 'Tallers', path: '/workshops' },
@@ -57,7 +56,7 @@ export default function TabLayout() {
             })}
           </ScrollView>
 
-          {/* Icono de perfil a la derecha (Mantenido) */}
+          {/* Icono de perfil a la derecha */}
           <View className="px-4 bg-gray-100 h-full justify-center border-l border-gray-300">
             <TouchableOpacity 
               className="p-2"
