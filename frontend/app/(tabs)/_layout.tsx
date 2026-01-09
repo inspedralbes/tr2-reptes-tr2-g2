@@ -19,11 +19,14 @@ export default function TabLayout() {
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       
-      {/* Nav Bar */}
+      {/* Nav Bar container */}
       <View style={{ paddingTop: insets.top }} className="bg-gray-100 shadow-sm z-10">
         
-        {/* Contenedor Fila */}
-        <View className="flex-row items-center border-b border-gray-300">
+        {/* CORRECCIÓN 1: 
+           Quitamos 'items-center'. 
+           Ahora usa el defecto (stretch), por lo que el ScrollView y la vista del perfil tendrán la misma altura.
+        */}
+        <View className="flex-row border-b border-gray-300">
           
           <ScrollView
             className="flex-1" 
@@ -33,13 +36,14 @@ export default function TabLayout() {
           >
             {TABS.map((tab, index) => {
               const isActive = pathname === tab.path || (tab.path !== '/' && pathname.startsWith(tab.path));
-              const isLast = index === TABS.length - 1;
+              // const isLast = index === TABS.length - 1; // No se usa actualmente
 
               return (
                 <TouchableOpacity
                   key={tab.path}
                   onPress={() => router.push(tab.path as Href)}
                   activeOpacity={0.8}
+                  // La altura de la barra la define este padding (py-4)
                   className={`
                     px-5 py-4
                     border-r border-gray-300
@@ -59,9 +63,16 @@ export default function TabLayout() {
             })}
           </ScrollView>
 
-          <View className="border-l border-gray-300 bg-gray-100">
-            <TouchableOpacity className="p-4 items-center justify-center">
-              <FontAwesome name="search" size={18} color="#64748b" />
+          {/* CORRECCIÓN 2: 
+             Quitamos 'h-full'. El padre ya lo estira.
+             Mantenemos 'justify-center' para que el icono quede en el medio verticalmente.
+          */}
+          <View className="px-4 bg-gray-100 justify-center border-l border-gray-300">
+            <TouchableOpacity 
+              className="p-2"
+              onPress={() => router.push('/profile')}
+            >
+              <FontAwesome name="user-circle" size={20} color="#64748b" />
             </TouchableOpacity>
           </View>
         </View>
