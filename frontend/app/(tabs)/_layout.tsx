@@ -9,7 +9,6 @@ const TABS = [
   { name: 'Workshops', label: 'Tallers', path: '/workshops' },
   { name: 'Students', label: 'Alumnes', path: '/students' },
   { name: 'Calendar', label: 'Calendari', path: '/calendar' },
-  { name: 'Profile', label: "Perfil", path: '/profile' },
 ];
 
 export default function TabLayout() {
