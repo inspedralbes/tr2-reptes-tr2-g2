@@ -29,7 +29,7 @@ const UserRow = ({ item }: { item: User }) => (
     <View className="flex-row items-center border-b border-gray-100 py-4 px-2 hover:bg-gray-50 bg-white">
 
         {/* Imagen */}
-        <View className="w-16 items-center justify-center">
+        <View className="w-12 md:w-16 items-center justify-center">
             <Image
                 source={{ uri: item.imagen }}
                 className="h-10 w-10 rounded-full border border-gray-100"
@@ -37,25 +37,27 @@ const UserRow = ({ item }: { item: User }) => (
         </View>
 
         {/* Nombre y Apellido */}
-        <View className="flex-[1.5] px-2">
-            <Text className="font-semibold text-gray-900 text-[15px]">{item.apellido}, {item.nombre}</Text>
+        <View className="flex-[2] md:flex-[1.5] px-2">
+            <Text className="font-semibold text-gray-900 text-[14px] md:text-[15px]" numberOfLines={1}>
+                {item.apellido}, {item.nombre}
+            </Text>
         </View>
 
-        {/* Centro */}
-        <View className="flex-[1.5] px-2 hidden md:flex">
-            <Text className="text-gray-600 text-sm">{item.centro}</Text>
+        {/* Centro - Hidden on mobile */}
+        <View className="hidden md:flex flex-[1.5] px-2">
+            <Text className="text-gray-600 text-sm" numberOfLines={1}>{item.centro}</Text>
         </View>
 
-        {/* Contacto (Email/Tel) */}
-        <View className="flex-[1.5] px-2">
+        {/* Contacto (Email/Tel) - Hidden on mobile */}
+        <View className="hidden md:flex flex-[1.5] px-2">
             <Text className="text-gray-700 text-xs font-medium" numberOfLines={1}>{item.email}</Text>
             <Text className="text-gray-400 text-xs mt-0.5">{item.telefono}</Text>
         </View>
 
         {/* Estado */}
-        <View className="flex-1 px-2 items-start">
-            <View className={`px-2.5 py-1 rounded-full border ${getStatusColor(item.estado)}`}>
-                <Text className={`text-[11px] font-bold ${getStatusColor(item.estado).split(' ')[1]}`}>
+        <View className="flex-[1.5] md:flex-1 px-2 items-start">
+            <View className={`px-2 py-1 rounded-full border ${getStatusColor(item.estado)}`}>
+                <Text className={`text-[10px] md:text-[11px] font-bold ${getStatusColor(item.estado).split(' ')[1]}`} numberOfLines={1}>
                     {item.estado ? item.estado.toUpperCase() : 'DESCONOCIDO'}
                 </Text>
             </View>
@@ -65,27 +67,47 @@ const UserRow = ({ item }: { item: User }) => (
 
 const TableHeader = () => (
     <View className="flex-row items-center bg-gray-50 border-y border-gray-200 py-3 px-2">
-        <View className="w-16 items-center"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">IMG</Text></View>
-        <View className="flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">ALUMNO</Text></View>
-        <View className="flex-[1.5] px-2 hidden md:flex"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CENTRO</Text></View>
-        <View className="flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CONTACTO</Text></View>
-        <View className="flex-1 px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">ESTADO</Text></View>
+        <View className="w-12 md:w-16 items-center"><Text className="font-bold text-gray-400 text-[10px] md:text-[11px] tracking-wider">IMG</Text></View>
+        <View className="flex-[2] md:flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[10px] md:text-[11px] tracking-wider">ALUMNO</Text></View>
+        <View className="hidden md:flex flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CENTRO</Text></View>
+        <View className="hidden md:flex flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CONTACTO</Text></View>
+        <View className="flex-[1.5] md:flex-1 px-2"><Text className="font-bold text-gray-400 text-[10px] md:text-[11px] tracking-wider">ESTADO</Text></View>
     </View>
 );
 
 export default function ListadoUsuarios() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                // Ensure the URL matches your backend configuration
-                const response = await fetch('http://localhost:3000/api/alumnes');
+                // Use environment variable for API URL, fallback to localhost for web/dev
+                const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+                console.log('Fetching users from:', `${apiUrl}/api/alumnes`);
+
+                const response = await fetch(`${apiUrl}/api/alumnes`, {
+                    method: 'GET',
+                    headers: {
+                        'ngrok-skip-browser-warning': 'true',
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const data = await response.json();
-                setUsers(data);
+                console.log('Users fetched successfully:', data.length || data.alumnes?.length);
+                setUsers(Array.isArray(data) ? data : data.alumnes || []);
+                setError(null);
             } catch (error) {
                 console.error("Error fetching users:", error);
+                setError(error instanceof Error ? error.message : 'Error fetching users');
+                setUsers([]);
             } finally {
                 setLoading(false);
             }
@@ -96,14 +118,31 @@ export default function ListadoUsuarios() {
 
     if (loading) {
         return (
-            <View className="flex-1 justify-center items-center h-40">
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', height: 200 }}>
                 <ActivityIndicator size="large" color="#0000ff" />
+                <Text style={{ marginTop: 10, color: '#666' }}>Loading students...</Text>
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', height: 200, paddingHorizontal: 16 }}>
+                <Text style={{ color: '#ef4444', textAlign: 'center' }}>Error: {error}</Text>
+            </View>
+        );
+    }
+
+    if (!users || users.length === 0) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', height: 200 }}>
+                <Text style={{ color: '#999' }}>No students found</Text>
             </View>
         );
     }
 
     return (
-        <View className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mx-2 my-2">
+        <View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', marginVertical: 8 }}>
             <TableHeader />
             <FlatList
                 data={users}
