@@ -25,7 +25,7 @@ async function seed() {
         detalls_tecnics: {
           descripcio: "Exploració a través de la construcció d'un producte.",
           durada_hores: 20,
-          places_maximes: 16,
+          places_maximes: "2/16",
           ubicacio_defecte: "Tallers externs ciutat",
         },
         referents_assignats: [],
@@ -40,7 +40,7 @@ async function seed() {
           descripcio:
             "Formació específica sobre atenció al client i benestar personal.",
           durada_hores: 20,
-          places_maximes: 20,
+          places_maximes: "2/20",
           ubicacio_defecte: "Al propi centre",
         },
         referents_assignats: [],
@@ -55,7 +55,7 @@ async function seed() {
           descripcio:
             "Descoberta de perfils professionals vinculats a la sostenibilitat.",
           durada_hores: 30,
-          places_maximes: 16,
+          places_maximes: "5/15",
           ubicacio_defecte: "Institut de Sostenibilitat (ISMAB)",
         },
         referents_assignats: [],
