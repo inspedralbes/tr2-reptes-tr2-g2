@@ -1,7 +1,7 @@
 const { MongoClient } = require("mongodb");
 const path = require("path");
 
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
 
 const uri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.DB_HOST}:${process.env.MONGO_PORT}/?authSource=admin`;
 const client = new MongoClient(uri);
@@ -98,6 +98,61 @@ async function seed() {
     const colSolicituds = db.collection("solicituds");
     await colSolicituds.deleteMany({});
     console.log("Colección de Solicitudes limpiada.");
+
+    // --- 4. COLECCIÓN ALUMNES ---
+    const colAlumnes = db.collection("alumnes");
+    await colAlumnes.deleteMany({});
+
+    const alumnesData = [
+      {
+        nombre: 'Ana',
+        apellido: 'García',
+        centro: 'Institut Pedralbes',
+        email: 'ana.garcia@gmail.com',
+        telefono: '612 345 678',
+        imagen: 'https://i.pravatar.cc/150?u=ana',
+        estado: 'Aprobado',
+      },
+      {
+        nombre: 'Carlos',
+        apellido: 'López',
+        centro: 'Institut Tecnològic',
+        email: 'carlos.lopez@gmail.com',
+        telefono: '698 765 432',
+        imagen: 'https://i.pravatar.cc/150?u=carlos',
+        estado: 'En proceso',
+      },
+      {
+        nombre: 'Maria',
+        apellido: 'Rodriguez',
+        centro: 'Centre d\'Estudis',
+        email: 'maria.rod@gmail.com',
+        telefono: '655 443 322',
+        imagen: 'https://i.pravatar.cc/150?u=maria',
+        estado: 'Rechazado',
+      },
+      {
+        nombre: 'Javier',
+        apellido: 'Martínez',
+        centro: 'Escola Pia',
+        email: 'javi.martinez@gmail.com',
+        telefono: '666 777 888',
+        imagen: 'https://i.pravatar.cc/150?u=javier',
+        estado: 'Aprobado',
+      },
+      {
+        nombre: 'Lucía',
+        apellido: 'Fernández',
+        centro: 'Institut Pedralbes',
+        email: 'lucia.fer@gmail.com',
+        telefono: '611 222 333',
+        imagen: 'https://i.pravatar.cc/150?u=lucia',
+        estado: 'En proceso',
+      },
+    ];
+
+    await colAlumnes.insertMany(alumnesData);
+    console.log(`${alumnesData.length} Alumnos insertados.`);
   } catch (err) {
     console.error("Error en el seed:", err);
   } finally {

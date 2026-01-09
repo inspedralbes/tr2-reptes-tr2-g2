@@ -1,10 +1,11 @@
 const express = require('express');
+
 const router = express.Router();
 
+const alumneRoutes = require('./alumne.routes');
 const tallerRoutes = require('./taller.routes');
-// Import other route files here in the future
 
-router.use('/api', tallerRoutes);
-// Use other routes here
+router.use('/alumnes', alumneRoutes);
+router.use('/', tallerRoutes);
 
 module.exports = router;
