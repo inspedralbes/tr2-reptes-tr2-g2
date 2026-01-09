@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const tallerRoutes = require('./taller.routes');
-// Import other route files here in the future
+const authRoutes = require('./auth.routes'); // Importar authRoutes
 
 router.use('/api', tallerRoutes);
-// Use other routes here
+router.use('/api', authRoutes); // Usar authRoutes
 
 module.exports = router;

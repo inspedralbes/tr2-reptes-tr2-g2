@@ -8,6 +8,9 @@
     "scheme": "frontend",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "extra": {
+      "apiUrl": "${EXPO_PUBLIC_API_URL}"
+    },
     "ios": {
       "supportsTablet": true
     },
