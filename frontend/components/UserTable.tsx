@@ -3,7 +3,7 @@ import { View, Text, FlatList, Image, ScrollView } from 'react-native';
 
 // <-- CONFIGURACIÓN DE ANCHOS COLUMNA (Toca solo aquí para cambiar el tamaño usando multiplos de 4)
 const COLUMN_WIDTHS = {
-    foto: 'w-24',      // 96px
+    foto: 'w-28',      // 96px
     apellidos: 'w-60', // 240px
     nombre: 'w-44',    // 176px
     centro: 'w-72',    // 288px
