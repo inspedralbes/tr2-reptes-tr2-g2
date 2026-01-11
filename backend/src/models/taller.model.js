@@ -6,17 +6,19 @@ const Taller = {
     const db = getDb();
     return await db.collection('tallers').find().toArray();
   },
-create: async (taller) => {
+  create: async (taller) => {
     if (!taller.titol || taller.titol.trim() === '') {
-        throw new Error("El campo 'titol' es obligatorio");
+      throw new Error("El campo 'titol' es obligatorio");
     }
     if (!taller.modalitat) {
-        throw new Error("El campo 'modalitat' es obligatorio");
+      throw new Error("El campo 'modalitat' es obligatorio");
     }
 
     const db = getDb();
     const result = await db.collection('tallers').insertOne(taller);
-    return result;
+    // Después de insertar, buscamos el documento completo para devolverlo
+    const newTaller = await db.collection('tallers').findOne({ _id: result.insertedId });
+    return newTaller;
   },
 
   findById: async (id) => {

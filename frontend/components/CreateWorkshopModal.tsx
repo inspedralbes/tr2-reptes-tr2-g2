@@ -42,7 +42,7 @@ const CreateWorkshopModal = ({
     setLoading(true);
     setError(null);
 
-    const newWorkshopData = {
+    const newWorkshopData: Omit<Taller, '_id'> = {
       titol,
       sector,
       modalitat,
@@ -54,15 +54,15 @@ const CreateWorkshopModal = ({
         ubicacio_defecte: ubicacioDefecte,
       },
       dies_execucio: diesExecucio.split(",").map((d) => d.trim()),
+      referents_assignats: [], // Or undefined, but an empty array is safer
     };
 
     try {
-      // @ts-ignore
       const createdTaller = await tallerService.create(newWorkshopData);
       onWorkshopCreated(createdTaller);
       onClose();
-    } catch (err) {
-      setError("No se pudo crear el taller. Inténtalo de nuevo.");
+    } catch (err: any) {
+      setError(err.message || "No se pudo crear el taller. Inténtalo de nuevo.");
       console.error(err);
     } finally {
       setLoading(false);

@@ -42,13 +42,15 @@ export default function TallerScreen() {
   }, []);
 
   const filteredTalleres = useMemo(() => {
+    if (!searchQuery) {
+      return talleres;
+    }
     return talleres.filter((taller) =>
-      taller.titol.toLowerCase().includes(searchQuery.toLowerCase())
+      taller.titol?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [talleres, searchQuery]);
 
   const handleWorkshopCreated = (newWorkshop: Taller) => {
-    // @ts-ignore
     setTalleres((prev) => [newWorkshop, ...prev]);
   };
 
@@ -143,7 +145,6 @@ export default function TallerScreen() {
         <WorkshopDetail
           visible={!!selectedWorkshop}
           onClose={() => setSelectedWorkshop(null)}
-          // @ts-ignore
           selectedWorkshop={selectedWorkshop}
         />
       )}

@@ -33,6 +33,20 @@ const tallerService = {
       throw error;
     }
   },
+
+  /**
+   * Crea un nuevo taller en el backend.
+   */
+  create: async (tallerData: Omit<Taller, '_id'>): Promise<Taller> => {
+    try {
+      const response = await api.post<Taller>("/api/talleres", tallerData);
+      return response.data;
+    } catch (error: any) {
+      console.error("Error en tallerService.create:", error);
+      const errorMessage = error.response?.data?.message || "No se pudo crear el taller";
+      throw new Error(errorMessage);
+    }
+  },
 };
 
 export default tallerService;
