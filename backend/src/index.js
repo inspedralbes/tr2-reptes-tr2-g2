@@ -38,7 +38,7 @@ app.use('/api', routes);
 
 connectToDb((err) => {
   if (!err) {
-    app.listen(PORT, () => {
+    app.listen(process.env.PORT, () => {
       console.log(`🚀 Servidor: ${process.env.PORT}`);
       console.log(`🌍 Ambiente: ${process.env.NODE_ENV}`);
     });
