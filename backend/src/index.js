@@ -11,6 +11,8 @@ app.set('trust proxy', 1);
 const allowedOrigins = [
   'https://enginy.kore29.com',      // Tu Web en Producción (Cloudflare)
   'http://enginy.kore29.com',       // Por si acaso entra por HTTP
+  'https://enginy-api.kore29.com',  // Tu API en Producción (Cloudflare)
+  'http://enginy-api.kore29.com',   // Por si acaso entra por HTTP
   'http://localhost:8081',          // Tu entorno local (Expo Web)
   'http://localhost:8002',          // Tu Frontend Docker en local
   'http://192.168.1.39:8081'        // Tu IP local para pruebas
@@ -34,12 +36,10 @@ app.use(cors({
 app.use(express.json());
 app.use('/api', routes);
 
-const PORT = process.env.PORT;
-
 connectToDb((err) => {
   if (!err) {
     app.listen(PORT, () => {
-      console.log(`🚀 Servidor listo y escuchando en el puerto ${PORT}`);
+      console.log(`🚀 Servidor: ${process.env.PORT}`);
       console.log(`🌍 Ambiente: ${process.env.NODE_ENV}`);
     });
   } else {
