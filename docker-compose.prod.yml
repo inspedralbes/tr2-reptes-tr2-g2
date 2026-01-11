@@ -7,6 +7,8 @@ services:
     restart: always
     env_file:
       - .env.prod
+    environment:
+      - NODE_ENV=production
     networks:
       - enginy-network-prod
     ports:
@@ -19,6 +21,8 @@ services:
       dockerfile: Dockerfile.prod
     container_name: enginy_frontend_prod
     restart: always
+    environment:
+      - NODE_ENV=production
     ports:
       - "8002:80"
     networks:

@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 // Accedemos a la variable de entorno
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.NODE_ENV === 'production'
+  ? 'http://backend:3000'
+  : process.env.EXPO_PUBLIC_API_URL;
 
 const api = axios.create({
   baseURL: API_URL,

@@ -1,4 +1,8 @@
-require('dotenv').config();
+if (process.env.NODE_ENV === 'production') {
+  require('dotenv').config({ path: '.env.prod' });
+} else {
+  require('dotenv').config();
+}
 const express = require('express');
 const cors = require('cors');
 const { connectToDb } = require('./config/database');
@@ -9,7 +13,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: [process.env.EXPO_PUBLIC_API_URL, 'http://localhost:8081', 'http://localhost:19006'],
+  origin: [process.env.EXPO_PUBLIC_API_URL, 'http://localhost:8081', 'http://localhost:19006', 'http://localhost:8002', 'http://192.168.1.39:8002'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
 }));
