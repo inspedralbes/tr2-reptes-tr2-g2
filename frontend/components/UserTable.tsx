@@ -1,107 +1,131 @@
-import React from 'react';
-import { View, Text, FlatList, Image, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, Image, ActivityIndicator, ScrollView } from 'react-native';
+import alumneService, { Alumne } from '../services/alumneService';
 
-// <-- CONFIGURACIÓN DE ANCHOS COLUMNA (Toca solo aquí para cambiar el tamaño usando multiplos de 4)
-const COLUMN_WIDTHS = {
-    foto: 'w-28',      // 96px
-    apellidos: 'w-60', // 240px
-    nombre: 'w-44',    // 176px
-    centro: 'w-72',    // 288px
-    email: 'w-64',     // 256px 
-    estado: 'w-40',    // 160px
-};
-
-interface User {
-    id: string;
-    nombre: string;
-    apellido: string;
-    centro: string;
-    email: string;
-    imagen: string;
-    estado: 'Aprobado' | 'En proceso' | 'Rechazado';
-}
-
-const MOCK_USERS: User[] = [
-    { id: '1', nombre: 'Ana', apellido: 'García Melich', centro: 'Institut Pedralbes', email: 'ana.garcia@gmail.com', imagen: 'https://i.pravatar.cc/150?u=ana', estado: 'Aprobado' },
-    { id: '2', nombre: 'Carlos', apellido: 'López Quintana', centro: 'Institut Tecnològic', email: 'carlos.lopez@gmail.com', imagen: 'https://i.pravatar.cc/150?u=carlos', estado: 'En proceso' },
-    { id: '3', nombre: 'Maria', apellido: 'Rodriguez Soler', centro: 'Centre d\'Estudis', email: 'maria.rod@gmail.com', imagen: 'https://i.pravatar.cc/150?u=maria', estado: 'Rechazado' },
-    { id: '4', nombre: 'Javier', apellido: 'Martínez Ruiz', centro: 'Escola Pia', email: 'javi.martinez@gmail.com', imagen: 'https://i.pravatar.cc/150?u=javier', estado: 'Aprobado' },
-    { id: '5', nombre: 'Lucía', apellido: 'Fernández Samsó', centro: 'Institut Pedralbes', email: 'lucia.fer@gmail.com', imagen: 'https://i.pravatar.cc/150?u=lucia', estado: 'En proceso' },
-];
-
-const getStatusBadge = (estado: string) => {
+const getStatusColor = (estado: string) => {
     switch (estado) {
-        case 'Aprobado': return { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200' };
-        case 'En proceso': return { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' };
-        case 'Rechazado': return { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' };
-        default: return { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' };
+        case 'Aprobado':
+            return 'bg-green-100 text-green-800 border-green-200';
+        case 'En proceso':
+            return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        case 'Rechazado':
+            return 'bg-red-100 text-red-800 border-red-200';
+        default:
+            return 'bg-gray-100 text-gray-800 border-gray-200';
     }
 };
 
-const UserRow = ({ item }: { item: User }) => {
-    const status = getStatusBadge(item.estado);
-    return (
-        <View className="flex-row items-center border-b border-gray-200 bg-white">
-            <View className={`${COLUMN_WIDTHS.foto} items-center border-r border-gray-200 py-3`}>
-                <Image source={{ uri: item.imagen }} className="h-11 w-11 rounded-full border border-gray-200" />
-            </View>
-            <View className={`${COLUMN_WIDTHS.apellidos} px-4 border-r border-gray-200 h-full justify-center`}>
-                <Text className="text-gray-900 text-[14px]">{item.apellido}</Text>
-            </View>
-            <View className={`${COLUMN_WIDTHS.nombre} px-4 border-r border-gray-200 h-full justify-center`}>
-                <Text className="text-gray-700 text-[14px]">{item.nombre}</Text>
-            </View>
-            <View className={`${COLUMN_WIDTHS.centro} px-4 border-r border-gray-200 h-full justify-center`}>
-                <Text className="text-gray-800 text-[13px] font-bold italic">{item.centro}</Text>
-            </View>
-            <View className={`${COLUMN_WIDTHS.email} px-4 border-r border-gray-200 h-full justify-center`}>
-                <Text className="text-blue-600 text-[13px] font-medium" numberOfLines={1}>{item.email}</Text>
-            </View>
-            <View className={`${COLUMN_WIDTHS.estado} px-5 justify-center items-center`}>
-                <View className={`px-2 py-1.5 rounded border ${status.bg} ${status.border} w-full`}>
-                    <Text className={`text-[10px] font-bold uppercase text-center ${status.text}`}>{item.estado}</Text>
-                </View>
+const UserRow = ({ item }: { item: Alumne }) => (
+    <View className="flex-row items-center border-b border-gray-100 py-4 px-2 hover:bg-gray-50 bg-white" style={{ minWidth: 600 }}>
+
+        {/* Imagen */}
+        <View className="w-16 items-center justify-center">
+            <Image
+                source={{ uri: item.imagen }}
+                className="h-10 w-10 rounded-full border border-gray-100"
+            />
+        </View>
+
+        {/* Nombre y Apellido */}
+        <View className="flex-[1.5] px-2">
+            <Text className="font-semibold text-gray-900 text-[15px]" numberOfLines={1}>
+                {item.apellido}, {item.nombre}
+            </Text>
+        </View>
+
+        {/* Centro */}
+        <View className="flex-[1.5] px-2">
+            <Text className="text-gray-600 text-sm" numberOfLines={1}>{item.centro}</Text>
+        </View>
+
+        {/* Contacto (Email/Tel) */}
+        <View className="flex-[1.5] px-2">
+            <Text className="text-gray-700 text-xs font-medium" numberOfLines={1}>{item.email}</Text>
+            <Text className="text-gray-400 text-xs mt-0.5">{item.telefono}</Text>
+        </View>
+
+        {/* Estado */}
+        <View className="flex-1 px-2 items-start">
+            <View className={`px-2 py-1 rounded-full border ${getStatusColor(item.estado)}`}>
+                <Text className={`text-[11px] font-bold ${getStatusColor(item.estado).split(' ')[1]}`} numberOfLines={1}>
+                    {item.estado ? item.estado.toUpperCase() : 'DESCONOCIDO'}
+                </Text>
             </View>
         </View>
-    );
-};
+    </View>
+);
+
+const TableHeader = () => (
+    <View className="flex-row items-center bg-gray-50 border-y border-gray-200 py-3 px-2" style={{ minWidth: 600 }}>
+        <View className="w-16 items-center"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">IMG</Text></View>
+        <View className="flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">ALUMNO</Text></View>
+        <View className="flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CENTRO</Text></View>
+        <View className="flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CONTACTO</Text></View>
+        <View className="flex-1 px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">ESTADO</Text></View>
+    </View>
+);
 
 export default function UserTable() {
-    return (
-        <View className="flex-1 bg-white">
-            <ScrollView horizontal showsHorizontalScrollIndicator={true}>
-                <View>
-                    {/* HEADER */}
-                    <View className="flex-row bg-gray-100 border-b-2 border-gray-400">
-                        <View className={`${COLUMN_WIDTHS.foto} py-5 border-r border-gray-300 items-center`}>
-                            <Text className="text-[11px] font-black text-black uppercase">Foto</Text>
-                        </View>
-                        <View className={`${COLUMN_WIDTHS.apellidos} py-5 px-4 border-r border-gray-300`}>
-                            <Text className="text-[11px] font-black text-black uppercase">Apellidos</Text>
-                        </View>
-                        <View className={`${COLUMN_WIDTHS.nombre} py-5 px-4 border-r border-gray-300`}>
-                            <Text className="text-[11px] font-black text-black uppercase">Nombre</Text>
-                        </View>
-                        <View className={`${COLUMN_WIDTHS.centro} py-5 px-4 border-r border-gray-300`}>
-                            <Text className="text-[11px] font-black text-black uppercase">Centro</Text>
-                        </View>
-                        <View className={`${COLUMN_WIDTHS.email} py-5 px-4 border-r border-gray-300`}>
-                            <Text className="text-[11px] font-black text-black uppercase">Email</Text>
-                        </View>
-                        <View className={`${COLUMN_WIDTHS.estado} py-5 px-4 items-center`}>
-                            <Text className="text-[11px] font-black text-black uppercase">Estado</Text>
-                        </View>
-                    </View>
+    const [users, setUsers] = useState<Alumne[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-                    {/* LISTA */}
-                    <FlatList
-                        data={MOCK_USERS}
-                        renderItem={({ item }) => <UserRow item={item} />}
-                        keyExtractor={item => item.id}
-                        scrollEnabled={false}
-                    />
-                </View>
-            </ScrollView>
-        </View>
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const data = await alumneService.getAll();
+                setUsers(data);
+                setError(null);
+            } catch (error) {
+                console.error("Error fetching users:", error);
+                setError(error instanceof Error ? error.message : 'Error fetching users');
+                setUsers([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUsers();
+    }, []);
+
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', height: 200 }}>
+                <ActivityIndicator size="large" color="#0000ff" />
+                <Text style={{ marginTop: 10, color: '#666' }}>Loading students...</Text>
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', height: 200, paddingHorizontal: 16 }}>
+                <Text style={{ color: '#ef4444', textAlign: 'center' }}>Error: {error}</Text>
+            </View>
+        );
+    }
+
+    if (!users || users.length === 0) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', height: 200 }}>
+                <Text style={{ color: '#999' }}>No students found</Text>
+            </View>
+        );
+    }
+
+    return (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', marginVertical: 8 }}>
+                <TableHeader />
+                <FlatList
+                    data={users}
+                    renderItem={({ item }) => <UserRow item={item} />}
+                    keyExtractor={item => item._id}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                />
+            </View>
+        </ScrollView>
     );
 }
+
