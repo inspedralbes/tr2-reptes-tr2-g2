@@ -9,10 +9,9 @@ services:
       - .env.prod
     networks:
       - enginy-network-prod
-    # The backend is not exposed directly to the host.
-    # It will be accessible to the frontend via the docker network.
-    # The port mapping is removed for better security.
-    # The Cloudflare tunnel should point to the frontend service.
+    ports:
+      - "3000:3000" 
+
 
   frontend:
     build:
@@ -21,9 +20,7 @@ services:
     container_name: enginy_frontend_prod
     restart: always
     ports:
-      # Map port 80 of the container to port 80 on the host.
-      # Your Cloudflare tunnel should point to localhost:80.
-      - "80:80"
+      - "8002:80"
     networks:
       - enginy-network-prod
     depends_on:

@@ -16,7 +16,7 @@ RUN npm install
 COPY . .
 
 # Build the web application
-RUN npx expo export:web
+RUN npx expo export -p web
 
 # Stage 2: Server
 FROM nginx:1.25-alpine

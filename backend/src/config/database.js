@@ -1,8 +1,17 @@
 const {MongoClient} = require("mongodb");
 
-const uri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.DB_HOST}:${process.env.MONGO_PORT}/?authSource=admin`;
+const { DB_HOST, MONGO_PORT, MONGO_INITDB_DATABASE, MONGO_INITDB_ROOT_USERNAME, MONGO_INITDB_ROOT_PASSWORD } = process.env;
 
-const client = new MongoClient(uri);
+let mongoUrl;
+
+if (MONGO_INITDB_ROOT_USERNAME && MONGO_INITDB_ROOT_PASSWORD) {
+  mongoUrl = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${DB_HOST}:${MONGO_PORT}/${MONGO_INITDB_DATABASE}?authSource=admin`;
+} else {
+  mongoUrl = `mongodb://${DB_HOST}:${MONGO_PORT}/${MONGO_INITDB_DATABASE}`;
+}
+
+// ... usar mongoUrl para conectar ...
+const client = new MongoClient(mongoUrl);
 let dbConnection;
 
 module.exports = {

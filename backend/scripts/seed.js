@@ -3,18 +3,43 @@ const path = require("path");
 
 require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
 
-const uri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.DB_HOST}:${process.env.MONGO_PORT}/?authSource=admin`;
+const { 
+  DB_HOST, 
+  MONGO_PORT, 
+  MONGO_INITDB_DATABASE, 
+  MONGO_INITDB_ROOT_USERNAME, 
+  MONGO_INITDB_ROOT_PASSWORD 
+} = process.env;
+
+let uri;
+
+// Lógica para decidir si usamos contraseña o no
+if (MONGO_INITDB_ROOT_USERNAME && MONGO_INITDB_ROOT_PASSWORD) {
+  // Caso CON autenticación
+  uri = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${DB_HOST}:${MONGO_PORT}/${MONGO_INITDB_DATABASE}?authSource=admin`;
+} else {
+  // Caso SIN autenticación (Tu caso actual)
+  const host = DB_HOST; 
+  const port = MONGO_PORT;
+  const dbName = MONGO_INITDB_DATABASE;
+  
+  uri = `mongodb://${host}:${port}/${dbName}`;
+}
+
 const client = new MongoClient(uri);
 
 async function seed() {
   try {
-    console.log("🌱 %% Iniciando proceso de Seed...");
+    console.log(`🌱 %% Iniciando seed en: ${DB_HOST}:${MONGO_PORT}`);
+    
     await client.connect();
-    const db = client.db(process.env.MONGO_INITDB_DATABASE);
+    console.log("✅ Conectado a MongoDB");
+
+    const db = client.db(MONGO_INITDB_DATABASE);
 
     // --- 1. COLECCIÓN TALLERS ---
     const colTallers = db.collection("tallers");
-    await colTallers.deleteMany({});
+    await colTallers.deleteMany({}); // Limpiar antes de insertar
 
     const tallersData = [
       {
@@ -64,7 +89,7 @@ async function seed() {
     ];
 
     await colTallers.insertMany(tallersData);
-    console.log(`${tallersData.length} Talleres insertados.`);
+    console.log(`📚 ${tallersData.length} Talleres insertados.`);
 
     // --- 2. COLECCIÓN CENTRES ---
     const colCentres = db.collection("centres");
@@ -92,7 +117,7 @@ async function seed() {
     ];
 
     await colCentres.insertMany(centresData);
-    console.log(`${centresData.length} Centros insertados.`);
+    console.log(`🏫 ${centresData.length} Centros insertados.`);
 
     // --- 3. COLECCIÓN SOLICITUDS ---
     const colSolicituds = db.collection("solicituds");
@@ -190,10 +215,10 @@ async function seed() {
     await colAlumnes.insertMany(alumnesData);
     console.log(`${alumnesData.length} Alumnos insertados.`);
   } catch (err) {
-    console.error("Error en el seed:", err);
+    console.error("❌ Error en el seed:", err);
   } finally {
     await client.close();
-    console.log("Conexión cerrada.");
+    console.log("👋 Conexión cerrada.");
     process.exit(0);
   }
 }
