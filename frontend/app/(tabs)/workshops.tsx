@@ -2,7 +2,6 @@ import {
   View,
   Text,
   FlatList,
-  TouchableOpacity,
   ActivityIndicator,
   Platform,
   ScrollView,
@@ -10,10 +9,12 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import WorkshopDetail from "../../components/WorkshopDetail";
 import WorkshopCard from "../../components/WorkshopCard";
 import tallerService, { Taller } from "../../services/tallerService";
+import WorkshopActions from "../../components/WorkshopActions";
+import CreateWorkshopModal from "../../components/CreateWorkshopModal";
 
 export default function TallerScreen() {
   const [selectedWorkshop, setSelectedWorkshop] = useState<Taller | null>(null);
@@ -21,34 +22,41 @@ export default function TallerScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const insets = useSafeAreaInsets();
-
-  const fetchTalleres = useCallback(async (isRefresh = false) => {
-    try {
-      if (!isRefresh) setLoading(true);
-      setError(null);
-      const listaTalleres = await tallerService.getAll();
-      setTalleres(listaTalleres);
-    } catch (err) {
-      setError("No se pudieron cargar los talleres.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isCreateModalVisible, setCreateModalVisible] = useState(false);
 
   useEffect(() => {
-    fetchTalleres(false);
-  }, [fetchTalleres]);
+    const fetchTalleres = async () => {
+      try {
+        setLoading(true);
+        const listaTalleres = await tallerService.getAll();
+        setTalleres(listaTalleres);
+        setError(null);
+      } catch (err) {
+        setError("No se pudieron cargar los talleres.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    fetchTalleres(true);
-  }, [fetchTalleres]);
+    fetchTalleres();
+  }, []);
 
-  if (loading && !refreshing) {
+  const filteredTalleres = useMemo(() => {
+    if (!searchQuery) {
+      return talleres;
+    }
+    return talleres.filter((taller) =>
+      taller.titol?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [talleres, searchQuery]);
+
+  const handleWorkshopCreated = (newWorkshop: Taller) => {
+    setTalleres((prev) => [newWorkshop, ...prev]);
+  };
+
+  if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-gray-50">
         <ActivityIndicator size="large" color="#003B5C" />
@@ -58,28 +66,9 @@ export default function TallerScreen() {
   }
 
   const renderContent = () => {
-    // WEB
-    if (Platform.OS === 'web') {
-      return (
-        <ScrollView contentContainerClassName="p-6">
-          <View className="flex-row flex-wrap -mx-4">
-            {talleres?.map((taller) => (
-              <View key={taller._id} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-4 mb-8">
-                <WorkshopCard
-                  item={taller}
-                  onPress={() => setSelectedWorkshop(taller)}
-                />
-              </View>
-            ))}
-          </View>
-        </ScrollView>
-      );
-    }
-
-    // MÓVIL
-    return (
+    const content = (
       <FlatList
-        data={talleres}
+        data={filteredTalleres}
         keyExtractor={(item) => item._id || Math.random().toString()}
         contentContainerClassName="px-5 pb-24"
         contentContainerStyle={{ paddingTop: insets.top + 20 }}
@@ -93,13 +82,14 @@ export default function TallerScreen() {
           />
         }
         ListEmptyComponent={
-          (!loading && !error) ? (
-            <View className="mt-20 items-center px-10">
-              <Text className="text-slate-400 text-lg text-center font-medium">
-                No hay talleres disponibles en este momento.
-              </Text>
-            </View>
-          ) : null
+          <View className="mt-10 items-center">
+            <Text className="text-slate-400 text-lg">
+              No hay talleres para mostrar
+            </Text>
+            <Text className="text-slate-300 text-sm">
+              Prueba a cambiar la búsqueda o los filtros
+            </Text>
+          </View>
         }
         renderItem={({ item }) => (
           <WorkshopCard
@@ -109,35 +99,62 @@ export default function TallerScreen() {
         )}
       />
     );
+
+    if (Platform.OS === "web") {
+      return (
+        <ScrollView contentContainerClassName="p-4">
+          <View className="flex-row flex-wrap -mx-2">
+            {filteredTalleres.map((taller) => (
+              <View
+                key={taller._id}
+                className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 mb-4"
+              >
+                <WorkshopCard
+                  item={taller}
+                  onPress={() => setSelectedWorkshop(taller)}
+                />
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      );
+    }
+
+    return content;
   };
 
   return (
     <View className="flex-1 bg-gray-50">
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View className="flex-1">
-        {error ? (
-          <View className="flex-1 justify-center items-center p-6">
-            <Text className="text-red-500 text-center text-lg mb-4 font-bold">Ocurrió un error</Text>
-            <Text className="text-slate-600 text-center mb-6">{error}</Text>
-            <TouchableOpacity onPress={() => fetchTalleres(false)} className="bg-[#003B5C] px-6 py-3 rounded-full">
-                <Text className="text-white font-bold">Reintentar</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          renderContent()
-        )}
+      <View className="flex-1 px-4">
+        <Text className="text-[#003B5C] text-2xl font-bold text-center mb-6 mt-2">
+          Tallers Disponibles
+        </Text>
+
+        <WorkshopActions
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onFilterPress={() => console.log("Filter pressed")}
+          onCreatePress={() => setCreateModalVisible(true)}
+        />
+
+        {renderContent()}
       </View>
 
-      {/* Modal de Detalle */}
       {selectedWorkshop && (
         <WorkshopDetail
           visible={!!selectedWorkshop}
           onClose={() => setSelectedWorkshop(null)}
-          // @ts-ignore
           selectedWorkshop={selectedWorkshop}
         />
       )}
-    </View>
+
+      <CreateWorkshopModal
+        visible={isCreateModalVisible}
+        onClose={() => setCreateModalVisible(false)}
+        onWorkshopCreated={handleWorkshopCreated}
+      />
+    </SafeAreaView>
   );
 }

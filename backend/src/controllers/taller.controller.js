@@ -15,7 +15,7 @@ const tallerController = {
       const newTaller = await Taller.create(req.body);
       res.status(201).json(newTaller);
     } catch (error) {
-      res.status(500).json({ error: "Error al crear taller" });
+      res.status(500).json({ error: "Error al crear taller", message: error.message });
     }
   },
 
