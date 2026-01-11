@@ -149,6 +149,42 @@ async function seed() {
         imagen: 'https://i.pravatar.cc/150?u=lucia',
         estado: 'En proceso',
       },
+      {
+        nombre: 'David',
+        apellido: 'Sánchez',
+        centro: 'Institut Tecnològic',
+        email: 'david.sanchez@gmail.com',
+        telefono: '633 444 555',
+        imagen: 'https://i.pravatar.cc/150?u=david',
+        estado: 'Aprobado',
+      },
+      {
+        nombre: 'Sara',
+        apellido: 'Gómez',
+        centro: 'Centre d\'Estudis',
+        email: 'sara.gomez@gmail.com',
+        telefono: '644 555 666',
+        imagen: 'https://i.pravatar.cc/150?u=sara',
+        estado: 'Rechazado',
+      },
+      {
+        nombre: 'Pablo',
+        apellido: 'Jiménez',
+        centro: 'Escola Pia',
+        email: 'pablo.jimenez@gmail.com',
+        telefono: '677 888 999',
+        imagen: 'https://i.pravatar.cc/150?u=pablo',
+        estado: 'Aprobado',
+      },
+      {
+        nombre: 'Laura',
+        apellido: 'Ruiz',
+        centro: 'Institut Pedralbes',
+        email: 'laura.ruiz@gmail.com',
+        telefono: '688 999 000',
+        imagen: 'https://i.pravatar.cc/150?u=laura',
+        estado: 'En proceso',
+      },
     ];
 
     await colAlumnes.insertMany(alumnesData);

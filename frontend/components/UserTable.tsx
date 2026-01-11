@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, ActivityIndicator } from 'react-native';
-
-interface User {
-    _id: string; // MongoDB uses _id
-    nombre: string;
-    apellido: string;
-    centro: string;
-    email: string;
-    telefono: string;
-    imagen: string;
-    estado: 'Aprobado' | 'En proceso' | 'Rechazado';
-}
+import { View, Text, FlatList, Image, ActivityIndicator, ScrollView } from 'react-native';
+import alumneService, { Alumne } from '../services/alumneService';
 
 const getStatusColor = (estado: string) => {
     switch (estado) {
@@ -25,11 +15,11 @@ const getStatusColor = (estado: string) => {
     }
 };
 
-const UserRow = ({ item }: { item: User }) => (
-    <View className="flex-row items-center border-b border-gray-100 py-4 px-2 hover:bg-gray-50 bg-white">
+const UserRow = ({ item }: { item: Alumne }) => (
+    <View className="flex-row items-center border-b border-gray-100 py-4 px-2 hover:bg-gray-50 bg-white" style={{ minWidth: 600 }}>
 
         {/* Imagen */}
-        <View className="w-12 md:w-16 items-center justify-center">
+        <View className="w-16 items-center justify-center">
             <Image
                 source={{ uri: item.imagen }}
                 className="h-10 w-10 rounded-full border border-gray-100"
@@ -37,27 +27,27 @@ const UserRow = ({ item }: { item: User }) => (
         </View>
 
         {/* Nombre y Apellido */}
-        <View className="flex-[2] md:flex-[1.5] px-2">
-            <Text className="font-semibold text-gray-900 text-[14px] md:text-[15px]" numberOfLines={1}>
+        <View className="flex-[1.5] px-2">
+            <Text className="font-semibold text-gray-900 text-[15px]" numberOfLines={1}>
                 {item.apellido}, {item.nombre}
             </Text>
         </View>
 
-        {/* Centro - Hidden on mobile */}
-        <View className="hidden md:flex flex-[1.5] px-2">
+        {/* Centro */}
+        <View className="flex-[1.5] px-2">
             <Text className="text-gray-600 text-sm" numberOfLines={1}>{item.centro}</Text>
         </View>
 
-        {/* Contacto (Email/Tel) - Hidden on mobile */}
-        <View className="hidden md:flex flex-[1.5] px-2">
+        {/* Contacto (Email/Tel) */}
+        <View className="flex-[1.5] px-2">
             <Text className="text-gray-700 text-xs font-medium" numberOfLines={1}>{item.email}</Text>
             <Text className="text-gray-400 text-xs mt-0.5">{item.telefono}</Text>
         </View>
 
         {/* Estado */}
-        <View className="flex-[1.5] md:flex-1 px-2 items-start">
+        <View className="flex-1 px-2 items-start">
             <View className={`px-2 py-1 rounded-full border ${getStatusColor(item.estado)}`}>
-                <Text className={`text-[10px] md:text-[11px] font-bold ${getStatusColor(item.estado).split(' ')[1]}`} numberOfLines={1}>
+                <Text className={`text-[11px] font-bold ${getStatusColor(item.estado).split(' ')[1]}`} numberOfLines={1}>
                     {item.estado ? item.estado.toUpperCase() : 'DESCONOCIDO'}
                 </Text>
             </View>
@@ -66,43 +56,25 @@ const UserRow = ({ item }: { item: User }) => (
 );
 
 const TableHeader = () => (
-    <View className="flex-row items-center bg-gray-50 border-y border-gray-200 py-3 px-2">
-        <View className="w-12 md:w-16 items-center"><Text className="font-bold text-gray-400 text-[10px] md:text-[11px] tracking-wider">IMG</Text></View>
-        <View className="flex-[2] md:flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[10px] md:text-[11px] tracking-wider">ALUMNO</Text></View>
-        <View className="hidden md:flex flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CENTRO</Text></View>
-        <View className="hidden md:flex flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CONTACTO</Text></View>
-        <View className="flex-[1.5] md:flex-1 px-2"><Text className="font-bold text-gray-400 text-[10px] md:text-[11px] tracking-wider">ESTADO</Text></View>
+    <View className="flex-row items-center bg-gray-50 border-y border-gray-200 py-3 px-2" style={{ minWidth: 600 }}>
+        <View className="w-16 items-center"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">IMG</Text></View>
+        <View className="flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">ALUMNO</Text></View>
+        <View className="flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CENTRO</Text></View>
+        <View className="flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CONTACTO</Text></View>
+        <View className="flex-1 px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">ESTADO</Text></View>
     </View>
 );
 
-export default function ListadoUsuarios() {
-    const [users, setUsers] = useState<User[]>([]);
+export default function UserTable() {
+    const [users, setUsers] = useState<Alumne[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                // Use environment variable for API URL, fallback to localhost for web/dev
-                const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
-                console.log('Fetching users from:', `${apiUrl}/api/alumnes`);
-
-                const response = await fetch(`${apiUrl}/api/alumnes`, {
-                    method: 'GET',
-                    headers: {
-                        'ngrok-skip-browser-warning': 'true',
-                        'Content-Type': 'application/json',
-                    }
-                });
-                
-                console.log('Response status:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                console.log('Users fetched successfully:', data.length || data.alumnes?.length);
-                setUsers(Array.isArray(data) ? data : data.alumnes || []);
+                const data = await alumneService.getAll();
+                setUsers(data);
                 setError(null);
             } catch (error) {
                 console.error("Error fetching users:", error);
@@ -142,15 +114,18 @@ export default function ListadoUsuarios() {
     }
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', marginVertical: 8 }}>
-            <TableHeader />
-            <FlatList
-                data={users}
-                renderItem={({ item }) => <UserRow item={item} />}
-                keyExtractor={item => item._id}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 20 }}
-            />
-        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', marginVertical: 8 }}>
+                <TableHeader />
+                <FlatList
+                    data={users}
+                    renderItem={({ item }) => <UserRow item={item} />}
+                    keyExtractor={item => item._id}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                />
+            </View>
+        </ScrollView>
     );
 }
+

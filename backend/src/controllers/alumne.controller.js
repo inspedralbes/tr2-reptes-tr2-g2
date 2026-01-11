@@ -1,14 +1,14 @@
 const Alumne = require('../models/alumne.model');
 
-const getAllAlumnes = async (req, res) => {
+const alumneController = {
+  getAllAlumnes: async (req, res) => {
     try {
-        const alumnes = await Alumne.findAll();
-        res.status(200).json(alumnes);
+      const alumnes = await Alumne.findAll();
+      res.status(200).json({ alumnes });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+      res.status(500).json({ error: "Error al buscar alumnes" });
     }
+  },
 };
 
-module.exports = {
-    getAllAlumnes
-};
+module.exports = alumneController;

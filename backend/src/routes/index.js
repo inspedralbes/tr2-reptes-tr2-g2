@@ -6,6 +6,6 @@ const alumneRoutes = require('./alumne.routes');
 const tallerRoutes = require('./taller.routes');
 
 router.use('/alumnes', alumneRoutes);
-router.use('/', tallerRoutes);
+router.use('/talleres', tallerRoutes);
 
 module.exports = router;
