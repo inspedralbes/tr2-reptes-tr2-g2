@@ -114,3 +114,6 @@ Esta es una lista de tareas estructurales que **necesitamos abordar** para const
 
 -   [ ] **Configurar un pipeline de Integración Continua (CI)** en GitHub Actions o GitLab CI. Esto debería correr los linters y tests en cada push a `develop`.
 -   [ ] Preparar la configuración para el **Despliegue Continuo (CD)** a un entorno de staging o producción.
+
+
+docker compose -f docker-compose.prod.yml exec backend npm run seed
