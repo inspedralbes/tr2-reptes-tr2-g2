@@ -1,7 +1,7 @@
 const { MongoClient } = require("mongodb");
 const path = require("path");
 
-require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
+require("dotenv").config({ path: path.resolve(__dirname, "../../.env.prod") });
 
 const { 
   DB_HOST, 

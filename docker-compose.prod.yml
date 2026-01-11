@@ -12,15 +12,16 @@ services:
     networks:
       - enginy-network-prod
     ports:
-      - "3000:3000" 
-
+      - "3000:3000"
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
+      context: . 
+      dockerfile: frontend/Dockerfile.prod 
     container_name: enginy_frontend_prod
     restart: always
+    env_file:
+      - .env.prod
     environment:
       - NODE_ENV=production
     ports:

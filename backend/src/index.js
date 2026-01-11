@@ -1,33 +1,49 @@
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
+require('dotenv').config(); 
+
 const express = require('express');
 const cors = require('cors');
 const { connectToDb } = require('./config/database');
 const routes = require('./routes');
 
-// Initialize the app
 const app = express();
+app.set('trust proxy', 1);
 
-// Middleware
+const allowedOrigins = [
+  'https://enginy.kore29.com',      // Tu Web en Producción (Cloudflare)
+  'http://enginy.kore29.com',       // Por si acaso entra por HTTP
+  'http://localhost:8081',          // Tu entorno local (Expo Web)
+  'http://localhost:8002',          // Tu Frontend Docker en local
+  'http://192.168.1.39:8081'        // Tu IP local para pruebas
+];
+
 app.use(cors({
-  origin: [process.env.EXPO_PUBLIC_API_URL, 'http://localhost:8081', 'http://localhost:19006', 'http://localhost:8002', 'http://192.168.1.39:8002'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'La política CORS no permite acceso desde este origen.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
+  credentials: true 
 }));
-app.use(express.json());
 
-// Mount the routes
+app.use(express.json());
 app.use('/api', routes);
 
 const PORT = process.env.PORT;
+
 connectToDb((err) => {
   if (!err) {
     app.listen(PORT, () => {
-      console.log(`Servidor escuchando en el puerto ${PORT}`);
+      console.log(`🚀 Servidor listo y escuchando en el puerto ${PORT}`);
+      console.log(`🌍 Ambiente: ${process.env.NODE_ENV}`);
     });
   } else {
-    console.log('No se pudo iniciar el servidor por error en DB', err);
+    console.error('❌ Error fatal: No se pudo conectar a la base de datos', err);
     process.exit(1);
   }
 });
