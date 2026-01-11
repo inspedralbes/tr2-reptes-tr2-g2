@@ -7,9 +7,9 @@ import {
   ScrollView,
   RefreshControl,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import WorkshopDetail from "../../components/WorkshopDetail";
 import WorkshopCard from "../../components/WorkshopCard";
 import tallerService, { Taller } from "../../services/tallerService";
@@ -25,23 +25,29 @@ export default function TallerScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateModalVisible, setCreateModalVisible] = useState(false);
 
-  useEffect(() => {
-    const fetchTalleres = async () => {
-      try {
-        setLoading(true);
-        const listaTalleres = await tallerService.getAll();
-        setTalleres(listaTalleres);
-        setError(null);
-      } catch (err) {
-        setError("No se pudieron cargar los talleres.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const insets = useSafeAreaInsets();
 
-    fetchTalleres();
+  const fetchTalleres = useCallback(async () => {
+    try {
+      const listaTalleres = await tallerService.getAll();
+      setTalleres(listaTalleres);
+      setError(null);
+    } catch (err) {
+      setError("No se pudieron cargar los talleres.");
+      console.error(err);
+    }
   }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchTalleres().finally(() => setLoading(false));
+  }, [fetchTalleres]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchTalleres();
+    setRefreshing(false);
+  }, [fetchTalleres]);
 
   const filteredTalleres = useMemo(() => {
     if (!searchQuery) {
@@ -74,12 +80,14 @@ export default function TallerScreen() {
         contentContainerStyle={{ paddingTop: insets.top + 20 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
-            onRefresh={onRefresh} 
-            tintColor="#003B5C" 
-            progressViewOffset={insets.top}
-          />
+          Platform.OS !== "web" ? (
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#003B5C"
+              progressViewOffset={insets.top}
+            />
+          ) : undefined
         }
         ListEmptyComponent={
           <View className="mt-10 items-center">
@@ -124,7 +132,7 @@ export default function TallerScreen() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-gray-50">
       <Stack.Screen options={{ headerShown: false }} />
 
       <View className="flex-1 px-4">
