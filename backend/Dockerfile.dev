@@ -2,12 +2,12 @@ FROM node:22-alpine
 
 WORKDIR /usr/src/app
 
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
-RUN npm install --frozen-lockfile
+RUN npm install
 
 COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "dev"]
+CMD ["npm", "run", "dev"]
