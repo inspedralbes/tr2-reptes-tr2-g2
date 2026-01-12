@@ -3,13 +3,14 @@ import { View, Text, TextInput, Pressable, ActivityIndicator } from 'react-nativ
 import { useAuth } from '../../context/AuthContext';
 import { Stack, router } from 'expo-router';
 
-export default function LoginScreen() {
+export default function RegisterScreen() {
+  const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
   const [notificationType, setNotificationType] = useState<'success' | 'error' | null>(null);
-  const { login } = useAuth();
+  const { register } = useAuth();
 
   useEffect(() => {
     if (notificationMessage) {
@@ -26,40 +27,47 @@ export default function LoginScreen() {
     setNotificationType(type);
   };
 
-  const handleLogin = async () => {
-    if (!email || !password) {
+  const handleRegister = async () => {
+    if (!nombre || !email || !password) {
       showNotification('Por favor completa todos los campos', 'error');
+      return;
+    }
+
+    if (!email.includes('@')) {
+      showNotification('El formato del email no es válido. Debe contener un "@".', 'error');
       return;
     }
 
     setLoading(true);
     try {
-      const result = await login(email, password);
+      const result = await register(nombre, email, password);
       setLoading(false);
 
       if (result.success) {
-        // Login successful, redirect to main app (tabs)
-        router.replace('/(tabs)');
+        showNotification('Tu cuenta ha sido creada. Redirigiendo a iniciar sesión...', 'success');
+        setTimeout(() => {
+          router.replace('/(auth)/login');
+        }, 1500); // Redirect after a short delay
       } else {
         // Handle specific errors from the backend
-        if (result.error && result.error.includes('Profesor no encontrado')) {
-          showNotification('Usuario no encontrado.', 'error');
-        } else if (result.error && result.error.includes('Credenciales inválidas')) {
-          showNotification('Contraseña incorrecta.', 'error');
+        if (result.error && result.error.includes('contraseña')) {
+          showNotification(result.error, 'error');
+        } else if (result.error && result.error.includes('usuario ya existe')) {
+          showNotification('Este correo electrónico ya está en uso.', 'error');
         } else {
-          showNotification(result.error || 'Credenciales inválidas. Inténtalo de nuevo.', 'error');
+          showNotification(result.error || 'No se pudo crear la cuenta.', 'error');
         }
       }
     } catch (error: any) {
       setLoading(false);
-      showNotification(error.message || 'Ocurrió un error inesperado durante el inicio de sesión.', 'error');
+      showNotification(error.message || 'Ocurrió un error inesperado.', 'error');
     }
   };
 
   return (
     <View className="flex-1 items-center justify-center p-4 bg-white dark:bg-gray-900">
       <Stack.Screen options={{ headerShown: false }} />
-      <Text className="text-3xl font-bold text-gray-800 dark:text-white mb-6">Iniciar Sesión</Text>
+      <Text className="text-3xl font-bold text-gray-800 dark:text-white mb-6">Crear Cuenta</Text>
 
       {notificationMessage && (
         <View
@@ -71,6 +79,15 @@ export default function LoginScreen() {
           </Text>
         </View>
       )}
+
+      <TextInput
+        className="w-full max-w-sm p-3 mb-4 border border-gray-300 rounded-lg text-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+        placeholder="Nombre"
+        placeholderTextColor="#9ca3af"
+        value={nombre}
+        onChangeText={setNombre}
+        autoCapitalize="words"
+      />
 
       <TextInput
         className="w-full max-w-sm p-3 mb-4 border border-gray-300 rounded-lg text-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
@@ -93,19 +110,19 @@ export default function LoginScreen() {
 
       <Pressable
         className="w-full max-w-sm p-3 bg-blue-600 rounded-lg flex-row items-center justify-center disabled:opacity-50 mb-4"
-        onPress={handleLogin}
+        onPress={handleRegister}
         disabled={loading}
       >
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text className="text-white text-xl font-semibold">Entrar</Text>
+          <Text className="text-white text-xl font-semibold">Registrarse</Text>
         )}
       </Pressable>
 
-      <Pressable onPress={() => router.push('/(auth)/register')}>
+      <Pressable onPress={() => router.push('/(auth)/login')}>
         <Text className="text-blue-600 text-base dark:text-blue-400">
-          ¿No tienes cuenta? Regístrate
+          ¿Ya tienes cuenta? Inicia sesión
         </Text>
       </Pressable>
     </View>

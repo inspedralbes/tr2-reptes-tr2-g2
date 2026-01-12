@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native'; // <--- IMPORTANTE: Importar Platform
-import { login as apiLogin } from '../services/authService';
+import { login as apiLogin, register as apiRegister } from '../services/authService';
 
 interface AuthState {
   token: string | null;
@@ -12,6 +12,7 @@ interface AuthState {
 interface AuthContextType {
   authState: AuthState;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (nombre: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -93,7 +94,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error: any) {
       console.error('Login error:', error);
-      return { success: false, error: error.message || 'Login failed' };
+      const errorMessage = error.response?.data?.error || error.message || 'Login failed';
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  const register = async (nombre: string, email: string, password: string) => {
+    try {
+      const response = await apiRegister(nombre, email, password);
+      if (response.token) {
+        await saveToken(response.token); 
+        
+        setAuthState({
+          token: response.token,
+          authenticated: true,
+          user: null, 
+        });
+        return { success: true };
+      } else {
+        return { success: false, error: response.error || 'Registration failed' };
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      const errorMessage = error.response?.data?.error || error.message || 'Registration failed';
+      return { success: false, error: errorMessage };
     }
   };
 
@@ -111,7 +135,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ authState, login, logout }}>
+    <AuthContext.Provider value={{ authState, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
