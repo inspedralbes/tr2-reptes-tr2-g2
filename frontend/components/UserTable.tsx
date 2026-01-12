@@ -44,6 +44,21 @@ const UserRow = ({ item }: { item: Alumne }) => (
             <Text className="text-gray-400 text-xs mt-0.5">{item.telefono}</Text>
         </View>
 
+        {/*Talleres*/}
+        <View className="flex-[2] px-2 flex-row flex-wrap gap-1">
+            {item.talleres && item.talleres.length > 0 ? (
+                item.talleres.map((taller, index) => (
+                    <View key={index} className="bg-blue-50 border border-blue-100 px-2 py-0.5 rounded">
+                        <Text className="text-blue-700 text-[10px] font-medium uppercase">
+                            {taller}
+                        </Text>
+                    </View>
+                ))
+            ) : (
+                <Text className="text-gray-300 text-[10px] italic ">Sin talleres</Text>
+            )}
+        </View>
+
         {/* Estado */}
         <View className="flex-1 px-2 items-start">
             <View className={`px-2 py-1 rounded-full border ${getStatusColor(item.estado)}`}>
@@ -56,11 +71,12 @@ const UserRow = ({ item }: { item: Alumne }) => (
 );
 
 const TableHeader = () => (
-    <View className="flex-row items-center bg-gray-50 border-y border-gray-200 py-3 px-2" style={{ minWidth: 600 }}>
+    <View className="flex-row items-center bg-gray-50 border-y border-gray-200 py-3 px-2" style={{ minWidth: 800 }}>
         <View className="w-16 items-center"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">IMG</Text></View>
         <View className="flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">ALUMNO</Text></View>
         <View className="flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CENTRO</Text></View>
         <View className="flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CONTACTO</Text></View>
+        <View className="flex-[2] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">TALLERES</Text></View>
         <View className="flex-1 px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">ESTADO</Text></View>
     </View>
 );

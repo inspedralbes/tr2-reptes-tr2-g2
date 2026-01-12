@@ -8,6 +8,7 @@ export interface Alumne {
   email: string;
   telefono: string;
   imagen: string;
+  talleres: string[];
   estado: string;
 }
 
