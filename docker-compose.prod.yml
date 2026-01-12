@@ -1,8 +1,7 @@
 services:
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile.prod
+      dockerfile: ./backend/Dockerfile.prod
     container_name: enginy_backend_prod
     restart: always
     env_file:
@@ -16,8 +15,7 @@ services:
 
   frontend:
     build:
-      context: . 
-      dockerfile: frontend/Dockerfile.prod 
+      dockerfile: ./frontend/Dockerfile.prod
     container_name: enginy_frontend_prod
     restart: always
     env_file:
