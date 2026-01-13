@@ -27,6 +27,7 @@ export default function TabLayout() {
 
   // Obtener el nombre de la sección actual para el breadcrumb
   const getBreadcrumbLabel = () => {
+    if (pathname.startsWith('/profile')) return 'Perfil';
     const activeTab = TABS.find(tab => pathname.startsWith(tab.path));
     return activeTab ? activeTab.label : '';
   };

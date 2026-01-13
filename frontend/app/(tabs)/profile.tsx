@@ -32,12 +32,6 @@ export default function Profile() {
       
       <View className="flex-1 px-5 pt-12 pb-10">
         
-        {/* 1. FIL D'ARIADNA (BREADCRUMBS) - Imitant la web */}
-        <View className="flex-row items-center mb-4">
-            <Text className="text-xs text-gray-500">Inici</Text>
-            <Text className="text-xs text-gray-400 mx-1">{'>'}</Text>
-            <Text className="text-xs text-gray-900 font-medium">El meu perfil</Text>
-        </View>
 
         {/* 2. TÍTOL PÀGINA - Estil "El Consorci" (Gran, blau i prim) */}
         <View className="border-b border-gray-300 pb-2 mb-8">
