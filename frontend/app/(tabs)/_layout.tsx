@@ -35,7 +35,7 @@ export default function TabLayout() {
     <View style={{ flex: 1, backgroundColor: '#ffffff'}}>
       
       {/* --- NAV BAR (Fondo gris extendido) --- */}
-      <View style={{ paddingTop: insets.top }} className="bg-[#f2f2f3] border-b border-gray-300">
+      <View style={{ paddingTop: insets.top, zIndex: 50 }} className="bg-[#f2f2f3] border-b border-gray-300">
         <ResponsiveContainer>
           <View className="flex-row">
             <ScrollView 
@@ -61,7 +61,7 @@ export default function TabLayout() {
             </ScrollView>
 
             {/* Perfil de usuario */}
-            <View className="px-4 justify-center">
+            <View className="px-4 justify-center z-50">
             <TouchableOpacity 
               className="px-4 py-4 bg-gray-100 justify-center border-l border-gray-300"
               onPress={() => setShowProfileMenu(!showProfileMenu)}
@@ -69,7 +69,7 @@ export default function TabLayout() {
               <FontAwesome name="user-circle" size={20} color="#64748b" />
             </TouchableOpacity>
                         {showProfileMenu && (
-              <View className="absolute right-0 top-full w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
+              <View className="absolute right-0 top-full w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
                 <TouchableOpacity
                   className="px-4 py-3 border-b border-gray-200"
                   onPress={() => {
