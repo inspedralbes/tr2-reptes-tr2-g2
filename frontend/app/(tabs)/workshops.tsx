@@ -64,9 +64,9 @@ export default function TallerScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-gray-50">
+      <View className="flex-1 justify-center items-center">
         <ActivityIndicator size="large" color="#003B5C" />
-        <Text className="mt-4 text-slate-500 font-medium">Cargando experiencias...</Text>
+        <Text className="mt-4 text-slate-500 font-medium">Carregant Tallers...</Text>
       </View>
     );
   }

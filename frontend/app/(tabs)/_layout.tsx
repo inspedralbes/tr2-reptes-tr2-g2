@@ -32,7 +32,7 @@ export default function TabLayout() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: '#ffffff'}}>
       
       {/* --- NAV BAR (Fondo gris extendido) --- */}
       <View style={{ paddingTop: insets.top }} className="bg-[#f2f2f3] border-b border-gray-300">

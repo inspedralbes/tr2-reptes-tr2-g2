@@ -103,7 +103,7 @@ export default function UserTable() {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', height: 200 }}>
                 <ActivityIndicator size="large" color="#0000ff" />
-                <Text style={{ marginTop: 10, color: '#666' }}>Loading students...</Text>
+                <Text style={{ marginTop: 10, color: '#666' }}>Carregant Estudiants...</Text>
             </View>
         );
     }

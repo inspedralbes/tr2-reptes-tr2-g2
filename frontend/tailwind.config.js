@@ -1,10 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
+  presets: [require("nativewind/preset")],
   theme: {
     extend: {
       colors: {
-        // Colores Corporativos
         primary: {
           DEFAULT: '#00426B', // Pantone 7694 C / 541 U
         },
@@ -15,10 +15,6 @@ module.exports = {
         beige: '#E0C5AC',        // Pantone 4685 C / 4685 U
       },
       fontFamily: {
-        // En React Native, 'Helvetica Neue' y 'Arial' pueden requerir configuración
-        // específica para cargar fuentes personalizadas si no son del sistema.
-        // Se recomienda usar 'sans' como fallback para asegurar compatibilidad.
-        // Para Helvetica Neue, puedes necesitar cargar los diferentes pesos (Light, Regular, Bold).
         sans: ['Arial', 'sans-serif'], // Para documentos editables
         corporate: ['Helvetica Neue', 'sans-serif'], // Para uso corporativo
       },
