@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { View, Text, FlatList, Image, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, Image, ActivityIndicator, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import alumneService, { Alumne } from '../services/alumneService';
 
-// 1. Actualizamos el tipo para incluir 'centro'
 type SortField = 'nombre' | 'estado' | 'centro' | null;
 type SortOrder = 'asc' | 'desc' | null;
 
@@ -58,16 +57,7 @@ const UserRow = ({ item }: { item: Alumne }) => (
     </View>
 );
 
-const TableHeader = ({ 
-    sortField, 
-    sortOrder, 
-    onSort 
-}: { 
-    sortField: SortField, 
-    sortOrder: SortOrder, 
-    onSort: (field: SortField) => void 
-}) => {
-    
+const TableHeader = ({ sortField, sortOrder, onSort }: { sortField: SortField, sortOrder: SortOrder, onSort: (field: SortField) => void }) => {
     const renderSortIndicator = (field: SortField) => {
         if (sortField !== field) return ' ↕';
         return sortOrder === 'asc' ? ' ↑' : ' ↓';
@@ -75,26 +65,17 @@ const TableHeader = ({
 
     return (
         <View className="flex-row items-center bg-gray-50 border-y border-gray-200 py-3 px-2" style={{ minWidth: 800 }}>
-            <View className="w-16 items-center">
-                <Text className="font-bold text-gray-400 text-[11px] tracking-wider">IMG</Text>
-            </View>
-            
-            {/* Filtro Alumno */}
+            <View className="w-16 items-center"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">IMG</Text></View>
             <TouchableOpacity className="flex-[1.5] px-2 flex-row items-center" onPress={() => onSort('nombre')}>
                 <Text className="font-bold text-gray-400 text-[11px] tracking-wider">ALUMNO</Text>
                 <Text className="text-blue-500 font-bold">{renderSortIndicator('nombre')}</Text>
             </TouchableOpacity>
-
-            {/* 2. Filtro Centro (Nuevo) */}
             <TouchableOpacity className="flex-[1.5] px-2 flex-row items-center" onPress={() => onSort('centro')}>
                 <Text className="font-bold text-gray-400 text-[11px] tracking-wider">CENTRO</Text>
                 <Text className="text-blue-500 font-bold">{renderSortIndicator('centro')}</Text>
             </TouchableOpacity>
-
             <View className="flex-[1.5] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">CONTACTO</Text></View>
             <View className="flex-[2] px-2"><Text className="font-bold text-gray-400 text-[11px] tracking-wider">TALLERES</Text></View>
-            
-            {/* Filtro Estado */}
             <TouchableOpacity className="flex-1 px-2 flex-row items-center" onPress={() => onSort('estado')}>
                 <Text className="font-bold text-gray-400 text-[11px] tracking-wider">ESTADO</Text>
                 <Text className="text-blue-500 font-bold">{renderSortIndicator('estado')}</Text>
@@ -107,6 +88,7 @@ export default function UserTable() {
     const [users, setUsers] = useState<Alumne[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState(''); // Estado para el buscador
     
     const [sortField, setSortField] = useState<SortField>(null);
     const [sortOrder, setSortOrder] = useState<SortOrder>(null);
@@ -138,18 +120,39 @@ export default function UserTable() {
         }
     };
 
-    // 3. La lógica de sortedUsers ya es dinámica, funcionará con 'centro' automáticamente
-    const sortedUsers = useMemo(() => {
-        if (!sortField || !sortOrder) return users;
+    // Lógica combinada de Filtrado + Ordenación
+    const processedUsers = useMemo(() => {
+        // 1. Filtrar primero
+        let filtered = users.filter(user => {
+            const query = searchQuery.toLowerCase();
+            
+            // Comprobación en campos de texto simple
+            const matchBasic = 
+                user.nombre?.toLowerCase().includes(query) ||
+                user.apellido?.toLowerCase().includes(query) ||
+                user.centro?.toLowerCase().includes(query) ||
+                user.estado?.toLowerCase().includes(query) ||
+                user.email?.toLowerCase().includes(query) ||
+                user.telefono?.toLowerCase().includes(query);
 
-        return [...users].sort((a, b) => {
+            const matchTalleres = user.talleres?.some(taller => 
+                taller.toLowerCase().includes(query)
+            );
+
+            return matchBasic || matchTalleres;
+        });
+
+        // 2. Ordenar el resultado filtrado
+        if (!sortField || !sortOrder) return filtered;
+
+        return filtered.sort((a, b) => {
             const valA = (a[sortField] || '').toString().toLowerCase();
             const valB = (b[sortField] || '').toString().toLowerCase();
 
             if (sortOrder === 'asc') return valA.localeCompare(valB);
             return valB.localeCompare(valA);
         });
-    }, [users, sortField, sortOrder]);
+    }, [users, searchQuery, sortField, sortOrder]);
 
     if (loading) return (
         <View className="flex-1 justify-center items-center h-40">
@@ -158,25 +161,40 @@ export default function UserTable() {
     );
 
     return (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View className="flex-1 bg-white rounded-xl border border-gray-200 my-2">
-                <TableHeader 
-                    sortField={sortField} 
-                    sortOrder={sortOrder} 
-                    onSort={handleSort} 
-                />
-                
-                <FlatList
-                    data={sortedUsers}
-                    renderItem={({ item }) => <UserRow item={item} />}
-                    keyExtractor={item => item._id}
-                    ListEmptyComponent={
-                        <View className="py-10 items-center">
-                            <Text className="text-gray-400">No se encontraron alumnos</Text>
-                        </View>
-                    }
+        <View className="flex-1 bg-gray-50 p-2">
+            {/* Buscador Superior */}
+            <View className="mb-4 px-2">
+                <TextInput
+                    className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-700 shadow-sm"
+                    placeholder="Buscar por nombre, centro, estado, email o taller..."
+                    placeholderTextColor="#9ca3af"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    clearButtonMode="while-editing"
                 />
             </View>
-        </ScrollView>
+
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View className="flex-1 bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <TableHeader 
+                        sortField={sortField} 
+                        sortOrder={sortOrder} 
+                        onSort={handleSort} 
+                    />
+                    
+                    <FlatList
+                        data={processedUsers}
+                        renderItem={({ item }) => <UserRow item={item} />}
+                        keyExtractor={item => item._id}
+                        ListEmptyComponent={
+                            <View className="py-20 items-center">
+                                <Text className="text-gray-400 text-lg">No se han encontrado resultados</Text>
+                                <Text className="text-gray-300 text-sm">Prueba con otros términos</Text>
+                            </View>
+                        }
+                    />
+                </View>
+            </ScrollView>
+        </View>
     );
 }
