@@ -1,5 +1,7 @@
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 const path = require("path");
+const bcrypt = require('bcryptjs'); // Importar bcrypt
+const Centro = require('../src/models/centro.model'); // Importar el modelo Centro
 
 require("dotenv").config({ path: path.resolve(__dirname, "../../.env.prod") });
 
@@ -119,7 +121,36 @@ async function seed() {
     await colCentres.insertMany(centresData);
     console.log(`🏫 ${centresData.length} Centros insertados.`);
 
-    // --- 3. COLECCIÓN SOLICITUDS ---
+    // --- 3. COLECCIÓN PROFESORES ---
+    const colProfesores = db.collection("profesores");
+    await colProfesores.deleteMany({});
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHashBrossa = await bcrypt.hash("password123", salt);
+    const passwordHashMila = await bcrypt.hash("password456", salt);
+
+    const centroBrossa = await colCentres.findOne({ nom: "Institut Joan Brossa" });
+    const centroMila = await colCentres.findOne({ nom: "INS Milà i Fontanals" });
+
+    const profesoresData = [
+        {
+            nombre: "Profesor Brossa",
+            email: "profe.brossa@example.com",
+            password: passwordHashBrossa,
+            centro_id: centroBrossa ? new ObjectId(centroBrossa._id) : null,
+        },
+        {
+            nombre: "Profesor Milà",
+            email: "profe.mila@example.com",
+            password: passwordHashMila,
+            centro_id: centroMila ? new ObjectId(centroMila._id) : null,
+        },
+    ];
+
+    await colProfesores.insertMany(profesoresData);
+    console.log(`${profesoresData.length} Profesores insertados.`);
+
+    // --- 4. COLECCIÓN SOLICITUDS ---
     const colSolicituds = db.collection("solicituds");
     await colSolicituds.deleteMany({});
     console.log("Colección de Solicitudes limpiada.");
