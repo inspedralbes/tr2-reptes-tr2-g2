@@ -36,7 +36,7 @@ const CreateWorkshopModal = ({
 
   const handleCreate = async () => {
     if (!titol || !modalitat) {
-      setError("El título y la modalidad son obligatorios.");
+      setError("El títol i la modalitat són obligatoris.");
       return;
     }
     setLoading(true);
@@ -76,7 +76,7 @@ const CreateWorkshopModal = ({
           <ScrollView showsVerticalScrollIndicator={false}>
             <View className="flex-row justify-between items-center mb-4">
               <Text className="text-2xl font-bold text-[#003B5C]">
-                Crear Nuevo Taller
+                Crear Nou Taller
               </Text>
               <TouchableOpacity onPress={onClose}>
                 <Ionicons name="close-circle" size={30} color="gray" />
@@ -87,7 +87,7 @@ const CreateWorkshopModal = ({
               <Text className="text-red-500 text-center mb-4">{error}</Text>
             )}
 
-            <Text className="text-gray-600 mb-2">Título</Text>
+            <Text className="text-gray-600 mb-2">Títol</Text>
             <TextInput
               className="border border-gray-300 p-2 rounded-lg mb-4"
               value={titol}
@@ -101,7 +101,7 @@ const CreateWorkshopModal = ({
               onChangeText={setSector}
             />
 
-            <Text className="text-gray-600 mb-2">Modalidad</Text>
+            <Text className="text-gray-600 mb-2">Modalitat</Text>
             <TextInput
               className="border border-gray-300 p-2 rounded-lg mb-4"
               value={modalitat}
@@ -115,7 +115,7 @@ const CreateWorkshopModal = ({
               onChangeText={setTrimestre}
             />
 
-            <Text className="text-gray-600 mb-2">Descripción</Text>
+            <Text className="text-gray-600 mb-2">Descripció</Text>
             <TextInput
               className="border border-gray-300 p-2 rounded-lg mb-4 h-24"
               value={descripcio}
@@ -123,7 +123,7 @@ const CreateWorkshopModal = ({
               multiline
             />
 
-            <Text className="text-gray-600 mb-2">Duración (horas)</Text>
+            <Text className="text-gray-600 mb-2">Durada (hores)</Text>
             <TextInput
               className="border border-gray-300 p-2 rounded-lg mb-4"
               value={duradaHores}
@@ -131,7 +131,7 @@ const CreateWorkshopModal = ({
               keyboardType="numeric"
             />
 
-            <Text className="text-gray-600 mb-2">Plazas Máximas</Text>
+            <Text className="text-gray-600 mb-2">Places màximes</Text>
             <TextInput
               className="border border-gray-300 p-2 rounded-lg mb-4"
               value={placesMaximes}
@@ -139,7 +139,7 @@ const CreateWorkshopModal = ({
               keyboardType="numeric"
             />
 
-            <Text className="text-gray-600 mb-2">Ubicación</Text>
+            <Text className="text-gray-600 mb-2">Ubicació</Text>
             <TextInput
               className="border border-gray-300 p-2 rounded-lg mb-4"
               value={ubicacioDefecte}
@@ -147,7 +147,7 @@ const CreateWorkshopModal = ({
             />
 
             <Text className="text-gray-600 mb-2">
-              Días de ejecución (separados por coma)
+              Dies d'execució (separats per coma)
             </Text>
             <TextInput
               className="border border-gray-300 p-2 rounded-lg mb-4"
@@ -163,7 +163,7 @@ const CreateWorkshopModal = ({
               disabled={loading}
             >
               <Text className="text-white text-center font-bold">
-                {loading ? "Creando..." : "Crear Taller"}
+                {loading ? "Creant..." : "Crear Taller"}
               </Text>
             </TouchableOpacity>
           </ScrollView>

@@ -33,7 +33,7 @@ export default function TallerScreen() {
       setTalleres(listaTalleres);
       setError(null);
     } catch (err) {
-      setError("No se pudieron cargar los talleres.");
+      setError("No s'han pogut carregar els tallers.");
       console.error(err);
     }
   }, []);
@@ -66,7 +66,7 @@ export default function TallerScreen() {
     return (
       <View className="flex-1 justify-center items-center bg-gray-50">
         <ActivityIndicator size="large" color="#003B5C" />
-        <Text className="mt-4 text-slate-500 font-medium">Cargando experiencias...</Text>
+        <Text className="mt-4 text-slate-500 font-medium">Carregant experiències...</Text>
       </View>
     );
   }
@@ -92,10 +92,10 @@ export default function TallerScreen() {
         ListEmptyComponent={
           <View className="mt-10 items-center">
             <Text className="text-slate-400 text-lg">
-              No hay talleres para mostrar
+              No hi ha tallers per mostrar
             </Text>
             <Text className="text-slate-300 text-sm">
-              Prueba a cambiar la búsqueda o los filtros
+              Prova a canviar la cerca o els filtres
             </Text>
           </View>
         }

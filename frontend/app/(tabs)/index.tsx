@@ -7,13 +7,13 @@ export default function Index() {
   return (
     <View className="flex-1 items-center justify-center bg-gray-50 p-4">
       <Text className="text-lg text-center mb-4">
-        Esta es la página principal de la aplicación. Aquí puedes gestionar talleres y alumnos, ver estadísticas y acceder a otras secciones.
+        Aquesta és la pàgina principal de l'aplicació. Aquí pots gestionar tallers i alumnes, veure estadístiques i accedir a altres seccions.
       </Text>
       <TouchableOpacity
         className="bg-blue-500 px-6 py-3 rounded-lg"
         onPress={() => router.push('/form' as Href)}
       >
-        <Text className="text-white text-center font-semibold">Ir al Formulario</Text>
+        <Text className="text-white text-center font-semibold">Anar al Formulari</Text>
       </TouchableOpacity>
     </View>
   );

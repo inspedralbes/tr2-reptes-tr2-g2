@@ -79,17 +79,6 @@ export default function CenterSelection({
           onChangeText={(text) => setFormData({ ...formData, coordinatorEmail: text })}
         />
       </View>
-
-      <View className="flex-row items-center justify-between mt-2">
-        <Text className="text-gray-700 font-medium flex-1 pr-4">
-          És la primera vegada que participeu a la Modalitat C "Oficis compartits"?
-        </Text>
-        <Switch
-          value={formData.isFirstTime}
-          onValueChange={(val) => setFormData({ ...formData, isFirstTime: val })}
-          trackColor={{ false: "#767577", true: "#00426B" }}
-        />
-      </View>
     </View>
   );
 }

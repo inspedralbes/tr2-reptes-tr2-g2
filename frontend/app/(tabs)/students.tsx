@@ -9,14 +9,14 @@ export default function StudentsPage() {
         {/* Contenedor que ajusta el ancho al texto */}
         <View className="self-start">
           <Text className="text-2xl font-bold text-gray-900">
-            Estudiantes
+            Alumnes
           </Text>
           {/* Línea azul: w-full hará que mida lo mismo que el View padre (el texto) */}
           <View className="h-1 w-full bg-blue-600 mt-1 rounded-full" />
         </View>
 
         <Text className="text-gray-500 mt-3 text-sm">
-          Registro oficial de inscripciones del centro.
+          Registre oficial d'inscripcions del centre.
         </Text>
       </View>
       
