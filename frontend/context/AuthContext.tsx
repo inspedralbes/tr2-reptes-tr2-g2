@@ -56,17 +56,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const decodeToken = (token: string): any => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      console.error('Error decoding token:', e);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const loadToken = async () => {
       try {
         const storedToken = await getToken(); // Usamos la función segura
         
         if (storedToken) {
-          setAuthState({
-            token: storedToken,
-            authenticated: true,
-            user: null, 
-          });
+          const decoded = decodeToken(storedToken);
+          // Check if token is expired
+          const currentTime = Date.now() / 1000;
+          if (decoded && decoded.exp && decoded.exp < currentTime) {
+            await removeToken();
+            setAuthState({
+              token: null,
+              authenticated: false,
+              user: null,
+            });
+          } else {
+            setAuthState({
+              token: storedToken,
+              authenticated: true,
+              user: decoded?.profesor || null, 
+            });
+          }
         }
       } catch (error) {
         console.log("Error cargando token:", error);
@@ -86,7 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setAuthState({
           token: response.token,
           authenticated: true,
-          user: null, 
+          user: response.user, 
         });
         return { success: true };
       } else {
@@ -108,7 +137,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setAuthState({
           token: response.token,
           authenticated: true,
-          user: null, 
+          user: response.user, 
         });
         return { success: true };
       } else {

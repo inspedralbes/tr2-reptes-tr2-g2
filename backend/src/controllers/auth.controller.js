@@ -36,7 +36,7 @@ const authController = {
         { expiresIn: '1h' }, // Token expira en 1 hora
         (err, token) => {
           if (err) throw err;
-          res.json({ token });
+          res.json({ token, user: payload.profesor });
         }
       );
     } catch (error) {
@@ -121,7 +121,7 @@ const authController = {
         { expiresIn: '1h' },
         (err, token) => {
           if (err) throw err;
-          res.json({ token });
+          res.json({ token, user: payload.profesor });
         }
       );
 
