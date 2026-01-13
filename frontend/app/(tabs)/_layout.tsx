@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, usePathname, Href, Slot } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
-import { useAuth } from '../../context/AuthContext'; // Import useAuth
+import { useAuth } from '../../context/AuthContext'; 
 
 const TABS = [
   { name: 'Index', label: 'Inici', path: '/' },
@@ -16,13 +16,13 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const pathname = usePathname();
-  const [showProfileMenu, setShowProfileMenu] = useState(false); // State for profile menu visibility
-  const { logout } = useAuth(); // Get logout function from AuthContext
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const { logout } = useAuth(); 
 
   const handleLogout = async () => {
     await logout();
-    setShowProfileMenu(false); // Hide menu after logout
-    router.replace('/(auth)/login'); // Redirect to login page
+    setShowProfileMenu(false);
+    router.replace('/(auth)/login');
   };
 
   return (
@@ -47,7 +47,7 @@ export default function TabLayout() {
                   key={tab.path}
                   onPress={() => {
                     router.push(tab.path as Href);
-                    setShowProfileMenu(false); // Close menu when navigating
+                    setShowProfileMenu(false);
                   }}
                   activeOpacity={0.8}
                   className={`
@@ -70,10 +70,10 @@ export default function TabLayout() {
           </ScrollView>
 
           {/* Profile Icon and Dropdown */}
-          <View className="relative"> {/* Use relative positioning for dropdown */}
+          <View className="relative"> 
             <TouchableOpacity 
               className="px-4 py-4 bg-gray-100 justify-center border-l border-gray-300"
-              onPress={() => setShowProfileMenu(!showProfileMenu)} // Toggle menu visibility
+              onPress={() => setShowProfileMenu(!showProfileMenu)}
             >
               <FontAwesome name="user-circle" size={20} color="#64748b" />
             </TouchableOpacity>
@@ -84,7 +84,7 @@ export default function TabLayout() {
                   className="px-4 py-3 border-b border-gray-200"
                   onPress={() => {
                     router.push('/profile');
-                    setShowProfileMenu(false); // Hide menu after selection
+                    setShowProfileMenu(false);
                   }}
                 >
                   <Text className="text-gray-700">Ver Perfil</Text>

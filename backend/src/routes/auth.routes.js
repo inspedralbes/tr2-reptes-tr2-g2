@@ -3,7 +3,7 @@ const router = express.Router();
 const authController = require('../controllers/auth.controller');
 
 // Ruta para el login de profesores
-router.post('/auth/login', authController.login);
-router.post('/auth/register', authController.register);
+router.post('/login', authController.login);
+router.post('/register', authController.register);
 
 module.exports = router;
