@@ -110,7 +110,7 @@ export default function TallerScreen() {
 
     if (Platform.OS === "web") {
       return (
-        <ScrollView contentContainerClassName="p-4">
+        <ScrollView contentContainerClassName="">
           <View className="flex-row flex-wrap -mx-2">
             {filteredTalleres.map((taller) => (
               <View
@@ -132,7 +132,7 @@ export default function TallerScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1">
       <Stack.Screen options={{ headerShown: false }} />
 
       <View className="flex-1 px-4">

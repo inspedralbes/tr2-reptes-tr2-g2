@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, usePathname, Href, Slot } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
+import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 import { useAuth } from '../../context/AuthContext'; 
 
 const TABS = [
-  { name: 'Index', label: 'Inici', path: '/' },
   { name: 'Workshops', label: 'Tallers', path: '/workshops' },
   { name: 'Students', label: 'Alumnes', path: '/students' },
   { name: 'Calendar', label: 'Calendari', path: '/calendar' },
@@ -25,60 +25,50 @@ export default function TabLayout() {
     router.replace('/(auth)/login');
   };
 
+  // Obtener el nombre de la sección actual para el breadcrumb
+  const getBreadcrumbLabel = () => {
+    const activeTab = TABS.find(tab => pathname.startsWith(tab.path));
+    return activeTab ? activeTab.label : '';
+  };
+
   return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
+    <View style={{ flex: 1 }}>
       
-      {/* Nav Bar container */}
-      <View style={{ paddingTop: insets.top }} className="bg-gray-100 shadow-sm z-10">
-        
-        <View className="flex-row border-b border-gray-300">
-          
-          <ScrollView
-            className="flex-1" 
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingLeft: 0 }}
-          >
-            {TABS.map((tab, index) => {
-              const isActive = pathname === tab.path || (tab.path !== '/' && pathname.startsWith(tab.path));
-
-              return (
-                <TouchableOpacity
-                  key={tab.path}
-                  onPress={() => {
-                    router.push(tab.path as Href);
-                    setShowProfileMenu(false);
-                  }}
-                  activeOpacity={0.8}
-                  className={`
-                    px-5 py-4
-                    border-r border-gray-300
-                    ${isActive ? 'bg-[#006996]' : 'bg-gray-100'}
-                  `}
-                >
-                  <Text
-                    className={`
-                      font-bold text-xs uppercase tracking-wide
-                      ${isActive ? 'text-white' : 'text-slate-600'}
-                    `}
+      {/* --- NAV BAR (Fondo gris extendido) --- */}
+      <View style={{ paddingTop: insets.top }} className="bg-[#f2f2f3] border-b border-gray-300">
+        <ResponsiveContainer>
+          <View className="flex-row">
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              className="flex-1"
+            >
+              {TABS.map((tab) => {
+                const isActive = pathname.startsWith(tab.path);
+                return (
+                  <TouchableOpacity
+                    key={tab.path}
+                    onPress={() => router.push(tab.path as Href)}
+                    activeOpacity={0.8}
+                    className={`px-5 py-4 ${isActive ? 'bg-[#0073ab]' : 'bg-[#f2f2f3]'}`}
                   >
-                    {tab.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+                    <Text className={`font-bold text-[13px] ${isActive ? 'text-white' : 'text-[#0073ab]'}`}>
+                      {tab.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
 
-          {/* Profile Icon and Dropdown */}
-          <View className="relative"> 
+            {/* Perfil de usuario */}
+            <View className="px-4 justify-center">
             <TouchableOpacity 
               className="px-4 py-4 bg-gray-100 justify-center border-l border-gray-300"
               onPress={() => setShowProfileMenu(!showProfileMenu)}
             >
               <FontAwesome name="user-circle" size={20} color="#64748b" />
             </TouchableOpacity>
-
-            {showProfileMenu && (
+                        {showProfileMenu && (
               <View className="absolute right-0 top-full w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
                 <TouchableOpacity
                   className="px-4 py-3 border-b border-gray-200"
@@ -97,14 +87,38 @@ export default function TabLayout() {
                 </TouchableOpacity>
               </View>
             )}
+            </View>
           </View>
-        </View>
+        </ResponsiveContainer>
       </View>
 
-      {/* --- Body --- */}
-      <View className="flex-1 bg-gray-50">
-        <Slot />
+      {/* --- BREADCRUMBS (Alineado con el contenido) --- */}
+      <View>
+        <ResponsiveContainer>
+          <View className="flex-row items-center py-3">
+            <TouchableOpacity onPress={() => router.push('/')}>
+              <Text className="text-[#0073ab] text-xs">Inici</Text>
+            </TouchableOpacity>
+            
+            {pathname !== '/' && (
+              <>
+                <Text className="text-gray-400 text-xs mx-2 font-light">{'>'}</Text>
+                <Text className="text-gray-500 text-xs">{getBreadcrumbLabel()}</Text>
+              </>
+            )}
+          </View>
+        </ResponsiveContainer>
+        {/* Línea decorativa fina de la web */}
+        <View className="h-[1px] bg-gray-100 w-full" />
       </View>
+
+      {/* --- CONTENIDO PRINCIPAL --- */}
+      <ScrollView className="flex-1">
+        <ResponsiveContainer style={{ paddingVertical: 20 }}>
+          <Slot />
+        </ResponsiveContainer>
+      </ScrollView>
+
     </View>
   );
 }

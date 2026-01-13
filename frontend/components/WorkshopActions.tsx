@@ -16,10 +16,10 @@ const WorkshopActions = ({
   onCreatePress,
 }: WorkshopActionsProps) => {
   return (
-    <View className="p-4 bg-white rounded-lg shadow-md mb-4">
+    <View className="mb-4">
       <View className="flex-row items-center mb-4">
-        <View className="flex-1 flex-row items-center bg-gray-100 rounded-lg p-2">
-          <Ionicons name="search" size={20} color="gray" />
+        <View className="flex-1 flex-row items-center p-2">
+          <Ionicons name="search" size={20} color="#4197CB" />
           <TextInput
             className="ml-2 flex-1"
             placeholder="Buscar talleres..."
@@ -30,14 +30,14 @@ const WorkshopActions = ({
       </View>
       <View className="flex-row justify-between">
         <TouchableOpacity
-          className="flex-row items-center bg-blue-500 p-2 rounded-lg"
+          className="flex-row items-center bg-primary p-2"
           onPress={onFilterPress}
         >
           <Ionicons name="filter" size={20} color="white" />
           <Text className="ml-2 text-white font-bold">Filtrar</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className="flex-row items-center bg-green-500 p-2 rounded-lg"
+          className="flex-row items-center bg-primary p-2"
           onPress={onCreatePress}
         >
           <Ionicons name="add" size={20} color="white" />

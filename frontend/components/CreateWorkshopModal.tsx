@@ -72,92 +72,92 @@ const CreateWorkshopModal = ({
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
       <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-        <View className="bg-white rounded-lg p-6 w-11/12 max-w-lg">
+        <View className=" p-6 w-11/12 max-w-lg">
           <ScrollView showsVerticalScrollIndicator={false}>
             <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-2xl font-bold text-[#003B5C]">
+              <Text className="text-2xl font-bold text-primary">
                 Crear Nuevo Taller
               </Text>
               <TouchableOpacity onPress={onClose}>
-                <Ionicons name="close-circle" size={30} color="gray" />
+                <Ionicons name="close-circle" size={30} color="#4197CB" />
               </TouchableOpacity>
             </View>
 
             {error && (
-              <Text className="text-red-500 text-center mb-4">{error}</Text>
+              <Text className="text-pink-red text-center mb-4">{error}</Text>
             )}
 
-            <Text className="text-gray-600 mb-2">Título</Text>
+            <Text className="text-primary/75 mb-2">Título</Text>
             <TextInput
-              className="border border-gray-300 p-2 rounded-lg mb-4"
+              className="border border-light-gray p-2 mb-4"
               value={titol}
               onChangeText={setTitol}
             />
 
-            <Text className="text-gray-600 mb-2">Sector</Text>
+            <Text className="text-primary/75 mb-2">Sector</Text>
             <TextInput
-              className="border border-gray-300 p-2 rounded-lg mb-4"
+              className="border border-light-gray p-2 mb-4"
               value={sector}
               onChangeText={setSector}
             />
 
-            <Text className="text-gray-600 mb-2">Modalidad</Text>
+            <Text className="text-primary/75 mb-2">Modalidad</Text>
             <TextInput
-              className="border border-gray-300 p-2 rounded-lg mb-4"
+              className="border border-light-gray p-2 mb-4"
               value={modalitat}
               onChangeText={setModalitat}
             />
 
-            <Text className="text-gray-600 mb-2">Trimestre</Text>
+            <Text className="text-primary/75 mb-2">Trimestre</Text>
             <TextInput
-              className="border border-gray-300 p-2 rounded-lg mb-4"
+              className="border border-light-gray p-2 mb-4"
               value={trimestre}
               onChangeText={setTrimestre}
             />
 
-            <Text className="text-gray-600 mb-2">Descripción</Text>
+            <Text className="text-primary/75 mb-2">Descripción</Text>
             <TextInput
-              className="border border-gray-300 p-2 rounded-lg mb-4 h-24"
+              className="border border-light-gray p-2 mb-4 h-24"
               value={descripcio}
               onChangeText={setDescripcio}
               multiline
             />
 
-            <Text className="text-gray-600 mb-2">Duración (horas)</Text>
+            <Text className="text-primary/75 mb-2">Duración (horas)</Text>
             <TextInput
-              className="border border-gray-300 p-2 rounded-lg mb-4"
+              className="border border-light-gray p-2 mb-4"
               value={duradaHores}
               onChangeText={setDuradaHores}
               keyboardType="numeric"
             />
 
-            <Text className="text-gray-600 mb-2">Plazas Máximas</Text>
+            <Text className="text-primary/75 mb-2">Plazas Máximas</Text>
             <TextInput
-              className="border border-gray-300 p-2 rounded-lg mb-4"
+              className="border border-light-gray p-2 mb-4"
               value={placesMaximes}
               onChangeText={setPlacesMaximes}
               keyboardType="numeric"
             />
 
-            <Text className="text-gray-600 mb-2">Ubicación</Text>
+            <Text className="text-primary/75 mb-2">Ubicación</Text>
             <TextInput
-              className="border border-gray-300 p-2 rounded-lg mb-4"
+              className="border border-light-gray p-2 mb-4"
               value={ubicacioDefecte}
               onChangeText={setUbicacioDefecte}
             />
 
-            <Text className="text-gray-600 mb-2">
+            <Text className="text-primary/75 mb-2">
               Días de ejecución (separados por coma)
             </Text>
             <TextInput
-              className="border border-gray-300 p-2 rounded-lg mb-4"
+              className="border border-light-gray p-2 mb-4"
               value={diesExecucio}
               onChangeText={setDiesExecucio}
             />
 
             <TouchableOpacity
-              className={`p-4 rounded-lg mt-4 ${
-                loading ? "bg-gray-400" : "bg-green-500"
+              className={`p-4 mt-4 ${
+                loading ? "bg-light-gray" : "bg-primary"
               }`}
               onPress={handleCreate}
               disabled={loading}

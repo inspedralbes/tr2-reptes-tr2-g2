@@ -30,7 +30,7 @@ export default function StatisticsPage() {
     };
 
     const renderItem = ({ item }: { item: typeof WORKSHOP_DATA[0] }) => (
-        <View className="flex-row items-center border-b border-gray-200 py-4 bg-white px-4">
+        <View className="flex-row items-center border-b border-gray-200 py-4  px-4">
             <View className="flex-[2]">
                 <Text className="text-slate-700 font-medium">{item.workshop}</Text>
             </View>
@@ -43,7 +43,7 @@ export default function StatisticsPage() {
                 <Text className="text-slate-600 text-xs">{item.assignation}</Text>
             </View>
             <View className="flex-[1.5] items-end">
-                <TouchableOpacity className="border border-gray-300 px-3 py-1 bg-white">
+                <TouchableOpacity className="border border-gray-300 px-3 py-1 ">
                     <Text className="text-slate-500 text-xs">Gestionar Documents</Text>
                 </TouchableOpacity>
             </View>
@@ -60,7 +60,7 @@ export default function StatisticsPage() {
             {/* Summary Cards */}
             <View className="flex-row justify-between mb-8 space-x-4">
                 {SUMMARY_CARDS.map((card, index) => (
-                    <View key={index} className="flex-1 bg-white p-6 items-center justify-center shadow-sm border border-gray-100">
+                    <View key={index} className="flex-1  p-6 items-center justify-center border border-gray-100">
                         <Text className="text-[#00426B] text-4xl font-light mb-1">{card.value}</Text>
                         <Text className="text-slate-600 text-center leading-4">{card.label}</Text>
                     </View>

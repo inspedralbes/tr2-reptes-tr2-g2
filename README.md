@@ -54,8 +54,8 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 To connect to the internal databases or trigger deployments in the **Proxmox LXC**, please refer to our internal guides:
 
-👉 **[Technical Documentation (DOCS.md)](https://www.google.com/search?q=./DOCS.md)**
-👉 **[Connection & Usage Guide (USAGE.md)](https://www.google.com/search?q=./USAGE.md)**
+👉 **[Technical Documentation (DOCS.md)](https://www.google.com/search?q=./doc/DOCS.md)**
+👉 **[Connection & Usage Guide (USAGE.md)](https://www.google.com/search?q=./doc/USAGE.md)**
 
 > [!IMPORTANT]
 > This project uses a **self-hosted runner** named `projects`. Ensure the runner is in **Idle** status before pushing critical updates to `main`.
