@@ -132,7 +132,7 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop }: P
                                     <TouchableOpacity
                                         onPress={() => {
                                             onClose();
-                                            router.push('/statistics' as any);
+                                            router.push('/form' as any);
                                         }}
                                         className="flex-[2] bg-[#00426b] flex-row items-center justify-center p-4 rounded-xl shadow-lg shadow-blue-900/20 active:bg-[#003355]"
                                     >
