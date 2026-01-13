@@ -168,6 +168,7 @@ async function seed() {
         telefono: '612 345 678',
         imagen: 'https://i.pravatar.cc/150?u=ana',
         estado: 'Aprobado',
+        talleres: ['Fusta', 'Energies Renovables'],
       },
       {
         nombre: 'Carlos',
@@ -177,6 +178,7 @@ async function seed() {
         telefono: '698 765 432',
         imagen: 'https://i.pravatar.cc/150?u=carlos',
         estado: 'En proceso',
+        talleres: ['Imatge personal per a tothom'],
       },
       {
         nombre: 'Maria',
@@ -186,6 +188,7 @@ async function seed() {
         telefono: '655 443 322',
         imagen: 'https://i.pravatar.cc/150?u=maria',
         estado: 'Rechazado',
+        talleres: ['Fusta'],
       },
       {
         nombre: 'Javier',
@@ -195,6 +198,7 @@ async function seed() {
         telefono: '666 777 888',
         imagen: 'https://i.pravatar.cc/150?u=javier',
         estado: 'Aprobado',
+        talleres: ['Energies Renovables', 'Imatge personal per a tothom'],
       },
       {
         nombre: 'Lucía',
@@ -204,6 +208,7 @@ async function seed() {
         telefono: '611 222 333',
         imagen: 'https://i.pravatar.cc/150?u=lucia',
         estado: 'En proceso',
+        talleres: ['Fusta', 'Imatge personal per a tothom'],
       },
       {
         nombre: 'David',
@@ -213,6 +218,7 @@ async function seed() {
         telefono: '633 444 555',
         imagen: 'https://i.pravatar.cc/150?u=david',
         estado: 'Aprobado',
+        talleres: ['Energies Renovables'],
       },
       {
         nombre: 'Sara',
@@ -222,6 +228,7 @@ async function seed() {
         telefono: '644 555 666',
         imagen: 'https://i.pravatar.cc/150?u=sara',
         estado: 'Rechazado',
+        talleres: ['Imatge personal per a tothom'],
       },
       {
         nombre: 'Pablo',
@@ -231,6 +238,7 @@ async function seed() {
         telefono: '677 888 999',
         imagen: 'https://i.pravatar.cc/150?u=pablo',
         estado: 'Aprobado',
+        talleres: ['Fusta', 'Energies Renovables'],
       },
       {
         nombre: 'Laura',
@@ -240,6 +248,7 @@ async function seed() {
         telefono: '688 999 000',
         imagen: 'https://i.pravatar.cc/150?u=laura',
         estado: 'En proceso',
+        talleres: ['Imatge personal per a tothom', 'Energies Renovables'],
       },
     ];
 
