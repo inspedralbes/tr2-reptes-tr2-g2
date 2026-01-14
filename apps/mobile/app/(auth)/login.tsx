@@ -16,7 +16,7 @@ export default function LoginScreen() {
       const timer = setTimeout(() => {
         setNotificationMessage(null);
         setNotificationType(null);
-      }, 3000); // Clear notification after 3 seconds
+      }, 8002); // Clear notification after 3 seconds
       return () => clearTimeout(timer);
     }
   }, [notificationMessage]);
