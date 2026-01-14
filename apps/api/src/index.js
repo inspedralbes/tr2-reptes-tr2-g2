@@ -13,8 +13,8 @@ const allowedOrigins = [
   'http://enginy.kore29.com',
   'https://enginy-api.kore29.com',  // Prod API
   'http://enginy-api.kore29.com',
-  'http://localhost:3000',     
-  'http://localhost:4000',  
+  'http://localhost:8002',     
+  'http://localhost:3000',  
 ]       
 
 app.use(cors({
@@ -37,7 +37,7 @@ app.use(express.json());
 // Rutas API
 app.use('/api', routes);
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor listo en puerto: ${PORT}`);
