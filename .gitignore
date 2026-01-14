@@ -1,7 +1,5 @@
-apps/mobile/.env
-apps/mobile/.env.dev
-apps/mobile/.env.prod
 .env
 .env.prod
+apps/mobile/.env
 
 /node_modules
