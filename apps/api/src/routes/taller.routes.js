@@ -1,15 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const tallerController = require('../controllers/taller.controller');
-const validateId = require('../middlewares/validationId');
 
-// --- RUTAS SIN ID ---
-router.get('/', tallerController.getAllTalleres);
+// GET /api/tallers - Listar todos los talleres (público o protegido, según decidas)
+router.get('/', tallerController.getTallers);
+
+// GET /api/tallers/:id - Detalle de un taller
+router.get('/:id', tallerController.getTallerById);
+
+// POST /api/tallers - Crear taller (Solo Admin)
+// Aquí podrías meter middleware de auth: router.post('/', authMiddleware, tallerController.createTaller);
 router.post('/', tallerController.createTaller);
 
-// --- RUTAS CON ID ---
-router.get('/:id', validateId, tallerController.getTallerById); 
-router.put('/:id', validateId, tallerController.updateTaller);
-router.delete('/:id', validateId, tallerController.deleteTaller);
+// PUT /api/tallers/:id - Editar taller
+router.put('/:id', tallerController.updateTaller);
+
+// DELETE /api/tallers/:id - Borrar taller
+router.delete('/:id', tallerController.deleteTaller);
 
 module.exports = router;

@@ -1,32 +1,47 @@
 services:
+  # En producción REAL, la DB suele estar fuera (AWS RDS, Atlas, etc).
+  # Pero si la quieres en Docker también, descomenta estas líneas:
+  # db:
+  #   image: postgres:15-alpine
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: root
+  #     POSTGRES_DB: enginy_db
+  #   volumes:
+  #     - postgres_prod_data:/var/lib/postgresql/data
+  #   networks:
+  #     - enginy-network-prod
+
   web:
     build:
       context: .
       dockerfile: Dockerfile
       target: runner-web
-    command: node server.js
+    restart: always
     ports:
       - "3000:3000"
+    env_file:
+      - ./apps/web/.env
     networks:
       - enginy-network-prod
-    env_file:
-      - ./.env
-    restart: always
 
   api:
     build:
       context: .
       dockerfile: Dockerfile
       target: runner-api
-    command: node dist/index.js
+    restart: always
     ports:
       - "4000:4000"
+    env_file:
+      - ./apps/api/.env
     networks:
       - enginy-network-prod
-    env_file:
-      - ./.env
-    restart: always
 
 networks:
   enginy-network-prod:
     driver: bridge
+
+# volumes:
+#   postgres_prod_data:
