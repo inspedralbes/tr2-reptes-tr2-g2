@@ -1,50 +1,47 @@
-# Dockerfile for Monorepo with Turborepo
-
-# Stage 1: Base image
+# Stage 1: Base
 FROM node:22-alpine AS base
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm install
 
-# Stage 2: Prune dependencies
-FROM node:22-alpine AS pruner
-WORKDIR /app
+# Stage 2: Pruner (Optimizamos para que haga ambos a la vez)
+FROM base AS pruner
 COPY . .
 RUN npm install -g turbo
-RUN turbo prune --scope=web --docker
-RUN turbo prune --scope=api --docker
+RUN turbo prune web --docker
+RUN turbo prune api --docker
 
-# Stage 3: Builder for web
-FROM node:22-alpine AS builder-web
-WORKDIR /app
+# Stage 3: Builder Web
+FROM base AS builder-web
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/package-lock.json ./package-lock.json
 RUN npm install
-COPY . .
+COPY --from=pruner /app/out/full/ .
 RUN npx turbo run build --filter=web
 
-# Stage 4: Runner for web
-FROM node:22-alpine AS runner-web
-WORKDIR /app
-COPY --from=builder-web /app/apps/web/next.config.js .
-COPY --from=builder-web /app/apps/web/public ./public
+# Stage 4: Runner Web (PRODUCCIÓN)
+FROM base AS runner-web
+ENV NODE_ENV=production
 COPY --from=builder-web /app/apps/web/.next/standalone ./
 COPY --from=builder-web /app/apps/web/.next/static ./apps/web/.next/static
-CMD ["node", "server.js"]
+COPY --from=builder-web /app/apps/web/public ./apps/web/public
 
-# Stage 5: Builder for api
-FROM node:22-alpine AS builder-api
-WORKDIR /app
+EXPOSE 3000
+CMD ["node", "apps/web/server.js"]
+
+# Stage 5: Builder API
+FROM base AS builder-api
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/package-lock.json ./package-lock.json
 RUN npm install
-COPY . .
+COPY --from=pruner /app/out/full/ .
 RUN npx turbo run build --filter=api
 
-# Stage 6: Runner for api
-FROM node:22-alpine AS runner-api
-WORKDIR /app
+# Stage 6: Runner API (PRODUCCIÓN)
+FROM base AS runner-api
+ENV NODE_ENV=production
 COPY --from=builder-api /app/apps/api/dist ./dist
-COPY --from=builder-api /app/package.json .
 COPY --from=builder-api /app/node_modules ./node_modules
+COPY --from=builder-api /app/apps/api/package.json ./package.json
+
+EXPOSE 4000
 CMD ["node", "dist/index.js"]

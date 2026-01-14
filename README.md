@@ -1,98 +1,124 @@
 # 🚀 Enginy Monorepo
 
-This monorepo contains the entire Enginy ecosystem, managed with Turborepo and npm.
+Bienvenido al núcleo del ecosistema **Enginy**. Esta es una infraestructura moderna basada en un **Monorepo** gestionado con **Turborepo**, diseñada para ser escalable, rápida y fácil de desplegar.
 
-## 🌐 Production Environment
+## 🌐 Entorno de Producción
 
-The ecosystem is exposed via secure Cloudflare Tunnels.
+El ecosistema está totalmente automatizado y expuesto de forma segura a través de **Cloudflare Tunnels**:
 
-* **Frontend UI:** [enginy.kore29.com](https://enginy.kore29.com)
-* **API Gateway:** [api-enginy.kore29.com](https://api-enginy.kore29.com)
+* **💻 Web UI (Cliente/Admin):** [enginy.kore29.com](https://enginy.kore29.com)
+* **🔌 API Gateway:** [api-enginy.kore29.com](https://api-enginy.kore29.com)
 
-##  Monorepo Structure
+---
 
-*   `apps/web`: Next.js application (client/admin).
-*   `apps/api`: Node.js backend.
-*   `apps/mobile`: Expo application (not dockerized).
-*   `packages/ui`: Shared UI components library.
+## 🏗️ Estructura del Proyecto
 
-## 🛠️ Tech Stack
+Utilizamos una arquitectura de **espacios de trabajo (workspaces)** para compartir código eficientemente:
 
-### **Backend (apps/api)**
+* **`apps/web`**: Aplicación unificada de **Next.js** que gestiona tanto la interfaz de cliente como el panel de administración.
+* **`apps/api`**: Backend robusto en **Node.js** que sirve como fuente de verdad para los datos.
+* **`apps/mobile`**: Aplicación nativa multiplataforma con **Expo** (iOS/Android).
+* **`packages/`**: Librerías compartidas (UI, configuraciones, tipos) que usan todas las aplicaciones anteriores.
 
-*   **Runtime:** Node.js (Express.js).
-*   **Database:** MongoDB via Mongoose ODM.
-*   **Infrastructure:** Docker & Docker Compose.
+---
 
-### **Frontend (apps/web)**
+## 🛠️ Stack Tecnológico
 
-*   **Framework:** Next.js (React).
-*   **Infrastructure:** Docker & Docker Compose.
+| Componente | Tecnología | Despliegue |
+| --- | --- | --- |
+| **Frontend Web** | Next.js (React) + Tailwind CSS | Docker (Standalone mode) |
+| **Backend API** | Node.js + Express + Mongoose | Docker |
+| **App Móvil** | Expo (React Native) | Nativo (Android/iOS) |
+| **Orquestador** | **Turborepo** | Pipeline CI/CD |
+| **Base de Datos** | MongoDB (External Server) | Conexión remota |
 
-### **Mobile (apps/mobile)**
+---
 
-*   **Framework:** Expo (React Native).
+## 🐳 Flujo de Trabajo con Docker
 
-## 🐳 Docker-based Workflow
+Este proyecto utiliza **Multi-stage builds** para optimizar el rendimiento entre desarrollo y producción.
 
-This project is fully containerized for both development and production environments.
+### 💻 Entorno de Desarrollo
 
-### Development Environment
-
-To start the development environment with hot-reloading for the `web` and `api` applications, run:
+Para levantar todo el backend y la web con **Hot-Reloading** (los cambios se ven al instante):
 
 ```bash
 docker-compose up --build
+
 ```
 
-This will start the following services:
+> [!TIP]
+> En este modo, Docker usa el target `builder`, manteniendo el entorno abierto para desarrollo activo.
 
-*   `web`: Next.js app, accessible at `http://localhost:3000`.
-*   `api`: Node.js API, accessible at `http://localhost:4000`.
-*   `mongodb`: MongoDB database.
+### 🚀 Entorno de Producción
 
-### Production Environment
-
-To build and start the production-ready containers, run:
+Para generar imágenes ultra-ligeras y optimizadas (usando el modo standalone de Next.js):
 
 ```bash
-docker-compose -f docker-compose.prod.yml up --build
+docker-compose -f docker-compose.prod.yml up --build -d
+
 ```
 
-This will build optimized images and start the `web` and `api` services in production mode.
+> [!NOTE]
+> Este comando ejecuta el proceso de `pruning` de Turbo, eliminando dependencias innecesarias y reduciendo el peso de la imagen final.
 
-## 🔄 Development Workflow
+---
 
-We follow strict Git standards to ensure stability and clean versioning.
+## 📱 Desarrollo Mobile (Expo)
 
-### **GitFlow Strategy**
+La aplicación móvil se ejecuta fuera de Docker para permitir la comunicación directa con dispositivos físicos y emuladores.
 
-* **`main`**: The production-ready branch. Every push here triggers the **self-hosted runner**.
-* **`dev`**: The active integration branch for features and testing.
-* **`feature/*` / `fix/***`: Temporary branches for isolated development.
+1. Instala dependencias en la raíz: `npm install`
+2. Lanza el proyecto:
+```bash
+npx turbo dev --filter=mobile
+
+```
+
+
+3. Escanea el código QR con la app **Expo Go**.
+
+---
+
+## 🔄 Estándares de Desarrollo
+
+### **Estrategia de GitFlow**
+
+* **`main`**: Rama de producción. Cada *push* dispara el **Self-hosted Runner** en Proxmox.
+* **`dev`**: Integración de nuevas funcionalidades y pruebas.
+* **`feature/*`**: Ramas temporales para desarrollo de nuevas características.
 
 ### **Commit Convention**
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
+Usamos [Conventional Commits](https://www.conventionalcommits.org/) para un historial limpio:
 
-* `feat:` New features.
-* `fix:` Bug fixes.
-* `docs:` Documentation changes.
-* `refactor:` Code changes that neither fix a bug nor add a feature.
+* `feat:` Nuevas funcionalidades.
+* `fix:` Corrección de errores.
+* `docs:` Cambios en documentación.
+* `refactor:` Mejoras de código que no añaden funciones.
 
-## 🗺️ 3. Roadmap
+---
 
-* [x] Finalize Frontend stack.
-* [ ] Implement JWT Auth & RBAC (Role-Based Access Control).
-* [x] Setup **CI/CD Pipelines** via GitHub Actions & Proxmox Runner.
-* [ ] API Documentation via Swagger.
+## 🗺️ Roadmap
 
-## 🔑 4. Access Control & Deployment
+* [x] Migración total a **Turborepo** y estructura de Monorepo.
+* [x] Dockerización profesional (Dev vs Prod).
+* [ ] Implementación de **React Compiler** para optimización automática.
+* [ ] Autenticación unificada mediante JWT & RBAC.
+* [ ] Documentación de API mediante Swagger/OpenAPI.
 
-To connect to the internal databases or trigger deployments in the **Proxmox LXC**, please refer to our internal guides:
+---
 
-👉 **[Technical Documentation (DOCS.md)](https://www.google.com/search?q=./doc/DOCS.md)**
-👉 **[Connection & Usage Guide (USAGE.md)](https://www.google.com/search?q=./doc/USAGE.md)**
+## 🔑 Acceso y Despliegue
+
+Para guías detalladas sobre la infraestructura en **Proxmox LXC** o conexión a bases de datos:
+
+👉 **[Documentación Técnica (DOCS.md)](https://www.google.com/search?q=./doc/DOCS.md)**
+👉 **[Guía de Uso y Conexión (USAGE.md)](https://www.google.com/search?q=./doc/USAGE.md)**
 
 > [!IMPORTANT]
-> This project uses a **self-hosted runner** named `projects`. Ensure the runner is in **Idle** status before pushing critical updates to `main`.
+> El **Self-hosted runner** (`projects`) debe estar en estado **Idle** antes de realizar despliegues críticos a la rama `main`.
+
+---
+
+¿Te gusta cómo ha quedado? Si quieres, puedo ayudarte ahora a crear un script de **auto-despliegue** para que tu servidor de Proxmox se actualice solo cuando hagas push. *¿Te gustaría que lo hagamos?*
