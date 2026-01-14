@@ -27,7 +27,7 @@ WORKDIR /app
 COPY --from=builder-web /app/apps/web/.next/standalone ./
 COPY --from=builder-web /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder-web /app/apps/web/public ./apps/web/public
-EXPOSE 3000
+EXPOSE 8002
 CMD ["node", "apps/web/server.js"]
 
 # --- BUILDER API ---
@@ -56,5 +56,5 @@ COPY --from=builder-api /app/apps/api/prisma ./prisma
 COPY --from=builder-api /app/apps/api/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder-api /app/apps/api/node_modules/@prisma ./node_modules/@prisma
 
-EXPOSE 4000
+EXPOSE 3000
 CMD ["node", "src/index.js"]

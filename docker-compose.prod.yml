@@ -20,7 +20,7 @@ services:
       target: runner-web
     restart: always
     ports:
-      - "3000:3000"
+      - "8002:8002"
     env_file:
       - ./apps/web/.env
     networks:
@@ -33,7 +33,7 @@ services:
       target: runner-api
     restart: always
     ports:
-      - "4000:4000"
+      - "3000:3000"
     env_file:
       - ./apps/api/.env
     networks:
