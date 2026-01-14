@@ -1,14 +1,24 @@
-const Alumne = require('../models/alumne.model');
+const prisma = require('../lib/prisma');
 
-const alumneController = {
-  getAllAlumnes: async (req, res) => {
-    try {
-      const alumnes = await Alumne.findAll();
-      res.status(200).json({ alumnes });
-    } catch (error) {
-      res.status(500).json({ error: "Error al buscar alumnes" });
-    }
-  },
+exports.getAlumnes = async (req, res) => {
+  try {
+    const alumnes = await prisma.alumne.findMany({
+      include: { centre_procedencia: true } // Trae el nombre del centro
+    });
+    res.json(alumnes);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener alumnos' });
+  }
 };
 
-module.exports = alumneController;
+exports.createAlumne = async (req, res) => {
+  try {
+    const alumne = await prisma.alumne.create({
+      data: req.body
+    });
+    res.json(alumne);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al crear alumno' });
+  }
+};

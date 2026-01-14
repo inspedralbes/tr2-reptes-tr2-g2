@@ -2,21 +2,20 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const { connectToDb } = require('./config/database');
-const routes = require('./routes');
+// const { connectToDb } = require('./config/database'); <--- ESTO YA NO HACE FALTA
+const routes = require('./routes'); // Asegúrate de que esto apunta a tus rutas nuevas
 
 const app = express();
 app.set('trust proxy', 1);
 
 const allowedOrigins = [
-  'https://enginy.kore29.com',      // Tu Web en Producción (Cloudflare)
-  'http://enginy.kore29.com',       // Por si acaso entra por HTTP
-  'https://enginy-api.kore29.com',  // Tu API en Producción (Cloudflare)
-  'http://enginy-api.kore29.com',   // Por si acaso entra por HTTP
-  'http://localhost:8081',          // Tu entorno local (Expo Web)
-  'http://localhost:8002',          // Tu Frontend Docker en local
-  'http://192.168.1.39:8081'        // Tu IP local para pruebas
-];
+  'https://enginy.kore29.com',      // Prod Web
+  'http://enginy.kore29.com',
+  'https://enginy-api.kore29.com',  // Prod API
+  'http://enginy-api.kore29.com',
+  'http://localhost:3000',     
+  'http://localhost:4000',  
+]       
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -34,16 +33,14 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+// Rutas API
 app.use('/api', routes);
 
-connectToDb((err) => {
-  if (!err) {
-    app.listen(process.env.PORT, () => {
-      console.log(`🚀 Servidor: ${process.env.PORT}`);
-      console.log(`🌍 Ambiente: ${process.env.NODE_ENV}`);
-    });
-  } else {
-    console.error('❌ Error fatal: No se pudo conectar a la base de datos', err);
-    process.exit(1);
-  }
+const PORT = process.env.PORT || 4000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor listo en puerto: ${PORT}`);
+  console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🗄️  Sistema DB: Prisma + MySQL`);
 });
