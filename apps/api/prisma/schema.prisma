@@ -23,7 +23,7 @@ enum EstatPeticio {
 
 enum EstatAssignacio {
   ACTIVA
-  CANCEL·LADA
+  CANCEL_LADA
   FINALITZADA
 }
 
@@ -193,7 +193,7 @@ model Inscripcio {
   alumne        Alumne        @relation(fields: [id_alumne], references: [id])
   
   assistencies  Assistencia[]
-  avaluacions   AvaluacioCompetencial[]
+  // avaluacions   AvaluacioCompetencial[]
 
   @@map("inscripcions")
 }
