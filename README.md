@@ -59,7 +59,7 @@ Hemos unificado la configuración en un archivo de ejemplo.
 Para levantar Base de Datos, API, Web y Adminer con **Hot-Reloading**:
 
 ```bash
-docker-compose up --build
+docker compose up --build
 
 ```
 
@@ -68,7 +68,7 @@ docker-compose up --build
 La primera vez que arranques, la base de datos estará vacía. Ejecuta este script para crear las tablas e insertar datos de prueba (Talleres, Centros, Usuarios):
 
 ```bash
-docker-compose exec api npx prisma db seed
+docker compose exec api npx prisma db seed
 
 ```
 
@@ -108,14 +108,14 @@ Este proyecto utiliza **Multi-stage builds** para optimizar el rendimiento.
 
 ### 💻 Desarrollo
 
-El `docker-compose.yml` monta volúmenes locales. Cualquier cambio que hagas en `src/` se reflejará inmediatamente (Hot-Reload) sin reconstruir el contenedor.
+El `docker compose.yml` monta volúmenes locales. Cualquier cambio que hagas en `src/` se reflejará inmediatamente (Hot-Reload) sin reconstruir el contenedor.
 
 ### 🚀 Producción
 
 Para simular el entorno real (imágenes ligeras y optimizadas):
 
 ```bash
-docker-compose -f docker-compose.prod.yml up --build -d
+docker compose -f docker-compose.prod.yml up --build -d
 
 ```
 
