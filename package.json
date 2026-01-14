@@ -1,0 +1,36 @@
+{
+  "name": "tr2-reptes-tr2-g2",
+  "version": "1.0.0",
+  "description": "**Central Hub for the Enginy Ecosystem | Unified Modern Stack**",
+  "private": true,
+  "main": "index.js",
+  "packageManager": "npm@11.7.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inspedralbes/tr2-reptes-tr2-g2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/inspedralbes/tr2-reptes-tr2-g2/issues"
+  },
+  "homepage": "https://github.com/inspedralbes/tr2-reptes-tr2-g2#readme",
+  "devDependencies": {
+    "turbo": "^2.7.4"
+  }
+}

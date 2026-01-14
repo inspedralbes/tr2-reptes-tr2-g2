@@ -1,6 +1,6 @@
-# 🚀 Project Core | Enginy
+# 🚀 Enginy Monorepo
 
-**Central Hub for the Enginy Ecosystem | Unified Modern Stack**
+This monorepo contains the entire Enginy ecosystem, managed with Turborepo and npm.
 
 ## 🌐 Production Environment
 
@@ -9,22 +9,59 @@ The ecosystem is exposed via secure Cloudflare Tunnels.
 * **Frontend UI:** [enginy.kore29.com](https://enginy.kore29.com)
 * **API Gateway:** [api-enginy.kore29.com](https://api-enginy.kore29.com)
 
-## 🛠️ 1. Tech Stack
+##  Monorepo Structure
 
-Project Core integrates a robust backend with a modern, containerized frontend.
+*   `apps/web`: Next.js application (client/admin).
+*   `apps/api`: Node.js backend.
+*   `apps/mobile`: Expo application (not dockerized).
+*   `packages/ui`: Shared UI components library.
 
-### **Backend**
+## 🛠️ Tech Stack
 
-* **Runtime:** Node.js (Express.js).
-* **Database:** MongoDB via Mongoose ODM.
-* **Infrastructure:** Docker & Docker Compose for consistent environments.
+### **Backend (apps/api)**
 
-### **Frontend**
+*   **Runtime:** Node.js (Express.js).
+*   **Database:** MongoDB via Mongoose ODM.
+*   **Infrastructure:** Docker & Docker Compose.
 
-* **Status:** <kbd>TBD</kbd> (Evaluation in progress).
-* **Proposed:** React Native for Web (React ecosystem).
+### **Frontend (apps/web)**
 
-## 🔄 2. Development Workflow
+*   **Framework:** Next.js (React).
+*   **Infrastructure:** Docker & Docker Compose.
+
+### **Mobile (apps/mobile)**
+
+*   **Framework:** Expo (React Native).
+
+## 🐳 Docker-based Workflow
+
+This project is fully containerized for both development and production environments.
+
+### Development Environment
+
+To start the development environment with hot-reloading for the `web` and `api` applications, run:
+
+```bash
+docker-compose up --build
+```
+
+This will start the following services:
+
+*   `web`: Next.js app, accessible at `http://localhost:3000`.
+*   `api`: Node.js API, accessible at `http://localhost:4000`.
+*   `mongodb`: MongoDB database.
+
+### Production Environment
+
+To build and start the production-ready containers, run:
+
+```bash
+docker-compose -f docker-compose.prod.yml up --build
+```
+
+This will build optimized images and start the `web` and `api` services in production mode.
+
+## 🔄 Development Workflow
 
 We follow strict Git standards to ensure stability and clean versioning.
 

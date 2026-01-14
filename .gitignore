@@ -1,5 +1,7 @@
-frontend/.env
-frontend/.env.dev
-frontend/.env.prod
+apps/mobile/.env
+apps/mobile/.env.dev
+apps/mobile/.env.prod
 .env
 .env.prod
+
+/node_modules
