@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "**Central Hub for the Enginy Ecosystem | Unified Modern Stack**",
   "private": true,
+  "packageManager": "npm@10.9.4",
   "main": "index.js",
   "workspaces": [
     "apps/*",
@@ -51,6 +52,11 @@
     "tailwindcss": "^4.1.18",
     "@types/bcrypt": "^6.0.0",
     "prettier": "latest",
-    "turbo": "^2.7.4"
+    "turbo": "2.7.4",
+    "typescript": "5.3.3",
+    "ts-node": "10.9.2",
+    "tsx": "4.19.2",
+    "nodemon": "3.1.0",
+    "prisma": "5.22.0"
   }
 }

@@ -25,6 +25,22 @@ services:
     networks:
       - enginy-network
 
+  # Service de Instalación y Setup (Premium Optimization)
+  setup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    working_dir: /app
+    volumes:
+      - .:/app
+      - node_modules_cache:/app/node_modules
+    command: sh -c "npm install && npx turbo db:generate db:push db:seed --filter=api"
+    depends_on:
+      - db
+    networks:
+      - enginy-network
+
   # Backend API
   api:
     build:
@@ -32,22 +48,18 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    command: sh -c "npm install && cd apps/api && npx prisma generate && npx prisma db push && npm run dev"
+    # Usamos npx turbo directamente, dependiendo de que 'setup' haya terminado
+    command: npx turbo dev --filter=api
     volumes:
-      - ./package.json:/app/package.json
-      - ./package-lock.json:/app/package-lock.json
-      - ./apps/api:/app/apps/api
-      - ./packages:/app/packages
+      - .:/app
       - node_modules_cache:/app/node_modules
-      - /app/apps/api/node_modules
-    environment:
-      - NODE_PATH=/app/node_modules
     ports:
       - "3000:3000"
     env_file:
       - ./apps/api/.env
     depends_on:
-      - db
+      setup:
+        condition: service_completed_successfully
     networks:
       - enginy-network
 
@@ -58,20 +70,17 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    command: sh -c "npm install && cd apps/web && npm run dev"
+    command: npx turbo dev --filter=web
     volumes:
-      - ./package.json:/app/package.json
-      - ./package-lock.json:/app/package-lock.json
-      - ./apps/web:/app/apps/web
-      - ./packages:/app/packages
+      - .:/app
       - node_modules_cache:/app/node_modules
-      - /app/apps/web/node_modules
-    environment:
-      - NODE_PATH=/app/node_modules
     ports:
       - "8002:3000"
     env_file:
       - ./apps/web/.env
+    depends_on:
+      setup:
+        condition: service_completed_successfully
     networks:
       - enginy-network
 

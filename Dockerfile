@@ -1,6 +1,7 @@
 # Stage 1: Base (Node 22 + Librerías sistema)
 FROM node:22-alpine AS base
 RUN apk add --no-cache libc6-compat openssl
+RUN npm install -g turbo@2.7.4
 WORKDIR /app
 
 # Stage 2: Pruner (Separa dependencias de Web y API)
