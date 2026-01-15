@@ -1,6 +1,7 @@
-const prisma = require('../lib/prisma');
+import prisma from '../lib/prisma';
+import { Request, Response } from 'express';
 
-exports.getAlumnes = async (req, res) => {
+export const getAlumnes = async (req: Request, res: Response) => {
   try {
     const alumnes = await prisma.alumne.findMany({
       include: { centre_procedencia: true } // Trae el nombre del centro
@@ -11,7 +12,7 @@ exports.getAlumnes = async (req, res) => {
   }
 };
 
-exports.createAlumne = async (req, res) => {
+export const createAlumne = async (req: Request, res: Response) => {
   try {
     const alumne = await prisma.alumne.create({
       data: req.body

@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const centroController = require('../controllers/centro.controller');
+import * as centroController from '../controllers/centro.controller';
 
 router.get('/', centroController.getCentres);
 router.get('/:id', centroController.getCentreById);
 router.post('/', centroController.createCentre);
 
-module.exports = router;
+export default router;

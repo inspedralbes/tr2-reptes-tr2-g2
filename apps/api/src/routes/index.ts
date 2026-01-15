@@ -1,12 +1,12 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Importar archivos de rutas individuales
-const authRoutes = require('./auth.routes');
-const tallerRoutes = require('./taller.routes');
-const centroRoutes = require('./centro.routes');
-const peticioRoutes = require('./peticio.routes'); // Nueva ruta para el flujo de reservas
-const alumneRoutes = require('./alumne.routes');
+import authRoutes from './auth.routes';
+import tallerRoutes from './taller.routes';
+import centroRoutes from './centro.routes';
+import peticioRoutes from './peticio.routes'; // Nueva ruta para el flujo de reservas
+import alumneRoutes from './alumne.routes';
 
 // --- Definir las rutas base ---
 
@@ -28,4 +28,4 @@ router.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });
 });
 
-module.exports = router;
+export default router;

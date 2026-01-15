@@ -1,4 +1,4 @@
-const { MongoClient } = require("mongodb");
+import { MongoClient, Db } from "mongodb";
 
 const { 
     DB_HOST, 
@@ -8,7 +8,7 @@ const {
     MONGO_INITDB_ROOT_PASSWORD 
 } = process.env;
 
-let mongoUrl;
+let mongoUrl: string;
 
 if (DB_HOST && (DB_HOST.startsWith('mongodb://') || DB_HOST.startsWith('mongodb+srv://'))) {
     // Caso A: En el .env pusiste la URL completa
@@ -22,25 +22,23 @@ if (DB_HOST && (DB_HOST.startsWith('mongodb://') || DB_HOST.startsWith('mongodb+
     }
 }
 
-const client = new MongoClient(mongoUrl);
-let dbConnection;
+const client = new MongoClient(mongoUrl!);
+let dbConnection: Db | undefined;
 
-module.exports = {
-    connectToDb: async (callback) => {
-        try {
-            console.log(`📡 Intentando conectar a MongoDB en: ${DB_HOST}:${MONGO_PORT}`);
-            
-            await client.connect();
-            console.log("✅ Conexión exitosa a MongoDB");
+export const connectToDb = async (callback: (err?: unknown) => void) => {
+    try {
+        console.log(`📡 Intentando conectar a MongoDB en: ${DB_HOST}:${MONGO_PORT}`);
+        
+        await client.connect();
+        console.log("✅ Conexión exitosa a MongoDB");
 
-            dbConnection = client.db(MONGO_INITDB_DATABASE || undefined); 
-            
-            return callback();
-        } catch (error) {
-            console.error("❌ Error conectando a la base de datos:", error);
-            return callback(error);
-        }
-    },
-
-    getDb: () => dbConnection
+        dbConnection = client.db(MONGO_INITDB_DATABASE || undefined); 
+        
+        return callback();
+    } catch (error) {
+        console.error("❌ Error conectando a la base de datos:", error);
+        return callback(error);
+    }
 };
+
+export const getDb = () => dbConnection;

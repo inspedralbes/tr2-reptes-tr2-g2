@@ -1,9 +1,9 @@
-require('dotenv').config(); 
+import dotenv from 'dotenv';
+dotenv.config(); 
 
-const express = require('express');
-const cors = require('cors');
-// const { connectToDb } = require('./config/database'); <--- ESTO YA NO HACE FALTA
-const routes = require('./routes'); // Asegúrate de que esto apunta a tus rutas nuevas
+import express from 'express';
+import cors from 'cors';
+import routes from './routes'; 
 
 const app = express();
 app.set('trust proxy', 1);
@@ -15,7 +15,7 @@ const allowedOrigins = [
   'http://enginy-api.kore29.com',
   'http://localhost:8002',     
   'http://localhost:3000',  
-]       
+];       
 
 app.use(cors({
   origin: function (origin, callback) {

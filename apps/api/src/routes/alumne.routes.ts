@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const alumneController = require('../controllers/alumne.controller');
+import * as alumneController from '../controllers/alumne.controller';
 
 router.get('/', alumneController.getAlumnes);
 router.post('/', alumneController.createAlumne);
 
-module.exports = router;
+export default router;

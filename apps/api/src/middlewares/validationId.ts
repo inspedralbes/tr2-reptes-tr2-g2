@@ -1,7 +1,8 @@
-const { ObjectId } = require('mongodb');
+import { ObjectId } from 'mongodb';
+import { Request, Response, NextFunction } from 'express';
 
 // Este middleware corta la petición si el ID está mal, protegiendo al controlador
-const validateId = (req, res, next) => {
+const validateId = (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   
   if (!ObjectId.isValid(id)) {
@@ -12,4 +13,4 @@ const validateId = (req, res, next) => {
   next();
 };
 
-module.exports = validateId;
+export default validateId;

@@ -1,7 +1,8 @@
-const prisma = require('../lib/prisma');
+import prisma from '../lib/prisma';
+import { Request, Response } from 'express';
 
 // GET: Listar todos
-exports.getCentres = async (req, res) => {
+export const getCentres = async (req: Request, res: Response) => {
   try {
     const centres = await prisma.centre.findMany();
     res.json(centres);
@@ -11,11 +12,11 @@ exports.getCentres = async (req, res) => {
 };
 
 // GET: Uno por ID
-exports.getCentreById = async (req, res) => {
+export const getCentreById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const centre = await prisma.centre.findUnique({
-      where: { id: parseInt(id) }
+      where: { id: parseInt(id as string) }
     });
     if (!centre) return res.status(404).json({ error: 'Centro no encontrado' });
     res.json(centre);
@@ -25,7 +26,7 @@ exports.getCentreById = async (req, res) => {
 };
 
 // POST: Crear
-exports.createCentre = async (req, res) => {
+export const createCentre = async (req: Request, res: Response) => {
   try {
     const newCentre = await prisma.centre.create({
       data: req.body // Asegúrate de validar datos en producción

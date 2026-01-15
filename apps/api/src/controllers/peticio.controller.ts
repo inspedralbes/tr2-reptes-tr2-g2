@@ -1,7 +1,9 @@
-const prisma = require('../lib/prisma');
+import prisma from '../lib/prisma';
+import { Request, Response } from 'express';
+import { ESTADOS_PETICION, EstadoPeticion } from '@enginy/shared';
 
 // GET: Ver peticiones (Idealmente filtrar por rol aquí)
-exports.getPeticions = async (req, res) => {
+export const getPeticions = async (req: Request, res: Response) => {
   try {
     const peticions = await prisma.peticio.findMany({
       include: {
@@ -16,7 +18,7 @@ exports.getPeticions = async (req, res) => {
 };
 
 // POST: Crear solicitud
-exports.createPeticio = async (req, res) => {
+export const createPeticio = async (req: Request, res: Response) => {
   const { id_centre, id_taller, alumnes_aprox, comentaris } = req.body;
   try {
     const nuevaPeticio = await prisma.peticio.create({
@@ -25,7 +27,7 @@ exports.createPeticio = async (req, res) => {
         taller: { connect: { id: parseInt(id_taller) } },
         alumnes_aprox: parseInt(alumnes_aprox),
         comentaris,
-        estat: 'PENDENT'
+        estat: ESTADOS_PETICION.PENDIENTE as EstadoPeticion
       }
     });
     res.json(nuevaPeticio);
@@ -36,14 +38,14 @@ exports.createPeticio = async (req, res) => {
 };
 
 // PATCH: Cambiar estado (Aprobar/Rechazar)
-exports.updatePeticioStatus = async (req, res) => {
+export const updatePeticioStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { estat } = req.body; // 'ACCEPTADA', 'REBUTJADA'
   
   try {
     const updated = await prisma.peticio.update({
-      where: { id: parseInt(id) },
-      data: { estat }
+      where: { id: parseInt(id as string) },
+      data: { estat: estat as EstadoPeticion }
     });
     
     // AQUÍ IRÍA LA LÓGICA DE CREAR LA ASIGNACIÓN AUTOMÁTICA SI SE ACEPTA

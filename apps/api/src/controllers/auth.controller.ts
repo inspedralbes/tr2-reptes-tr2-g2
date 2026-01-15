@@ -1,9 +1,10 @@
-// apps/api/src/controllers/auth.controller.js
-const prisma = require('../lib/prisma');
-const bcrypt = require('bcrypt'); // Asegúrate de tener: npm install bcrypt jsonwebtoken
-const jwt = require('jsonwebtoken');
+// apps/api/src/controllers/auth.controller.ts
+import prisma from '../lib/prisma';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { Request, Response } from 'express';
 
-exports.login = async (req, res) => {
+export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
@@ -51,7 +52,8 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.register = async (req, res) => {
+export const register = async (req: Request, res: Response) => {
   // Lógica de registro para Admins o script inicial
   // ... similar al createTaller pero con bcrypt.hash(password, 10)
+  res.status(501).json({ error: 'Not implemented' });
 };

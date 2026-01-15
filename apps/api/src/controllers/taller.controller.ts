@@ -1,8 +1,9 @@
-// apps/api/src/controllers/taller.controller.js
-const prisma = require('../lib/prisma'); // Importamos nuestro cliente singleton
+// apps/api/src/controllers/taller.controller.ts
+import prisma from '../lib/prisma'; // Importamos nuestro cliente singleton
+import { Request, Response } from 'express';
 
 // GET: Listar todos los talleres
-exports.getTallers = async (req, res) => {
+export const getTallers = async (req: Request, res: Response) => {
   try {
     const tallers = await prisma.taller.findMany({
       include: {
@@ -17,11 +18,11 @@ exports.getTallers = async (req, res) => {
 };
 
 // GET: Detalle de un taller
-exports.getTallerById = async (req, res) => {
+export const getTallerById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const taller = await prisma.taller.findUnique({
-      where: { id: parseInt(id) }, // ¡OJO! En URL viene string, en DB es Int. Hay que convertir.
+      where: { id: parseInt(id as string) }, // ¡OJO! En URL viene string, en DB es Int. Hay que convertir.
       include: {
         sector: true,
       },
@@ -35,7 +36,7 @@ exports.getTallerById = async (req, res) => {
 };
 
 // POST: Crear Taller
-exports.createTaller = async (req, res) => {
+export const createTaller = async (req: Request, res: Response) => {
   // Asumimos que validas los datos antes o los extraes del body
   const { titol, descripcio, durada_h, places_maximes, modalitat, id_sector } = req.body;
 
@@ -53,18 +54,19 @@ exports.createTaller = async (req, res) => {
     res.status(201).json(nuevoTaller);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al crear el taller', details: error.message });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    res.status(500).json({ error: 'Error al crear el taller', details: (error as any).message });
   }
 };
 
 // PUT: Actualizar
-exports.updateTaller = async (req, res) => {
+export const updateTaller = async (req: Request, res: Response) => {
   const { id } = req.params;
   const datos = req.body;
 
   try {
     const tallerActualizado = await prisma.taller.update({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id as string) },
       data: datos, // Prisma ignora los campos que no coinciden, pero mejor filtrar
     });
     res.json(tallerActualizado);
@@ -74,16 +76,17 @@ exports.updateTaller = async (req, res) => {
 };
 
 // DELETE: Borrar
-exports.deleteTaller = async (req, res) => {
+export const deleteTaller = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     await prisma.taller.delete({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id as string) },
     });
     res.json({ message: 'Taller eliminado correctamente' });
   } catch (error) {
     // Código P2025 es "Record to delete does not exist" en Prisma
-    if (error.code === 'P2025') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((error as any).code === 'P2025') {
       return res.status(404).json({ error: 'Taller no encontrado' });
     }
     res.status(500).json({ error: 'Error al eliminar' });

@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const tallerController = require('../controllers/taller.controller');
+import * as tallerController from '../controllers/taller.controller';
 
 // GET /api/tallers - Listar todos los talleres (público o protegido, según decidas)
 router.get('/', tallerController.getTallers);
@@ -18,4 +18,4 @@ router.put('/:id', tallerController.updateTaller);
 // DELETE /api/tallers/:id - Borrar taller
 router.delete('/:id', tallerController.deleteTaller);
 
-module.exports = router;
+export default router;
