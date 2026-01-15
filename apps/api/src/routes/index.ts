@@ -6,6 +6,7 @@ import authRoutes from './auth.routes';
 import tallerRoutes from './taller.routes';
 import centroRoutes from './centro.routes';
 import peticioRoutes from './peticio.routes'; // Nueva ruta para el flujo de reservas
+import assignacioRoutes from './assignacio.routes';
 import alumneRoutes from './alumne.routes';
 
 // --- Definir las rutas base ---
@@ -19,6 +20,7 @@ router.use('/centres', centroRoutes);
 
 // Rutas del Flujo de Negocio (Solicitudes y Asignaciones)
 router.use('/peticions', peticioRoutes);
+router.use('/assignacions', assignacioRoutes);
 
 // Rutas de Alumnos e Inscripciones
 router.use('/alumnes', alumneRoutes);

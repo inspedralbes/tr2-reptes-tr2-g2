@@ -36,3 +36,18 @@ export const createCentre = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al crear centro' });
   }
 };
+
+// PATCH: Marcar asistencia a la reunión
+export const updateCentreAttendance = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { asistencia_reunion } = req.body;
+  try {
+    const updated = await prisma.centre.update({
+      where: { id_centre: parseInt(id as string) },
+      data: { asistencia_reunion }
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al actualizar asistencia' });
+  }
+};

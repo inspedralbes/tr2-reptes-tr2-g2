@@ -3,6 +3,11 @@ export interface User {
   id: number;
   email: string;
   nom_complet: string;
+  id_centre?: number;
+  centre?: {
+    id_centre: number;
+    nom: string;
+  };
   rol: {
     nom_rol: 'ADMIN' | 'COORDINADOR' | 'PROFESSOR';
   };

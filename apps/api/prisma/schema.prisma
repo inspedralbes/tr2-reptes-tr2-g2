@@ -12,23 +12,23 @@ datasource db {
 // ==========================================
 
 model Sector {
-  id_sector   Int      @id @default(autoincrement())
-  nom         String
-  descripcio  String?  @db.Text
-  tallers     Taller[]
+  id_sector  Int      @id @default(autoincrement())
+  nom        String
+  descripcio String?  @db.Text
+  tallers    Taller[]
 
   @@map("sectors")
 }
 
 model Taller {
-  id_taller        Int        @id @default(autoincrement())
+  id_taller        Int          @id @default(autoincrement())
   titol            String
   descripcio_curta String
   durada_h         Int
-  places_maximes   Int        @default(25)
+  places_maximes   Int          @default(25)
   modalitat        Modalitat
   id_sector        Int
-  sector           Sector     @relation(fields: [id_sector], references: [id_sector])
+  sector           Sector       @relation(fields: [id_sector], references: [id_sector])
   peticions        Peticio[]
   assignacions     Assignacio[]
 
@@ -46,39 +46,52 @@ enum Modalitat {
 // ==========================================
 
 model Centre {
-  id_centre         Int      @id @default(autoincrement())
-  codi_centre       String   @unique
-  nom               String
-  adreca            String?
-  telefon_contacte  String?
-  email_contacte    String?
-  
-  usuaris           Usuari[]
-  peticions         Peticio[]
-  assignacions      Assignacio[]
-  alumnes           Alumne[] @relation("CentreProcedencia")
+  id_centre          Int     @id @default(autoincrement())
+  codi_centre        String  @unique
+  nom                String
+  adreca             String?
+  telefon_contacte   String?
+  email_contacte     String?
+  asistencia_reunion Boolean @default(false)
+
+  usuaris      Usuari[]
+  peticions    Peticio[]
+  assignacions Assignacio[]
+  alumnes      Alumne[]     @relation("CentreProcedencia")
+  incidencies  Incidencia[]
 
   @@map("centres")
 }
 
+model Incidencia {
+  id_incidencia Int      @id @default(autoincrement())
+  id_centre     Int
+  centre        Centre   @relation(fields: [id_centre], references: [id_centre])
+  descripcio    String   @db.Text
+  estat         String   @default("Pendent")
+  data_creacio  DateTime @default(now())
+
+  @@map("incidencies")
+}
+
 model Rol {
-  id_rol    Int      @id @default(autoincrement())
-  nom_rol   String
-  usuaris   Usuari[]
+  id_rol  Int      @id @default(autoincrement())
+  nom_rol String
+  usuaris Usuari[]
 
   @@map("rols")
 }
 
 model Usuari {
-  id_usuari      Int      @id @default(autoincrement())
-  nom_complet    String
-  email          String   @unique
-  password_hash  String
-  id_rol         Int
-  rol            Rol      @relation(fields: [id_rol], references: [id_rol])
-  id_centre      Int?
-  centre         Centre?  @relation(fields: [id_centre], references: [id_centre])
-  
+  id_usuari     Int     @id @default(autoincrement())
+  nom_complet   String
+  email         String  @unique
+  password_hash String
+  id_rol        Int
+  rol           Rol     @relation(fields: [id_rol], references: [id_rol])
+  id_centre     Int?
+  centre        Centre? @relation(fields: [id_centre], references: [id_centre])
+
   assignacio_professors AssignacioProfessor[]
   logs                  LogAuditoria[]
 
@@ -90,17 +103,17 @@ model Usuari {
 // ==========================================
 
 model Peticio {
-  id_peticio    Int           @id @default(autoincrement())
+  id_peticio    Int          @id @default(autoincrement())
   id_centre     Int
-  centre        Centre        @relation(fields: [id_centre], references: [id_centre])
+  centre        Centre       @relation(fields: [id_centre], references: [id_centre])
   id_taller     Int
-  taller        Taller        @relation(fields: [id_taller], references: [id_taller])
+  taller        Taller       @relation(fields: [id_taller], references: [id_taller])
   alumnes_aprox Int?
-  comentaris    String?       @db.Text
-  data_peticio  DateTime      @default(now())
-  estat         EstatPeticio  @default(Pendent)
-  
-  assignacio    Assignacio?
+  comentaris    String?      @db.Text
+  data_peticio  DateTime     @default(now())
+  estat         EstatPeticio @default(Pendent)
+
+  assignacio Assignacio?
 
   @@map("peticions")
 }
@@ -112,21 +125,21 @@ enum EstatPeticio {
 }
 
 model Assignacio {
-  id_assignacio Int              @id @default(autoincrement())
-  id_peticio    Int?             @unique
-  peticio       Peticio?         @relation(fields: [id_peticio], references: [id_peticio])
+  id_assignacio Int             @id @default(autoincrement())
+  id_peticio    Int?            @unique
+  peticio       Peticio?        @relation(fields: [id_peticio], references: [id_peticio])
   id_centre     Int
-  centre        Centre           @relation(fields: [id_centre], references: [id_centre])
+  centre        Centre          @relation(fields: [id_centre], references: [id_centre])
   id_taller     Int
-  taller        Taller           @relation(fields: [id_taller], references: [id_taller])
-  data_inici    DateTime?        @db.Date
-  data_fi       DateTime?        @db.Date
-  estat         EstatAssignacio  @default(En_curs)
-  
-  professors    AssignacioProfessor[]
-  checklist     ChecklistAssignacio[]
-  inscripcions  Inscripcio[]
-  respostes     RespostesQuestionari[]
+  taller        Taller          @relation(fields: [id_taller], references: [id_taller])
+  data_inici    DateTime?       @db.Date
+  data_fi       DateTime?       @db.Date
+  estat         EstatAssignacio @default(En_curs)
+
+  professors   AssignacioProfessor[]
+  checklist    ChecklistAssignacio[]
+  inscripcions Inscripcio[]
+  respostes    RespostesQuestionari[]
 
   @@map("assignacions")
 }
@@ -143,19 +156,19 @@ model AssignacioProfessor {
   id_usuari     Int
   usuari        Usuari     @relation(fields: [id_usuari], references: [id_usuari])
   es_principal  Boolean    @default(false)
-  
+
   @@id([id_assignacio, id_usuari])
   @@map("assignacio_professors")
 }
 
 model ChecklistAssignacio {
-  id_checklist    Int       @id @default(autoincrement())
-  id_assignacio   Int
-  assignacio      Assignacio @relation(fields: [id_assignacio], references: [id_assignacio])
-  pas_nom         String
-  completat       Boolean   @default(false)
-  url_evidencia   String?
-  data_completat  DateTime?
+  id_checklist   Int        @id @default(autoincrement())
+  id_assignacio  Int
+  assignacio     Assignacio @relation(fields: [id_assignacio], references: [id_assignacio])
+  pas_nom        String
+  completat      Boolean    @default(false)
+  url_evidencia  String?
+  data_completat DateTime?
 
   @@map("checklist_assignacio")
 }
@@ -165,15 +178,15 @@ model ChecklistAssignacio {
 // ==========================================
 
 model Alumne {
-  id_alumne             Int        @id @default(autoincrement())
-  idalu                 String     @unique
+  id_alumne             Int     @id @default(autoincrement())
+  idalu                 String  @unique
   nom                   String
   cognoms               String
   curs                  String?
   id_centre_procedencia Int?
-  centre_procedencia    Centre?    @relation("CentreProcedencia", fields: [id_centre_procedencia], references: [id_centre])
-  
-  inscripcions          Inscripcio[]
+  centre_procedencia    Centre? @relation("CentreProcedencia", fields: [id_centre_procedencia], references: [id_centre])
+
+  inscripcions Inscripcio[]
 
   @@map("alumnes")
 }
@@ -184,19 +197,19 @@ model Inscripcio {
   assignacio    Assignacio @relation(fields: [id_assignacio], references: [id_assignacio])
   id_alumne     Int
   alumne        Alumne     @relation(fields: [id_alumne], references: [id_alumne])
-  
-  assistencia   Assistencia[]
-  avaluacions   AvaluacioCompetencial[]
+
+  assistencia Assistencia[]
+  avaluacions AvaluacioCompetencial[]
 
   @@map("inscripcions")
 }
 
 model Assistencia {
-  id_assistencia Int               @id @default(autoincrement())
+  id_assistencia Int              @id @default(autoincrement())
   id_inscripcio  Int
-  inscripcio     Inscripcio        @relation(fields: [id_inscripcio], references: [id_inscripcio])
+  inscripcio     Inscripcio       @relation(fields: [id_inscripcio], references: [id_inscripcio])
   numero_sessio  Int
-  data_sessio    DateTime          @db.Date
+  data_sessio    DateTime         @db.Date
   estat          EstatAssistencia
   observacions   String?
 
@@ -215,11 +228,11 @@ enum EstatAssistencia {
 // ==========================================
 
 model Competencia {
-  id_competencia Int               @id @default(autoincrement())
+  id_competencia Int              @id @default(autoincrement())
   nom            String
   tipus          TipusCompetencia
-  
-  avaluacions    AvaluacioCompetencial[]
+
+  avaluacions AvaluacioCompetencial[]
 
   @@map("competencies")
 }
@@ -241,7 +254,7 @@ model AvaluacioCompetencial {
 }
 
 model ModelQuestionari {
-  id_model    Int          @id @default(autoincrement())
+  id_model    Int         @id @default(autoincrement())
   titol       String
   destinatari Destinatari
   preguntes   Pregunta[]
@@ -256,10 +269,10 @@ enum Destinatari {
 }
 
 model Pregunta {
-  id_pregunta    Int                  @id @default(autoincrement())
+  id_pregunta    Int                    @id @default(autoincrement())
   id_model       Int
-  model          ModelQuestionari     @relation(fields: [id_model], references: [id_model])
-  enunciat       String               @db.Text
+  model          ModelQuestionari       @relation(fields: [id_model], references: [id_model])
+  enunciat       String                 @db.Text
   tipus_resposta TipusResposta
   respostes      RespostesQuestionari[]
 
@@ -267,9 +280,9 @@ model Pregunta {
 }
 
 enum TipusResposta {
-  Likert_1_5  @map("Likert 1-5")
+  Likert_1_5 @map("Likert 1-5")
   Oberta
-  Si_No       @map("Si/No")
+  Si_No      @map("Si/No")
   Multiple
 }
 
@@ -291,14 +304,14 @@ model RespostesQuestionari {
 // ==========================================
 
 model LogAuditoria {
-  id_log              Int       @id @default(autoincrement())
+  id_log              Int      @id @default(autoincrement())
   id_usuari           Int?
-  usuari              Usuari?   @relation(fields: [id_usuari], references: [id_usuari])
+  usuari              Usuari?  @relation(fields: [id_usuari], references: [id_usuari])
   accio               String
   taula_afectada      String?
   id_registre_afectat Int?
   detalls             Json?
-  data_hora           DateTime  @default(now())
+  data_hora           DateTime @default(now())
 
   @@map("logs_auditoria")
 }

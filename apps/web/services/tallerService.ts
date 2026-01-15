@@ -24,11 +24,11 @@ const tallerService = {
     const api = getApi();
     try {
       // Backend returns an array directly: [...]
-      const response = await api.get<any[]>("/api/tallers");
+      const response = await api.get<any[]>("/tallers");
 
       // Adapt backend data to frontend Taller interface
       return response.data.map((t: any) => ({
-        _id: t.id.toString(),
+        _id: t.id_taller.toString(),
         titol: t.titol,
         sector: t.sector?.nom || "General", // Fallback if sector name is missing
         modalitat: t.modalitat,
@@ -65,7 +65,7 @@ const tallerService = {
         id_sector: 1, // Hardcoded for now as we don't have sector management
       };
 
-      const response = await api.post("/api/tallers", payload);
+      const response = await api.post("/tallers", payload);
       const t = response.data;
 
       // Return adapted created object
@@ -106,7 +106,7 @@ const tallerService = {
         if (tallerData.detalls_tecnics.places_maximes) payload.places_maximes = tallerData.detalls_tecnics.places_maximes;
       }
 
-      const response = await api.put(`/api/tallers/${id}`, payload);
+      const response = await api.put(`/tallers/${id}`, payload);
       const t = response.data;
 
       // Return adapted object
@@ -138,7 +138,7 @@ const tallerService = {
   delete: async (id: string): Promise<void> => {
     const api = getApi();
     try {
-      await api.delete(`/api/tallers/${id}`);
+      await api.delete(`/tallers/${id}`);
     } catch (error: any) {
       console.error("Error en tallerService.delete:", error);
       const errorMessage = error.response?.data?.message || "No se pudo eliminar el taller";
