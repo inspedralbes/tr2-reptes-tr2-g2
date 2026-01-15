@@ -30,7 +30,7 @@ export const login = async (req: Request, res: Response) => {
     // 3. Generar JWT
     const token = jwt.sign(
       { 
-        userId: usuari.id, 
+        userId: usuari.id_usuari, 
         role: usuari.rol.nom_rol, 
         centreId: usuari.id_centre 
       },

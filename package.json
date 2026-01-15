@@ -4,7 +4,6 @@
   "description": "**Central Hub for the Enginy Ecosystem | Unified Modern Stack**",
   "private": true,
   "main": "index.js",
-  "packageManager": "npm@11.7.0",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -17,12 +16,10 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "echo \"Error: no test specified\" && exit 1",
-    
     "// --- DATABASE HELPERS ---": "",
     "db:studio": "turbo run studio --filter=api",
     "db:push": "turbo run db:push --filter=api",
     "db:seed": "turbo run db:seed --filter=api",
-
     "// --- MAINTENANCE ---": "",
     "clean": "rm -rf node_modules package-lock.json apps/*/node_modules apps/*/package-lock.json packages/*/node_modules packages/*/package-lock.json"
   },
@@ -49,7 +46,8 @@
   },
   "homepage": "https://github.com/inspedralbes/tr2-reptes-tr2-g2#readme",
   "devDependencies": {
-    "turbo": "^2.7.4",
-    "prettier": "latest"
+    "@types/bcrypt": "^6.0.0",
+    "prettier": "latest",
+    "turbo": "^2.7.4"
   }
 }

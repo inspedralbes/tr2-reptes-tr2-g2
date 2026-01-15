@@ -23,8 +23,8 @@ export const createPeticio = async (req: Request, res: Response) => {
   try {
     const nuevaPeticio = await prisma.peticio.create({
       data: {
-        centre: { connect: { id: parseInt(id_centre) } },
-        taller: { connect: { id: parseInt(id_taller) } },
+        centre: { connect: { id_centre: parseInt(id_centre) } },
+        taller: { connect: { id_taller: parseInt(id_taller) } },
         alumnes_aprox: parseInt(alumnes_aprox),
         comentaris,
         estat: ESTADOS_PETICION.PENDIENTE as EstadoPeticion
@@ -44,7 +44,7 @@ export const updatePeticioStatus = async (req: Request, res: Response) => {
   
   try {
     const updated = await prisma.peticio.update({
-      where: { id: parseInt(id as string) },
+      where: { id_peticio: parseInt(id as string) },
       data: { estat: estat as EstadoPeticion }
     });
     

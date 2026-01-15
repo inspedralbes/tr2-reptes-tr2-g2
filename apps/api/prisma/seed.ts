@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -78,7 +78,7 @@ async function main() {
       nom_complet: 'Administrador Global',
       email: 'admin@admin.com',
       password_hash: passAdmin,
-      id_rol: rolAdmin.id
+      id_rol: rolAdmin.id_rol
     }
   });
 
@@ -89,8 +89,8 @@ async function main() {
       nom_complet: 'Coordinador General',
       email: 'centros@centros.com',
       password_hash: passCentro,
-      id_rol: rolCoord.id,
-      id_centre: centroBrossa.id
+      id_rol: rolCoord.id_rol,
+      id_centre: centroBrossa.id_centre
     }
   });
 
@@ -101,8 +101,8 @@ async function main() {
       nom_complet: 'Professor Ejemplo',
       email: 'profe@profe.com',
       password_hash: passProfe,
-      id_rol: rolProfe.id,
-      id_centre: centroMila.id
+      id_rol: rolProfe.id_rol,
+      id_centre: centroMila.id_centre
     }
   });
 
@@ -115,7 +115,7 @@ async function main() {
       durada_h: 20,
       places_maximes: 16, // Parseado a Int
       modalitat: 'A',     // Enum
-      id_sector: sectorAgro.id
+      id_sector: sectorAgro.id_sector
     }
   });
 
@@ -126,7 +126,7 @@ async function main() {
       durada_h: 20,
       places_maximes: 20,
       modalitat: 'B',
-      id_sector: sectorOci.id
+      id_sector: sectorOci.id_sector
     }
   });
 
@@ -137,7 +137,7 @@ async function main() {
       durada_h: 30,
       places_maximes: 15,
       modalitat: 'C',
-      id_sector: sectorEnergia.id
+      id_sector: sectorEnergia.id_sector
     }
   });
 
@@ -150,7 +150,7 @@ async function main() {
       cognoms: 'García',
       idalu: '111111111', // Inventado
       curs: '3r ESO',
-      id_centre_procedencia: centroBrossa.id
+      id_centre_procedencia: centroBrossa.id_centre
     }
   });
 
@@ -160,7 +160,7 @@ async function main() {
       cognoms: 'López',
       idalu: '222222222',
       curs: '4t ESO',
-      id_centre_procedencia: centroMila.id
+      id_centre_procedencia: centroMila.id_centre
     }
   });
 

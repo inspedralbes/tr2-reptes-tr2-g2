@@ -22,7 +22,7 @@ export const getTallerById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const taller = await prisma.taller.findUnique({
-      where: { id: parseInt(id as string) }, // ¡OJO! En URL viene string, en DB es Int. Hay que convertir.
+      where: { id_taller: parseInt(id as string) }, // ¡OJO! En URL viene string, en DB es Int. Hay que convertir.
       include: {
         sector: true,
       },
@@ -66,7 +66,7 @@ export const updateTaller = async (req: Request, res: Response) => {
 
   try {
     const tallerActualizado = await prisma.taller.update({
-      where: { id: parseInt(id as string) },
+      where: { id_taller: parseInt(id as string) },
       data: datos, // Prisma ignora los campos que no coinciden, pero mejor filtrar
     });
     res.json(tallerActualizado);
@@ -80,7 +80,7 @@ export const deleteTaller = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     await prisma.taller.delete({
-      where: { id: parseInt(id as string) },
+      where: { id_taller: parseInt(id as string) },
     });
     res.json({ message: 'Taller eliminado correctamente' });
   } catch (error) {

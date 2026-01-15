@@ -16,7 +16,7 @@ export const getCentreById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const centre = await prisma.centre.findUnique({
-      where: { id: parseInt(id as string) }
+      where: { id_centre: parseInt(id as string) }
     });
     if (!centre) return res.status(404).json({ error: 'Centro no encontrado' });
     res.json(centre);
