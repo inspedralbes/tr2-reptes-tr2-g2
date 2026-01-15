@@ -1,52 +1,145 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { getUser, logout, User } from '@/lib/auth';
+export const dynamic = 'force-dynamic';
 
-export default function AdminDashboard() {
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
+import { useState, useEffect, useMemo, useCallback } from "react";
+import WorkshopDetail from "../../components/WorkshopDetail";
+import WorkshopCard from "../../components/WorkshopCard";
+import tallerService, { Taller } from "../../services/tallerService";
+import WorkshopActions from "../../components/WorkshopActions";
+import CreateWorkshopModal from "../../components/CreateWorkshopModal";
 
-  useEffect(() => {
-    const currentUser = getUser();
-    if (!currentUser || currentUser.rol.nom_rol !== 'ADMIN') {
-      router.push('/login');
-      return;
+export default function TallerScreen() {
+  const [selectedWorkshop, setSelectedWorkshop] = useState<Taller | null>(null);
+  const [editingWorkshop, setEditingWorkshop] = useState<Taller | null>(null);
+  const [talleres, setTalleres] = useState<Taller[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isCreateModalVisible, setCreateModalVisible] = useState(false);
+
+  const fetchTalleres = useCallback(async () => {
+    try {
+      const listaTalleres = await tallerService.getAll();
+      setTalleres(listaTalleres);
+      setError(null);
+    } catch (err) {
+      setError("No se pudieron cargar los talleres.");
+      console.error(err);
     }
-    setUser(currentUser);
   }, []);
 
-  if (!user) return <div className="p-8">Cargando...</div>;
+  useEffect(() => {
+    setLoading(true);
+    fetchTalleres().finally(() => setLoading(false));
+  }, [fetchTalleres]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchTalleres();
+    setRefreshing(false);
+  }, [fetchTalleres]);
+
+  const filteredTalleres = useMemo(() => {
+    if (!searchQuery) {
+      return talleres;
+    }
+    return talleres.filter((taller) =>
+      taller.titol?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [talleres, searchQuery]);
+
+  const handleWorkshopSaved = (savedWorkshop: Taller) => {
+    setTalleres((prev) => {
+      const exists = prev.find((t) => t._id === savedWorkshop._id);
+      if (exists) {
+        return prev.map((t) => (t._id === savedWorkshop._id ? savedWorkshop : t));
+      }
+      return [savedWorkshop, ...prev];
+    });
+    setEditingWorkshop(null);
+  };
+
+  const handleEdit = (taller: Taller) => {
+    setEditingWorkshop(taller);
+    setSelectedWorkshop(null); // Close detail view
+    setCreateModalVisible(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await tallerService.delete(id);
+      setTalleres((prev) => prev.filter((t) => t._id !== id));
+      setSelectedWorkshop(null);
+    } catch (err) {
+      console.error(err);
+      alert("Error al eliminar el taller");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-1 justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-500 font-medium">Carregant Tallers...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const renderContent = () => {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-5">
+        {filteredTalleres.map((taller) => (
+          <WorkshopCard
+            key={taller._id}
+            item={taller}
+            onPress={() => setSelectedWorkshop(taller)}
+          />
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-800">Panel de Administración</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-600">Hola, {user.nom_complet}</span>
-              <button
-                onClick={logout}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm transition"
-              >
-                Cerrar Sesión
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-blue-600 text-2xl font-bold text-center mb-6">
+          Tallers Disponibles
+        </h1>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">
-            <p className="text-gray-500 text-lg">Bienvenido al Dashboard de Administrador</p>
-          </div>
-        </div>
-      </main>
+        <WorkshopActions
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onFilterPress={() => console.log("Filter pressed")}
+          onCreatePress={() => {
+            setEditingWorkshop(null);
+            setCreateModalVisible(true);
+          }}
+        />
+
+        {renderContent()}
+      </div>
+
+      <WorkshopDetail
+        visible={!!selectedWorkshop}
+        onClose={() => setSelectedWorkshop(null)}
+        selectedWorkshop={selectedWorkshop}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+
+      <CreateWorkshopModal
+        visible={isCreateModalVisible}
+        onClose={() => {
+          setCreateModalVisible(false);
+          setEditingWorkshop(null);
+        }}
+        onWorkshopCreated={handleWorkshopSaved}
+        initialData={editingWorkshop}
+      />
     </div>
   );
 }
