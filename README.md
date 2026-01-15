@@ -68,8 +68,7 @@ docker compose up --build
 La primera vez que arranques, la base de datos estará vacía. Ejecuta este script para crear las tablas e insertar datos de prueba (Talleres, Centros, Usuarios):
 
 ```bash
-docker compose exec api npx prisma db seed
-
+docker compose exec -w /app/apps/api api npx prisma db seed
 ```
 
 
@@ -80,8 +79,8 @@ Una vez levantado Docker, tienes acceso a estos servicios:
 
 | Servicio | URL Local | Descripción |
 |  |  |  |
-| **Web App** | `http://localhost:3000` | Interfaz de Usuario |
-| **API REST** | `http://localhost:4000/api` | Backend Principal |
+| **Web App** | `http://localhost:8002` | Interfaz de Usuario |
+| **API REST** | `http://localhost:3000/api` | Backend Principal |
 | **Adminer** | `http://localhost:8080` | Visor SQL Visual |
 
 ### 🔑 Credenciales de Prueba

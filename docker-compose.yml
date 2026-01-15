@@ -32,24 +32,18 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    # 1. Instala dependencias globales
-    # 2. Entra a la API
-    # 3. Genera Prisma, actualiza DB y arranca
     command: sh -c "npm install && cd apps/api && npx prisma generate && npx prisma db push && npm run dev"
     volumes:
       - ./package.json:/app/package.json
       - ./package-lock.json:/app/package-lock.json
-      # Carpetas de código
       - ./apps/api:/app/apps/api
       - ./packages:/app/packages
-      # Volúmenes de node_modules (protegidos)
-      - /app/node_modules
+      - node_modules_cache:/app/node_modules
       - /app/apps/api/node_modules
     environment:
-      # FIX: Fuerza a Node a buscar módulos en la raíz si no los encuentra en apps/api
       - NODE_PATH=/app/node_modules
     ports:
-      - "4000:4000"
+      - "3000:3000"
     env_file:
       - ./apps/api/.env
     depends_on:
@@ -64,22 +58,18 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    # Instalamos en raíz, luego entramos a web
     command: sh -c "npm install && cd apps/web && npm run dev"
     volumes:
       - ./package.json:/app/package.json
       - ./package-lock.json:/app/package-lock.json
-      # Carpetas de código
       - ./apps/web:/app/apps/web
       - ./packages:/app/packages
-      # Volúmenes de node_modules (protegidos)
-      - /app/node_modules
+      - node_modules_cache:/app/node_modules
       - /app/apps/web/node_modules
     environment:
-      # FIX: CRÍTICO PARA TAILWIND. Fuerza a buscar @tailwindcss/node en la raíz
       - NODE_PATH=/app/node_modules
     ports:
-      - "3000:3000"
+      - "8002:3000"
     env_file:
       - ./apps/web/.env
     networks:
@@ -91,3 +81,4 @@ networks:
 
 volumes:
   postgres_data:
+  node_modules_cache:

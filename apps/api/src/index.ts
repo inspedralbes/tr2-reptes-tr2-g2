@@ -37,7 +37,7 @@ app.use(express.json());
 // Rutas API
 app.use('/api', routes);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor listo en puerto: ${PORT}`);
