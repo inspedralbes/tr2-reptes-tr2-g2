@@ -1,5 +1,5 @@
 services:
-  # Base de Datos (PostgreSQL)
+  # Base de Datos
   db:
     image: postgres:15-alpine
     container_name: enginy_postgres
@@ -15,7 +15,7 @@ services:
     networks:
       - enginy-network
 
-  # Gestor de Base de Datos Visual (Adminer)
+  # Adminer (Visualizador DB)
   adminer:
     image: adminer
     container_name: enginy_adminer
@@ -31,15 +31,25 @@ services:
       context: .
       dockerfile: Dockerfile
       target: base
-    command: sh -c "npm install && npx prisma generate && npx prisma db push && npx prisma db seed && npm run dev"    
-    working_dir: /app/apps/api
+    # CAMBIO 1: Trabajamos desde la raíz para ver todos los paquetes
+    working_dir: /app
+    # CAMBIO 2: Comando actualizado
+    # 1. Instala dependencias globales (conecta packages y apps)
+    # 2. Entra a la API
+    # 3. Genera Prisma, actualiza DB y arranca
+    command: sh -c "npm install && cd apps/api && npx prisma generate && npx prisma db push && npm run dev"
     volumes:
+      # CAMBIO 3: Montamos los archivos de configuración de la RAÍZ
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      # Carpetas de código
       - ./apps/api:/app/apps/api
       - ./packages:/app/packages
+      # Volúmenes de node_modules (para que no se mezclen con tu PC)
       - /app/node_modules
       - /app/apps/api/node_modules
     ports:
-      - "3000:3000"
+      - "4000:4000"
     env_file:
       - ./apps/api/.env
     depends_on:
@@ -53,15 +63,20 @@ services:
       context: .
       dockerfile: Dockerfile
       target: base
-    command: sh -c "npm install && npm run dev"
-    working_dir: /app/apps/web
+    # CAMBIO 1: Trabajamos desde la raíz
+    working_dir: /app
+    # CAMBIO 2: Instalamos en raíz, luego entramos a web
+    command: sh -c "npm install && cd apps/web && npm run dev"
     volumes:
+      # CAMBIO 3: Montamos configs de raíz
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
       - ./apps/web:/app/apps/web
       - ./packages:/app/packages
       - /app/node_modules
       - /app/apps/web/node_modules
     ports:
-      - "8002:8002"
+      - "3000:3000"
     env_file:
       - ./apps/web/.env
     networks:
