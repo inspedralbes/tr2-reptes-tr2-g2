@@ -64,38 +64,44 @@ async function main() {
   });
 
   // 5. CREAR USUARIOS (Profesores/Coordinadores)
-  console.log('users Creando Usuarios...');
+  // 5. CREAR USUARIOS ESPECIFICOS (Requerimiento del Proyecto)
+  console.log('users Creando Usuarios Específicos...');
   const salt = await bcrypt.genSalt(10);
-  const passwordAdmin = await bcrypt.hash('admin123', salt);
-  const passwordUser = await bcrypt.hash('password123', salt);
+  
+  // Contraseñas generadas
+  const passAdmin = await bcrypt.hash('Admin@1234', salt);
+  const passCentro = await bcrypt.hash('Centro@1234', salt); // Coordinador
+  const passProfe = await bcrypt.hash('Profe@1234', salt);
 
-  // Admin Global (Sin centro)
+  // 1. ADMIN (Global) - admin@admin.com
   await prisma.usuari.create({
     data: {
-      nom_complet: 'Super Admin',
-      email: 'admin@enginy.com',
-      password_hash: passwordAdmin,
+      nom_complet: 'Administrador Global',
+      email: 'admin@admin.com',
+      password_hash: passAdmin,
       id_rol: rolAdmin.id
     }
   });
 
-  // Coordinador Brossa
+  // 2. CENTROS (Coordinador) - centros@centros.com
+  // Asignamos al centro Brossa como ejemplo
   await prisma.usuari.create({
     data: {
-      nom_complet: 'Coord. Brossa',
-      email: 'profe.brossa@example.com',
-      password_hash: passwordUser,
+      nom_complet: 'Coordinador General',
+      email: 'centros@centros.com',
+      password_hash: passCentro,
       id_rol: rolCoord.id,
       id_centre: centroBrossa.id
     }
   });
 
-  // Profesor Milà
+  // 3. PROFESOR (Mobile) - profe@profe.com
+  // Asignamos al centro Milà como ejemplo
   await prisma.usuari.create({
     data: {
-      nom_complet: 'Profesor Milà',
-      email: 'profe.mila@example.com',
-      password_hash: passwordUser,
+      nom_complet: 'Professor Ejemplo',
+      email: 'profe@profe.com',
+      password_hash: passProfe,
       id_rol: rolProfe.id,
       id_centre: centroMila.id
     }
