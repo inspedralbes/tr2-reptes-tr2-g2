@@ -11,6 +11,7 @@ import CreateWorkshopModal from "../../components/CreateWorkshopModal";
 
 export default function TallerScreen() {
   const [selectedWorkshop, setSelectedWorkshop] = useState<Taller | null>(null);
+  const [editingWorkshop, setEditingWorkshop] = useState<Taller | null>(null);
   const [talleres, setTalleres] = useState<Taller[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -49,8 +50,32 @@ export default function TallerScreen() {
     );
   }, [talleres, searchQuery]);
 
-  const handleWorkshopCreated = (newWorkshop: Taller) => {
-    setTalleres((prev) => [newWorkshop, ...prev]);
+  const handleWorkshopSaved = (savedWorkshop: Taller) => {
+    setTalleres((prev) => {
+      const exists = prev.find((t) => t._id === savedWorkshop._id);
+      if (exists) {
+        return prev.map((t) => (t._id === savedWorkshop._id ? savedWorkshop : t));
+      }
+      return [savedWorkshop, ...prev];
+    });
+    setEditingWorkshop(null);
+  };
+
+  const handleEdit = (taller: Taller) => {
+    setEditingWorkshop(taller);
+    setSelectedWorkshop(null); // Close detail view
+    setCreateModalVisible(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await tallerService.delete(id);
+      setTalleres((prev) => prev.filter((t) => t._id !== id));
+      setSelectedWorkshop(null);
+    } catch (err) {
+      console.error(err);
+      alert("Error al eliminar el taller");
+    }
   };
 
   if (loading) {
@@ -89,7 +114,10 @@ export default function TallerScreen() {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           onFilterPress={() => console.log("Filter pressed")}
-          onCreatePress={() => setCreateModalVisible(true)}
+          onCreatePress={() => {
+            setEditingWorkshop(null);
+            setCreateModalVisible(true);
+          }}
         />
 
         {renderContent()}
@@ -99,12 +127,18 @@ export default function TallerScreen() {
         visible={!!selectedWorkshop}
         onClose={() => setSelectedWorkshop(null)}
         selectedWorkshop={selectedWorkshop}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
 
       <CreateWorkshopModal
         visible={isCreateModalVisible}
-        onClose={() => setCreateModalVisible(false)}
-        onWorkshopCreated={handleWorkshopCreated}
+        onClose={() => {
+          setCreateModalVisible(false);
+          setEditingWorkshop(null);
+        }}
+        onWorkshopCreated={handleWorkshopSaved}
+        initialData={editingWorkshop}
       />
     </div>
   );

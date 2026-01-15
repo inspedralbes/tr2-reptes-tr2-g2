@@ -8,16 +8,24 @@ interface Props {
   visible: boolean;
   onClose: () => void;
   selectedWorkshop: Taller | null;
+  onEdit: (taller: Taller) => void;
+  onDelete: (id: string) => void;
 }
 
-export default function WorkshopDetail({ visible, onClose, selectedWorkshop }: Props) {
+export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onEdit, onDelete }: Props) {
   const router = useRouter();
 
-  const imageSource = (selectedWorkshop as any)?.imatge 
-    ? (selectedWorkshop as any).imatge 
+  const imageSource = (selectedWorkshop as any)?.imatge
+    ? (selectedWorkshop as any).imatge
     : "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop";
 
   if (!visible || !selectedWorkshop) return null;
+
+  const handleDelete = () => {
+    if (confirm("¿Estás seguro de que quieres eliminar este taller? Esta acción no se puede deshacer.")) {
+      onDelete(selectedWorkshop._id);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -30,16 +38,32 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop }: P
           ✕
         </button>
 
-        <img 
-          src={imageSource} 
+        <img
+          src={imageSource}
           className="w-full h-72 bg-gray-200 object-cover"
           alt={selectedWorkshop.titol}
         />
 
         <div className="p-6">
-          <h1 className="text-blue-600 text-3xl font-bold mb-4 leading-tight">
-            {selectedWorkshop.titol}
-          </h1>
+          <div className="flex justify-between items-start mb-4">
+            <h1 className="text-blue-600 text-3xl font-bold leading-tight flex-1">
+              {selectedWorkshop.titol}
+            </h1>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => onEdit(selectedWorkshop)}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm font-bold"
+              >
+                Editar
+              </button>
+              <button
+                onClick={handleDelete}
+                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-bold"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
 
           {/* Etiquetas */}
           <div className="flex items-center mb-8 flex-wrap gap-2">
