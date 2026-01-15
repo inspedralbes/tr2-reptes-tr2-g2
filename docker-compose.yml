@@ -31,23 +31,23 @@ services:
       context: .
       dockerfile: Dockerfile
       target: base
-    # CAMBIO 1: Trabajamos desde la raíz para ver todos los paquetes
     working_dir: /app
-    # CAMBIO 2: Comando actualizado
-    # 1. Instala dependencias globales (conecta packages y apps)
+    # 1. Instala dependencias globales
     # 2. Entra a la API
     # 3. Genera Prisma, actualiza DB y arranca
     command: sh -c "npm install && cd apps/api && npx prisma generate && npx prisma db push && npm run dev"
     volumes:
-      # CAMBIO 3: Montamos los archivos de configuración de la RAÍZ
       - ./package.json:/app/package.json
       - ./package-lock.json:/app/package-lock.json
       # Carpetas de código
       - ./apps/api:/app/apps/api
       - ./packages:/app/packages
-      # Volúmenes de node_modules (para que no se mezclen con tu PC)
+      # Volúmenes de node_modules (protegidos)
       - /app/node_modules
       - /app/apps/api/node_modules
+    environment:
+      # FIX: Fuerza a Node a buscar módulos en la raíz si no los encuentra en apps/api
+      - NODE_PATH=/app/node_modules
     ports:
       - "4000:4000"
     env_file:
@@ -63,18 +63,21 @@ services:
       context: .
       dockerfile: Dockerfile
       target: base
-    # CAMBIO 1: Trabajamos desde la raíz
     working_dir: /app
-    # CAMBIO 2: Instalamos en raíz, luego entramos a web
+    # Instalamos en raíz, luego entramos a web
     command: sh -c "npm install && cd apps/web && npm run dev"
     volumes:
-      # CAMBIO 3: Montamos configs de raíz
       - ./package.json:/app/package.json
       - ./package-lock.json:/app/package-lock.json
+      # Carpetas de código
       - ./apps/web:/app/apps/web
       - ./packages:/app/packages
+      # Volúmenes de node_modules (protegidos)
       - /app/node_modules
       - /app/apps/web/node_modules
+    environment:
+      # FIX: CRÍTICO PARA TAILWIND. Fuerza a buscar @tailwindcss/node en la raíz
+      - NODE_PATH=/app/node_modules
     ports:
       - "3000:3000"
     env_file:
