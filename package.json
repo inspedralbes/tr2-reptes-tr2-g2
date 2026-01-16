@@ -1,36 +1,62 @@
 {
   "name": "tr2-reptes-tr2-g2",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "**Central Hub for the Enginy Ecosystem | Unified Modern Stack**",
   "private": true,
+  "packageManager": "npm@10.9.4",
   "main": "index.js",
-  "packageManager": "npm@11.7.0",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
-  "directories": {
-    "doc": "doc"
+  "engines": {
+    "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "// --- DATABASE HELPERS ---": "",
+    "db:studio": "turbo run studio --filter=api",
+    "db:push": "turbo run db:push --filter=api",
+    "db:seed": "turbo run db:seed --filter=api",
+    "// --- MAINTENANCE ---": "",
+    "clean": "rm -rf node_modules package-lock.json apps/*/node_modules apps/*/package-lock.json packages/*/node_modules packages/*/package-lock.json"
+  },
+  "directories": {
+    "doc": "doc"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/inspedralbes/tr2-reptes-tr2-g2.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "monorepo",
+    "turborepo",
+    "nextjs",
+    "express",
+    "prisma",
+    "postgres",
+    "docker"
+  ],
+  "author": "Enginy Team",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/inspedralbes/tr2-reptes-tr2-g2/issues"
   },
   "homepage": "https://github.com/inspedralbes/tr2-reptes-tr2-g2#readme",
-  "devDependencies": {
-    "turbo": "^2.7.4"
+"devDependencies": {
+    "@tailwindcss/node": "^4.1.18",
+    "@tailwindcss/postcss": "^4.1.18",
+    "tailwindcss": "^4.1.18",
+    "@types/bcrypt": "^6.0.0",
+    "prettier": "latest",
+    "turbo": "2.7.4",
+    "typescript": "5.3.3",
+    "ts-node": "10.9.2",
+    "tsx": "4.19.2",
+    "nodemon": "3.1.0",
+    "prisma": "5.22.0"
   }
 }

@@ -1,176 +1,96 @@
-# 🚀 Enginy Monorepo (v2.0)
+# 🚀 TR2 Reptes Iter - Enginy
 
-Bienvenido al núcleo del ecosistema **Enginy**. Esta es una infraestructura moderna basada en un **Monorepo** gestionado con **Turborepo**, diseñada para ser escalable, rápida y fácil de desplegar.
+Benvingut al nucli de l'ecosistema **Enginy**. Aquesta és una infraestructura moderna basada en un **Monorepo** gestionat amb **Turborepo**, dissenyada per ser escalable, ràpida i fàcil de desplegar.
 
-> **⚠️ ACTUALIZACIÓN IMPORTANTE (Enero 2026):**
-> Hemos migrado el backend de MongoDB a **PostgreSQL + Prisma**. Si vienes de una versión antigua, revisa la sección de *Configuración Inicial*.
+> [!IMPORTANT]
+> **ACTUALIZACIÓ ARQUITECTÒNICA (Gener 2026):**
+> Hem implementat un nou flux d'arrencada seqüencial amb un servei de `setup` dedicat per garantir la màxima estabilitat i evitar conflictes de dependències en l'entorn Docker.
 
-## 🌐 Entorno de Producción
+## 🌐 Entorn de Producció
 
-El ecosistema está totalmente automatizado y expuesto de forma segura a través de **Cloudflare Tunnels**:
+L'ecosistema està totalment automatitzat i exposat de forma segura a través de **Cloudflare Tunnels**:
 
-* **💻 Web UI (Cliente/Admin):** [enginy.kore29.com](https://enginy.kore29.com)
+* **💻 Web UI (Client/Admin):** [enginy.kore29.com](https://enginy.kore29.com)
 * **🔌 API Gateway:** [api-enginy.kore29.com](https://api-enginy.kore29.com)
 
+## 🏗️ Estructura del Projecte
 
+Utilitzem una arquitectura d'**espais de treball (workspaces)** per compartir codi eficientment:
 
-## 🏗️ Estructura del Proyecto
+* **`apps/web`**: Aplicació unificada de **Next.js 16** (amb Turbopack) que gestiona tant la interfície de client com el panell d'administració.
+* **`apps/api`**: Backend robust en **Node.js 22** amb **Express, Prisma ORM** i execució optimitzada amb `tsx`.
+* **`apps/mobile`**: Aplicació nativa multiplataforma amb **Expo** (iOS/Android).
+* **`packages/shared`**: Llibreria de tipus i utilitats compartides entre el frontend i el backend.
 
-Utilizamos una arquitectura de **espacios de trabajo (workspaces)** para compartir código eficientemente:
+## 🛠️ Stack Tecnològic
 
-* **`apps/web`**: Aplicación unificada de **Next.js** que gestiona tanto la interfaz de cliente como el panel de administración.
-* **`apps/api`**: Backend robusto en **Node.js** con **Express y Prisma ORM**.
-* **`apps/mobile`**: Aplicación nativa multiplataforma con **Expo** (iOS/Android).
-* **`packages/`**: Librerías compartidas (UI, configuraciones, tipos).
+| Component | Tecnologia | Desplegament |
+| :--- | :--- | :--- |
+| **Frontend Web** | Next.js (React 19) + Tailwind CSS | Docker (Port 8002) |
+| **Backend API** | Node.js + Express + **Prisma ORM** | Docker (Port 3000) |
+| **Base de Dades** | **PostgreSQL 15** | Docker |
+| **Orquestrador** | **Turborepo** | Gestió de Monorepo |
+| **Admin BBDD** | **Adminer** | Docker (Port 8080) |
 
+## ⚡ Configuració Inicial (Quick Start)
 
+Gràcies a la nostra **Optimització Premium**, l'arrencada és totalment automatitzada.
 
-## 🛠️ Stack Tecnológico
+### 1. Variables d'Entorn
 
-| Componente | Tecnología | Despliegue |
-|  |  |  |
-| **Frontend Web** | Next.js (React) + Tailwind CSS | Docker (Standalone mode) |
-| **Backend API** | Node.js + Express + **Prisma ORM** | Docker |
-| **Base de Datos** | **PostgreSQL 15** | Docker (Local) / Cloud (Prod) |
-| **App Móvil** | Expo (React Native) | Nativo (Android/iOS) |
-| **Orquestador** | **Turborepo** | Pipeline CI/CD |
-| **Admin BBDD** | **Adminer** | Docker (:8080) |
+1. Copia l'arxiu `.env.example` a `.env` a l'arrel.
+2. Configura les variables necessàries per a cada aplicació a `apps/api/.env`, `apps/web/.env` i `apps/mobile/.env`.
 
+### 2. Arrencada amb Docker
 
-
-## ⚡ Configuración Inicial (Quick Start)
-
-Antes de levantar Docker, necesitas configurar las variables de entorno.
-
-### 1. Variables de Entorno
-
-Hemos unificado la configuración en un archivo de ejemplo.
-
-1. Copia el archivo `.env.example` a `.env` en la raíz.
-2. Abre `.env.example` y sigue las instrucciones para copiar/pegar las secciones correspondientes en:
-* `apps/api/.env` (Backend)
-* `apps/web/.env` (Frontend Web)
-* `apps/mobile/.env` (Frontend Mobile)
-
-
-
-### 2. Levantar Infraestructura
-
-Para levantar Base de Datos, API, Web y Adminer con **Hot-Reloading**:
+L'arrencada utilitza un servei intermediari de `setup` que instal·la dependències, genera el client de Prisma i pobla la base de dades automàticament.
 
 ```bash
-docker compose up --build
+# Arrencada estàndard
+docker compose up
 
+# Arrencada neta (reconstruint imatges i buidant volums)
+docker compose down -v && docker compose up --build
 ```
 
-### 3. Poblar Base de Datos (Seed)
+## 📍 Endpoints i Accessos Locals
 
-La primera vez que arranques, la base de datos estará vacía. Ejecuta este script para crear las tablas e insertar datos de prueba (Talleres, Centros, Usuarios):
+| Servei | URL Local | Descripció |
+| :--- | :--- | :--- |
+| **Web App** | `http://localhost:8002` | Interfície d'Usuari i Admin |
+| **API REST** | `http://localhost:3000/api` | Backend Principal |
+| **Adminer** | `http://localhost:8080` | Gestor de Base de Dades |
 
-```bash
-docker compose exec api npx prisma db seed
+### 🔑 Credencials de Prova (Seed)
 
-```
-
-
-
-## 📍 Endpoints y Accesos Locales
-
-Una vez levantado Docker, tienes acceso a estos servicios:
-
-| Servicio | URL Local | Descripción |
-|  |  |  |
-| **Web App** | `http://localhost:3000` | Interfaz de Usuario |
-| **API REST** | `http://localhost:4000/api` | Backend Principal |
-| **Adminer** | `http://localhost:8080` | Visor SQL Visual |
-
-### 🔑 Credenciales de Prueba
-
-**Usuarios de la App:**
+El sistema pobla automàticament la base de dades amb les següents credencials:
 
 * **Admin Global:** `admin@enginy.com` / `admin123`
-* **Profesor (Brossa):** `profe.brossa@example.com` / `password123`
-* **Profesor (Milà):** `profe.mila@example.com` / `password123`
+* **Professor (Brossa):** `profe.brossa@example.com` / `password123`
+* **Professor (Milà):** `profe.mila@example.com` / `password123`
 
-**Acceso a Base de Datos (Adminer):**
+## 🐳 Arquitectura Docker Seqüencial
 
-* **Sistema:** PostgreSQL
-* **Servidor:** `db` (¡Importante! no usar localhost)
-* **Usuario:** `postgres`
-* **Contraseña:** `root`
-* **Base de Datos:** `enginy_db`
+Per evitar conflictes de lectura/escriptura de fitxers, hem implementat un flux seqüencial:
 
+1. **`db`**: Aixeca PostgreSQL.
+2. **`setup`**: Instal·la paquets, sincronitza la DB i executa el `seed`.
+3. **`api` & `web`**: S'inicien només quan el `setup` ha finalitzat correctament.
 
+Això garanteix que mai tindràs errors de "mòduls no trobats" o fitxers bloquejats.
 
-## 🐳 Flujo de Trabajo con Docker
+## 🗺️ Roadmap i Documentació
 
-Este proyecto utiliza **Multi-stage builds** para optimizar el rendimiento.
+* [x] Migració a **PostgreSQL + Prisma**.
+* [x] Arrencada Seqüencial Premium.
+* [x] Optimització amb **tsx** i **Turbopack**.
+* [ ] Implementació de Lògica d'Assignació Automàtica.
 
-### 💻 Desarrollo
+---
 
-El `docker compose.yml` monta volúmenes locales. Cualquier cambio que hagas en `src/` se reflejará inmediatamente (Hot-Reload) sin reconstruir el contenedor.
+### 📖 Documentació Tècnica Detallada
 
-### 🚀 Producción
+Per a més detalls, consulta els manuals a la carpeta `/doc`:
 
-Para simular el entorno real (imágenes ligeras y optimizadas):
-
-```bash
-docker compose -f docker-compose.prod.yml up --build -d
-
-```
-
-> [!NOTE]
-> Este comando ejecuta `turbo prune`, eliminando dependencias de desarrollo y reduciendo el peso de la imagen final drásticamente.
-
-
-
-## 📱 Desarrollo Mobile (Expo)
-
-La aplicación móvil se ejecuta fuera de Docker para permitir la conexión con el emulador o dispositivo físico.
-
-1. Asegúrate de que tu `apps/mobile/.env` tiene la IP local de tu PC (no localhost).
-2. Lanza el proyecto:
-```bash
-npx turbo dev --filter=mobile
-
-```
-
-
-3. Escanea el QR con **Expo Go**.
-
-
-
-## 🔄 Estándares de Desarrollo
-
-### **Estrategia de GitFlow**
-
-* **`main`**: Producción estable.
-* **`dev`**: Integración (Docker + Postgres). **¡No hacer push directos sin validar!**
-* **`feature/*`**: Ramas para nuevas funcionalidades.
-
-### **Base de Datos (Prisma)**
-
-Si modificas el archivo `schema.prisma`:
-
-1. Actualiza la BBDD local: `npx prisma db push`
-2. Regenera el cliente: `npx prisma generate`
-
-
-
-## 🗺️ Roadmap Actualizado
-
-* [x] Migración a **Monorepo (Turbo)**.
-* [x] Migración a **PostgreSQL + Prisma**.
-* [x] Dockerización completa (Web + API + DB + Adminer).
-* [ ] Implementación de Lógica de Asignación Automática.
-* [ ] Autenticación JWT en Middleware.
-* [ ] Documentación Swagger.
-
-
-
-## 🔑 Documentación Técnica
-
-Para detalles sobre el despliegue en Proxmox o guías de conexión:
-
-👉 **[Documentación Técnica (DOCS.md)](https://www.google.com/search?q=./doc/DOCS.md)**
-👉 **[Guía de Uso (USAGE.md)](https://www.google.com/search?q=./doc/USAGE.md)**
+👉 **[Documentació Tècnica (DOCS.md)](./doc/DOCS.md)**: Detalls d'infraestructura, volums i xarxes.
+👉 **[Guia d'Ús (USAGE.md)](./doc/USAGE.md)**: Fluxos de treball, migracions i manteniment.
