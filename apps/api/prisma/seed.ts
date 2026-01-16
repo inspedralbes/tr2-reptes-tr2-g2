@@ -239,6 +239,38 @@ async function main() {
       tipus: 'milestone'
     }
   });
+  // 10. CREAR PETICIONES Y ASIGNACIONES DE PRUEBA
+  console.log('📝 Creando Peticiones y Asignaciones de prueba...');
+  
+  // Una petición pendiente del centro Milà
+  await prisma.peticio.create({
+    data: {
+      id_centre: centroMila.id_centre,
+      id_taller: 1, // Fusta
+      estat: 'Pendent',
+      data_peticio: new Date('2025-10-05')
+    }
+  });
+
+  // Una asignación confirmada para el centro Brossa
+  await prisma.assignacio.create({
+    data: {
+      id_centre: centroBrossa.id_centre,
+      id_taller: 2, // Imatge personal
+      data_inici: new Date('2025-10-20T10:00:00'),
+      data_fi: new Date('2025-10-20T12:00:00')
+    }
+  });
+
+  // Otra asignación para noviembre
+  await prisma.assignacio.create({
+    data: {
+      id_centre: centroBrossa.id_centre,
+      id_taller: 3, // Energies Renovables
+      data_inici: new Date('2025-11-05T09:00:00'),
+      data_fi: new Date('2025-11-05T14:00:00')
+    }
+  });
 
   console.log('✅ Seed completado con éxito.');
 }

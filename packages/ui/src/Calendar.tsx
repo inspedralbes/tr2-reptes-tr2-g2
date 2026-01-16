@@ -42,8 +42,16 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
 
     // Days of current month
     for (let d = 1; d <= totalDays; d++) {
-      const dateStr = new Date(year, currentDate.getMonth(), d).toISOString().split('T')[0];
-      const dayEvents = events.filter(e => e.date.startsWith(dateStr));
+      // Create date in local time to match the grid day
+      const date = new Date(year, currentDate.getMonth(), d);
+      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      
+      const dayEvents = events.filter(e => {
+        // Simple string comparison for the date part (YYYY-MM-DD)
+        const eventDate = e.date.split('T')[0];
+        return eventDate === dateStr;
+      });
+      
       days.push({ day: d, date: dateStr, dayEvents });
     }
 

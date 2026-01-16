@@ -8,25 +8,30 @@ import getApi from "@/services/api";
 
 export default function CalendarPage() {
   const { user, loading: authLoading } = useAuth();
+  const [activeFase, setActiveFase] = useState<any>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    const fetchData = async () => {
       try {
         const api = getApi();
-        const response = await api.get("/calendar");
-        setEvents(response.data);
+        const [eventsRes, phasesRes] = await Promise.all([
+          api.get("/calendar"),
+          api.get("/fases")
+        ]);
+        setEvents(eventsRes.data);
+        setActiveFase(phasesRes.data.find((f: any) => f.activa));
       } catch (error) {
-        console.error("Error fetching calendar events:", error);
+        console.error("Error fetching calendar data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     if (user) {
-      fetchEvents();
+      fetchData();
     }
   }, [user]);
 
@@ -37,7 +42,27 @@ export default function CalendarPage() {
       title="Calendari Enginy" 
       subtitle="Visualitza totes les fites, tallers i terminis en un sol lloc."
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {activeFase && (
+          <div className="bg-blue-600 rounded-3xl p-6 text-white flex items-center justify-between shadow-xl shadow-blue-900/10 animate-in slide-in-from-top duration-700">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70">Fase Actual del Programa</p>
+                <h3 className="text-xl font-black">{activeFase.nom}</h3>
+              </div>
+            </div>
+            <div className="hidden md:block text-right">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70 mb-1">Termini de la Fase</p>
+              <p className="font-bold text-sm">
+                {new Date(activeFase.data_inici).toLocaleDateString()} — {new Date(activeFase.data_fi).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <div className="py-20 text-center">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto"></div>
