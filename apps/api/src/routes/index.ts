@@ -8,6 +8,7 @@ import centroRoutes from './centro.routes';
 import peticioRoutes from './peticio.routes'; // Nueva ruta para el flujo de reservas
 import assignacioRoutes from './assignacio.routes';
 import alumneRoutes from './alumne.routes';
+import calendarRoutes from './calendar.routes';
 
 // --- Definir las rutas base ---
 
@@ -24,6 +25,9 @@ router.use('/assignacions', assignacioRoutes);
 
 // Rutas de Alumnos e Inscripciones
 router.use('/alumnes', alumneRoutes);
+
+// Rutas de Calendario
+router.use('/calendar', calendarRoutes);
 
 // Health Check (Para ver si la API respira)
 router.get('/health', (req, res) => {

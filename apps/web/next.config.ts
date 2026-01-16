@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true, 
   },
-
+  transpilePackages: ["@enginy/shared", "@enginy/ui"],
 };
 
 export default nextConfig;

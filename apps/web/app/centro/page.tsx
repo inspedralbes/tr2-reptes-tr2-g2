@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { THEME, FASES } from '@enginy/shared';
 import DashboardLayout from '@/components/DashboardLayout';
+import NextEventsWidget from '@/components/NextEventsWidget';
 
 export default function CentroDashboard() {
   const { user, loading, logout } = useAuth();
@@ -29,45 +30,47 @@ export default function CentroDashboard() {
       title={`Panel de Centro: ${user.centre?.nom || 'Educatiu'}`}
       subtitle="Benvolgut al procés de gestió de tallers del Programa Enginy."
     >
-      {/* Timeline de Fases */}
-      <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-10 overflow-hidden relative">
-        <div className="absolute top-0 right-0 p-8 opacity-5">
-          <svg className="h-32 w-32" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        
-        <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-8">Cronograma del Procés</h3>
-        <div className="relative">
-          <div className="absolute left-6 top-0 h-full w-0.5 bg-gray-100 hidden sm:block"></div>
-          <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
-            {FASES.map((fase, index) => (
-              <div key={fase.id} className="relative flex flex-col items-start sm:items-center text-left sm:text-center">
-                <div 
-                  className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 z-10 border-2 transition-all shadow-sm ${
-                    index === 1 ? 'border-blue-500 bg-blue-600 text-white shadow-blue-200' : 'border-gray-100 bg-white text-gray-400'
-                  }`}
-                >
-                  <span className="text-sm font-black">
-                    {index + 1}
-                  </span>
-                </div>
-                <h4 className="font-bold text-sm text-gray-800 tracking-tight leading-tight">{fase.nom}</h4>
-                {fase.data && (
-                  <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-tighter">
-                    {new Date(fase.data).toLocaleDateString('ca-ES', { day: 'numeric', month: 'short' })}
-                  </p>
-                )}
-                {index === 1 && (
-                  <span className="mt-3 px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-black rounded-md uppercase tracking-widest">
-                    Actual
-                  </span>
-                )}
+      {/* Timeline i Properes Fites */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-10">
+        <div className="lg:col-span-3">
+          <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 h-full overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-8 opacity-5">
+              <svg className="h-32 w-32" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            
+            <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-8">Cronograma del Procés</h3>
+            <div className="relative">
+              <div className="absolute left-6 top-0 h-full w-0.5 bg-gray-100 hidden sm:block"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
+                {FASES.map((fase, index) => (
+                  <div key={fase.id} className="relative flex flex-col items-start sm:items-center text-left sm:text-center">
+                    <div 
+                      className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 z-10 border-2 transition-all shadow-sm ${
+                        index === 1 ? 'border-blue-500 bg-blue-600 text-white shadow-blue-200' : 'border-gray-100 bg-white text-gray-400'
+                      }`}
+                    >
+                      <span className="text-sm font-black">
+                        {index + 1}
+                      </span>
+                    </div>
+                    <h4 className="font-bold text-sm text-gray-800 tracking-tight leading-tight">{fase.nom}</h4>
+                    {fase.data && (
+                      <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-tighter">
+                        {new Date(fase.data).toLocaleDateString('ca-ES', { day: 'numeric', month: 'short' })}
+                      </p>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          </section>
         </div>
-      </section>
+        <div className="lg:col-span-1">
+          <NextEventsWidget />
+        </div>
+      </div>
 
       {/* Accesos Directos */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
