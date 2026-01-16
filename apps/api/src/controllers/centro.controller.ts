@@ -51,3 +51,32 @@ export const updateCentreAttendance = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al actualizar asistencia' });
   }
 };
+
+// PATCH: Actualizar centro
+export const updateCentre = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const updated = await prisma.centre.update({
+      where: { id_centre: parseInt(id as string) },
+      data: req.body
+    });
+    res.json(updated);
+  } catch (error) {
+    console.error("Error en centroController.updateCentre:", error);
+    res.status(500).json({ error: 'Error al actualizar centro' });
+  }
+};
+
+// DELETE: Eliminar centro
+export const deleteCentre = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    await prisma.centre.delete({
+      where: { id_centre: parseInt(id as string) }
+    });
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error en centroController.deleteCentre:", error);
+    res.status(500).json({ error: 'Error al eliminar centro' });
+  }
+};

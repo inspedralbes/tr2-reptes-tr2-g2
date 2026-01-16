@@ -26,7 +26,11 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Enginy' }) => {
             <nav className="ml-8 hidden md:flex items-center space-x-4">
               <a href="/calendar" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Calendari</a>
               {user.rol.nom_rol === 'ADMIN' && (
-                <a href="/admin/fases" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Fases</a>
+                <>
+                  <a href="/admin/talleres" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Talleres</a>
+                  <a href="/admin/centros" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Centros</a>
+                  <a href="/admin/fases" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Fases</a>
+                </>
               )}
             </nav>
           </div>
