@@ -315,3 +315,31 @@ model LogAuditoria {
 
   @@map("logs_auditoria")
 }
+
+// ==========================================
+// 7. CONFIGURACIÓ DINÀMICA
+// ==========================================
+
+model fase {
+  id_fase    Int              @id @default(autoincrement())
+  nom        String           @unique
+  descripcio String?
+  data_inici DateTime
+  data_fi    DateTime
+  activa     Boolean          @default(false)
+  events     calendariEvent[]
+
+  @@map("fases")
+}
+
+model calendariEvent {
+  id_event   Int      @id @default(autoincrement())
+  id_fase    Int
+  fase       fase     @relation(fields: [id_fase], references: [id_fase])
+  titol      String
+  descripcio String?
+  data       DateTime
+  tipus      String // milestone, deadline, assignment
+
+  @@map("calendari_events")
+}

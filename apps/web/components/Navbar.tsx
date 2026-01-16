@@ -23,6 +23,12 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Enginy' }) => {
               <span className="text-blue-900 font-black text-xs">E</span>
             </div>
             <h1 className="text-xl font-bold text-white tracking-tight">{title}</h1>
+            <nav className="ml-8 hidden md:flex items-center space-x-4">
+              <a href="/calendar" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Calendari</a>
+              {user.rol.nom_rol === 'ADMIN' && (
+                <a href="/admin/fases" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Fases</a>
+              )}
+            </nav>
           </div>
           
           <div className="flex items-center space-x-6">

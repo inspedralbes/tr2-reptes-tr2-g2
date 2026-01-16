@@ -9,6 +9,7 @@ import { THEME } from '@enginy/shared';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showProfessorLink, setShowProfessorLink] = useState(false);
@@ -27,7 +28,6 @@ export default function LoginPage() {
 
       if (user.rol.nom_rol === 'PROFESSOR') {
         setShowProfessorLink(true);
-        // No redirigimos, mostramos el link de descarga
       } else {
         login(user, token);
         if (user.rol.nom_rol === 'ADMIN') {
@@ -37,79 +37,124 @@ export default function LoginPage() {
         }
       }
     } catch (err: any) {
-      setError(err.message);
+      // Improved error messaging based on backend response or common errors
+      if (err.message.includes('401') || err.message.toLowerCase().includes('inválidas')) {
+        setError('Correu o contrasenya incorrectes. Torna-ho a provar.');
+      } else if (err.message.includes('fetch') || err.message.includes('network')) {
+        setError('Error de conexió. Comprova que el servidor estigui actiu.');
+      } else {
+        setError(err.message || 'S\'ha produït un error inesperat.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: THEME.colors.background }}>
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold" style={{ color: THEME.colors.primary }}>Programa Enginy</h2>
-          <p className="text-gray-500 mt-2">Inicia sessió per gestionar els tallers</p>
+    <div className="flex min-h-screen items-center justify-center p-4" style={{ backgroundColor: THEME.colors.background }}>
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100 animate-in fade-in zoom-in duration-500">
+        <div className="text-center mb-10">
+          <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
+             <span className="text-blue-600 font-black text-2xl">E</span>
+          </div>
+          <h2 className="text-3xl font-black tracking-tight" style={{ color: THEME.colors.primary, fontFamily: THEME.fonts.primary }}>Programa Enginy</h2>
+          <p className="text-gray-400 font-medium mt-2">Gestió de tallers i centres</p>
         </div>
         
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
+          <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl mb-8 text-sm font-bold flex items-center gap-3 animate-shake">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
             {error}
           </div>
         )}
 
         {showProfessorLink ? (
-          <div className="bg-blue-50 border border-blue-200 p-6 rounded-xl text-center">
-            <h3 className="text-lg font-bold text-blue-900 mb-2">Accés via App Mòbil</h3>
-            <p className="text-sm text-blue-700 mb-6">
-              Com a professor, has d'utilitzar l'aplicació mòbil d'Enginy per gestionar les teves sessions.
+          <div className="bg-blue-50 border border-blue-100 p-8 rounded-2xl text-center animate-in slide-in-from-bottom duration-500">
+            <h3 className="text-xl font-black text-blue-900 mb-2">Accés via App Mòbil</h3>
+            <p className="text-sm text-blue-700/70 font-medium mb-8 leading-relaxed">
+              Com a professor, has d'utilitzar l'aplicació mòbil d'Enginy per gestionar les teves sessions d'aprenentatge.
             </p>
             <a 
               href="#" 
-              className="inline-block w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
-              onClick={(e) => { e.preventDefault(); alert('Enllaç de descàrrega (Placeholder)'); }}
+              className="group relative flex items-center justify-center w-full py-4 bg-blue-600 text-white font-black rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-200 active:scale-95"
+              onClick={(e) => { e.preventDefault(); alert('Enllaç de descàrrega próximament (Expo)'); }}
             >
-              Descarregar App Enginy (Expo)
+              <span className="mr-2">Descarregar App Enginy</span>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
             </a>
             <button 
               onClick={() => setShowProfessorLink(false)}
-              className="mt-4 text-xs text-blue-500 hover:underline"
+              className="mt-6 text-xs font-bold text-blue-400 hover:text-blue-600 tracking-widest uppercase transition-colors"
             >
-              Tornar al login
+              ← Tornar al login
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2">Correu Electrònic</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                placeholder="coordinador@centre.cat"
-                required
-              />
+              <label className="block text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">Correu Electrònic</label>
+              <div className="relative">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all font-bold text-gray-900 placeholder:text-gray-300"
+                  placeholder="coordinador@centre.cat"
+                  required
+                />
+                <div className="absolute left-0 -translate-x-full pr-4 top-1/2 -translate-y-1/2 hidden lg:block">
+                   {/* Decorative icon or similar if needed */}
+                </div>
+              </div>
             </div>
             
             <div>
-              <label className="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2">Contrasenya</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                placeholder="********"
-                required
-              />
+              <label className="block text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">Contrasenya</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all font-bold text-gray-900 placeholder:text-gray-300 pr-12"
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-600 transition-colors p-1"
+                >
+                  {showPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26a4 4 0 015.493 5.493l-5.493-5.493z" clipRule="evenodd" />
+                      <path d="M12.454 15.697A9.75 9.75 0 0110 16c-4.478 0-8.268-2.943-9.542-7a10.018 10.018 0 012.182-3.159L5.43 8.632A4 4 0 0010 13.5l2.454 2.197z" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                      <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg text-white font-bold transition duration-200 disabled:opacity-50 shadow-md"
+              className="w-full py-4 rounded-2xl text-white font-black transition-all duration-200 disabled:opacity-50 shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5 active:translate-y-0"
               style={{ backgroundColor: THEME.colors.primary }}
             >
-              {loading ? 'Accedint...' : 'Entrar'}
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span>Accedint...</span>
+                </div>
+              ) : 'Entrar al Programa'}
             </button>
           </form>
         )}
