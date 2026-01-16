@@ -11,7 +11,6 @@ import WorkshopCard from "../../../components/WorkshopCard";
 import tallerService, { Taller } from "../../../services/tallerService";
 import DashboardLayout from "../../../components/DashboardLayout";
 import CreateWorkshopModal from "../../../components/CreateWorkshopModal";
-import NextEventsWidget from "../../../components/NextEventsWidget";
 
 export default function TallerScreen() {
   const { user, loading: authLoading } = useAuth();
@@ -116,28 +115,21 @@ export default function TallerScreen() {
       actions={headerActions}
     >
       {/* Buscador */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
-        <div className="lg:col-span-3">
-          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full flex flex-col justify-center">
-            <div className="max-w-md">
-              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Buscador ràpid</label>
-              <div className="relative">
-                <input 
-                  type="text"
-                  placeholder="Ej: Fusta, Robòtica..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-700"
-                />
-                <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-3.5 h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </div>
-          </section>
-        </div>
-        <div className="lg:col-span-1">
-          <NextEventsWidget />
+      <div className="mb-8 flex justify-between items-center bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="max-w-md w-full">
+          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Buscador ràpid</label>
+          <div className="relative">
+            <input 
+              type="text"
+              placeholder="Ej: Fusta, Robòtica..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-700"
+            />
+            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-3.5 h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
         </div>
       </div>
 

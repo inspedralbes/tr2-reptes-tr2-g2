@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { login as apiLogin } from '@/lib/auth';
 import { useAuth } from '@/context/AuthContext';
@@ -14,7 +14,17 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showProfessorLink, setShowProfessorLink] = useState(false);
   const router = useRouter();
-  const { login } = useAuth();
+  const { user, login, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      if (user.rol.nom_rol === 'ADMIN') {
+        router.push('/admin');
+      } else if (user.rol.nom_rol === 'COORDINADOR') {
+        router.push('/centro');
+      }
+    }
+  }, [user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
