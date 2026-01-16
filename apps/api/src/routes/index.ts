@@ -9,6 +9,7 @@ import peticioRoutes from './peticio.routes'; // Nueva ruta para el flujo de res
 import assignacioRoutes from './assignacio.routes';
 import alumneRoutes from './alumne.routes';
 import calendarRoutes from './calendar.routes';
+import faseRoutes from './fase.routes';
 
 // --- Definir las rutas base ---
 
@@ -28,6 +29,7 @@ router.use('/alumnes', alumneRoutes);
 
 // Rutas de Calendario
 router.use('/calendar', calendarRoutes);
+router.use('/fases', faseRoutes);
 
 // Health Check (Para ver si la API respira)
 router.get('/health', (req, res) => {
