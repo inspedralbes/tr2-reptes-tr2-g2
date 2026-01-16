@@ -84,6 +84,24 @@ services:
     networks:
       - enginy-network
 
+  # Ngrok Tunnel for API
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: enginy_ngrok
+    restart: always
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    command:
+      - http
+      - --host-header=rewrite
+      - api:3000
+    depends_on:
+      - api
+    ports:
+      - "4040:4040"
+    networks:
+      - enginy-network
+
 networks:
   enginy-network:
     driver: bridge

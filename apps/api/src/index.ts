@@ -15,21 +15,27 @@ const allowedOrigins = [
   'http://enginy-api.kore29.com',
   'http://localhost:8002',     
   'http://localhost:3000',  
-];       
+];
+
+// Añadir orígenes desde el .env si existen
+if (process.env.CORS_ORIGIN) {
+  const envOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim());
+  envOrigins.forEach(origin => {
+    if (!allowedOrigins.includes(origin)) {
+      allowedOrigins.push(origin);
+    }
+  });
+}
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'La política CORS no permite acceso desde este origen.';
-      return callback(new Error(msg), false);
-    }
+    // Permitir todas las peticiones en desarrollo para evitar problemas con ngrok
     return callback(null, true);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
-  credentials: true 
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'ngrok-skip-browser-warning'],
+  credentials: true,
+  optionsSuccessStatus: 200 // Para compatibilidad con navegadores antiguos
 }));
 
 app.use(express.json());

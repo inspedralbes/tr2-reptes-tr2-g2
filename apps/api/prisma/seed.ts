@@ -110,7 +110,7 @@ async function main() {
 
   // 6. CREAR TALLERES
   console.log('🛠️ Creando Talleres...');
-  await prisma.taller.create({
+  const tallerFusta = await prisma.taller.create({
     data: {
       titol: 'Fusta',
       descripcio_curta: "Exploració a través de la construcció d'un producte.",
@@ -121,7 +121,7 @@ async function main() {
     }
   });
 
-  await prisma.taller.create({
+  const tallerImatge = await prisma.taller.create({
     data: {
       titol: 'Imatge personal per a tothom',
       descripcio_curta: 'Formació específica sobre atenció al client.',
@@ -132,7 +132,7 @@ async function main() {
     }
   });
 
-  await prisma.taller.create({
+  const tallerEnergia = await prisma.taller.create({
     data: {
       titol: 'Energies Renovables',
       descripcio_curta: 'Descoberta de perfils professionals sostenibles.',
@@ -246,7 +246,7 @@ async function main() {
   await prisma.peticio.create({
     data: {
       id_centre: centroMila.id_centre,
-      id_taller: 1, // Fusta
+      id_taller: tallerFusta.id_taller,
       estat: 'Pendent',
       data_peticio: new Date('2025-10-05')
     }
@@ -256,7 +256,7 @@ async function main() {
   await prisma.assignacio.create({
     data: {
       id_centre: centroBrossa.id_centre,
-      id_taller: 2, // Imatge personal
+      id_taller: tallerImatge.id_taller,
       data_inici: new Date('2025-10-20T10:00:00'),
       data_fi: new Date('2025-10-20T12:00:00')
     }
@@ -266,7 +266,7 @@ async function main() {
   await prisma.assignacio.create({
     data: {
       id_centre: centroBrossa.id_centre,
-      id_taller: 3, // Energies Renovables
+      id_taller: tallerEnergia.id_taller,
       data_inici: new Date('2025-11-05T09:00:00'),
       data_fi: new Date('2025-11-05T14:00:00')
     }
