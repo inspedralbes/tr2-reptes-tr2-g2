@@ -47,9 +47,9 @@
   },
   "homepage": "https://github.com/inspedralbes/tr2-reptes-tr2-g2#readme",
 "devDependencies": {
-    "@tailwindcss/node": "^4.1.18",
-    "@tailwindcss/postcss": "^4.1.18",
-    "tailwindcss": "^4.1.18",
+    "tailwindcss": "^3.4.19",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
     "@types/bcrypt": "^6.0.0",
     "prettier": "latest",
     "turbo": "2.7.4",
