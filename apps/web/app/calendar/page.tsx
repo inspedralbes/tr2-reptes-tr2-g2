@@ -21,7 +21,18 @@ export default function CalendarPage() {
           api.get("/calendar"),
           api.get("/fases")
         ]);
-        setEvents(eventsRes.data);
+        
+        // Transform phases into calendar events
+        const phaseEvents = phasesRes.data.map((f: any) => ({
+          id: `fase-${f.id_fase}`,
+          title: `Fase: ${f.nom}`,
+          date: f.data_inici,
+          endDate: f.data_fi,
+          type: 'milestone', // Use milestone color or a new type
+          description: f.descripcio
+        }));
+
+        setEvents([...eventsRes.data, ...phaseEvents]);
         setActiveFase(phasesRes.data.find((f: any) => f.activa));
       } catch (error) {
         console.error("Error fetching calendar data:", error);
@@ -78,20 +89,20 @@ export default function CalendarPage() {
             </div>
             
             <div className="space-y-6">
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-6">Llegenda</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm font-bold text-gray-600">Fita del Programa</span>
+              <div className="bg-white p-8 rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#CFD2D3] mb-8">Llegenda</h3>
+                <div className="space-y-5">
+                  <div className="flex items-center gap-4 group cursor-default">
+                    <div className="w-4 h-4 bg-blue-600 rounded-lg shadow-lg shadow-blue-500/20 transition-transform group-hover:scale-110"></div>
+                    <span className="text-sm font-bold text-[#00426B]">Fita del Programa</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <span className="text-sm font-bold text-gray-600">Termini Límit</span>
+                  <div className="flex items-center gap-4 group cursor-default">
+                    <div className="w-4 h-4 bg-[#F26178] rounded-lg shadow-lg shadow-rose-500/20 transition-transform group-hover:scale-110"></div>
+                    <span className="text-sm font-bold text-[#00426B]">Termini Límit</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-bold text-gray-600">Taller Assignat</span>
+                  <div className="flex items-center gap-4 group cursor-default">
+                    <div className="w-4 h-4 bg-[#4197CB] rounded-lg shadow-lg shadow-blue-400/20 transition-transform group-hover:scale-110"></div>
+                    <span className="text-sm font-bold text-[#00426B]">Taller Assignat</span>
                   </div>
                 </div>
               </div>
