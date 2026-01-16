@@ -23,7 +23,9 @@ export default function PeticionsPage() {
     setUser(currentUser);
 
     // Fetch talleres disponibles
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/tallers`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/tallers`, {
+      headers: { 'ngrok-skip-browser-warning': 'true' }
+    })
       .then(res => res.json())
       .then(setTallers);
   }, []);
@@ -36,7 +38,10 @@ export default function PeticionsPage() {
       for (const id_taller of selectedTallers) {
         await fetch(`${process.env.NEXT_PUBLIC_API_URL}/peticions`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
+          },
           body: JSON.stringify({
             id_centre: user?.id_centre,
             id_taller,

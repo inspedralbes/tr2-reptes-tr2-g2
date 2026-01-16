@@ -20,7 +20,9 @@ export default function AssignacionsPage() {
 
     // Fetch asignaciones
     if (currentUser.id_centre) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignacions/centre/${currentUser.id_centre}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignacions/centre/${currentUser.id_centre}`, {
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+      })
         .then(res => res.json())
         .then(setAssignacions);
     }
@@ -119,7 +121,10 @@ export default function AssignacionsPage() {
                 if (!input.value) return;
                 await fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignacions/incidencies`, {
                   method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
+                  headers: { 
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                  },
                   body: JSON.stringify({
                     id_centre: user.id_centre,
                     descripcio: input.value

@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
     unoptimized: true, 
   },
   transpilePackages: ["@enginy/shared", "@enginy/ui"],
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://api:3000/api/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;
