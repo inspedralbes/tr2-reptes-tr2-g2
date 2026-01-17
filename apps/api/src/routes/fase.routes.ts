@@ -7,7 +7,7 @@ const router = Router();
 // Get all phases with their status
 router.get('/', authenticateToken, async (_req: Request, res: Response) => {
   const phases = await prisma.fase.findMany({
-    orderBy: { data_inici: 'asc' },
+    orderBy: { ordre: 'asc' },
     include: {
       _count: {
         select: { events: true }

@@ -58,7 +58,7 @@ model Centre {
   usuaris      Usuari[]
   peticions    Peticio[]
   assignacions Assignacio[]
-  alumnes      Alumne[]              @relation("CentreProcedencia")
+  alumnes      Alumne[]     @relation("CentreProcedencia")
   professors   Professor[]
   incidencies  Incidencia[]
 
@@ -101,11 +101,11 @@ model Usuari {
 }
 
 model Professor {
-  id_professor     Int     @id @default(autoincrement())
-  nom              String
-  contacte         String?
-  id_centre        Int
-  centre           Centre  @relation(fields: [id_centre], references: [id_centre])
+  id_professor Int     @id @default(autoincrement())
+  nom          String
+  contacte     String?
+  id_centre    Int
+  centre       Centre  @relation(fields: [id_centre], references: [id_centre])
 
   peticiones1 Peticio[] @relation("Profesor1")
   peticiones2 Peticio[] @relation("Profesor2")
@@ -355,6 +355,7 @@ model fase {
   data_inici DateTime
   data_fi    DateTime
   activa     Boolean          @default(false)
+  ordre      Int              @default(0)
   events     calendariEvent[]
 
   @@map("fases")

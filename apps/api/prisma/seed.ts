@@ -3,12 +3,25 @@ import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
+const PHASES = {
+  SOLICITUD: 'Solicitud e Inscripción',
+  PLANIFICACION: 'Planificación y Asignación',
+  EJECUCION: 'Ejecución y Seguimiento',
+  CIERRE: 'Cierre y Evaluación'
+} as const;
+
 async function main() {
   console.log('🌱 Iniciando Seed para PostgreSQL...');
 
-  // 1. LIMPIEZA
+  // 1. LIMPIEZA EXHAUSTIVA
+  await prisma.respostesQuestionari.deleteMany();
+  await prisma.pregunta.deleteMany();
+  await prisma.modelQuestionari.deleteMany();
+  await prisma.avaluacioCompetencial.deleteMany();
   await prisma.assistencia.deleteMany();
   await prisma.inscripcio.deleteMany();
+  await prisma.checklistAssignacio.deleteMany();
+  await prisma.assignacioProfessor.deleteMany();
   await prisma.assignacio.deleteMany();
   await prisma.peticio.deleteMany();
   await prisma.taller.deleteMany();
@@ -21,6 +34,7 @@ async function main() {
   await prisma.centre.deleteMany();
   await prisma.sector.deleteMany();
   await prisma.rol.deleteMany();
+  await prisma.competencia.deleteMany();
 
   console.log('🧹 Base de datos limpiada.');
 
@@ -165,7 +179,7 @@ async function main() {
       modalitat: 'A', 
       id_sector: sectorAgro.id_sector, 
       descripcio_curta: 'Construcció en fusta',
-      ambit: 'Àmbit Medi Ambient i Sostenibilitat' // Ejemplo de ámbito
+      ambit: 'Àmbit Medi Ambient i Sostenibilitat'
     }
   });
 
@@ -198,43 +212,51 @@ async function main() {
 
   // 9. FASES DEL PROGRAMA (Dinámicas)
   console.log('🗓️ Creando Fases del Programa...');
+  const now = new Date();
+  const currentYear = now.getFullYear(); // 2026
+  const prevYear = currentYear - 1; // 2025
+
   const fase1 = await prisma.fase.create({
     data: {
-      nom: 'Solicitud e Inscripción',
-      descripcio: 'Fase inicial donde los centros solicitan talleres y registran alumnos.',
-      data_inici: new Date('2025-09-01'),
-      data_fi: new Date('2025-10-15'),
-      activa: true
+      nom: PHASES.SOLICITUD,
+      descripcio: 'Fase inicial on els centres sol·liciten tallers i indiquen nombre d\'alumnes.',
+      data_inici: new Date(`${prevYear}-09-01`),
+      data_fi: new Date(`${currentYear}-02-15`), // Activa ahora (Enero 2026)
+      activa: true,
+      ordre: 1
     }
   });
 
   const fase2 = await prisma.fase.create({
     data: {
-      nom: 'Planificación y Asignación',
-      descripcio: 'Los administradores validan peticiones y asignan talleres a profesores.',
-      data_inici: new Date('2025-10-16'),
-      data_fi: new Date('2025-11-15'),
-      activa: false
+      nom: PHASES.PLANIFICACION,
+      descripcio: 'Planificació i assignació de tallers.',
+      data_inici: new Date(`${currentYear}-02-16`),
+      data_fi: new Date(`${currentYear}-03-15`),
+      activa: false,
+      ordre: 2
     }
   });
 
   const fase3 = await prisma.fase.create({
     data: {
-      nom: 'Ejecución y Seguimiento',
-      descripcio: 'Realización de sesiones de talleres y control de asistencia.',
-      data_inici: new Date('2025-11-16'),
-      data_fi: new Date('2026-05-30'),
-      activa: false
+      nom: PHASES.EJECUCION,
+      descripcio: 'Execució dels tallers als centres.',
+      data_inici: new Date(`${currentYear}-03-16`),
+      data_fi: new Date(`${currentYear}-06-15`),
+      activa: false,
+      ordre: 3
     }
   });
 
   const fase4 = await prisma.fase.create({
     data: {
-      nom: 'Cierre y Evaluación',
-      descripcio: 'Finalización de talleres y recogida de encuestas de satisfacción.',
-      data_inici: new Date('2026-06-01'),
-      data_fi: new Date('2026-07-15'),
-      activa: false
+      nom: PHASES.CIERRE,
+      descripcio: 'Tancament i avaluació.',
+      data_inici: new Date(`${currentYear}-06-16`),
+      data_fi: new Date(`${currentYear}-07-31`),
+      activa: false,
+      ordre: 4
     }
   });
 

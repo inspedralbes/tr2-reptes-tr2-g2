@@ -55,7 +55,7 @@ export const getPeticions = async (req: Request, res: Response) => {
 export const createPeticio = async (req: Request, res: Response) => {
   const { 
     id_taller, 
-    alumnes_ids,
+    alumnes_aprox,
     comentaris,
     prof1_id,
     prof2_id,
@@ -79,9 +79,26 @@ export const createPeticio = async (req: Request, res: Response) => {
     return res.status(403).json({ error: errorMessage });
   }
 
-  const numAlumnes = alumnes_ids?.length || 0;
-  if (modalitat === 'C' && numAlumnes > 4) {
-    return res.status(400).json({ error: 'En la Modalidad C, el número máximo de alumnos es 4.' });
+  // --- VALIDACIONES DE MODALIDAD C (REGLAS DEL PROGRAMA) ---
+  if (modalitat === 'C') {
+    if (alumnes_aprox > 4) {
+      return res.status(400).json({ error: 'En la Modalidad C, el máximo es de 4 alumnos de un mismo instituto por proyecto.' });
+    }
+
+    // Comprobar límite total de 12 alumnos para el centro en Modalidad C
+    const peticionsC = await prisma.peticio.findMany({
+      where: {
+        id_centre: parseInt(centreId),
+        modalitat: 'C'
+      }
+    });
+
+    const totalAlumnesC = peticionsC.reduce((sum, p) => sum + (p.alumnes_aprox || 0), 0);
+    if (totalAlumnesC + alumnes_aprox > 12) {
+      return res.status(400).json({ 
+        error: `Límite excedido. El instituto ya tiene ${totalAlumnesC} alumnos en proyectos de Modalidad C. El máximo total permitido es 12.` 
+      });
+    }
   }
 
   try {
@@ -100,16 +117,13 @@ export const createPeticio = async (req: Request, res: Response) => {
       data: {
         id_centre: parseInt(centreId),
         id_taller: parseInt(id_taller),
-        alumnes_aprox: numAlumnes,
+        alumnes_aprox: parseInt(alumnes_aprox),
         comentaris,
         estat: 'Pendent',
         modalitat,
         prof1_id: prof1_id ? parseInt(prof1_id) : null,
         prof2_id: prof2_id ? parseInt(prof2_id) : null,
-        ids_alumnes: alumnes_ids || [],
-        alumnes: {
-          connect: alumnes_ids?.map((id: number) => ({ id_alumne: id })) || []
-        }
+        ids_alumnes: [], // Ya no se guardan identidades en Fase 1
       },
       include: {
         taller: true

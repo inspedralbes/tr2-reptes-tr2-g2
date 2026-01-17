@@ -39,7 +39,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
           return;
         }
 
-        // Fetch assignment
+        // Fetch assignment with inscriptions
         const resAssig = await api.get(`/assignacions/centre/${currentUser.id_centre}`);
         const found = resAssig.data.find((a: any) => a.id_assignacio === parseInt(id));
         
@@ -49,10 +49,15 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
           return;
         }
         setAssignacio(found);
+
+        // Pre-populate selectedIds from existing inscriptions
+        if (found.inscripcions) {
+          setSelectedIds(found.inscripcions.map((i: any) => i.id_alumne));
+        }
         
         // Fetch all students from center
         const resAlumnes = await api.get(`/alumnes/centre/${currentUser.id_centre}`);
-        setAlumnes(resAlumnes.data);
+        setAlumnes(resAlumnes.data || []);
       } catch (error) {
         console.error("Error fetching nominal register data:", error);
       } finally {
@@ -64,21 +69,30 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
   }, [id, router]);
 
   const toggleAlumne = (idAlumne: number) => {
-    setSelectedIds(prev => 
-      prev.includes(idAlumne) 
+    setSelectedIds(prev => {
+      const isSelected = prev.includes(idAlumne);
+      const plazasMax = assignacio?.peticio?.alumnes_aprox || 0;
+      
+      if (!isSelected && prev.length >= plazasMax) {
+        alert(`Has arribat al límit de ${plazasMax} places sol·licitades.`);
+        return prev;
+      }
+      
+      return isSelected 
         ? prev.filter(i => i !== idAlumne) 
-        : [...prev, idAlumne]
-    );
+        : [...prev, idAlumne];
+    });
   };
 
   const handleSave = async () => {
     try {
+      setLoading(true);
       const api = getApi();
       // 1. Save inscriptions (Nominal Register)
       await api.post(`/assignacions/${id}/inscripcions`, { ids_alumnes: selectedIds });
       
       // 2. Update Checklist Item "Subir Registro Nominal (Excel)"
-      const item = assignacio.checklist.find((i: any) => i.pas_nom === 'Subir Registro Nominal (Excel)');
+      const item = assignacio.checklist.find((i: any) => i.pas_nom.includes('Registro Nominal'));
       if (item) {
         await api.patch(`/assignacions/checklist/${item.id_checklist}`, { completat: true });
       }
@@ -87,72 +101,132 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
       router.push('/centro/assignacions');
     } catch (error) {
       alert('Error al desar el registre nominal.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading || !user || !assignacio) return (
+  if (loading && !assignacio) return (
     <div className="flex min-h-screen justify-center items-center">
-      <div className="animate-spin h-10 w-10 border-b-2 border-blue-600"></div>
+      <div className="animate-spin h-10 w-10 border-b-2 border-primary"></div>
     </div>
   );
+
+  const plazasAsignadas = assignacio?.peticio?.alumnes_aprox || 0;
+  const isFull = selectedIds.length === plazasAsignadas;
 
   return (
     <DashboardLayout 
       title={`Registre Nominal: ${assignacio.taller?.titol}`} 
-      subtitle={`Selecciona els alumnes del centre que participaran en aquest taller.`}
+      subtitle={`En aquesta fase has de designar els ${plazasAsignadas} alumnes que participaran.`}
     >
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white border-2 border-gray-100 p-8 shadow-sm mb-8">
-          <div className="flex justify-between items-center mb-8">
-            <h3 className="text-sm font-black uppercase tracking-widest text-gray-400">Llistat d'Alumnat disponible</h3>
-            <span className="bg-blue-50 text-blue-600 px-4 py-2 text-xs font-black uppercase tracking-widest border border-blue-100">
-              {selectedIds.length} Seleccionats
-            </span>
+      <div className="max-w-4xl mx-auto pb-20">
+        {/* Header de Status */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-6 border shadow-sm flex flex-col items-center justify-center text-center">
+            <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2">Places Assignades</span>
+            <span className="text-3xl font-black text-blue-900">{plazasAsignadas}</span>
+          </div>
+          <div className="bg-white p-6 border shadow-sm flex flex-col items-center justify-center text-center">
+            <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2">Seleccionats</span>
+            <span className={`text-3xl font-black ${isFull ? 'text-green-600' : 'text-blue-600'}`}>{selectedIds.length}</span>
+          </div>
+          <div className="bg-white p-6 border shadow-sm flex flex-col items-center justify-center text-center">
+            <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2">Restants</span>
+            <span className="text-3xl font-black text-gray-200">{Math.max(0, plazasAsignadas - selectedIds.length)}</span>
+          </div>
+        </div>
+
+        <div className="bg-white border shadow-sm overflow-hidden">
+          <div className="bg-gray-50 px-8 py-4 border-b flex justify-between items-center">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Llistat d'Alumnat del Centre</h3>
+            {isFull && (
+              <span className="text-[10px] font-black uppercase bg-green-100 text-green-700 px-3 py-1 animate-pulse">
+                Cupo Completat
+              </span>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 gap-3">
-            {alumnes.map(alum => (
-              <div 
-                key={alum.id_alumne}
-                onClick={() => toggleAlumne(alum.id_alumne)}
-                className={`p-4 border-2 flex justify-between items-center cursor-pointer transition-all ${
-                  selectedIds.includes(alum.id_alumne) 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-50 hover:border-gray-200 bg-gray-50/30'
-                }`}
-              >
-                <div>
-                  <p className="font-bold text-gray-900">{alum.nom} {alum.cognoms}</p>
-                  <p className="text-[10px] font-black uppercase tracking-tighter text-gray-400">{alum.idalu} • {alum.curs}</p>
-                </div>
-                {selectedIds.includes(alum.id_alumne) && (
-                  <div className="w-6 h-6 bg-blue-600 text-white flex items-center justify-center">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
-                  </div>
-                )}
+          <div className="divide-y max-h-[500px] overflow-y-auto custom-scrollbar">
+            {alumnes.length === 0 ? (
+              <div className="p-20 text-center">
+                <p className="text-sm text-gray-400 italic">No s'han trobat alumnes registrats al centre.</p>
+                <button 
+                  onClick={() => router.push('/centro/alumnos')}
+                  className="mt-4 text-xs font-bold text-blue-600 hover:underline"
+                >
+                  + Anar a Gestió d'Alumnes
+                </button>
               </div>
-            ))}
+            ) : (
+              alumnes.map(alum => {
+                const isSelected = selectedIds.includes(alum.id_alumne);
+                return (
+                  <div 
+                    key={alum.id_alumne}
+                    onClick={() => toggleAlumne(alum.id_alumne)}
+                    className={`px-8 py-5 flex justify-between items-center cursor-pointer transition-all ${
+                      isSelected 
+                        ? 'bg-blue-50/50' 
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-6">
+                      <div className={`w-12 h-12 flex items-center justify-center font-black italic text-sm transition-all ${
+                        isSelected ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-300'
+                      }`}>
+                        {alum.nom.charAt(0)}{alum.cognoms.charAt(0)}
+                      </div>
+                      <div>
+                        <p className={`font-bold transition-colors ${isSelected ? 'text-blue-900' : 'text-gray-700'}`}>
+                          {alum.nom} {alum.cognoms}
+                        </p>
+                        <p className="text-[10px] font-black uppercase tracking-tighter text-gray-400">
+                          IDALU: {alum.idalu} <span className="mx-2 text-gray-200">|</span> CURS: {alum.curs}
+                        </p>
+                      </div>
+                    </div>
+                    <div className={`w-6 h-6 border-2 flex items-center justify-center transition-all ${
+                      isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-200'
+                    }`}>
+                      {isSelected && <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>}
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
 
-          <div className="mt-12 flex gap-4">
+          <div className="p-8 bg-gray-50 border-t flex flex-col sm:flex-row gap-4">
             <button 
               onClick={handleSave}
-              className="flex-1 bg-blue-600 text-white py-4 font-black uppercase text-xs tracking-[0.2em] shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all"
+              disabled={loading || selectedIds.length === 0}
+              className={`flex-1 py-4 font-black uppercase text-xs tracking-[0.2em] shadow-lg transition-all flex items-center justify-center gap-3 ${
+                loading || selectedIds.length === 0
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                : 'bg-blue-900 text-white hover:bg-black active:scale-95'
+              }`}
             >
-              Confirmar i Desar Registre
+              {loading ? 'Processant...' : 'Confirmar Registre Nominal'}
+              {!loading && <svg className="w-4 h-4" fill="white" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>}
             </button>
             <button 
               onClick={() => router.back()}
-              className="px-8 bg-gray-100 text-gray-400 py-4 font-black uppercase text-xs tracking-widest hover:bg-gray-200 transition-all"
+              className="px-10 bg-white text-gray-400 py-4 font-black uppercase text-xs tracking-widest border border-gray-200 hover:bg-gray-100 transition-all"
             >
-              Cancel·lar
+              Tornar
             </button>
           </div>
         </div>
         
-        <div className="p-6 bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium flex gap-4 items-start">
+        <div className="mt-8 p-6 bg-blue-50/50 border-l-4 border-blue-900 text-blue-900 text-xs font-bold flex gap-4 items-start">
           <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          <p>D'acord amb la Fase 2, aquest registre nominal és obligatori per procedir amb l'emissió de certificats al finalitzal el taller.</p>
+          <div>
+            <p className="uppercase tracking-widest mb-1">Nota sobre la Fase 2</p>
+            <p className="font-normal text-blue-800/80 leading-relaxed">
+              D'acord amb la normativa, el registre nominal ha de coincidir amb el nombre de places sol·licitades en la Fase 1. Aquestes dades s'utilizaren per a la certificació final.
+            </p>
+          </div>
         </div>
       </div>
     </DashboardLayout>

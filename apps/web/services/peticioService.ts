@@ -40,7 +40,7 @@ const peticioService = {
    */
   create: async (data: { 
     id_taller: number; 
-    alumnes_ids?: number[]; 
+    alumnes_aprox: number; 
     comentaris?: string;
     prof1_id?: number;
     prof2_id?: number;

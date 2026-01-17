@@ -56,12 +56,6 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
               >
                 Inicio
               </Link>
-              {isAdmin && (
-                <>
-                  <Link href="/admin/solicitudes" className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/admin/solicitudes' ? 'text-white bg-white/10' : ''}`}>Solicitudes</Link>
-                  <Link href="/admin/centros" className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/admin/centros' ? 'text-white bg-white/10' : ''}`}>Centros</Link>
-                </>
-              )}
               <Link 
                 href="/calendar" 
                 className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/calendar' ? 'text-white bg-white/10' : ''}`}

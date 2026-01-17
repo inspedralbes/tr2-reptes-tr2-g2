@@ -1,13 +1,4 @@
 <div align="center">
-<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="200" height="200" rx="60" fill="#1e4e5f"/>
-
-<path d="M155 60V140C155 140 145 136 130 136C115 136 100 145 100 145V65C100 65 115 56 130 56C145 56 155 60 155 60Z" fill="white" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-<path d="M45 60V140C45 140 55 136 70 136C85 136 100 145 100 145V65C100 65 85 56 70 56C55 56 45 60 45 60Z" fill="white" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-
-<path d="M45 155H155" stroke="white" stroke-width="8" stroke-linecap="round"/>
-</svg>
-
   <h1 style="font-size: 3rem; font-weight: bold; margin-top: 20px;">ITER ECOSYSTEM</h1>
   
   **Infraestructura Monorepo Escalable para Centros Educativos**

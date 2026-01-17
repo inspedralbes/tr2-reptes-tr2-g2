@@ -15,6 +15,7 @@ interface Fase {
   data_inici: string;
   data_fi: string;
   activa: boolean;
+  ordre: number;
 }
 
 export default function CentroDashboard() {
@@ -107,7 +108,7 @@ export default function CentroDashboard() {
                     }`}
                   >
                     <span className="text-sm font-black italic">
-                      {index + 1}
+                      {fase.ordre}
                     </span>
                   </div>
                   <h4 className={`font-black text-[11px] uppercase tracking-wider leading-tight mb-2 transition-colors duration-300 ${
@@ -148,7 +149,7 @@ export default function CentroDashboard() {
               </svg>
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Solicitar Talleres</h3>
-            <p className="text-sm text-gray-500 leading-relaxed">Indica les teves preferències i el nombre d'alumnes abans del <span className="font-bold text-gray-700">10 d'octubre</span>.</p>
+            <p className="text-sm text-gray-500 leading-relaxed">Fase 1: Indica el nombre aproximat d'alumnes i preferències abans del <span className="font-bold text-gray-700">10 d'octubre</span>.</p>
             {!isPhaseActive(PHASES.SOLICITUD) && <span className="text-[10px] font-black uppercase text-red-500 mt-4 block">Fase Tancada</span>}
           </div>
 
@@ -167,8 +168,8 @@ export default function CentroDashboard() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Gestionar Alumnos</h3>
-          <p className="text-sm text-gray-500 leading-relaxed">Afegeix o modifica els alumnes que participaran en els tallers.</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Gestió Nominal</h3>
+          <p className="text-sm text-gray-500 leading-relaxed">Fase 2: Un cop assignat el taller, comunica les dades identitàries dels alumnes.</p>
           {!isPhaseActive(PHASES.PLANIFICACION) && <span className="text-[10px] font-black uppercase text-blue-500 mt-4 block">Disponible a la Fase 2</span>}
         </div>
 
@@ -193,23 +194,23 @@ export default function CentroDashboard() {
         </div>
 
         <div 
-          onClick={() => (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION)) && router.push('/centro/assignacions')}
-          className={`group p-8 border shadow-sm transition-all duration-300 ${
-            (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION))
+            onClick={() => (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) && router.push('/centro/assignacions')}
+            className={`group p-8 border shadow-sm transition-all duration-300 ${
+              (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE))
               ? 'bg-white border-gray-100 cursor-pointer' 
               : 'bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed grayscale'
           }`}
         >
-          <div className={`w-14 h-14 flex items-center justify-center mb-6 shadow-inner transition-all duration-300 ${
-            (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION)) ? 'bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-white' : 'bg-gray-200 text-gray-400'
-          }`}>
+            <div className={`w-14 h-14 flex items-center justify-center mb-6 shadow-inner transition-all duration-300 ${
+              (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) ? 'bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-white' : 'bg-gray-200 text-gray-400'
+            }`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">Ver Asignaciones</h3>
           <p className="text-sm text-gray-500 leading-relaxed">Consulta els tallers assignats i el teu centre referent.</p>
-          {!(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION)) && <span className="text-[10px] font-black uppercase text-blue-500 mt-4 block">Disponible a la Fase 2</span>}
+          {!(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) && <span className="text-[10px] font-black uppercase text-blue-500 mt-4 block">Disponible a la Fase 2</span>}
         </div>
       </div>
     </DashboardLayout>

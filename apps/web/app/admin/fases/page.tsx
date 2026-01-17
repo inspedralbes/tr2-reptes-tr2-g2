@@ -13,6 +13,7 @@ interface Fase {
   data_inici: string;
   data_fi: string;
   activa: boolean;
+  ordre: number;
 }
 
 export default function PhaseManagementPage() {
@@ -98,6 +99,9 @@ export default function PhaseManagementPage() {
                 <div className="flex flex-col md:flex-row justify-between gap-6">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
+                       <span className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-xs font-black text-gray-400">
+                         {fase.ordre}
+                       </span>
                        <h3 className="text-xl font-black text-gray-900">{fase.nom}</h3>
                        {fase.activa && (
                          <span className="px-3 py-1 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest animate-pulse">ACTIVA</span>

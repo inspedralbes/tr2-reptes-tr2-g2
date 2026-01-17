@@ -19,7 +19,6 @@ export default function PeticionsPage() {
   
   const [selectedTallerId, setSelectedTallerId] = useState<string | null>(null);
   const [alumnesCount, setAlumnesCount] = useState<number | ''>('');
-  const [selectedAlumnesIds, setSelectedAlumnesIds] = useState<number[]>([]);
   const [prof1_id, setProf1Id] = useState<string>('');
   const [prof2_id, setProf2Id] = useState<string>('');
   const [comentaris, setComentaris] = useState('');
@@ -39,15 +38,13 @@ export default function PeticionsPage() {
     if (user) {
       const loadInitialData = async () => {
         try {
-          const [fetchedTallers, fetchedProfs, fetchedAlumnes, fetchedPeticions] = await Promise.all([
+          const [fetchedTallers, fetchedProfs, fetchedPeticions] = await Promise.all([
             tallerService.getAll(),
             professorService.getAll(),
-            alumneService.getAll(),
             peticioService.getAll()
           ]);
           setTallers(fetchedTallers);
           setProfessors(fetchedProfs);
-          setAlumnesList(fetchedAlumnes);
           setRequestedWorkshopIds(fetchedPeticions.map(p => p.id_taller));
         } catch (err) {
           console.error(err);
@@ -71,21 +68,9 @@ export default function PeticionsPage() {
 
   const selectedTaller = tallers.find(t => t._id === selectedTallerId);
 
-  // Update selectedAlumnesIds length when count changes
-  useEffect(() => {
-    const count = alumnesCount === '' ? 0 : alumnesCount;
-    setSelectedAlumnesIds(prev => {
-      const next = [...prev];
-      if (next.length > count) return next.slice(0, count);
-      while (next.length < count) next.push(0);
-      return next;
-    });
-  }, [alumnesCount]);
-
-  const handleAlumneChange = (index: number, id: string) => {
-    const next = [...selectedAlumnesIds];
-    next[index] = parseInt(id);
-    setSelectedAlumnesIds(next);
+  const handleAlumneCountChange = (value: string) => {
+    const num = value === '' ? '' : parseInt(value);
+    setAlumnesCount(num);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -101,17 +86,11 @@ export default function PeticionsPage() {
       return;
     }
 
-    // Check if any student is empty
-    if (selectedAlumnesIds.some(id => id === 0)) {
-      setError('Por favor, selecciona a todos los alumnos.');
-      setSubmitting(false);
-      return;
-    }
 
     try {
       await peticioService.create({
         id_taller: parseInt(selectedTallerId),
-        alumnes_ids: selectedAlumnesIds,
+        alumnes_aprox: Number(alumnesCount),
         comentaris,
         prof1_id: prof1_id ? parseInt(prof1_id) : undefined,
         prof2_id: prof2_id ? parseInt(prof2_id) : undefined,
@@ -285,43 +264,44 @@ export default function PeticionsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Número de Alumnos</label>
-                <input 
-                  type="number"
-                  value={alumnesCount}
-                  onChange={(e) => setAlumnesCount(e.target.value === '' ? '' : parseInt(e.target.value))}
-                  placeholder="Ej: 3"
-                  className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-700"
-                  min="0"
-                  required
-                />
+                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Plazas Solicitadas (Nº Alumnos)</label>
+                <div className="relative">
+                  <input 
+                    type="number"
+                    value={alumnesCount}
+                    onChange={(e) => handleAlumneCountChange(e.target.value)}
+                    placeholder="Ej: 4"
+                    className={`w-full px-4 py-4 bg-gray-50 border-2 rounded-xl focus:ring-0 transition-all font-bold text-lg ${
+                      selectedTaller?.modalitat === 'C' && alumnesCount !== '' && alumnesCount > 4 
+                      ? 'border-red-200 text-red-600 focus:border-red-500' 
+                      : 'border-transparent focus:border-blue-500 text-gray-800'
+                    }`}
+                    min="1"
+                    max={selectedTaller?.modalitat === 'C' ? 4 : 100}
+                    required
+                  />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase text-gray-400">
+                    Estudiantes
+                  </div>
+                </div>
+                
+                {selectedTaller?.modalitat === 'C' && (
+                  <div className="mt-4 p-4 bg-orange-50 border border-orange-100 rounded-xl space-y-2">
+                    <p className="text-[10px] text-orange-700 font-black uppercase tracking-wider flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
+                      Restricciones Modalidad C
+                    </p>
+                    <ul className="text-[10px] text-orange-600/80 font-bold space-y-1 ml-6 list-disc">
+                      <li>Máximo 4 alumnos de un mismo instituto por taller.</li>
+                      <li>Máximo 12 alumnos totales por instituto distribuidos en diferentes proyectos.</li>
+                    </ul>
+                    <p className="text-[9px] text-gray-400 italic mt-2">
+                      * En esta fase inicial solo indicamos la cantidad. Los nombres se solicitarán tras la asignación.
+                    </p>
+                  </div>
+                )}
               </div>
 
-              {selectedAlumnesIds.length > 0 && (
-                <div className="space-y-3">
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest">Seleccionar Alumnos</label>
-                  {selectedAlumnesIds.map((id, index) => (
-                    <select
-                      key={index}
-                      value={id || ''}
-                      onChange={(e) => handleAlumneChange(index, e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-700 text-sm"
-                      required
-                    >
-                      <option value="">Alumne {index + 1}</option>
-                      {alumnesList.map(a => (
-                        <option 
-                          key={a.id_alumne} 
-                          value={a.id_alumne}
-                          disabled={selectedAlumnesIds.includes(a.id_alumne) && id !== a.id_alumne}
-                        >
-                          {a.nom} {a.cognoms} ({a.curs})
-                        </option>
-                      ))}
-                    </select>
-                  ))}
-                </div>
-              )}
 
               <div>
                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Preferencias y Comentarios</label>
