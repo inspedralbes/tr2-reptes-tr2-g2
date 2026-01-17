@@ -45,14 +45,14 @@ const Breadcrumbs: React.FC = () => {
               </span>
             )}
             {isLast ? (
-              <span className="text-gray-400" style={{ fontFamily: THEME.fonts.secondary }}>
+              <span className="text-gray-400" style={{ fontFamily: THEME.fonts.primary }}>
                 {label}
               </span>
             ) : (
               <Link 
                 href={path}
                 className="hover:text-blue-600 transition-colors"
-                style={{ color: THEME.colors.primary, fontFamily: THEME.fonts.secondary }}
+                style={{ color: THEME.colors.primary, fontFamily: THEME.fonts.primary }}
               >
                 {label}
               </Link>
