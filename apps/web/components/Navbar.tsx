@@ -19,15 +19,22 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Enginy' }) => {
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-4">
             {/* Logo placeholder or icon */}
-            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-              <span className="text-blue-900 font-black text-xs">E</span>
-            </div>
-            <h1 className="text-xl font-bold text-white tracking-tight">{title}</h1>
+            <a 
+              href={user.rol.nom_rol === 'ADMIN' ? '/admin' : '/centro'} 
+              className="flex items-center gap-4 hover:opacity-80 transition-opacity"
+            >
+              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                <span className="text-blue-900 font-black text-xs">E</span>
+              </div>
+              <h1 className="text-xl font-bold text-white tracking-tight">{title}</h1>
+            </a>
             <nav className="ml-8 hidden md:flex items-center space-x-4">
               <a href="/calendar" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Calendari</a>
               {user.rol.nom_rol === 'ADMIN' && (
                 <>
+                  <a href="/admin" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Panel</a>
                   <a href="/admin/talleres" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Talleres</a>
+                  <a href="/admin/solicitudes" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Solicitudes</a>
                   <a href="/admin/centros" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Centros</a>
                   <a href="/admin/fases" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Fases</a>
                 </>

@@ -56,7 +56,21 @@ async function main() {
 
   // 6. CREAR USUARIOS
   const salt = await bcrypt.genSalt(10);
+  const passAdmin = await bcrypt.hash('Admin@1234', salt);
   const passCentro = await bcrypt.hash('Centro@1234', salt);
+  const passProfe = await bcrypt.hash('Profe@1234', salt);
+
+  // 1. ADMIN (Global)
+  await prisma.usuari.create({
+    data: {
+      nom_complet: 'Administrador Global',
+      email: 'admin@admin.com',
+      password_hash: passAdmin,
+      id_rol: rolAdmin.id_rol
+    }
+  });
+
+  // 2. COORDINADOR (Centro Brossa)
   await prisma.usuari.create({
     data: {
       nom_complet: 'Coordinador General',
@@ -64,6 +78,17 @@ async function main() {
       password_hash: passCentro,
       id_rol: rolCoord.id_rol,
       id_centre: centroBrossa.id_centre
+    }
+  });
+
+  // 3. PROFESOR (Centro Milà)
+  await prisma.usuari.create({
+    data: {
+      nom_complet: 'Professor Ejemplo',
+      email: 'profe@profe.com',
+      password_hash: passProfe,
+      id_rol: rolProfe.id_rol,
+      id_centre: centroMila.id_centre
     }
   });
 
