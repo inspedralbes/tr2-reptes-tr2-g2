@@ -55,6 +55,17 @@ export const createPeticio = async (req: Request, res: Response) => {
   }
 
   try {
+    // Comprobar si ya existe una petición para este centro y taller
+    const existingPeticio = await prisma.peticio.findFirst({
+      where: {
+        id_centre: parseInt(centreId),
+        id_taller: parseInt(id_taller)
+      }
+    });
+
+    if (existingPeticio) {
+      return res.status(400).json({ error: 'Este centro ya ha realizado una solicitud para este taller.' });
+    }
     const nuevaPeticio = await prisma.peticio.create({
       data: {
         id_centre: parseInt(centreId),

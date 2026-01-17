@@ -15,6 +15,7 @@ export default function PeticionsPage() {
   const [tallers, setTallers] = useState<Taller[]>([]);
   const [professors, setProfessors] = useState<Professor[]>([]);
   const [alumnesList, setAlumnesList] = useState<Alumne[]>([]);
+  const [requestedWorkshopIds, setRequestedWorkshopIds] = useState<number[]>([]);
   
   const [selectedTallerId, setSelectedTallerId] = useState<string | null>(null);
   const [alumnesCount, setAlumnesCount] = useState<number | ''>('');
@@ -38,14 +39,16 @@ export default function PeticionsPage() {
     if (user) {
       const loadInitialData = async () => {
         try {
-          const [fetchedTallers, fetchedProfs, fetchedAlumnes] = await Promise.all([
+          const [fetchedTallers, fetchedProfs, fetchedAlumnes, fetchedPeticions] = await Promise.all([
             tallerService.getAll(),
             professorService.getAll(),
-            alumneService.getAll()
+            alumneService.getAll(),
+            peticioService.getAll()
           ]);
           setTallers(fetchedTallers);
           setProfessors(fetchedProfs);
           setAlumnesList(fetchedAlumnes);
+          setRequestedWorkshopIds(fetchedPeticions.map(p => p.id_taller));
         } catch (err) {
           console.error(err);
           setError('No se pudieron cargar los datos necesarios.');
@@ -172,14 +175,20 @@ export default function PeticionsPage() {
                 {filteredTallers.map((taller) => (
                   <div 
                     key={taller._id}
-                    onClick={() => toggleTaller(taller._id)}
-                    className={`group p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 relative overflow-hidden ${
-                      selectedTallerId === taller._id 
-                      ? 'border-blue-600 bg-blue-50/50 shadow-md' 
-                      : 'border-gray-100 hover:border-blue-200 hover:bg-white hover:shadow-lg'
+                    onClick={() => !requestedWorkshopIds.includes(parseInt(taller._id)) && toggleTaller(taller._id)}
+                    className={`group p-5 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden ${
+                      requestedWorkshopIds.includes(parseInt(taller._id))
+                      ? 'border-gray-100 bg-gray-50/50 opacity-60 cursor-not-allowed grayscale'
+                      : selectedTallerId === taller._id 
+                      ? 'border-blue-600 bg-blue-50/50 shadow-md cursor-pointer' 
+                      : 'border-gray-100 hover:border-blue-200 hover:bg-white hover:shadow-lg cursor-pointer'
                     }`}
                   >
-                    {selectedTallerId === taller._id && (
+                    {requestedWorkshopIds.includes(parseInt(taller._id)) ? (
+                      <div className="absolute top-3 right-3 text-gray-400">
+                        <span className="text-[10px] font-black uppercase tracking-widest bg-gray-200 px-2 py-1 rounded">Solicitado</span>
+                      </div>
+                    ) : selectedTallerId === taller._id && (
                       <div className="absolute top-3 right-3 text-blue-600 animate-in fade-in zoom-in duration-300">
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />

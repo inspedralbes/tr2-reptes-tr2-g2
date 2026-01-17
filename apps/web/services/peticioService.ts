@@ -9,10 +9,9 @@ export interface Peticio {
   data_peticio: string;
   estat: string;
   modalitat?: string;
-  prof1_nom?: string;
-  prof1_contacte?: string;
-  prof2_nom?: string;
-  prof2_contacte?: string;
+  prof1_id?: number;
+  prof2_id?: number;
+  ids_alumnes?: number[];
   taller?: {
     titol: string;
   };
@@ -41,12 +40,10 @@ const peticioService = {
    */
   create: async (data: { 
     id_taller: number; 
-    alumnes_aprox?: number; 
+    alumnes_ids?: number[]; 
     comentaris?: string;
-    prof1_nom?: string;
-    prof1_contacte?: string;
-    prof2_nom?: string;
-    prof2_contacte?: string;
+    prof1_id?: number;
+    prof2_id?: number;
     modalitat?: string;
   }): Promise<Peticio> => {
     const api = getApi();
