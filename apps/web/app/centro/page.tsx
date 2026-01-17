@@ -34,7 +34,7 @@ export default function CentroDashboard() {
       try {
         const api = getApi();
         const response = await api.get("/fases");
-        setFases(response.data);
+        setFases(response.data.data);
       } catch (error) {
         console.error("Error fetching phases:", error);
       } finally {

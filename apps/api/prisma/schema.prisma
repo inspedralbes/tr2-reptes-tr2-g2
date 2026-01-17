@@ -138,6 +138,7 @@ model Peticio {
 
   assignacio Assignacio?
 
+  @@index([estat])
   @@map("peticions")
 }
 
@@ -164,6 +165,7 @@ model Assignacio {
   inscripcions Inscripcio[]
   respostes    RespostesQuestionari[]
 
+  @@index([data_inici, data_fi])
   @@map("assignacions")
 }
 
@@ -337,6 +339,7 @@ model LogAuditoria {
   detalls             Json?
   data_hora           DateTime @default(now())
 
+  @@index([data_hora])
   @@map("logs_auditoria")
 }
 

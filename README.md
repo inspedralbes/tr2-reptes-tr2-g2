@@ -93,4 +93,5 @@ Això garanteix que mai tindràs errors de "mòduls no trobats" o fitxers bloque
 Per a més detalls, consulta els manuals a la carpeta `/doc`:
 
 👉 **[Documentació Tècnica (DOCS.md)](./doc/DOCS.md)**: Detalls d'infraestructura, volums i xarxes.
+👉 **[Arquitectura Backend (BACKEND_TECH.md)](./doc/BACKEND_TECH.md)**: Detalls de professionalització, validació i optimització.
 👉 **[Guia d'Ús (USAGE.md)](./doc/USAGE.md)**: Fluxos de treball, migracions i manteniment.

@@ -6,20 +6,25 @@ const router = Router();
 
 // Get all phases with their status
 router.get('/', authenticateToken, async (_req: Request, res: Response) => {
-  try {
-    const phases = await prisma.fase.findMany({
-      orderBy: { data_inici: 'asc' },
-      include: {
-        _count: {
-          select: { events: true }
-        }
+  const phases = await prisma.fase.findMany({
+    orderBy: { data_inici: 'asc' },
+    include: {
+      _count: {
+        select: { events: true }
       }
-    });
-    res.json(phases);
-  } catch (error) {
-    console.error('Error fetching phases:', error);
-    res.status(500).json({ error: 'Error intern del servidor' });
-  }
+    }
+  });
+  
+  // Return consistent structure
+  res.json({
+    data: phases,
+    meta: {
+      total: phases.length,
+      page: 1,
+      limit: phases.length,
+      totalPages: 1
+    }
+  });
 });
 
 // Update a specific phase (Admin only)
@@ -32,31 +37,25 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
     return res.status(403).json({ error: 'Accés denegat: Només els administradors poden modificar les fases.' });
   }
 
-  try {
-    const updatedFase = await prisma.fase.update({
-      where: { id_fase: parseInt(id) },
-      data: {
-        nom,
-        descripcio,
-        data_inici: data_inici ? new Date(data_inici) : undefined,
-        data_fi: data_fi ? new Date(data_fi) : undefined,
-        activa: activa !== undefined ? activa : undefined
-      }
-    });
-
-    // If activating this phase, deactivate others? (Optional logic)
-    if (activa === true) {
-      await prisma.fase.updateMany({
-        where: { id_fase: { not: parseInt(id) } },
-        data: { activa: false }
-      });
+  const updatedFase = await prisma.fase.update({
+    where: { id_fase: parseInt(id as string) },
+    data: {
+      nom,
+      descripcio,
+      data_inici: data_inici ? new Date(data_inici) : undefined,
+      data_fi: data_fi ? new Date(data_fi) : undefined,
+      activa: activa !== undefined ? activa : undefined
     }
+  });
 
-    res.json(updatedFase);
-  } catch (error) {
-    console.error('Error updating phase:', error);
-    res.status(500).json({ error: 'Error al actualizar la fase' });
+  if (activa === true) {
+    await prisma.fase.updateMany({
+      where: { id_fase: { not: parseInt(id as string) } },
+      data: { activa: false }
+    });
   }
+
+  res.json(updatedFase);
 });
 
 export default router;

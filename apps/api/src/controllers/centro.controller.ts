@@ -1,82 +1,75 @@
 import prisma from '../lib/prisma';
 import { Request, Response } from 'express';
 
-// GET: Listar todos
+// GET: Listar todos con paginación
 export const getCentres = async (req: Request, res: Response) => {
-  try {
-    const centres = await prisma.centre.findMany();
-    res.json(centres);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener centros' });
-  }
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (Number(page) - 1) * Number(limit);
+  const take = Number(limit);
+
+  const [centres, total] = await Promise.all([
+    prisma.centre.findMany({
+      skip,
+      take,
+    }),
+    prisma.centre.count(),
+  ]);
+
+  res.json({
+    data: centres,
+    meta: {
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(total / take),
+    },
+  });
 };
 
 // GET: Uno por ID
 export const getCentreById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  try {
-    const centre = await prisma.centre.findUnique({
-      where: { id_centre: parseInt(id as string) }
-    });
-    if (!centre) return res.status(404).json({ error: 'Centro no encontrado' });
-    res.json(centre);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener centro' });
-  }
+  const centre = await prisma.centre.findUnique({
+    where: { id_centre: parseInt(id as string) }
+  });
+  if (!centre) return res.status(404).json({ error: 'Centro no encontrado' });
+  res.json(centre);
 };
 
 // POST: Crear
 export const createCentre = async (req: Request, res: Response) => {
-  try {
-    const newCentre = await prisma.centre.create({
-      data: req.body // Asegúrate de validar datos en producción
-    });
-    res.json(newCentre);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al crear centro' });
-  }
+  const newCentre = await prisma.centre.create({
+    data: req.body
+  });
+  res.json(newCentre);
 };
 
 // PATCH: Marcar asistencia a la reunión
 export const updateCentreAttendance = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { asistencia_reunion } = req.body;
-  try {
-    const updated = await prisma.centre.update({
-      where: { id_centre: parseInt(id as string) },
-      data: { asistencia_reunion }
-    });
-    res.json(updated);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar asistencia' });
-  }
+  const updated = await prisma.centre.update({
+    where: { id_centre: parseInt(id as string) },
+    data: { asistencia_reunion }
+  });
+  res.json(updated);
 };
 
 // PATCH: Actualizar centro
 export const updateCentre = async (req: Request, res: Response) => {
   const { id } = req.params;
-  try {
-    const updated = await prisma.centre.update({
-      where: { id_centre: parseInt(id as string) },
-      data: req.body
-    });
-    res.json(updated);
-  } catch (error) {
-    console.error("Error en centroController.updateCentre:", error);
-    res.status(500).json({ error: 'Error al actualizar centro' });
-  }
+  const updated = await prisma.centre.update({
+    where: { id_centre: parseInt(id as string) },
+    data: req.body
+  });
+  res.json(updated);
 };
 
 // DELETE: Eliminar centro
 export const deleteCentre = async (req: Request, res: Response) => {
   const { id } = req.params;
-  try {
-    await prisma.centre.delete({
-      where: { id_centre: parseInt(id as string) }
-    });
-    res.status(204).send();
-  } catch (error) {
-    console.error("Error en centroController.deleteCentre:", error);
-    res.status(500).json({ error: 'Error al eliminar centro' });
-  }
+  await prisma.centre.delete({
+    where: { id_centre: parseInt(id as string) }
+  });
+  res.status(204).send();
 };

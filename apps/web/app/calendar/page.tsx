@@ -22,8 +22,10 @@ export default function CalendarPage() {
           api.get("/fases")
         ]);
         
+        const phasesData = phasesRes.data.data;
+        
         // Transform phases into calendar events
-        const phaseEvents = phasesRes.data.map((f: any) => ({
+        const phaseEvents = phasesData.map((f: any) => ({
           id: `fase-${f.id_fase}`,
           title: `Fase: ${f.nom}`,
           date: f.data_inici,
@@ -33,7 +35,7 @@ export default function CalendarPage() {
         }));
 
         setEvents([...eventsRes.data, ...phaseEvents]);
-        setActiveFase(phasesRes.data.find((f: any) => f.activa));
+        setActiveFase(phasesData.find((f: any) => f.activa));
       } catch (error) {
         console.error("Error fetching calendar data:", error);
       } finally {

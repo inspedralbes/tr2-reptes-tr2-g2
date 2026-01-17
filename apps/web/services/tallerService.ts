@@ -23,11 +23,12 @@ const tallerService = {
   getAll: async (): Promise<Taller[]> => {
     const api = getApi();
     try {
-      // Backend returns an array directly: [...]
-      const response = await api.get<any[]>("/tallers");
+      // Backend now returns: { data: [...], meta: {...} }
+      const response = await api.get<{ data: any[], meta: any }>("/tallers");
+      const tallersData = response.data.data;
 
       // Adapt backend data to frontend Taller interface
-      return response.data.map((t: any) => ({
+      return tallersData.map((t: any) => ({
         _id: t.id_taller.toString(),
         titol: t.titol,
         sector: t.sector?.nom || "General", // Fallback if sector name is missing

@@ -17,8 +17,8 @@ const centroService = {
   getAll: async (): Promise<Centre[]> => {
     const api = getApi();
     try {
-      const response = await api.get<Centre[]>("/centres");
-      return response.data;
+      const response = await api.get<{ data: Centre[], meta: any }>("/centres");
+      return response.data.data;
     } catch (error) {
       console.error("Error en centroService.getAll:", error);
       throw error;
