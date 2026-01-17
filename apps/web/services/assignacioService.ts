@@ -54,6 +54,20 @@ const assignacioService = {
       console.error("Error en assignacioService.updateChecklistItem:", error);
       throw error;
     }
+  },
+
+  /**
+   * Ejecuta el algoritmo Tetris de asignación masiva.
+   */
+  runTetris: async (): Promise<any> => {
+    const api = getApi();
+    try {
+      const response = await api.post("/assignacions/tetris");
+      return response.data;
+    } catch (error) {
+      console.error("Error en assignacioService.runTetris:", error);
+      throw error;
+    }
   }
 };
 

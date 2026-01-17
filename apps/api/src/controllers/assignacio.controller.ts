@@ -208,3 +208,36 @@ export const createInscripcions = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al realizar el registro nominal.' });
   }
 };
+
+// PATCH: Designar profesores para una asignación
+export const designateProfessors = async (req: Request, res: Response) => {
+  const { idAssignacio } = req.params;
+  const { prof1_id, prof2_id } = req.body;
+
+  try {
+    const updated = await prisma.assignacio.update({
+      where: { id_assignacio: parseInt(idAssignacio as string) },
+      data: {
+        prof1_id,
+        prof2_id
+      }
+    });
+
+    // Actualizar checklist
+    await prisma.checklistAssignacio.updateMany({
+      where: {
+        id_assignacio: parseInt(idAssignacio as string),
+        pas_nom: { contains: 'Profesores Referentes' }
+      },
+      data: {
+        completat: true,
+        data_completat: new Date()
+      }
+    });
+
+    res.json(updated);
+  } catch (error) {
+    console.error("Error al designar profesores:", error);
+    res.status(500).json({ error: 'Error al designar profesores.' });
+  }
+};

@@ -106,7 +106,18 @@ export default function AssignacionsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mt-6">
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  <button 
+                    onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push(`/centro/assignacions/${a.id_assignacio}/profesores`)}
+                    disabled={!isPhaseActive(PHASES.PLANIFICACION)}
+                    className={`py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${
+                      isPhaseActive(PHASES.PLANIFICACION) 
+                        ? 'border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white' 
+                        : 'border-gray-200 text-gray-300 cursor-not-allowed'
+                    }`}
+                  >
+                    Designar Professors
+                  </button>
                   <button 
                     onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push(`/centro/assignacions/${a.id_assignacio}/alumnos`)}
                     disabled={!isPhaseActive(PHASES.PLANIFICACION)}
@@ -118,15 +129,17 @@ export default function AssignacionsPage() {
                   >
                     Registro Nominal
                   </button>
+                </div>
+                <div className="mt-3">
                   <button 
                     onClick={() => isPhaseActive(PHASES.CIERRE) ? alert('Validant dades per a certificació...') : alert('Documentació encara no disponible')}
-                    className={`py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${
+                    className={`w-full py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${
                       isPhaseActive(PHASES.CIERRE)
                         ? 'border-accent text-accent hover:bg-accent hover:text-white'
-                        : 'border-gray-200 text-gray-300'
+                        : 'border-gray-100 text-gray-300'
                     }`}
                   >
-                    {isPhaseActive(PHASES.CIERRE) ? 'Validar Taller' : 'Documentació'}
+                    {isPhaseActive(PHASES.CIERRE) ? 'Validar Taller' : 'Consultar Documentació'}
                   </button>
                 </div>
               </div>

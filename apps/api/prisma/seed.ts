@@ -13,28 +13,18 @@ const PHASES = {
 async function main() {
   console.log('🌱 Iniciando Seed para PostgreSQL...');
 
-  // 1. LIMPIEZA EXHAUSTIVA
-  await prisma.respostesQuestionari.deleteMany();
-  await prisma.pregunta.deleteMany();
-  await prisma.modelQuestionari.deleteMany();
-  await prisma.avaluacioCompetencial.deleteMany();
-  await prisma.assistencia.deleteMany();
-  await prisma.inscripcio.deleteMany();
-  await prisma.checklistAssignacio.deleteMany();
-  await prisma.assignacioProfessor.deleteMany();
-  await prisma.assignacio.deleteMany();
-  await prisma.peticio.deleteMany();
-  await prisma.taller.deleteMany();
-  await prisma.alumne.deleteMany();
-  await prisma.professor.deleteMany();
-  await prisma.logAuditoria.deleteMany();
-  await prisma.calendariEvent.deleteMany();
-  await prisma.fase.deleteMany();
-  await prisma.usuari.deleteMany();
-  await prisma.centre.deleteMany();
-  await prisma.sector.deleteMany();
-  await prisma.rol.deleteMany();
-  await prisma.competencia.deleteMany();
+  // 1. LIMPIEZA EXHAUSTIVA CON REINICIO DE IDENTIDADES
+  console.log('🧹 Limpiando base de datos...');
+  const tables = [
+    'respostes_questionari', 'preguntes', 'model_questionaris', 'avaluacio_competencial',
+    'assistencia', 'inscripcions', 'checklist_assignacio', 'assignacio_professors',
+    'assignacions', 'peticions', 'tallers', 'alumnes', 'professors', 'logs_auditoria',
+    'calendari_events', 'fases', 'usuaris', 'centres', 'sectors', 'rols', 'competencies'
+  ];
+
+  for (const table of tables) {
+    await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE`);
+  }
 
   console.log('🧹 Base de datos limpiada.');
 
@@ -298,13 +288,11 @@ async function main() {
     data: {
       id_centre: centroBrossa.id_centre,
       id_taller: tallerFusta.id_taller,
+      alumnes_aprox: 2,
       estat: 'Pendent',
       modalitat: 'A',
       prof1_id: prof1.id_professor,
-      prof2_id: prof2.id_professor,
-      alumnes: {
-        connect: [{ id_alumne: creados[0].id_alumne }, { id_alumne: creados[1].id_alumne }]
-      }
+      prof2_id: prof2.id_professor
     }
   });
 

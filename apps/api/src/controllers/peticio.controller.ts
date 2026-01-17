@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { EstadoPeticion } from '@iter/shared';
 import { connectToDatabase } from '../lib/mongodb';
 import { isPhaseActive, PHASES } from '../lib/phaseUtils';
+import { createNotificacioInterna } from './notificacio.controller';
 
 // GET: Ver peticiones (Filtra por centro si es COORDINADOR) con paginación
 export const getPeticions = async (req: Request, res: Response) => {
@@ -184,7 +185,16 @@ export const updatePeticioStatus = async (req: Request, res: Response) => {
   try {
     const updated = await prisma.peticio.update({
       where: { id_peticio: parseInt(id as string) },
-      data: { estat: estat as EstadoPeticion }
+      data: { estat: estat as EstadoPeticion },
+      include: { taller: true }
+    });
+
+    await createNotificacioInterna({
+      id_centre: updated.id_centre,
+      titol: `Sol·licitud ${updated.estat === 'Aprovada' ? 'Aprovada' : 'Rebutjada'}`,
+      missatge: `La teva sol·licitud per al taller "${updated.taller.titol}" ha estat ${updated.estat.toLowerCase()}.`,
+      tipus: 'PETICIO',
+      importancia: updated.estat === 'Aprovada' ? 'INFO' : 'WARNING'
     });
     
     res.json(updated);

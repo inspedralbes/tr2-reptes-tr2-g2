@@ -91,16 +91,33 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
       // 1. Save inscriptions (Nominal Register)
       await api.post(`/assignacions/${id}/inscripcions`, { ids_alumnes: selectedIds });
       
-      // 2. Update Checklist Item "Subir Registro Nominal (Excel)"
-      const item = assignacio.checklist.find((i: any) => i.pas_nom.includes('Registro Nominal'));
-      if (item) {
-        await api.patch(`/assignacions/checklist/${item.id_checklist}`, { completat: true });
-      }
-
-      alert('Registre Nominal desat amb èxit i checklist actualitzat.');
+      // 2. Update Checklist Item etc.
+      alert('Registre Nominal desat amb èxit.');
       router.push('/centro/assignacions');
     } catch (error) {
       alert('Error al desar el registre nominal.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setLoading(true);
+    try {
+      const api = getApi();
+      const response = await api.post(`/assignacions/${id}/enrollment/excel`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      alert(response.data.message);
+      window.location.reload(); // Refresh to show new students
+    } catch (err: any) {
+      alert('Error al carregar l\'Excel: ' + (err.response?.data?.error || err.message));
     } finally {
       setLoading(false);
     }
@@ -121,6 +138,28 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
       subtitle={`En aquesta fase has de designar els ${plazasAsignadas} alumnes que participaran.`}
     >
       <div className="max-w-4xl mx-auto pb-20">
+        <div className="mb-6 flex justify-between items-center">
+          <h2 className="text-xl font-bold text-gray-800">Assignació d'Alumnes</h2>
+          <div className="flex gap-2">
+            <label className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest cursor-pointer transition-all shadow-lg flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Importar Excel
+              <input type="file" className="hidden" accept=".xlsx,.xls" onChange={handleExcelUpload} disabled={loading} />
+            </label>
+            <button 
+              onClick={() => router.push('/centro/alumnos')}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Crear Alumne
+            </button>
+          </div>
+        </div>
+
         {/* Header de Status */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 border shadow-sm flex flex-col items-center justify-center text-center">

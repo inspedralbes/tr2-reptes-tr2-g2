@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../middlewares/authMiddleware';
 import prisma from '../lib/prisma';
+import { createNotificacioInterna } from '../controllers/notificacio.controller';
+import { PHASES } from '@iter/shared';
 
 const router = Router();
 
@@ -52,6 +54,14 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
     await prisma.fase.updateMany({
       where: { id_fase: { not: parseInt(id as string) } },
       data: { activa: false }
+    });
+
+    // Notificar a todos los centros del inicio de la nueva fase
+    await createNotificacioInterna({
+      titol: `Nova Fase: ${updatedFase.nom}`,
+      missatge: `S'ha iniciat la fase de "${updatedFase.nom}". Consulta el calendari per a més detalls.`,
+      tipus: 'FASE',
+      importancia: 'URGENT'
     });
   }
 
