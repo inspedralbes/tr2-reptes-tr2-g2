@@ -66,9 +66,9 @@ const ResourcesWidget: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 border shadow-sm ${
+        className={`flex items-center gap-3 px-6 py-3 font-black text-xs uppercase tracking-widest transition-all duration-300 border shadow-sm ${
           isOpen 
-            ? 'bg-blue-600 text-white border-blue-600 shadow-blue-200 ring-4 ring-blue-50' 
+            ? 'bg-blue-600 text-white border-blue-600 shadow-blue-200' 
             : 'bg-white text-gray-600 border-gray-100 hover:border-blue-200 hover:text-blue-600'
         }`}
       >
@@ -82,15 +82,15 @@ const ResourcesWidget: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-3 w-72 bg-white rounded-[32px] shadow-[0_20px_50px_rgba(0,66,107,0.15)] border border-gray-100 p-3 z-50 animate-in fade-in zoom-in slide-in-from-top-4 duration-300">
+        <div className="absolute top-full right-0 mt-3 w-72 bg-white shadow-xl border border-gray-100 p-3 z-50 animate-in fade-in duration-300">
           <div className="space-y-1">
             {resources.map((resource) => (
               <a
                 key={resource.id}
                 href={resource.url}
-                className="flex items-center gap-4 p-4 rounded-[20px] hover:bg-blue-50 transition-all duration-300 group/item"
+                className="flex items-center gap-4 p-4 hover:bg-blue-50 transition-all duration-300 group/item"
               >
-                <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover/item:bg-blue-600 group-hover/item:text-white transition-all shadow-inner">
+                <div className="w-10 h-10 bg-gray-50 flex items-center justify-center text-gray-400 group-hover/item:bg-blue-600 group-hover/item:text-white transition-all shadow-inner">
                   {resource.icon}
                 </div>
                 <div className="flex-1 overflow-hidden">
@@ -100,7 +100,7 @@ const ResourcesWidget: React.FC = () => {
               </a>
             ))}
           </div>
-          <div className="mt-2 p-4 bg-gray-50 rounded-[20px] border border-gray-100">
+          <div className="mt-2 p-4 bg-gray-50 border border-gray-100">
             <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">
               Consorci d'Educació de Barcelona
             </p>

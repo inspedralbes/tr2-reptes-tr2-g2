@@ -82,9 +82,9 @@ export default function AdminDashboardPage() {
           <div 
             key={section.path}
             onClick={() => router.push(section.path)}
-            className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+            className="group bg-white p-8 border border-gray-100 shadow-sm cursor-pointer transition-all duration-300"
           >
-            <div className={`w-14 h-14 bg-${section.color}-50 rounded-2xl flex items-center justify-center mb-6 text-${section.color}-600 group-hover:bg-${section.color}-600 group-hover:text-white transition-all duration-300 shadow-inner`}>
+            <div className={`w-14 h-14 bg-${section.color}-50 flex items-center justify-center mb-6 text-${section.color}-600 shadow-inner group-hover:bg-${section.color}-600 group-hover:text-white transition-all duration-300`}>
               {section.icon}
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">{section.title}</h3>

@@ -14,7 +14,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ item, onPress }) => {
   return (
     <button
       onClick={onPress}
-      className="mb-6 border border-gray-300 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow rounded-lg"
+      className="mb-6 border border-gray-300 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
     >
       <div className="h-48 w-full bg-gray-200 relative">
         <img 
@@ -22,7 +22,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ item, onPress }) => {
           className="w-full h-full object-cover"
           alt={item.titol}
         />
-        <div className="absolute top-3 left-3 bg-white px-3 py-1 rounded">
+        <div className="absolute top-3 left-3 bg-white px-3 py-1">
           <span className="text-blue-600 text-xs font-bold uppercase">
             {item.modalitat}
           </span>
@@ -48,7 +48,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ item, onPress }) => {
             </span>
           </div>
 
-          <div className="bg-blue-600 px-4 py-2 rounded">
+          <div className="bg-blue-600 px-4 py-2 hover:bg-blue-700 transition-colors">
             <span className="text-white text-xs font-bold">Ver Taller</span>
           </div>
         </div>

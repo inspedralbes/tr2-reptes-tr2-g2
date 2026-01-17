@@ -94,7 +94,7 @@ export default function CentrosScreen() {
         setEditingCentro(null);
         setModalVisible(true);
       }}
-      className="flex items-center gap-2 px-6 py-3 rounded-xl text-white font-bold transition shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0"
+      className="flex items-center gap-2 px-6 py-3 text-white font-bold shadow-lg"
       style={{ backgroundColor: THEME.colors.primary }}
     >
       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -112,7 +112,7 @@ export default function CentrosScreen() {
     >
       {/* Buscador */}
       <div className="mb-8">
-        <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full flex flex-col justify-center">
+        <section className="bg-white shadow-sm border border-gray-100 p-6 h-full flex flex-col justify-center">
           <div className="max-w-md">
             <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Buscador de centros</label>
             <div className="relative">
@@ -121,7 +121,7 @@ export default function CentrosScreen() {
                 placeholder="Ej: Institut Pedralbes, 08012345..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-700"
+                className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 font-medium text-gray-700"
               />
               <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-3.5 h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -140,10 +140,10 @@ export default function CentrosScreen() {
       ) : filteredCentros.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredCentros.map((centro) => (
-            <div key={centro.id_centre} className="group bg-white rounded-3xl shadow-sm border border-gray-100 p-6 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+            <div key={centro.id_centre} className="group bg-white shadow-sm border border-gray-100 p-6 relative overflow-hidden transition-all duration-300">
               <div className="relative">
                 <div className="flex justify-between items-start mb-6">
-                  <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-inner">
+                  <div className="w-12 h-12 bg-blue-50 flex items-center justify-center text-blue-600 shadow-inner group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
@@ -168,7 +168,7 @@ export default function CentrosScreen() {
                     {centro.email_contacte || "N/A"}
                   </div>
                   <div className="mt-2">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${centro.asistencia_reunion ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-medium ${centro.asistencia_reunion ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                       {centro.asistencia_reunion ? 'Asistencia confirmada' : 'Pendiente asistencia'}
                     </span>
                   </div>
@@ -177,13 +177,13 @@ export default function CentrosScreen() {
                 <div className="flex gap-2">
                   <button 
                     onClick={() => handleEdit(centro)}
-                    className="flex-1 py-3 px-4 text-xs font-bold text-blue-800 bg-blue-50/50 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300"
+                    className="flex-1 py-3 px-4 text-xs font-bold text-blue-800 bg-blue-50/50 hover:bg-blue-600 hover:text-white transition-all duration-300"
                   >
                     Editar Detalles
                   </button>
                   <button 
                     onClick={() => handleDelete(centro.id_centre)}
-                    className="p-3 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                    className="p-3 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all"
                     title="Eliminar"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -196,8 +196,8 @@ export default function CentrosScreen() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-32 bg-white rounded-3xl border border-dashed border-gray-200 animate-in fade-in zoom-in duration-500">
-          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="text-center py-32 bg-white border border-dashed border-gray-200 animate-in fade-in zoom-in duration-500">
+          <div className="w-16 h-16 bg-gray-50 flex items-center justify-center mx-auto mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>

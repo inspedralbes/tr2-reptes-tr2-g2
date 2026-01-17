@@ -98,7 +98,7 @@ export default function TallerScreen() {
         setEditingWorkshop(null);
         setCreateModalVisible(true);
       }}
-      className="flex items-center gap-2 px-6 py-3 rounded-xl text-white font-bold transition shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0"
+      className="flex items-center gap-2 px-6 py-3 text-white font-bold shadow-lg"
       style={{ backgroundColor: THEME.colors.primary }}
     >
       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -115,7 +115,7 @@ export default function TallerScreen() {
       actions={headerActions}
     >
       {/* Buscador */}
-      <div className="mb-8 flex justify-between items-center bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="mb-8 flex justify-between items-center bg-white shadow-sm border border-gray-100 p-6">
         <div className="max-w-md w-full">
           <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Buscador ràpid</label>
           <div className="relative">
@@ -124,7 +124,7 @@ export default function TallerScreen() {
               placeholder="Ej: Fusta, Robòtica..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-700"
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 font-medium text-gray-700"
             />
             <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-3.5 h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -136,13 +136,13 @@ export default function TallerScreen() {
       {/* Grid de Talleres */}
       {loading ? (
         <div className="py-20 text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 mx-auto mb-4" style={{ borderColor: THEME.colors.primary }}></div>
+          <div className="animate-spin h-10 w-10 border-b-2 mx-auto mb-4" style={{ borderColor: THEME.colors.primary }}></div>
           <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Carregant catàleg...</p>
         </div>
       ) : filteredTalleres.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filteredTalleres.map((taller) => (
-            <div key={taller._id} className="group bg-white rounded-3xl shadow-sm border border-gray-100 p-6 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+            <div key={taller._id} className="group bg-white shadow-sm border border-gray-100 p-6 relative overflow-hidden transition-all duration-300">
               <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
                 <svg className="h-24 w-24" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
@@ -151,7 +151,7 @@ export default function TallerScreen() {
 
               <div className="relative">
                 <div className="flex justify-between items-start mb-6">
-                  <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-inner">
+                  <div className="w-12 h-12 bg-blue-50 flex items-center justify-center text-blue-600 shadow-inner group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
                     </svg>
@@ -163,11 +163,11 @@ export default function TallerScreen() {
                 <p className="text-sm text-gray-500 mb-6 h-10 line-clamp-2 leading-relaxed">{taller.detalls_tecnics?.descripcio}</p>
                 
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-orange-50 text-orange-700 rounded-lg font-bold text-[10px] uppercase tracking-wide">
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-orange-50 text-orange-700 font-bold text-[10px] uppercase tracking-wide">
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     {taller.detalls_tecnics?.durada_hores}h
                   </div>
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 rounded-lg font-bold text-[10px] uppercase tracking-wide">
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 font-bold text-[10px] uppercase tracking-wide">
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     {taller.detalls_tecnics?.places_maximes} p.
                   </div>
@@ -176,13 +176,13 @@ export default function TallerScreen() {
                 <div className="flex gap-2">
                   <button 
                     onClick={() => setSelectedWorkshop(taller)}
-                    className="flex-1 py-3 px-4 text-xs font-bold text-blue-800 bg-blue-50/50 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300"
+                    className="flex-1 py-3 px-4 text-xs font-bold text-blue-800 bg-blue-50/50 hover:bg-blue-600 hover:text-white transition-all duration-300"
                   >
                     Detalles
                   </button>
                   <button 
                     onClick={() => handleEdit(taller)}
-                    className="p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                    className="p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
                     title="Editar"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -191,7 +191,7 @@ export default function TallerScreen() {
                   </button>
                   <button 
                     onClick={() => handleDelete(taller._id)}
-                    className="p-3 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                    className="p-3 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all"
                     title="Eliminar"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -204,8 +204,8 @@ export default function TallerScreen() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-32 bg-white rounded-3xl border border-dashed border-gray-200 animate-in fade-in zoom-in duration-500">
-          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="text-center py-32 bg-white border border-dashed border-gray-200 animate-in fade-in zoom-in duration-500">
+          <div className="w-16 h-16 bg-gray-50 flex items-center justify-center mx-auto mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
