@@ -14,6 +14,9 @@ async function seedMongo() {
       {
         id_taller: 1, // Robòtica
         tipus: 'tecnològic',
+        zona: 'Eixample',
+        places_totals: 100,
+        places_ocupades: 45,
         requisits: {
           software: ['Arduino IDE', 'Python 3.9'],
           hardware: ['Kits LEGO Mindstorms', 'Sensores de ultrasonido'],
@@ -23,6 +26,9 @@ async function seedMongo() {
       {
         id_taller: 2, // Fusta
         tipus: 'artístic',
+        zona: 'Sants',
+        places_totals: 50,
+        places_ocupades: 12,
         requisits: {
           materials: ['Cola blanca 5kg', 'Llistons de pi 2x2'],
           seguretat: {

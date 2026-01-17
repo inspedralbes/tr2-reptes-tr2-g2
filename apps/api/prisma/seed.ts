@@ -30,9 +30,30 @@ async function main() {
   const rolProfe = await prisma.rol.create({ data: { nom_rol: 'PROFESSOR' } });
 
   // 3. CREAR SECTORES
-  const sectorAgro = await prisma.sector.create({ data: { nom: 'Agroalimentari i Manufacturer' } });
-  const sectorOci = await prisma.sector.create({ data: { nom: 'Oci i Benestar' } });
-  const sectorEnergia = await prisma.sector.create({ data: { nom: 'Energia i Sostenibilitat' } });
+  console.log('🏗️ Creando Sectores...');
+  const sectorsData = [
+    { nom: 'Agroalimentari' },
+    { nom: 'Manufacturer' },
+    { nom: 'Indústria del Metall i la Mobilitat' },
+    { nom: 'Construcció' },
+    { nom: 'Químic' },
+    { nom: 'Serveis a les empreses' },
+    { nom: 'Salut i atenció a les persones' },
+    { nom: 'Oci i Benestar' },
+    { nom: 'Energia i Sostenibilitat' },
+    { nom: 'Transformació Digital' },
+    { nom: 'Creació Artística' }
+  ];
+
+  const creadosSectors = [];
+  for (const s of sectorsData) {
+    const created = await prisma.sector.create({ data: s });
+    creadosSectors.push(created);
+  }
+
+  const sectorAgro = creadosSectors[0];
+  const sectorMobilitat = creadosSectors[2]; // Metal i Mobilitat
+  const sectorOci = creadosSectors[7]; // Oci i Benestar
 
   // 4. CREAR CENTROS
   console.log('🏫 Creando Centros de Barcelona...');
@@ -137,7 +158,27 @@ async function main() {
 
   // 7. CREAR TALLERES
   const tallerFusta = await prisma.taller.create({
-    data: { titol: 'Fusta', durada_h: 20, places_maximes: 16, modalitat: 'A', id_sector: sectorAgro.id_sector, descripcio_curta: 'Construcció en fusta' }
+    data: { 
+      titol: 'Fusta', 
+      durada_h: 20, 
+      places_maximes: 16, 
+      modalitat: 'A', 
+      id_sector: sectorAgro.id_sector, 
+      descripcio_curta: 'Construcció en fusta',
+      ambit: 'Àmbit Medi Ambient i Sostenibilitat' // Ejemplo de ámbito
+    }
+  });
+
+  const tallerRobotica = await prisma.taller.create({
+    data: {
+      titol: 'Robòtica Avançada',
+      durada_h: 30,
+      places_maximes: 12,
+      modalitat: 'C',
+      id_sector: sectorMobilitat.id_sector,
+      descripcio_curta: 'Manteniment industrial i robòtica',
+      ambit: 'Àmbit Tecnològic / Indústria 4.0 / Indústria Avançada'
+    }
   });
 
   // 8. CREAR ALUMNOS

@@ -201,3 +201,67 @@ export const cleanupLogs = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al limpiar logs' });
   }
 };
+
+/**
+ * PATCH /stats/workshop/:id/book
+ * REQUISITO: Operacions atòmiques amb $inc e impedició de race conditions
+ */
+export const bookWorkshopPlace = async (req: Request, res: Response) => {
+  try {
+    const { db } = await connectToDatabase();
+    const { id } = req.params;
+
+    // Actualización atómica con verificación: solo si hay plazas disponibles
+    const result = await db.collection('workshop_metadata').updateOne(
+      { 
+        id_taller: parseInt(id as string),
+        $expr: { $lt: ["$places_ocupades", "$places_totals"] } // Evita race condition
+      },
+      { 
+        $inc: { places_ocupades: 1 } // Operación atómica
+      }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({ error: 'No hi ha places disponibles o el taller no existeix' });
+    }
+
+    res.json({ success: true, message: 'Plaça reservada amb èxit' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error en la reserva atòmica' });
+  }
+};
+
+/**
+ * GET /stats/occupancy-by-zone
+ * REQUISITO: Estadístiques d'ocupació per zones (aggregation pipeline)
+ */
+export const getOccupancyByZone = async (req: Request, res: Response) => {
+  try {
+    const { db } = await connectToDatabase();
+    
+    const stats = await db.collection('workshop_metadata').aggregate([
+      {
+        $group: {
+          _id: "$zona",
+          total_places: { $sum: "$places_totals" },
+          total_ocupades: { $sum: "$places_ocupades" }
+        }
+      },
+      {
+        $project: {
+          zona: "$_id",
+          percentatge_ocupacio: { 
+            $multiply: [ { $divide: ["$total_ocupades", "$total_places"] }, 100 ] 
+          },
+          _id: 0
+        }
+      },
+      { $sort: { percentatge_ocupacio: -1 } }
+    ]).toArray();
+
+    res.json(stats);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al calcular ocupació per zones' });
+  }
+};

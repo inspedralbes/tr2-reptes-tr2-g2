@@ -95,3 +95,4 @@ Per a més detalls, consulta els manuals a la carpeta `/doc`:
 👉 **[Documentació Tècnica (DOCS.md)](./doc/DOCS.md)**: Detalls d'infraestructura, volums i xarxes.
 👉 **[Arquitectura Backend (BACKEND_TECH.md)](./doc/BACKEND_TECH.md)**: Detalls de professionalització, validació i optimització.
 👉 **[Guia d'Ús (USAGE.md)](./doc/USAGE.md)**: Fluxos de treball, migracions i manteniment.
+👉 **[Justificació MongoDB (MONGODB_JUSTIFICACIO.md)](./doc/MONGODB_JUSTIFICACIO.md)**: Justificació de requisits de l'Activitat 3 (Repte 2).

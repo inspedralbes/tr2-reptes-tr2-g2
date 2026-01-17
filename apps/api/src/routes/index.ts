@@ -12,6 +12,7 @@ import professorRoutes from './professor.routes';
 import calendarRoutes from './calendar.routes';
 import faseRoutes from './fase.routes';
 import statsRoutes from './stats.routes';
+import sectorRoutes from './sector.routes';
 
 // --- Definir las rutas base ---
 
@@ -21,6 +22,7 @@ router.use('/auth', authRoutes);
 // Rutas de Maestros
 router.use('/tallers', tallerRoutes);
 router.use('/centres', centroRoutes);
+router.use('/sectors', sectorRoutes);
 
 // Rutas del Flujo de Negocio (Solicitudes y Asignaciones)
 router.use('/peticions', peticioRoutes);

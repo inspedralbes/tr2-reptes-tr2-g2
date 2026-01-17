@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import tallerService, { Taller } from "../services/tallerService";
+import sectorService, { Sector } from "../services/sectorService";
 
 type CreateWorkshopModalProps = {
   visible: boolean;
@@ -17,7 +18,8 @@ const CreateWorkshopModal = ({
   initialData,
 }: CreateWorkshopModalProps) => {
   const [titol, setTitol] = useState("");
-  const [sector, setSector] = useState("");
+  const [idSector, setIdSector] = useState<number | "">("");
+  const [sectors, setSectors] = useState<Sector[]>([]);
   const [modalitat, setModalitat] = useState("A");
   const [trimestre, setTrimestre] = useState("1r");
   const [descripcio, setDescripcio] = useState("");
@@ -28,11 +30,23 @@ const CreateWorkshopModal = ({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const fetchSectors = async () => {
+      try {
+        const data = await sectorService.getAll();
+        setSectors(data);
+      } catch (err) {
+        console.error("Error fetching sectors:", err);
+      }
+    };
+    fetchSectors();
+  }, []);
+
   React.useEffect(() => {
     if (visible) {
       if (initialData) {
         setTitol(initialData.titol);
-        setSector(initialData.sector);
+        setIdSector(initialData.id_sector || "");
         setModalitat(initialData.modalitat);
         setTrimestre(initialData.trimestre);
         setDescripcio(initialData.detalls_tecnics?.descripcio || "");
@@ -43,7 +57,7 @@ const CreateWorkshopModal = ({
       } else {
         // Reset form
         setTitol("");
-        setSector("");
+        setIdSector("");
         setModalitat("A");
         setTrimestre("1r");
         setDescripcio("");
@@ -66,7 +80,8 @@ const CreateWorkshopModal = ({
 
     const tallerData: Omit<Taller, "_id"> = {
       titol,
-      sector,
+      sector: sectors.find(s => s.id_sector === idSector)?.nom || "",
+      id_sector: idSector === "" ? undefined : idSector,
       modalitat,
       trimestre,
       detalls_tecnics: {
@@ -187,12 +202,18 @@ const CreateWorkshopModal = ({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Sector
               </label>
-              <input
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-black"
-                placeholder="Ej: Tecnología"
-                value={sector}
-                onChange={(e) => setSector(e.target.value)}
-              />
+              <select
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none bg-white text-black"
+                value={idSector}
+                onChange={(e) => setIdSector(e.target.value === "" ? "" : Number(e.target.value))}
+              >
+                <option value="">Selecciona un sector</option>
+                {sectors.map((s) => (
+                  <option key={s.id_sector} value={s.id_sector}>
+                    {s.nom}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
