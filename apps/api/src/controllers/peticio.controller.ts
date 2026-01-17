@@ -1,6 +1,6 @@
 import prisma from '../lib/prisma';
 import { Request, Response } from 'express';
-import { EstadoPeticion } from '@enginy/shared';
+import { EstadoPeticion } from '@iter/shared';
 
 // GET: Ver peticiones (Filtra por centro si es COORDINADOR) con paginación
 export const getPeticions = async (req: Request, res: Response) => {

@@ -7,11 +7,11 @@ services:
   #   environment:
   #     POSTGRES_USER: postgres
   #     POSTGRES_PASSWORD: root
-  #     POSTGRES_DB: enginy_db
+  #     POSTGRES_DB: iter_db
   #   volumes:
   #     - postgres_prod_data:/var/lib/postgresql/data
   #   networks:
-  #     - enginy-network-prod
+  #     - iter-network-prod
 
   web:
     build:
@@ -24,7 +24,7 @@ services:
     env_file:
       - ./apps/web/.env
     networks:
-      - enginy-network-prod
+      - iter-network-prod
 
   api:
     build:
@@ -37,10 +37,10 @@ services:
     env_file:
       - ./apps/api/.env
     networks:
-      - enginy-network-prod
+      - iter-network-prod
 
 networks:
-  enginy-network-prod:
+  iter-network-prod:
     driver: bridge
 
 # volumes:

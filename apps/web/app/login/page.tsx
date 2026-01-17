@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { login as apiLogin } from '@/lib/auth';
 import { useAuth } from '@/context/AuthContext';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -67,7 +67,7 @@ export default function LoginPage() {
           <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
              <span className="text-blue-600 font-black text-2xl">E</span>
           </div>
-          <h2 className="text-3xl font-black tracking-tight" style={{ color: THEME.colors.primary, fontFamily: THEME.fonts.primary }}>Programa Enginy</h2>
+          <h2 className="text-3xl font-black tracking-tight" style={{ color: THEME.colors.primary, fontFamily: THEME.fonts.primary }}>Programa Iter</h2>
           <p className="text-gray-400 font-medium mt-2">Gestió de tallers i centres</p>
         </div>
         
@@ -84,14 +84,14 @@ export default function LoginPage() {
           <div className="bg-blue-50 border border-blue-100 p-8 rounded-2xl text-center animate-in slide-in-from-bottom duration-500">
             <h3 className="text-xl font-black text-blue-900 mb-2">Accés via App Mòbil</h3>
             <p className="text-sm text-blue-700/70 font-medium mb-8 leading-relaxed">
-              Com a professor, has d'utilitzar l'aplicació mòbil d'Enginy per gestionar les teves sessions d'aprenentatge.
+              Com a professor, has d'utilitzar l'aplicació mòbil d'Iter per gestionar les teves sessions d'aprenentatge.
             </p>
             <a 
               href="#" 
               className="group relative flex items-center justify-center w-full py-4 bg-blue-600 text-white font-black rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-200 active:scale-95"
               onClick={(e) => { e.preventDefault(); alert('Enllaç de descàrrega próximament (Expo)'); }}
             >
-              <span className="mr-2">Descarregar App Enginy</span>
+              <span className="mr-2">Descarregar App Iter</span>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>

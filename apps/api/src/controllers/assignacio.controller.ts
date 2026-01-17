@@ -1,6 +1,6 @@
 import prisma from '../lib/prisma';
 import { Request, Response } from 'express';
-import { AssignmentChecklistSchema } from '@enginy/shared';
+import { AssignmentChecklistSchema } from '@iter/shared';
 
 // GET: Listar asignaciones de un centro
 export const getAssignacionsByCentre = async (req: Request, res: Response) => {

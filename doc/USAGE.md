@@ -1,4 +1,4 @@
-# 📖 Guia d'Ús - Enginy
+# 📖 Guia d'Ús - Iter
 
 Aquesta guia explica com treballar amb l'ecosistema de desenvolupament en el dia a dia.
 
@@ -33,7 +33,7 @@ Si necessites modificar el model de dades:
     *   Server: `db`
     *   User: `postgres`
     *   Pass: `root`
-    *   DB: `enginy_db`
+    *   DB: `iter_db`
 
 ## 🛠️ Comandos Útils de Manteniment
 

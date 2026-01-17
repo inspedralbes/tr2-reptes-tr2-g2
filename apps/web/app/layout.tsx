@@ -3,8 +3,8 @@ import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
-  title: 'Enginy Web',
-  description: 'Aplicación web de Enginy',
+  title: 'Iter Web',
+  description: 'Aplicación web de Iter',
 };
 
 export default function RootLayout({

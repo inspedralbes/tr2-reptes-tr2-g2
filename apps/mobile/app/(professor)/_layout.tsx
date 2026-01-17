@@ -2,7 +2,7 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 import MobileNavbar from '../../components/MobileNavbar';
 
 export default function ProfessorLayout() {

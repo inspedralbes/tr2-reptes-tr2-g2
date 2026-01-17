@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Calendar, CalendarEvent } from "@enginy/ui";
+import { Calendar, CalendarEvent } from "@iter/ui";
 import getApi from "@/services/api";
 
 export default function CalendarPage() {
@@ -52,7 +52,7 @@ export default function CalendarPage() {
 
   return (
     <DashboardLayout 
-      title="Calendari Enginy" 
+      title="Calendari Iter" 
       subtitle="Visualitza totes les fites, tallers i terminis en un sol lloc."
     >
       <div className="max-w-6xl mx-auto space-y-6">

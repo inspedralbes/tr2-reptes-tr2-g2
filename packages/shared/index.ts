@@ -39,7 +39,7 @@ export const THEME = {
   }
 } as const;
 
-// Calendari Programa Enginy (Curs 25-26 aprox)
+// Calendari Programa Iter (Curs 25-26 aprox)
 export const CALENDARI = {
   REUNION_PRESENTACION: '2025-09-30',
   LIMITE_DEMANDA: '2025-10-10',

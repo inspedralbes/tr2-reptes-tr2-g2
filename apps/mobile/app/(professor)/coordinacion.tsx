@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 
 export default function CoordinacionScreen() {
   const referents = [

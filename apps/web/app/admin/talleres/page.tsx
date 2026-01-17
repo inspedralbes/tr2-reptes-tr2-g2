@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { THEME } from "@enginy/shared";
+import { THEME } from "@iter/shared";
 import WorkshopDetail from "../../../components/WorkshopDetail";
 import WorkshopCard from "../../../components/WorkshopCard";
 import tallerService, { Taller } from "../../../services/tallerService";
@@ -111,7 +111,7 @@ export default function TallerScreen() {
   return (
     <DashboardLayout 
       title="Gestión de Talleres" 
-      subtitle="Creación, edición y supervisión del catálogo oficial del Programa Enginy."
+      subtitle="Creación, edición y supervisión del catálogo oficial del Programa Iter."
       actions={headerActions}
     >
       {/* Buscador */}

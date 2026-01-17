@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useEffect } from 'react';
 
@@ -75,7 +75,7 @@ export default function AdminDashboardPage() {
   return (
     <DashboardLayout 
       title="Panel de Administración" 
-      subtitle="Bienvenido al centro de control del programa Enginy. Gestiona talleres, centros y solicitudes desde este panel."
+      subtitle="Bienvenido al centro de control del programa Iter. Gestiona talleres, centros y solicitudes desde este panel."
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {sections.map((section) => (

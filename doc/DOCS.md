@@ -1,4 +1,4 @@
-# 📄 Documentació Tècnica - Infraestructura Enginy
+# 📄 Documentació Tècnica - Infraestructura Iter
 
 Aquest document detalla l'arquitectura del sistema, la gestió de contenidors i les optimitzacions de rendiment aplicades al projecte.
 
@@ -40,7 +40,7 @@ Hem optimitzat l'ús de volums per evitar la contaminació de l'espai de treball
 
 ## 🔌 Configuració de Xarxa i Ports
 
-El projecte utilitza una xarxa interna anomenada `enginy-network`. Els ports exposats s'han canviat respecte a configuracions anteriors per evitar col·lisions:
+El projecte utilitza una xarxa interna anomenada `iter-network`. Els ports exposats s'han canviat respecte a configuracions anteriors per evitar col·lisions:
 
 | Host Port | Container Port | Servei |
 | :--- | :--- | :--- |

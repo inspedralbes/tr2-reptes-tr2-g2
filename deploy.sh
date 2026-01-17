@@ -10,7 +10,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}🚀 Iniciando despliegue de Enginy Monorepo...${NC}"
+echo -e "${YELLOW}🚀 Iniciando despliegue de Iter Monorepo...${NC}"
 
 # 1. Ir al directorio
 cd "$PROJECT_DIR" || { echo -e "${RED}❌ Error: No encuentro el directorio $PROJECT_DIR${NC}"; exit 1; }
@@ -31,8 +31,8 @@ docker-compose -f docker-compose.prod.yml up --build -d --remove-orphans
 # 5. Verificación de salud
 if [ $? -eq 0 ]; then
   echo -e "${GREEN}✅ ¡Despliegue completado con éxito!${NC}"
-  echo -e "${GREEN}👉 Web: https://enginy.kore29.com${NC}"
-  echo -e "${GREEN}👉 API: https://api-enginy.kore29.com${NC}"
+  echo -e "${GREEN}👉 Web: https://iter.kore29.com${NC}"
+  echo -e "${GREEN}👉 API: https://api-iter.kore29.com${NC}"
   
   # 6. Limpieza de basura espacial (Importante en VPS)
   echo -e "${YELLOW}🧹 Limpiando imágenes antiguas para ahorrar espacio...${NC}"

@@ -1,6 +1,6 @@
-# 🚀 TR2 Reptes Iter - Enginy
+# 🚀 TR2 Reptes Iter - Iter
 
-Benvingut al nucli de l'ecosistema **Enginy**. Aquesta és una infraestructura moderna basada en un **Monorepo** gestionat amb **Turborepo**, dissenyada per ser escalable, ràpida i fàcil de desplegar.
+Benvingut al nucli de l'ecosistema **Iter**. Aquesta és una infraestructura moderna basada en un **Monorepo** gestionat amb **Turborepo**, dissenyada per ser escalable, ràpida i fàcil de desplegar.
 
 > [!IMPORTANT]
 > **ACTUALIZACIÓ ARQUITECTÒNICA (Gener 2026):**
@@ -10,8 +10,8 @@ Benvingut al nucli de l'ecosistema **Enginy**. Aquesta és una infraestructura m
 
 L'ecosistema està totalment automatitzat i exposat de forma segura a través de **Cloudflare Tunnels**:
 
-* **💻 Web UI (Client/Admin):** [enginy.kore29.com](https://enginy.kore29.com)
-* **🔌 API Gateway:** [api-enginy.kore29.com](https://api-enginy.kore29.com)
+* **💻 Web UI (Client/Admin):** [iter.kore29.com](https://iter.kore29.com)
+* **🔌 API Gateway:** [api-iter.kore29.com](https://api-iter.kore29.com)
 
 ## 🏗️ Estructura del Projecte
 
@@ -65,7 +65,7 @@ docker compose down -v && docker compose up --build
 
 El sistema pobla automàticament la base de dades amb les següents credencials:
 
-* **Admin Global:** `admin@enginy.com` / `admin123`
+* **Admin Global:** `admin@iter.com` / `admin123`
 * **Professor (Brossa):** `profe.brossa@example.com` / `password123`
 * **Professor (Milà):** `profe.mila@example.com` / `password123`
 

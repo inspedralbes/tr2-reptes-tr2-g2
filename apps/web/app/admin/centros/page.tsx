@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { THEME } from "@enginy/shared";
+import { THEME } from "@iter/shared";
 import DashboardLayout from "../../../components/DashboardLayout";
 import CreateCentroModal from "../../../components/CreateCentroModal";
 import centroService, { Centre } from "../../../services/centroService";
@@ -107,7 +107,7 @@ export default function CentrosScreen() {
   return (
     <DashboardLayout 
       title="Gestión de Centros" 
-      subtitle="Administración de centros educativos participantes en el Programa Enginy."
+      subtitle="Administración de centros educativos participantes en el Programa Iter."
       actions={headerActions}
     >
       {/* Buscador */}

@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 
 export default function ProfilePage() {
   const { user, loading } = useAuth();

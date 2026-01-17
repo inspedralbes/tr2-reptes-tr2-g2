@@ -1,7 +1,7 @@
 {
   "name": "tr2-reptes-tr2-g2",
   "version": "2.0.0",
-  "description": "**Central Hub for the Enginy Ecosystem | Unified Modern Stack**",
+  "description": "**Central Hub for the Iter Ecosystem | Unified Modern Stack**",
   "private": true,
   "packageManager": "npm@10.9.4",
   "main": "index.js",
@@ -40,7 +40,7 @@
     "postgres",
     "docker"
   ],
-  "author": "Enginy Team",
+  "author": "Iter Team",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/inspedralbes/tr2-reptes-tr2-g2/issues"

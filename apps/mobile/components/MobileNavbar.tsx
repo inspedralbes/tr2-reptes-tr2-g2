@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, SafeAreaView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 
 interface MobileNavbarProps {
   title?: string;
 }
 
-const MobileNavbar: React.FC<MobileNavbarProps> = ({ title = 'Programa Enginy' }) => {
+const MobileNavbar: React.FC<MobileNavbarProps> = ({ title = 'Programa Iter' }) => {
   return (
     <SafeAreaView style={{ backgroundColor: THEME.colors.primary }}>
       <View className="flex-row justify-between items-center h-16 px-4 border-b" style={{ borderColor: THEME.colors.primary }}>

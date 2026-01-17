@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import ResourcesWidget from '@/components/ResourcesWidget';
 import getApi from '@/services/api';
@@ -62,7 +62,7 @@ export default function CentroDashboard() {
   return (
     <DashboardLayout 
       title={`Panell de Centre: ${user.centre?.nom || 'Educatiu'}`}
-      subtitle="Procés de gestió de tallers del Programa Enginy."
+      subtitle="Procés de gestió de tallers del Programa Iter."
       actions={headerActions}
     >
       {/* Timeline Secció Compacta */}

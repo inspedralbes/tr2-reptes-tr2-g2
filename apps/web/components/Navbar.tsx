@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 
 interface NavbarProps {
   title?: string;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Enginy' }) => {
+const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
   const { user, logout } = useAuth();
   const pathname = usePathname();
 

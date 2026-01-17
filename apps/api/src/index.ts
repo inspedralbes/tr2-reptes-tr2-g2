@@ -13,10 +13,10 @@ app.set('trust proxy', 1);
 
 // ... (allowedOrigins logic remains same)
 const allowedOrigins = [
-  'https://enginy.kore29.com',      // Prod Web
-  'http://enginy.kore29.com',
-  'https://enginy-api.kore29.com',  // Prod API
-  'http://enginy-api.kore29.com',
+  'https://iter.kore29.com',      // Prod Web
+  'http://iter.kore29.com',
+  'https://iter-api.kore29.com',  // Prod API
+  'http://iter-api.kore29.com',
   'http://localhost:8002',
   'http://localhost:3000',
 ];

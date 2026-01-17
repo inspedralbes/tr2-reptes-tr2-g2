@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 
 export default function PerfilScreen() {
   const [notifications, setNotifications] = React.useState(true);
@@ -69,7 +69,7 @@ export default function PerfilScreen() {
         </TouchableOpacity>
 
         <View className="mt-12 items-center">
-          <Text className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Enginy App v1.0.0</Text>
+          <Text className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Iter App v1.0.0</Text>
           <Text className="text-[9px] text-gray-300 font-bold mt-2 uppercase">© 2026 Consorci d'Educació de Barcelona</Text>
         </View>
       </View>

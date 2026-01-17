@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Linking, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 
 export default function DashboardScreen() {
   const router = useRouter();

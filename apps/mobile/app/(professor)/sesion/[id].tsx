@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 
 export default function SesionScreen() {
   const { id } = useLocalSearchParams();

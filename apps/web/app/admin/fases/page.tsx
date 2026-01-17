@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import getApi from "@/services/api";
-import { THEME } from "@enginy/shared";
+import { THEME } from "@iter/shared";
 
 interface Fase {
   id_fase: number;
@@ -66,7 +66,7 @@ export default function PhaseManagementPage() {
 
   return (
     <DashboardLayout 
-      title="Gestió de Fases Enginy" 
+      title="Gestió de Fases Iter" 
       subtitle="Controla el cicle de vida del programa i simula dates per a test."
     >
       <div className="max-w-4xl mx-auto space-y-8">

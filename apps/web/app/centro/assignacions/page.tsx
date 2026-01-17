@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 
 export default function AssignacionsPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -56,7 +56,7 @@ export default function AssignacionsPage() {
               <div key={a.id_assignacio} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-blue-500 mb-1 block">Taller Enginy</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-blue-500 mb-1 block">Taller Iter</span>
                     <h3 className="text-xl font-bold">{a.taller?.titol}</h3>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-bold ${

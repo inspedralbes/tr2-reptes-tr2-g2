@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import professorService, { Professor } from '@/services/professorService';
 

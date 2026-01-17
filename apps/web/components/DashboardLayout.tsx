@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { THEME } from '@enginy/shared';
+import { THEME } from '@iter/shared';
 import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
 
@@ -52,7 +52,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       <footer className="py-8 border-t bg-white/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">
-            © {new Date().getFullYear()} Programa Enginy • Consorci d'Educació de Barcelona
+            © {new Date().getFullYear()} Programa Iter • Consorci d'Educació de Barcelona
           </p>
         </div>
       </footer>

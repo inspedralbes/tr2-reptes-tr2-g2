@@ -1,4 +1,4 @@
-# Documentació Tècnica Backend - Programa Enginy
+# Documentació Tècnica Backend - Programa Iter
 
 Este documento describe la arquitectura y las mejores prácticas implementadas en el backend para asegurar un sistema profesional, robusto y escalable.
 
