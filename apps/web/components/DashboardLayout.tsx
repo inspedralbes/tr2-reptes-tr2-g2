@@ -3,6 +3,7 @@
 import React from 'react';
 import { THEME } from '@enginy/shared';
 import Navbar from './Navbar';
+import Breadcrumbs from './Breadcrumbs';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -22,6 +23,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       <Navbar />
       
       <main className="flex-1 max-w-7xl mx-auto w-full py-8 px-4 sm:px-6 lg:px-8">
+        <Breadcrumbs />
+        
         {(title || actions) && (
           <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="animate-in fade-in slide-in-from-left duration-500">

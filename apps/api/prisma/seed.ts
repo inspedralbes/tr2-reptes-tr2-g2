@@ -112,9 +112,78 @@ async function main() {
     creados.push(created);
   }
 
-  // 9. FASES
+  // 9. FASES DEL PROGRAMA (Dinámicas)
+  console.log('🗓️ Creando Fases del Programa...');
   const fase1 = await prisma.fase.create({
-    data: { nom: 'Solicitud e Inscripción', data_inici: new Date('2025-09-01'), data_fi: new Date('2025-12-31'), activa: true }
+    data: {
+      nom: 'Solicitud e Inscripción',
+      descripcio: 'Fase inicial donde los centros solicitan talleres y registran alumnos.',
+      data_inici: new Date('2025-09-01'),
+      data_fi: new Date('2025-10-15'),
+      activa: true
+    }
+  });
+
+  const fase2 = await prisma.fase.create({
+    data: {
+      nom: 'Planificación y Asignación',
+      descripcio: 'Los administradores validan peticiones y asignan talleres a profesores.',
+      data_inici: new Date('2025-10-16'),
+      data_fi: new Date('2025-11-15'),
+      activa: false
+    }
+  });
+
+  const fase3 = await prisma.fase.create({
+    data: {
+      nom: 'Ejecución y Seguimiento',
+      descripcio: 'Realización de sesiones de talleres y control de asistencia.',
+      data_inici: new Date('2025-11-16'),
+      data_fi: new Date('2026-05-30'),
+      activa: false
+    }
+  });
+
+  const fase4 = await prisma.fase.create({
+    data: {
+      nom: 'Cierre y Evaluación',
+      descripcio: 'Finalización de talleres y recogida de encuestas de satisfacción.',
+      data_inici: new Date('2026-06-01'),
+      data_fi: new Date('2026-07-15'),
+      activa: false
+    }
+  });
+
+  // 9.1 HITOS GLOBALES (Enlazados a fases)
+  console.log('🚩 Creando Hitos Globales...');
+  await prisma.calendariEvent.create({
+    data: {
+      id_fase: fase1.id_fase,
+      titol: 'Reunión de Presentación',
+      descripcio: 'Reunión inicial para todos los coordinadores de centros.',
+      data: new Date('2025-09-30'),
+      tipus: 'milestone'
+    }
+  });
+
+  await prisma.calendariEvent.create({
+    data: {
+      id_fase: fase1.id_fase,
+      titol: 'Límite de Demanda',
+      descripcio: 'Último día para enviar solicitudes de talleres.',
+      data: new Date('2025-10-10'),
+      tipus: 'deadline'
+    }
+  });
+
+  await prisma.calendariEvent.create({
+    data: {
+      id_fase: fase2.id_fase,
+      titol: 'Publicación de Asignaciones',
+      descripcio: 'Se publican las listas definitivas de talleres asignados.',
+      data: new Date('2025-10-25'),
+      tipus: 'milestone'
+    }
   });
 
   // 10. PETICIÓN DE EJEMPLO
