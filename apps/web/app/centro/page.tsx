@@ -125,96 +125,59 @@ export default function CentroDashboard() {
         </div>
       </section>
 
-      {/* Accesos Directos Dinàmics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {(() => {
-          const findFase = (name: string) => fases.find(f => f.nom.includes(name));
-          
-          const faseInscripcio = findFase('Inscripció');
-          const faseAsignacio = findFase('Asignación');
-          const faseCierre = findFase('Cierre');
+      {/* Accesos Directos */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div 
+          onClick={() => router.push('/centro/peticions')}
+          className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+        >
+          <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Solicitar Talleres</h3>
+          <p className="text-sm text-gray-500 leading-relaxed">Indica les teves preferències i el nombre d'alumnes abans del <span className="font-bold text-gray-700">10 d'octubre</span>.</p>
+        </div>
 
-          const formatDate = (dateStr: string) => {
-            if (!dateStr) return '';
-            const d = new Date(dateStr);
-            return d.toLocaleDateString('ca-ES', { day: 'numeric', month: 'long' });
-          };
+        <div 
+          onClick={() => router.push('/centro/alumnos')}
+          className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+        >
+          <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-6 text-green-600 group-hover:bg-green-600 group-hover:text-white transition-all duration-300 shadow-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Gestionar Alumnos</h3>
+          <p className="text-sm text-gray-500 leading-relaxed">Afegeix o modifica els alumnes que participaran en els tallers.</p>
+        </div>
 
-          const actions = [
-            {
-              title: "Solicitar Talleres",
-              desc: faseInscripcio 
-                ? `Indica les teves preferències i el nombre d'alumnes abans del <span class="font-bold text-gray-700">${formatDate(faseInscripcio.data_fi)}</span>.`
-                : "Indica les teves preferències i el nombre d'alumnes.",
-              path: '/centro/peticions',
-              icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              ),
-              enabled: faseInscripcio?.activa || false
-            },
-            {
-              title: "Ver Asignaciones",
-              desc: faseAsignacio
-                ? `Consulta els tallers assignats i el teu centre referent a partir del <span class="font-bold text-gray-700">${formatDate(faseAsignacio.data_inici)}</span>.`
-                : "Consulta els tallers assignats i el teu centre referent.",
-              path: '/centro/assignacions',
-              icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              ),
-              enabled: faseAsignacio?.activa || false
-            },
-            {
-              title: "Validación Final",
-              desc: "Completa el checklist un cop hagin finalitzat les sessions dels tallers.",
-              path: '#',
-              icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-              ),
-              enabled: faseCierre?.activa || false
-            }
-          ];
+        <div 
+          onClick={() => router.push('/centro/profesores')}
+          className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+        >
+          <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300 shadow-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Gestionar Profesores</h3>
+          <p className="text-sm text-gray-500 leading-relaxed">Gestiona els professors referents del teu centre.</p>
+        </div>
 
-          return actions.map((action, idx) => (
-            <div 
-              key={idx}
-              onClick={() => action.enabled && action.path !== '#' && router.push(action.path)}
-              className={`group bg-white p-8 rounded-[32px] shadow-sm border border-gray-100 transition-all duration-500 relative overflow-hidden ${
-                action.enabled 
-                  ? 'hover:shadow-[0_20px_40px_rgba(0,66,107,0.08)] cursor-pointer hover:-translate-y-2' 
-                  : 'opacity-60 cursor-not-allowed grayscale'
-              }`}
-            >
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 shadow-inner ${
-                action.enabled 
-                  ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white' 
-                  : 'bg-gray-100 text-gray-400'
-              }`}>
-                {action.icon}
-              </div>
-              <h3 className={`text-xl font-black mb-3 tracking-tight ${action.enabled ? 'text-gray-900' : 'text-gray-400'}`}>
-                {action.title}
-              </h3>
-              <p 
-                className={`text-sm leading-relaxed ${action.enabled ? 'text-gray-500' : 'text-gray-300'}`}
-                dangerouslySetInnerHTML={{ __html: action.desc }}
-              />
-              
-              {action.enabled && (
-                <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              )}
-            </div>
-          ));
-        })()}
+        <div 
+          onClick={() => router.push('/centro/assignacions')}
+          className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+        >
+          <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-all duration-300 shadow-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Ver Asignaciones</h3>
+          <p className="text-sm text-gray-500 leading-relaxed">Consulta els tallers assignats i el teu centre referent.</p>
+        </div>
       </div>
     </DashboardLayout>
   );

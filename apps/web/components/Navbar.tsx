@@ -38,30 +38,27 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Enginy' }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-4">
-            <Link href={getInicioPath()} className="flex items-center gap-3 group">
-              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-110">
+            {/* Logo placeholder or icon */}
+            <a 
+              href={user.rol.nom_rol === 'ADMIN' ? '/admin' : '/centro'} 
+              className="flex items-center gap-4 hover:opacity-80 transition-opacity"
+            >
+              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                 <span className="text-blue-900 font-black text-xs">E</span>
               </div>
-              <h1 className="text-xl font-bold text-white tracking-tight hidden sm:block">{title}</h1>
-            </Link>
-            
-            <nav className="ml-8 hidden md:flex items-center space-x-1">
-              {navLinks.filter(link => link.show).map((link) => {
-                const isActive = pathname === link.path;
-                return (
-                  <Link 
-                    key={link.path} 
-                    href={link.path}
-                    className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-200 ${
-                      isActive 
-                        ? 'bg-white/20 text-white' 
-                        : 'text-white/60 hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
+              <h1 className="text-xl font-bold text-white tracking-tight">{title}</h1>
+            </a>
+            <nav className="ml-8 hidden md:flex items-center space-x-4">
+              <a href="/calendar" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Calendari</a>
+              {user.rol.nom_rol === 'ADMIN' && (
+                <>
+                  <a href="/admin" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Panel</a>
+                  <a href="/admin/talleres" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Talleres</a>
+                  <a href="/admin/solicitudes" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Solicitudes</a>
+                  <a href="/admin/centros" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Centros</a>
+                  <a href="/admin/fases" className="text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10">Fases</a>
+                </>
+              )}
             </nav>
           </div>
           

@@ -1,6 +1,6 @@
 import prisma from '../lib/prisma';
 import { Request, Response } from 'express';
-import { ESTADOS_PETICION, EstadoPeticion } from '@enginy/shared';
+import { EstadoPeticion } from '@enginy/shared';
 
 // GET: Ver peticiones (Filtra por centro si es COORDINADOR)
 export const getPeticions = async (req: Request, res: Response) => {
@@ -16,7 +16,10 @@ export const getPeticions = async (req: Request, res: Response) => {
       where,
       include: {
         centre: true,
-        taller: true
+        taller: true,
+        prof1: true,
+        prof2: true,
+        alumnes: true
       },
       orderBy: {
         data_peticio: 'desc'
@@ -31,24 +34,58 @@ export const getPeticions = async (req: Request, res: Response) => {
 
 // POST: Crear solicitud
 export const createPeticio = async (req: Request, res: Response) => {
-  const { id_taller, alumnes_aprox, comentaris } = req.body;
+  const { 
+    id_taller, 
+    alumnes_ids, // Array de IDs de alumnos seleccionados
+    comentaris,
+    prof1_id,
+    prof2_id,
+    modalitat
+  } = req.body;
   const { centreId } = (req as any).user;
 
   if (!id_taller || !centreId) {
     return res.status(400).json({ error: 'Faltan campos obligatorios (id_taller, centreId)' });
   }
 
+  // Validación: Máximo 4 alumnos para Modalidad C
+  const numAlumnes = alumnes_ids?.length || 0;
+  if (modalitat === 'C' && numAlumnes > 4) {
+    return res.status(400).json({ error: 'En la Modalidad C, el número máximo de alumnos es 4.' });
+  }
+
   try {
+    // Comprobar si ya existe una petición para este centro y taller
+    const existingPeticio = await prisma.peticio.findFirst({
+      where: {
+        id_centre: parseInt(centreId),
+        id_taller: parseInt(id_taller)
+      }
+    });
+
+    if (existingPeticio) {
+      return res.status(400).json({ error: 'Este centro ya ha realizado una solicitud para este taller.' });
+    }
     const nuevaPeticio = await prisma.peticio.create({
       data: {
         id_centre: parseInt(centreId),
         id_taller: parseInt(id_taller),
-        alumnes_aprox: alumnes_aprox ? parseInt(alumnes_aprox as string) : null,
+        alumnes_aprox: numAlumnes,
         comentaris,
-        estat: 'Pendent'
+        estat: 'Pendent',
+        modalitat,
+        prof1_id: prof1_id ? parseInt(prof1_id) : null,
+        prof2_id: prof2_id ? parseInt(prof2_id) : null,
+        ids_alumnes: alumnes_ids || [],
+        alumnes: {
+          connect: alumnes_ids?.map((id: number) => ({ id_alumne: id })) || []
+        }
       },
       include: {
-        taller: true
+        taller: true,
+        alumnes: true,
+        prof1: true,
+        prof2: true
       }
     });
     res.json(nuevaPeticio);
@@ -57,8 +94,6 @@ export const createPeticio = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al crear petición' });
   }
 };
-
-
 
 // PATCH: Cambiar estado (Aprobar/Rechazar)
 export const updatePeticioStatus = async (req: Request, res: Response) => {
@@ -70,9 +105,6 @@ export const updatePeticioStatus = async (req: Request, res: Response) => {
       where: { id_peticio: parseInt(id as string) },
       data: { estat: estat as EstadoPeticion }
     });
-    
-    // AQUÍ IRÍA LA LÓGICA DE CREAR LA ASIGNACIÓN AUTOMÁTICA SI SE ACEPTA
-    // Lo haremos más adelante para no complicar ahora.
     
     res.json(updated);
   } catch (error) {
