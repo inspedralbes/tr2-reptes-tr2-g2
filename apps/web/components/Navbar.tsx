@@ -39,12 +39,15 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Enginy' }) => {
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-4">
             {/* Logo placeholder or icon */}
-            <div className="flex items-center gap-4">
-              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+            <Link 
+              href={getInicioPath()} 
+              className="flex items-center gap-4 hover:opacity-80 transition-opacity group"
+            >
+              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-110">
                 <span className="text-blue-900 font-black text-xs">E</span>
               </div>
               <h1 className="text-xl font-bold text-white tracking-tight">{title}</h1>
-            </div>
+            </Link>
 
             <nav className="ml-8 hidden md:flex items-center space-x-4">
               <Link 
@@ -53,6 +56,12 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Enginy' }) => {
               >
                 Inicio
               </Link>
+              {isAdmin && (
+                <>
+                  <Link href="/admin/solicitudes" className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/admin/solicitudes' ? 'text-white bg-white/10' : ''}`}>Solicitudes</Link>
+                  <Link href="/admin/centros" className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/admin/centros' ? 'text-white bg-white/10' : ''}`}>Centros</Link>
+                </>
+              )}
               <Link 
                 href="/calendar" 
                 className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/calendar' ? 'text-white bg-white/10' : ''}`}

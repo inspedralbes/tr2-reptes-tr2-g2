@@ -71,7 +71,7 @@ const tallerService = {
 
       // Return adapted created object
       return {
-        _id: t.id.toString(),
+        _id: t.id_taller.toString(),
         titol: t.titol,
         sector: "General",
         modalitat: t.modalitat,
@@ -112,7 +112,7 @@ const tallerService = {
 
       // Return adapted object
       return {
-        _id: t.id.toString(),
+        _id: t.id_taller.toString(),
         titol: t.titol,
         sector: "General",
         modalitat: t.modalitat,
