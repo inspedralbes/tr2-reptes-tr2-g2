@@ -8,6 +8,11 @@ export interface Peticio {
   comentaris: string | null;
   data_peticio: string;
   estat: string;
+  modalitat?: string;
+  prof1_nom?: string;
+  prof1_contacte?: string;
+  prof2_nom?: string;
+  prof2_contacte?: string;
   taller?: {
     titol: string;
   };
@@ -34,7 +39,16 @@ const peticioService = {
   /**
    * Crea una nueva petición.
    */
-  create: async (data: { id_taller: number; alumnes_aprox?: number; comentaris?: string }): Promise<Peticio> => {
+  create: async (data: { 
+    id_taller: number; 
+    alumnes_aprox?: number; 
+    comentaris?: string;
+    prof1_nom?: string;
+    prof1_contacte?: string;
+    prof2_nom?: string;
+    prof2_contacte?: string;
+    modalitat?: string;
+  }): Promise<Peticio> => {
     const api = getApi();
     try {
       const response = await api.post<Peticio>("/peticions", data);

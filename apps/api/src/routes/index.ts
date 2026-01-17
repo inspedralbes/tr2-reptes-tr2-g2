@@ -8,6 +8,7 @@ import centroRoutes from './centro.routes';
 import peticioRoutes from './peticio.routes'; // Nueva ruta para el flujo de reservas
 import assignacioRoutes from './assignacio.routes';
 import alumneRoutes from './alumne.routes';
+import professorRoutes from './professor.routes';
 import calendarRoutes from './calendar.routes';
 import faseRoutes from './fase.routes';
 
@@ -24,8 +25,9 @@ router.use('/centres', centroRoutes);
 router.use('/peticions', peticioRoutes);
 router.use('/assignacions', assignacioRoutes);
 
-// Rutas de Alumnos e Inscripciones
+// Rutas de Alumnos y Profesores
 router.use('/alumnes', alumneRoutes);
+router.use('/professors', professorRoutes);
 
 // Rutas de Calendario
 router.use('/calendar', calendarRoutes);

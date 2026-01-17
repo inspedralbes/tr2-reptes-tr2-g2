@@ -57,7 +57,8 @@ model Centre {
   usuaris      Usuari[]
   peticions    Peticio[]
   assignacions Assignacio[]
-  alumnes      Alumne[]     @relation("CentreProcedencia")
+  alumnes      Alumne[]              @relation("CentreProcedencia")
+  professors   Professor[]
   incidencies  Incidencia[]
 
   @@map("centres")
@@ -98,6 +99,19 @@ model Usuari {
   @@map("usuaris")
 }
 
+model Professor {
+  id_professor     Int     @id @default(autoincrement())
+  nom              String
+  contacte         String?
+  id_centre        Int
+  centre           Centre  @relation(fields: [id_centre], references: [id_centre])
+
+  peticiones1 Peticio[] @relation("Profesor1")
+  peticiones2 Peticio[] @relation("Profesor2")
+
+  @@map("professors")
+}
+
 // ==========================================
 // 3. PETICIONS I ASSIGNACIONS
 // ==========================================
@@ -112,6 +126,15 @@ model Peticio {
   comentaris    String?      @db.Text
   data_peticio  DateTime     @default(now())
   estat         EstatPeticio @default(Pendent)
+  modalitat     Modalitat?
+
+  prof1_id Int?
+  prof1    Professor? @relation("Profesor1", fields: [prof1_id], references: [id_professor])
+  prof2_id Int?
+  prof2    Professor? @relation("Profesor2", fields: [prof2_id], references: [id_professor])
+
+  ids_alumnes Int[]
+  alumnes     Alumne[] @relation("AlumnesPeticio")
 
   assignacio Assignacio?
 
@@ -187,6 +210,7 @@ model Alumne {
   centre_procedencia    Centre? @relation("CentreProcedencia", fields: [id_centre_procedencia], references: [id_centre])
 
   inscripcions Inscripcio[]
+  peticions    Peticio[]    @relation("AlumnesPeticio")
 
   @@map("alumnes")
 }

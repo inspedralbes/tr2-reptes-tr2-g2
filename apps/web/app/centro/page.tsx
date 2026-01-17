@@ -73,7 +73,7 @@ export default function CentroDashboard() {
       </div>
 
       {/* Accesos Directos */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <div 
           onClick={() => router.push('/centro/peticions')}
           className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
@@ -88,28 +88,42 @@ export default function CentroDashboard() {
         </div>
 
         <div 
+          onClick={() => router.push('/centro/alumnos')}
+          className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+        >
+          <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-6 text-green-600 group-hover:bg-green-600 group-hover:text-white transition-all duration-300 shadow-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Gestionar Alumnos</h3>
+          <p className="text-sm text-gray-500 leading-relaxed">Afegeix o modifica els alumnes que participaran en els tallers.</p>
+        </div>
+
+        <div 
+          onClick={() => router.push('/centro/profesores')}
+          className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+        >
+          <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300 shadow-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Gestionar Profesores</h3>
+          <p className="text-sm text-gray-500 leading-relaxed">Gestiona els professors referents del teu centre.</p>
+        </div>
+
+        <div 
           onClick={() => router.push('/centro/assignacions')}
           className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
         >
-          <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-inner">
+          <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-all duration-300 shadow-inner">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">Ver Asignaciones</h3>
-          <p className="text-sm text-gray-500 leading-relaxed">Consulta els tallers assignats i el teu centre referent a partir del <span className="font-bold text-gray-700">20 d'octubre</span>.</p>
-        </div>
-
-        <div 
-          className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 opacity-60 cursor-not-allowed grayscale"
-        >
-          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Validación Final</h3>
-          <p className="text-sm text-gray-500 leading-relaxed">Completa el checklist un cop hagin finalitzat les sessions dels tallers.</p>
+          <p className="text-sm text-gray-500 leading-relaxed">Consulta els tallers assignats i el teu centre referent.</p>
         </div>
       </div>
     </DashboardLayout>
