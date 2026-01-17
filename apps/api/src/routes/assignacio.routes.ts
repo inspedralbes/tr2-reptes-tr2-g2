@@ -9,5 +9,7 @@ router.get('/:idAssignacio/checklist', authenticateToken, assignacioController.g
 router.patch('/checklist/:idItem', authenticateToken, assignacioController.updateChecklistItem);
 router.get('/incidencies/centre/:idCentre', authenticateToken, assignacioController.getIncidenciesByCentre);
 router.post('/incidencies', authenticateToken, assignacioController.createIncidencia);
+router.post('/', authenticateToken, assignacioController.createAssignacioFromPeticio);
+router.post('/:idAssignacio/inscripcions', authenticateToken, assignacioController.createInscripcions);
 
 export default router;

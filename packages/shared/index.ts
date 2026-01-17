@@ -39,7 +39,7 @@ export const THEME = {
   }
 } as const;
 
-// Calendari Programa Iter (Curs 25-26 aprox)
+// Calendario Programa Iter (Curso 25-26 aprox)
 export const CALENDARI = {
   REUNION_PRESENTACION: '2025-09-30',
   LIMITE_DEMANDA: '2025-10-10',
@@ -47,12 +47,20 @@ export const CALENDARI = {
   GESTION_VACANTES: '2025-11-01',
 } as const;
 
-export const FASES = [
-  { id: 'PRESENTACIO', nom: 'Presentació i Sol·licitud', data: CALENDARI.REUNION_PRESENTACION },
+// Nombres oficiales de las fases para consistencia en DB y UI
+export const PHASES = {
+  SOLICITUD: 'Solicitud e Inscripción',
+  PLANIFICACION: 'Planificación y Asignación',
+  EJECUCION: 'Ejecución y Seguimiento',
+  CIERRE: 'Cierre y Evaluación'
+} as const;
+
+export const FASES_TIMELINE = [
+  { id: 'PRESENTACIO', nom: PHASES.SOLICITUD, data: CALENDARI.REUNION_PRESENTACION },
   { id: 'DEMANDA', nom: 'Enviament de Demanda', data: CALENDARI.LIMITE_DEMANDA },
-  { id: 'ASSIGNACIO', nom: 'Recepció d\'Asignacions', data: CALENDARI.COMUNICACION_ASIGNACIONES },
+  { id: 'ASSIGNACIO', nom: PHASES.PLANIFICACION, data: CALENDARI.COMUNICACION_ASIGNACIONES },
   { id: 'VACANTS', nom: 'Gestió de Vacants i Incidències', data: CALENDARI.GESTION_VACANTES },
-  { id: 'VALIDACIO', nom: 'Validació Final', data: null }
+  { id: 'VALIDACIO', nom: PHASES.CIERRE, data: null }
 ] as const;
 
 // Utility functions

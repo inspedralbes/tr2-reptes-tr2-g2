@@ -13,6 +13,7 @@ import calendarRoutes from './calendar.routes';
 import faseRoutes from './fase.routes';
 import statsRoutes from './stats.routes';
 import sectorRoutes from './sector.routes';
+import assistenciaRoutes from './assistencia.routes';
 
 // --- Definir las rutas base ---
 
@@ -31,6 +32,7 @@ router.use('/assignacions', assignacioRoutes);
 // Rutas de Alumnos y Profesores
 router.use('/alumnes', alumneRoutes);
 router.use('/professors', professorRoutes);
+router.use('/assistencia', assistenciaRoutes);
 
 // Rutas de Calendario
 router.use('/calendar', calendarRoutes);

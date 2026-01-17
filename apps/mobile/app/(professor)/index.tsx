@@ -2,10 +2,36 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Linking, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { THEME } from '@iter/shared';
+import { THEME, PHASES } from '@iter/shared';
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
 
 export default function DashboardScreen() {
   const router = useRouter();
+  const [fases, setFases] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchFases = async () => {
+      try {
+        const token = await SecureStore.getItemAsync('token');
+        const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/fases`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setFases(response.data.data);
+      } catch (error) {
+        console.error("Error fetching phases mobile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFases();
+  }, []);
+
+  const isPhaseActive = (nomFase: string) => {
+    const fase = fases.find(f => f.nom === nomFase);
+    return fase ? fase.activa : false;
+  };
 
   const nextWorkshop = {
     id: 1,
@@ -87,10 +113,12 @@ export default function DashboardScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity 
-            onPress={() => router.push(`/sesion/${nextWorkshop.id}`)}
-            className="bg-primary py-5 items-center active:bg-blue-900"
+            onPress={() => isPhaseActive(PHASES.EJECUCION) ? router.push(`/sesion/${nextWorkshop.id}`) : alert('El període d\'execució encara no ha començat')}
+            className={`py-5 items-center ${isPhaseActive(PHASES.EJECUCION) ? 'bg-primary active:bg-blue-900' : 'bg-gray-200'}`}
           >
-            <Text className="text-white font-black text-sm uppercase tracking-[2px]">GESTIONAR ASISTENCIA</Text>
+            <Text className="text-white font-black text-sm uppercase tracking-[2px]">
+              {isPhaseActive(PHASES.EJECUCION) ? 'GESTIONAR ASISTENCIA' : 'SESIÓN PENDIENTE'}
+            </Text>
           </TouchableOpacity>
         </View>
 

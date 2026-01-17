@@ -2,6 +2,7 @@ import prisma from '../lib/prisma';
 import { Request, Response } from 'express';
 import { EstadoPeticion } from '@iter/shared';
 import { connectToDatabase } from '../lib/mongodb';
+import { isPhaseActive, PHASES } from '../lib/phaseUtils';
 
 // GET: Ver peticiones (Filtra por centro si es COORDINADOR) con paginación
 export const getPeticions = async (req: Request, res: Response) => {
@@ -64,6 +65,18 @@ export const createPeticio = async (req: Request, res: Response) => {
 
   if (!id_taller || !centreId) {
     return res.status(400).json({ error: 'Faltan campos obligatorios (id_taller, centreId)' });
+  }
+
+  // --- VERIFICACIÓN DE FASE ---
+  const phaseStatus = await isPhaseActive(PHASES.SOLICITUD);
+  if (!phaseStatus.isActive) {
+    let errorMessage = 'El período de solicitud de talleres no está activo.';
+    if (!phaseStatus.phaseActiveFlag) {
+      errorMessage = 'La fase de solicitud ha sido desactivada por el administrador.';
+    } else if (!phaseStatus.isWithinDates) {
+      errorMessage = 'El plazo para solicitar talleres ha finalizado.';
+    }
+    return res.status(403).json({ error: errorMessage });
   }
 
   const numAlumnes = alumnes_ids?.length || 0;

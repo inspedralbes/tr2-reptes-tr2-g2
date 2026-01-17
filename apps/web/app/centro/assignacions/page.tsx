@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
-import { THEME } from '@iter/shared';
+import { THEME, PHASES } from '@iter/shared';
+import getApi from '@/services/api';
 
 export default function AssignacionsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [assignacions, setAssignacions] = useState<any[]>([]);
+  const [fases, setFases] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,13 +22,20 @@ export default function AssignacionsPage() {
 
     // Fetch asignaciones
     if (currentUser.id_centre) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignacions/centre/${currentUser.id_centre}`, {
-        headers: { 'ngrok-skip-browser-warning': 'true' }
-      })
-        .then(res => res.json())
-        .then(setAssignacions);
+      const api = getApi();
+      
+      api.get(`/assignacions/centre/${currentUser.id_centre}`)
+        .then(res => setAssignacions(res.data));
+        
+      api.get("/fases")
+        .then(res => setFases(res.data.data));
     }
   }, []);
+
+  const isPhaseActive = (nomFase: string) => {
+    const fase = fases.find(f => f.nom === nomFase);
+    return fase ? fase.activa : false;
+  };
 
   if (!user) return null;
 
@@ -81,7 +90,7 @@ export default function AssignacionsPage() {
                   </div>
                 </div>
 
-                <div className="border-t pt-4">
+                <div className="border-t pt-4 mb-4">
                   <h4 className="text-sm font-bold mb-3 uppercase tracking-tight text-gray-400">Progreso de Validación</h4>
                   <div className="space-y-2">
                     {a.checklist?.map((item: any) => (
@@ -96,49 +105,69 @@ export default function AssignacionsPage() {
                     ))}
                   </div>
                 </div>
+
+                <div className="grid grid-cols-2 gap-3 mt-6">
+                  <button 
+                    onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push(`/centro/assignacions/${a.id_assignacio}/alumnos`)}
+                    disabled={!isPhaseActive(PHASES.PLANIFICACION)}
+                    className={`py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${
+                      isPhaseActive(PHASES.PLANIFICACION) 
+                        ? 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white' 
+                        : 'border-gray-200 text-gray-300 cursor-not-allowed'
+                    }`}
+                  >
+                    Registro Nominal
+                  </button>
+                  <button 
+                    onClick={() => isPhaseActive(PHASES.CIERRE) ? alert('Validant dades per a certificació...') : alert('Documentació encara no disponible')}
+                    className={`py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${
+                      isPhaseActive(PHASES.CIERRE)
+                        ? 'border-accent text-accent hover:bg-accent hover:text-white'
+                        : 'border-gray-200 text-gray-300'
+                    }`}
+                  >
+                    {isPhaseActive(PHASES.CIERRE) ? 'Validar Taller' : 'Documentació'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Sección de Incidencias */}
-        <section className="mt-16 bg-white p-8 rounded-xl shadow-sm border border-red-50">
-          <h3 className="text-xl font-bold text-red-800 mb-4">Gestión de Incidencias y Vacantes</h3>
-          <p className="text-sm text-gray-600 mb-6">
-            Durante el mes de noviembre, puedes reportar incidencias o solicitar plazas vacantes a través de este formulario.
-          </p>
-          
-          <div className="flex gap-4">
-            <input 
-              id="incidencia-input"
-              type="text" 
-              placeholder="Describe el problema o la vacante detectada..." 
-              className="flex-1 p-3 border rounded-lg text-sm"
-            />
-            <button 
-              onClick={async () => {
-                const input = document.getElementById('incidencia-input') as HTMLInputElement;
-                if (!input.value) return;
-                await fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignacions/incidencies`, {
-                  method: 'POST',
-                  headers: { 
-                    'Content-Type': 'application/json',
-                    'ngrok-skip-browser-warning': 'true'
-                  },
-                  body: JSON.stringify({
+        {/* Sección de Incidencias (Solo disponible en Fase 3) */}
+        {isPhaseActive(PHASES.EJECUCION) && (
+          <section className="mt-16 bg-white p-8 border-2 border-red-600 shadow-[8px_8px_0px_0px_rgba(242,97,120,0.1)]">
+            <h3 className="text-xl font-black text-gray-900 mb-4 uppercase tracking-tighter">Gestión de Incidencias y Vacantes</h3>
+            <p className="text-xs font-bold text-gray-500 mb-6 uppercase tracking-widest">
+              REPORTAR PROBLEMES DE COMPORTAMENT O SOL·LICITAR PLACES VACANTS.
+            </p>
+            
+            <div className="flex gap-4">
+              <input 
+                id="incidencia-input"
+                type="text" 
+                placeholder="Descriu el problema..." 
+                className="flex-1 p-4 border-2 border-gray-100 text-sm font-bold focus:border-red-600 outline-none transition-all"
+              />
+              <button 
+                onClick={async () => {
+                  const input = document.getElementById('incidencia-input') as HTMLInputElement;
+                  if (!input.value) return;
+                  const api = getApi();
+                  await api.post('/assignacions/incidencies', {
                     id_centre: user.id_centre,
                     descripcio: input.value
-                  })
-                });
-                input.value = '';
-                alert('Incidencia reportada. El CEB la revisará próximamente.');
-              }}
-              className="px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition"
-            >
-              Reportar
-            </button>
-          </div>
-        </section>
+                  });
+                  input.value = '';
+                  alert('Incidència reportada. El CEB la revisarà properament.');
+                }}
+                className="px-8 py-4 bg-red-600 text-white font-black uppercase text-xs tracking-widest hover:bg-red-700 transition"
+              >
+                Reportar
+              </button>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

@@ -55,6 +55,20 @@ const peticioService = {
       const errorMessage = error.response?.data?.error || "No se pudo crear la solicitud";
       throw new Error(errorMessage);
     }
+  },
+
+  /**
+   * Actualiza el estado de una petición.
+   */
+  updateStatus: async (id: number, estat: string): Promise<Peticio> => {
+    const api = getApi();
+    try {
+      const response = await api.patch<Peticio>(`/peticions/${id}/status`, { estat });
+      return response.data;
+    } catch (error) {
+      console.error("Error en peticioService.updateStatus:", error);
+      throw error;
+    }
   }
 };
 

@@ -3,10 +3,11 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME } from '@iter/shared';
+import { THEME, ESTADOS_PETICION } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import tallerService, { Taller } from '@/services/tallerService';
 import peticioService, { Peticio } from '@/services/peticioService';
+import assignacioService from '@/services/assignacioService';
 
 export default function AdminSolicitudesPage() {
   const { user, loading: authLoading } = useAuth();
@@ -42,6 +43,31 @@ export default function AdminSolicitudesPage() {
       fetchData();
     }
   }, [user, authLoading, router]);
+
+  const handleApprove = async (idPeticio: number) => {
+    if (!confirm('¿Seguro que quieres aprobar esta solicitud y generar la asignación?')) return;
+    try {
+      await peticioService.updateStatus(idPeticio, ESTADOS_PETICION.ACEPTADA);
+      await assignacioService.createFromPeticio(idPeticio);
+      // Refresh data
+      const updatedPeticions = await peticioService.getAll();
+      setPeticions(updatedPeticions);
+      alert('Solicitud aprovada i assignació generada.');
+    } catch (err) {
+      alert('Error en el procés d\'aprovació.');
+    }
+  };
+
+  const handleReject = async (idPeticio: number) => {
+    if (!confirm('¿Seguro que quieres rechazar esta solicitud?')) return;
+    try {
+      await peticioService.updateStatus(idPeticio, ESTADOS_PETICION.RECHAZADA);
+      const updatedPeticions = await peticioService.getAll();
+      setPeticions(updatedPeticions);
+    } catch (err) {
+      alert('Error al rebutjar la sol·licitud.');
+    }
+  };
 
   const workshopRequests = useMemo(() => {
     const map: Record<number, Peticio[]> = {};
@@ -184,6 +210,23 @@ export default function AdminSolicitudesPage() {
                         }`}>
                           {p.estat}
                         </div>
+                        
+                        {p.estat === 'Pendent' && (
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => handleApprove(p.id_peticio)}
+                              className="px-3 py-1 bg-green-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-green-700 transition"
+                            >
+                              Aprobar
+                            </button>
+                            <button 
+                              onClick={() => handleReject(p.id_peticio)}
+                              className="px-3 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition"
+                            >
+                              Rechazar
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
