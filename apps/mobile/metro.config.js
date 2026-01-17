@@ -1,6 +1,27 @@
-const { getDefaultConfig } = require("expo/metro-config");
+const { getDefaultConfig } = require('expo/metro-config');
 const { withNativeWind } = require('nativewind/metro');
- 
-const config = getDefaultConfig(__dirname)
- 
-module.exports = withNativeWind(config, { input: './global.css' })
+const path = require('path');
+
+// Find the project and workspace root
+const projectRoot = __dirname;
+// This can be replaced with `find-up` if needed
+const workspaceRoot = path.resolve(projectRoot, '../..');
+
+const config = getDefaultConfig(projectRoot);
+
+// 1. Watch all files within the monorepo root
+config.watchFolders = [workspaceRoot];
+
+// 2. Let Metro know where to resolve packages from
+config.resolver.nodeModulesPaths = [
+  path.resolve(projectRoot, 'node_modules'),
+  path.resolve(workspaceRoot, 'node_modules'),
+];
+
+// 3. Make sure typescript files in the monorepo are discoverable
+config.resolver.sourceExts.push('mjs', 'ts', 'tsx');
+
+// 4. Force Metro to resolve (sub)dependencies only from the `node_modules` folders
+config.resolver.disableHierarchicalLookup = true;
+
+module.exports = withNativeWind(config, { input: './global.css' });
