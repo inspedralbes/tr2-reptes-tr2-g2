@@ -4,6 +4,7 @@ export interface Taller {
   _id: string;
   titol: string;
   sector: string;
+  id_sector?: number;
   modalitat: string;
   trimestre: string;
   detalls_tecnics?: {
@@ -23,22 +24,21 @@ const tallerService = {
   getAll: async (): Promise<Taller[]> => {
     const api = getApi();
     try {
-      // Backend now returns: { data: [...], meta: {...} }
       const response = await api.get<{ data: any[], meta: any }>("/tallers");
       const tallersData = response.data.data;
 
-      // Adapt backend data to frontend Taller interface
       return tallersData.map((t: any) => ({
         _id: t.id_taller.toString(),
         titol: t.titol,
-        sector: t.sector?.nom || "General", // Fallback if sector name is missing
+        sector: t.sector?.nom || "General",
+        id_sector: t.id_sector,
         modalitat: t.modalitat,
-        trimestre: "1r", // Default value as backend might not have it
+        trimestre: "1r",
         detalls_tecnics: {
           descripcio: t.descripcio_curta || t.descripcio || "",
           durada_hores: t.durada_h || 0,
           places_maximes: t.places_maximes || 0,
-          ubicacio_defecte: "Ca n'Olivella", // Default
+          ubicacio_defecte: "Ca n'Olivella",
         },
         referents_assignats: [],
         dies_execucio: [],
@@ -55,25 +55,23 @@ const tallerService = {
   create: async (tallerData: Omit<Taller, '_id'>): Promise<Taller> => {
     const api = getApi();
     try {
-      // Adapt frontend data to backend expectations
-      // Backend expects: { titol, descripcio, durada_h, places_maximes, modalitat, id_sector }
       const payload = {
         titol: tallerData.titol,
         descripcio: tallerData.detalls_tecnics?.descripcio,
         durada_h: tallerData.detalls_tecnics?.durada_hores,
         places_maximes: tallerData.detalls_tecnics?.places_maximes,
         modalitat: tallerData.modalitat,
-        id_sector: 1, // Hardcoded for now as we don't have sector management
+        id_sector: tallerData.id_sector || 1,
       };
 
       const response = await api.post("/tallers", payload);
       const t = response.data;
 
-      // Return adapted created object
       return {
-        _id: t.id.toString(),
+        _id: t.id_taller.toString(),
         titol: t.titol,
-        sector: "General",
+        sector: t.sector?.nom || "General",
+        id_sector: t.id_sector,
         modalitat: t.modalitat,
         trimestre: "1r",
         detalls_tecnics: {
@@ -101,6 +99,7 @@ const tallerService = {
       const payload: any = {};
       if (tallerData.titol) payload.titol = tallerData.titol;
       if (tallerData.modalitat) payload.modalitat = tallerData.modalitat;
+      if (tallerData.id_sector) payload.id_sector = tallerData.id_sector;
       if (tallerData.detalls_tecnics) {
         if (tallerData.detalls_tecnics.descripcio) payload.descripcio = tallerData.detalls_tecnics.descripcio;
         if (tallerData.detalls_tecnics.durada_hores) payload.durada_h = tallerData.detalls_tecnics.durada_hores;
@@ -110,11 +109,11 @@ const tallerService = {
       const response = await api.put(`/tallers/${id}`, payload);
       const t = response.data;
 
-      // Return adapted object
       return {
-        _id: t.id.toString(),
+        _id: t.id_taller.toString(),
         titol: t.titol,
-        sector: "General",
+        sector: t.sector?.nom || "General",
+        id_sector: t.id_sector,
         modalitat: t.modalitat,
         trimestre: "1r",
         detalls_tecnics: {

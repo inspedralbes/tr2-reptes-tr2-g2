@@ -9,6 +9,7 @@
     "start": "node dist/index.js",
     "db:push": "npx prisma db push",
     "db:seed": "npx prisma db seed",
+    "db:seed-mongo": "npx ts-node src/seed_mongo.ts",
     "db:generate": "npx prisma generate"
   },
   "prisma": {

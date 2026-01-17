@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 
 // GET: Listar todos con paginación
 export const getCentres = async (req: Request, res: Response) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 100 } = req.query;
   const skip = (Number(page) - 1) * Number(limit);
   const take = Number(limit);
 

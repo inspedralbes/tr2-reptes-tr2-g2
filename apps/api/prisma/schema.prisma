@@ -31,6 +31,7 @@ model Taller {
   sector           Sector       @relation(fields: [id_sector], references: [id_sector])
   peticions        Peticio[]
   assignacions     Assignacio[]
+  ambit            String?
 
   @@map("tallers")
 }
