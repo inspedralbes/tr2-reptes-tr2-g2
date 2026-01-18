@@ -4,7 +4,6 @@
   "description": "**Central Hub for the Iter Ecosystem | Unified Modern Stack**",
   "private": true,
   "packageManager": "npm@10.9.4",
-  "main": "index.js",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -22,7 +21,10 @@
     "db:push": "turbo run db:push --filter=api",
     "db:seed": "turbo run db:seed --filter=api",
     "// --- MAINTENANCE ---": "",
-    "clean": "rm -rf node_modules package-lock.json apps/*/node_modules apps/*/package-lock.json packages/*/node_modules packages/*/package-lock.json"
+    "clean": "rm -rf node_modules package-lock.json apps/*/node_modules apps/*/package-lock.json packages/*/node_modules packages/*/package-lock.json",
+    "// --- MOBILE ---": "",
+    "mobile": "npm run start --workspace=mobile",
+    "mobile:tunnel": "npm run dev:tunnel --workspace=mobile"
   },
   "directories": {
     "doc": "doc"
