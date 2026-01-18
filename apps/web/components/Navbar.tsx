@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { THEME } from '@iter/shared';
+import notificacioService, { Notificacio } from '@/services/notificacioService';
+import { useEffect, useState } from 'react';
 
 interface NavbarProps {
   title?: string;
@@ -12,6 +14,25 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
   const { user, logout } = useAuth();
   const pathname = usePathname();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (user) {
+      const fetchUnread = async () => {
+        try {
+          const list = await notificacioService.getAll();
+          setUnreadCount(list.filter(n => !n.llegida).length);
+        } catch (error) {
+          console.error("Error fetching notifications for navbar", error);
+        }
+      };
+      fetchUnread();
+      
+      // Refresh every 2 minutes
+      const interval = setInterval(fetchUnread, 120000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
 
   if (!user) return null;
 
@@ -56,12 +77,6 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
               >
                 Inicio
               </Link>
-              {isAdmin && (
-                <>
-                  <Link href="/admin/solicitudes" className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/admin/solicitudes' ? 'text-white bg-white/10' : ''}`}>Solicitudes</Link>
-                  <Link href="/admin/centros" className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/admin/centros' ? 'text-white bg-white/10' : ''}`}>Centros</Link>
-                </>
-              )}
               <Link 
                 href="/calendar" 
                 className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/calendar' ? 'text-white bg-white/10' : ''}`}
@@ -74,6 +89,22 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
               >
                 Perfil
               </Link>
+              {isCoordinator && (
+                <Link 
+                  href="/centro/avisos" 
+                  className={`relative text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/centro/avisos' ? 'text-white bg-white/10' : ''}`}
+                >
+                  Avisos
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 text-[8px] font-black items-center justify-center text-white">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    </span>
+                  )}
+                </Link>
+              )}
             </nav>
           </div>
           

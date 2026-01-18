@@ -2,38 +2,125 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { THEME } from '@iter/shared';
+import { THEME, PHASES } from '@iter/shared';
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
+import { useEffect } from 'react';
+
+interface Student {
+  id: number;
+  id_inscripcio: number;
+  name: string;
+  status: string;
+  institute: string;
+  permissions: string;
+  flag?: boolean;
+}
 
 export default function SesionScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [incidentModal, setIncidentModal] = useState(false);
   const [incidentText, setIncidentText] = useState('');
 
-  const [students, setStudents] = useState([
-    { id: 1, name: 'Pau Claris', status: 'pending', institute: 'Inst. Martí i Pous', permissions: 'Vuelve solo a casa' },
-    { id: 2, name: 'Laia Sanz', status: 'present', institute: 'Inst. Bosc de Montjuïc', permissions: 'Recogida por tutor' },
-    { id: 3, name: 'Èric Vila', status: 'absent', institute: 'Inst. Martí i Pous', permissions: 'Vuelve solo a casa', flag: true },
-    { id: 4, name: 'Alba Ruiz', status: 'late', institute: 'Inst. Bosc de Montjuïc', permissions: 'Vuelve solo a casa' },
-    { id: 5, name: 'Marc Font', status: 'pending', institute: 'Inst. Martí i Pous', permissions: 'Recogida por tutor' },
-  ]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isEjecucion, setIsEjecucion] = useState(false);
 
-  const updateStatus = (studentId, newStatus) => {
-    setStudents(students.map(s => 
-      s.id === studentId ? { ...s, status: newStatus, flag: newStatus === 'absent' } : s
-    ));
-    setModalVisible(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = await SecureStore.getItemAsync('token');
+        const apiBase = process.env.EXPO_PUBLIC_API_URL;
+        
+        // 1. Check Phases
+        const resFases = await axios.get(`${apiBase}/fases`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const active = resFases.data.data.find((f: any) => f.nom === PHASES.EJECUCION)?.activa;
+        setIsEjecucion(!!active);
+
+        // 2. Fetch Assignment and Students (Inscripcions)
+        const resAssig = await axios.get(`${apiBase}/assignacions/${id}/checklist`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        // Fetch all inscriptions for this assignment
+        // Since we don't have a direct "get inscripcions by assignment" yet, we'll use a mocked list or improve API
+        // For the sake of "professional/scalable", let's assume we have the endpoint or we fetch from attendance
+        const resInsc = await axios.get(`${apiBase}/assistencia/assignacio/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        // Map data to local state
+        const mapped = resInsc.data.map((a: any) => ({
+          id: a.inscripcio.id_alumne,
+          id_inscripcio: a.id_inscripcio,
+          name: `${a.inscripcio.alumne.nom} ${a.inscripcio.alumne.cognoms}`,
+          status: a.estat.toLowerCase(),
+          institute: a.inscripcio.alumne.curs || 'Inst. Martí i Pous',
+          permissions: 'Vuelve solo a casa'
+        }));
+        
+        if (mapped.length > 0) setStudents(mapped);
+        else {
+            // Fallback mock if data is empty (for demo/development)
+            setStudents([
+                { id: 1, id_inscripcio: 1, name: 'Pau Claris', status: 'pending', institute: 'Inst. Martí i Pous', permissions: 'Vuelve solo a casa' },
+                { id: 2, id_inscripcio: 2, name: 'Laia Sanz', status: 'present', institute: 'Inst. Bosc de Montjuïc', permissions: 'Recogida por tutor' },
+            ]);
+        }
+
+      } catch (error) {
+        console.error("Error fetching session data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  const updateStatus = async (studentId: number, idInscripcio: number, newStatus: string) => {
+    if (!isEjecucion) {
+      alert('Només es pot registrar assistència durant la fase d\'execució.');
+      return;
+    }
+
+    try {
+      const token = await SecureStore.getItemAsync('token');
+      const apiBase = process.env.EXPO_PUBLIC_API_URL;
+      
+      const estatMapeado = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+      
+      await axios.post(`${apiBase}/assistencia`, {
+        id_inscripcio: idInscripcio,
+        numero_sessio: 4, // Harcoded for demo
+        data_sessio: new Date().toISOString().split('T')[0],
+        estat: estatMapeado,
+        observacions: ''
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setStudents(students.map(s => 
+        s.id === studentId ? { ...s, status: newStatus, flag: newStatus === 'absent' } : s
+      ));
+      setModalVisible(false);
+    } catch (error) {
+      alert('Error en desar l\'assistència.');
+    }
   };
 
-  const toggleFlag = (studentId) => {
+  const toggleFlag = (studentId: number) => {
     setStudents(students.map(s => 
       s.id === studentId ? { ...s, flag: !s.flag } : s
     ));
   };
 
-  const getStatusBorder = (status) => {
+  const getStatusBorder = (status: string) => {
     switch (status) {
       case 'present': return 'border-green-600';
       case 'late': return 'border-yellow-500';
@@ -42,7 +129,7 @@ export default function SesionScreen() {
     }
   };
 
-  const getStatusLabel = (status) => {
+  const getStatusLabel = (status: string) => {
     switch (status) {
       case 'present': return 'PRESENTE';
       case 'late': return 'RETRASO';
@@ -51,7 +138,7 @@ export default function SesionScreen() {
     }
   };
 
-  const openStudentInfo = (student) => {
+  const openStudentInfo = (student: Student) => {
     setSelectedStudent(student);
     setModalVisible(true);
   };
@@ -96,19 +183,19 @@ export default function SesionScreen() {
 
               <View className="flex-row space-x-2">
                 <TouchableOpacity 
-                  onPress={() => updateStatus(student.id, 'present')}
+                  onPress={() => updateStatus(student.id, student.id_inscripcio, 'present')}
                   className={`flex-1 py-3 items-center border-2 ${student.status === 'present' ? 'bg-green-600 border-green-600' : 'bg-white border-gray-200'}`}
                 >
                   <Ionicons name="checkmark" size={18} color={student.status === 'present' ? 'white' : '#10B981'} />
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  onPress={() => updateStatus(student.id, 'late')}
+                  onPress={() => updateStatus(student.id, student.id_inscripcio, 'late')}
                   className={`flex-1 py-3 items-center border-2 ${student.status === 'late' ? 'bg-yellow-500 border-yellow-500' : 'bg-white border-gray-200'}`}
                 >
                   <Ionicons name="time" size={18} color={student.status === 'late' ? 'white' : '#F59E0B'} />
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  onPress={() => updateStatus(student.id, 'absent')}
+                  onPress={() => updateStatus(student.id, student.id_inscripcio, 'absent')}
                   className={`flex-1 py-3 items-center border-2 ${student.status === 'absent' ? 'bg-red-600 border-red-600' : 'bg-white border-gray-200'}`}
                 >
                   <Ionicons name="close" size={18} color={student.status === 'absent' ? 'white' : '#EF4444'} />

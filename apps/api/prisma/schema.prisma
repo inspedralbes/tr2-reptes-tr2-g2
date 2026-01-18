@@ -55,12 +55,13 @@ model Centre {
   email_contacte     String?
   asistencia_reunion Boolean @default(false)
 
-  usuaris      Usuari[]
-  peticions    Peticio[]
-  assignacions Assignacio[]
-  alumnes      Alumne[]              @relation("CentreProcedencia")
-  professors   Professor[]
-  incidencies  Incidencia[]
+  usuaris       Usuari[]
+  peticions     Peticio[]
+  assignacions  Assignacio[]
+  alumnes       Alumne[]      @relation("CentreProcedencia")
+  professors    Professor[]
+  incidencies   Incidencia[]
+  notificacions Notificacio[]
 
   @@map("centres")
 }
@@ -96,19 +97,22 @@ model Usuari {
 
   assignacio_professors AssignacioProfessor[]
   logs                  LogAuditoria[]
+  notificacions         Notificacio[]
 
   @@map("usuaris")
 }
 
 model Professor {
-  id_professor     Int     @id @default(autoincrement())
-  nom              String
-  contacte         String?
-  id_centre        Int
-  centre           Centre  @relation(fields: [id_centre], references: [id_centre])
+  id_professor Int     @id @default(autoincrement())
+  nom          String
+  contacte     String?
+  id_centre    Int
+  centre       Centre  @relation(fields: [id_centre], references: [id_centre])
 
-  peticiones1 Peticio[] @relation("Profesor1")
-  peticiones2 Peticio[] @relation("Profesor2")
+  peticiones1 Peticio[]    @relation("Profesor1")
+  peticiones2 Peticio[]    @relation("Profesor2")
+  assig1      Assignacio[] @relation("AssigProf1")
+  assig2      Assignacio[] @relation("AssigProf2")
 
   @@map("professors")
 }
@@ -160,6 +164,11 @@ model Assignacio {
   data_inici    DateTime?       @db.Date
   data_fi       DateTime?       @db.Date
   estat         EstatAssignacio @default(En_curs)
+
+  prof1_id Int?
+  prof1    Professor? @relation("AssigProf1", fields: [prof1_id], references: [id_professor])
+  prof2_id Int?
+  prof2    Professor? @relation("AssigProf2", fields: [prof2_id], references: [id_professor])
 
   professors   AssignacioProfessor[]
   checklist    ChecklistAssignacio[]
@@ -327,7 +336,28 @@ model RespostesQuestionari {
 }
 
 // ==========================================
-// 6. LOGS
+// 6. NOTIFICACIONS I AVISOS
+// ==========================================
+
+model Notificacio {
+  id_notificacio Int      @id @default(autoincrement())
+  id_usuari      Int?
+  usuari         Usuari?  @relation(fields: [id_usuari], references: [id_usuari])
+  id_centre      Int?
+  centre         Centre?  @relation(fields: [id_centre], references: [id_centre])
+  titol          String
+  missatge       String   @db.Text
+  llegida        Boolean  @default(false)
+  data_creacio   DateTime @default(now())
+  tipus          String // PETICIO, FASE, SISTEMA
+  importancia    String   @default("NORMAL") // INFO, WARNING, URGENT
+
+  @@index([id_usuari, id_centre])
+  @@map("notificacions")
+}
+
+// ==========================================
+// 7. LOGS
 // ==========================================
 
 model LogAuditoria {
@@ -355,6 +385,7 @@ model fase {
   data_inici DateTime
   data_fi    DateTime
   activa     Boolean          @default(false)
+  ordre      Int              @default(0)
   events     calendariEvent[]
 
   @@map("fases")

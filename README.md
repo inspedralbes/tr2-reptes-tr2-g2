@@ -1,4 +1,18 @@
-# 🚀 TR2 Reptes Iter - Iter
+<div align="center">
+  <h1 style="font-size: 3rem; font-weight: bold; margin-top: 20px;">ITER ECOSYSTEM</h1>
+  
+  **Infraestructura Monorepo Escalable para Centros Educativos**
+
+  [![Turborepo](https://img.shields.io/badge/Orchestration-Turborepo-ef4444?style=flat-square&logo=turborepo)](https://turbo.build/)
+  [![Next.js](https://img.shields.io/badge/Frontend-Next.js_16-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+  [![Node.js](https://img.shields.io/badge/Backend-Node.js_22-339933?style=flat-square&logo=nodedotjs)](https://nodejs.org/)
+  [![Docker](https://img.shields.io/badge/Deploy-Docker_Compose-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
+  [![Prisma](https://img.shields.io/badge/ORM-Prisma-2d3748?style=flat-square&logo=prisma)](https://www.prisma.io/)
+
+  [Demo en Vivo](https://iter.kore29.com) • [Documentación](./doc/DOCS.md) • [Reportar Bug](https://github.com/tu-repo/issues)
+</div>
+
+---
 
 Benvingut al nucli de l'ecosistema **Iter**. Aquesta és una infraestructura moderna basada en un **Monorepo** gestionat amb **Turborepo**, dissenyada per ser escalable, ràpida i fàcil de desplegar.
 
@@ -55,11 +69,13 @@ docker compose down -v && docker compose up --build
 
 ## 📍 Endpoints i Accessos Locals
 
-| Servei | URL Local | Descripció |
-| :--- | :--- | :--- |
-| **Web App** | `http://localhost:8002` | Interfície d'Usuari i Admin |
-| **API REST** | `http://localhost:3000/api` | Backend Principal |
-| **Adminer** | `http://localhost:8080` | Gestor de Base de Dades |
+| Component         | Tecnologia                         | Desplegament       |
+| :---------------- | :--------------------------------- | :----------------- |
+| **Frontend Web** | Next.js (React 19) + Tailwind CSS  | Docker (Port 8002) |
+| **Backend API** | Node.js + Express + **Prisma ORM** | Docker (Port 3000) |
+| **Base de Dades** | **PostgreSQL 15** | Docker (Port 5432) |
+| **Orquestrador** | **Turborepo** | Gestió de Monorepo |
+| **Admin BBDD** | **Adminer** | Docker (Port 8080) |
 
 ### 🔑 Credencials de Prova (Seed)
 
@@ -77,22 +93,21 @@ Per evitar conflictes de lectura/escriptura de fitxers, hem implementat un flux 
 2. **`setup`**: Instal·la paquets, sincronitza la DB i executa el `seed`.
 3. **`api` & `web`**: S'inicien només quan el `setup` ha finalitzat correctament.
 
-Això garanteix que mai tindràs errors de "mòduls no trobats" o fitxers bloquejats.
-
 ## 🗺️ Roadmap i Documentació
 
 * [x] Migració a **PostgreSQL + Prisma**.
 * [x] Arrencada Seqüencial Premium.
 * [x] Optimització amb **tsx** i **Turbopack**.
-* [ ] Implementació de Lògica d'Assignació Automàtica.
-
----
+* [ ] **Motor d'Assignació (AI Constraint Satisfaction):** Algorisme d'optimització per garantir l'heterogeneïtat de grups i respectar límits complexos de places per centre.
+* [ ] **Assistent d'Avaluació per Veu (NLP):** Sistema *Speech-to-Text* que omple automàticament rúbriques i observacions analitzant el dictat del professor.
+* [ ] **Predicció de Risc d'Abandonament:** Sistema *Early Warning* que alerta als tutors de possibles abandonaments basant-se en patrons d'assistència i baixada de rendiment.
+* [ ] **Validació Documental (Computer Vision):** Verificació automàtica de signatures i estructura de documents (ex: Acords Pedagògics) al pujar-los.
 
 ### 📖 Documentació Tècnica Detallada
 
 Per a més detalls, consulta els manuals a la carpeta `/doc`:
 
-👉 **[Documentació Tècnica (DOCS.md)](./doc/DOCS.md)**: Detalls d'infraestructura, volums i xarxes.
-👉 **[Arquitectura Backend (BACKEND_TECH.md)](./doc/BACKEND_TECH.md)**: Detalls de professionalització, validació i optimització.
-👉 **[Guia d'Ús (USAGE.md)](./doc/USAGE.md)**: Fluxos de treball, migracions i manteniment.
-👉 **[Justificació MongoDB (MONGODB_JUSTIFICACIO.md)](./doc/MONGODB_JUSTIFICACIO.md)**: Justificació de requisits de l'Activitat 3 (Repte 2).
+👉 **[Documentació Tècnica (DOCS.md)](https://www.google.com/search?q=./doc/DOCS.md)**: Detalls d'infraestructura, volums i xarxes.
+👉 **[Arquitectura Backend (BACKEND_TECH.md)](https://www.google.com/search?q=./doc/BACKEND_TECH.md)**: Detalls de professionalització, validació i optimització.
+👉 **[Guia d'Ús (USAGE.md)](https://www.google.com/search?q=./doc/USAGE.md)**: Fluxos de treball, migracions i manteniment.
+👉 **[Justificació MongoDB (MONGODB_JUSTIFICACIO.md)](https://www.google.com/search?q=./doc/MONGODB_JUSTIFICACIO.md)**: Justificació de requisits de l'Activitat 3 (Repte 2).

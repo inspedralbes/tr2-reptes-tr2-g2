@@ -13,6 +13,8 @@ import calendarRoutes from './calendar.routes';
 import faseRoutes from './fase.routes';
 import statsRoutes from './stats.routes';
 import sectorRoutes from './sector.routes';
+import assistenciaRoutes from './assistencia.routes';
+import notificacioRoutes from './notificacio.routes';
 
 // --- Definir las rutas base ---
 
@@ -27,10 +29,12 @@ router.use('/sectors', sectorRoutes);
 // Rutas del Flujo de Negocio (Solicitudes y Asignaciones)
 router.use('/peticions', peticioRoutes);
 router.use('/assignacions', assignacioRoutes);
+router.use('/notificacions', notificacioRoutes);
 
 // Rutas de Alumnos y Profesores
 router.use('/alumnes', alumneRoutes);
 router.use('/professors', professorRoutes);
+router.use('/assistencia', assistenciaRoutes);
 
 // Rutas de Calendario
 router.use('/calendar', calendarRoutes);

@@ -1,4 +1,4 @@
-# Justificació Tècnica Completa: MongoDB (Repte 2 - Aplicatiu ENGINY)
+# Justificació Tècnica Completa: MongoDB (Repte 2 - Aplicatiu ITER)
 
 Aquest document detalla el compliment del **100% dels punts** de la checklist oficial per a l'Activitat 3 de MongoDB.
 

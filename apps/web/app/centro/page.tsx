@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME } from '@iter/shared';
+import { THEME, PHASES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import ResourcesWidget from '@/components/ResourcesWidget';
 import getApi from '@/services/api';
@@ -15,6 +15,7 @@ interface Fase {
   data_inici: string;
   data_fi: string;
   activa: boolean;
+  ordre: number;
 }
 
 export default function CentroDashboard() {
@@ -46,6 +47,11 @@ export default function CentroDashboard() {
       fetchFases();
     }
   }, [user]);
+
+  const isPhaseActive = (nomFase: string) => {
+    const fase = fases.find(f => f.nom === nomFase);
+    return fase ? fase.activa : false;
+  };
 
   if (authLoading || !user) {
     return (
@@ -102,7 +108,7 @@ export default function CentroDashboard() {
                     }`}
                   >
                     <span className="text-sm font-black italic">
-                      {index + 1}
+                      {fase.ordre}
                     </span>
                   </div>
                   <h4 className={`font-black text-[11px] uppercase tracking-wider leading-tight mb-2 transition-colors duration-300 ${
@@ -128,55 +134,83 @@ export default function CentroDashboard() {
       {/* Accesos Directos */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div 
-            onClick={() => router.push('/centro/peticions')}
-            className="group bg-white p-8 border border-gray-100 shadow-sm cursor-pointer transition-all duration-300"
+            onClick={() => isPhaseActive(PHASES.SOLICITUD) && router.push('/centro/peticions')}
+            className={`group p-8 border shadow-sm transition-all duration-300 ${
+              isPhaseActive(PHASES.SOLICITUD) 
+                ? 'bg-white border-gray-100 cursor-pointer' 
+                : 'bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed grayscale'
+            }`}
           >
-            <div className="w-14 h-14 bg-blue-50 flex items-center justify-center mb-6 text-blue-600 shadow-inner group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+            <div className={`w-14 h-14 flex items-center justify-center mb-6 shadow-inner transition-all duration-300 ${
+              isPhaseActive(PHASES.SOLICITUD) ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white' : 'bg-gray-200 text-gray-400'
+            }`}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Solicitar Talleres</h3>
-            <p className="text-sm text-gray-500 leading-relaxed">Indica les teves preferències i el nombre d'alumnes abans del <span className="font-bold text-gray-700">10 d'octubre</span>.</p>
+            <p className="text-sm text-gray-500 leading-relaxed">Fase 1: Indica el nombre aproximat d'alumnes i preferències abans del <span className="font-bold text-gray-700">10 d'octubre</span>.</p>
+            {!isPhaseActive(PHASES.SOLICITUD) && <span className="text-[10px] font-black uppercase text-red-500 mt-4 block">Fase Tancada</span>}
           </div>
 
         <div 
-          onClick={() => router.push('/centro/alumnos')}
-          className="group bg-white p-8 border border-gray-100 shadow-sm cursor-pointer transition-all duration-300"
+          onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push('/centro/alumnos')}
+          className={`group p-8 border shadow-sm transition-all duration-300 ${
+            isPhaseActive(PHASES.PLANIFICACION) 
+              ? 'bg-white border-gray-100 cursor-pointer' 
+              : 'bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed grayscale'
+          }`}
         >
-          <div className="w-14 h-14 bg-green-50 flex items-center justify-center mb-6 text-green-600 shadow-inner group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
+          <div className={`w-14 h-14 flex items-center justify-center mb-6 shadow-inner transition-all duration-300 ${
+            isPhaseActive(PHASES.PLANIFICACION) ? 'bg-green-50 text-green-600 group-hover:bg-green-600 group-hover:text-white' : 'bg-gray-200 text-gray-400'
+          }`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Gestionar Alumnos</h3>
-          <p className="text-sm text-gray-500 leading-relaxed">Afegeix o modifica els alumnes que participaran en els tallers.</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Gestió Nominal</h3>
+          <p className="text-sm text-gray-500 leading-relaxed">Fase 2: Un cop assignat el taller, comunica les dades identitàries dels alumnes.</p>
+          {!isPhaseActive(PHASES.PLANIFICACION) && <span className="text-[10px] font-black uppercase text-blue-500 mt-4 block">Disponible a la Fase 2</span>}
         </div>
 
         <div 
-          onClick={() => router.push('/centro/profesores')}
-          className="group bg-white p-8 border border-gray-100 shadow-sm cursor-pointer transition-all duration-300"
+          onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push('/centro/profesores')}
+          className={`group p-8 border shadow-sm transition-all duration-300 ${
+            isPhaseActive(PHASES.PLANIFICACION) 
+              ? 'bg-white border-gray-100 cursor-pointer' 
+              : 'bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed grayscale'
+          }`}
         >
-          <div className="w-14 h-14 bg-purple-50 flex items-center justify-center mb-6 text-purple-600 shadow-inner group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+          <div className={`w-14 h-14 flex items-center justify-center mb-6 shadow-inner transition-all duration-300 ${
+            isPhaseActive(PHASES.PLANIFICACION) ? 'bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white' : 'bg-gray-200 text-gray-400'
+          }`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">Gestionar Profesores</h3>
           <p className="text-sm text-gray-500 leading-relaxed">Gestiona els professors referents del teu centre.</p>
+          {!isPhaseActive(PHASES.PLANIFICACION) && <span className="text-[10px] font-black uppercase text-blue-500 mt-4 block">Disponible a la Fase 2</span>}
         </div>
 
         <div 
-          onClick={() => router.push('/centro/assignacions')}
-          className="group bg-white p-8 border border-gray-100 shadow-sm cursor-pointer transition-all duration-300"
+            onClick={() => (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) && router.push('/centro/assignacions')}
+            className={`group p-8 border shadow-sm transition-all duration-300 ${
+              (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE))
+              ? 'bg-white border-gray-100 cursor-pointer' 
+              : 'bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed grayscale'
+          }`}
         >
-          <div className="w-14 h-14 bg-orange-50 flex items-center justify-center mb-6 text-orange-600 shadow-inner group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
+            <div className={`w-14 h-14 flex items-center justify-center mb-6 shadow-inner transition-all duration-300 ${
+              (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) ? 'bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-white' : 'bg-gray-200 text-gray-400'
+            }`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">Ver Asignaciones</h3>
           <p className="text-sm text-gray-500 leading-relaxed">Consulta els tallers assignats i el teu centre referent.</p>
+          {!(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) && <span className="text-[10px] font-black uppercase text-blue-500 mt-4 block">Disponible a la Fase 2</span>}
         </div>
       </div>
     </DashboardLayout>
