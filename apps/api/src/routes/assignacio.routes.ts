@@ -10,4 +10,9 @@ router.patch('/checklist/:idItem', authenticateToken, assignacioController.updat
 router.get('/incidencies/centre/:idCentre', authenticateToken, assignacioController.getIncidenciesByCentre);
 router.post('/incidencies', authenticateToken, assignacioController.createIncidencia);
 
+// Phase 3: Sessions & Attendance
+router.get('/:idAssignacio/sessions', authenticateToken, assignacioController.getSessions);
+router.get('/:idAssignacio/sessions/:sessionNum', authenticateToken, assignacioController.getSessionAttendance);
+router.post('/:idAssignacio/sessions/:sessionNum', authenticateToken, assignacioController.registerAttendance);
+
 export default router;

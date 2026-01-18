@@ -1,6 +1,8 @@
 import prisma from '../lib/prisma';
 import { Request, Response } from 'express';
 import { AssignmentChecklistSchema } from '@iter/shared';
+import { SessionService } from '../services/session.service';
+import { EstatAssistencia } from '@prisma/client';
 
 // GET: Listar asignaciones de un centro
 export const getAssignacionsByCentre = async (req: Request, res: Response) => {
@@ -90,5 +92,119 @@ export const createIncidencia = async (req: Request, res: Response) => {
     res.status(201).json(nuevaIncidencia);
   } catch (error) {
     res.status(500).json({ error: 'Error al crear incidencia' });
+  }
+};
+
+// ==========================================
+// PHASE 3: SESSIONS & ATTENDANCE
+// ==========================================
+
+// GET: Obtain calculated sessions for an assignment
+export const getSessions = async (req: Request, res: Response) => {
+  const { idAssignacio } = req.params;
+  try {
+    const assignacio = await prisma.assignacio.findUnique({
+      where: { id_assignacio: parseInt(idAssignacio as string) }
+    });
+
+    if (!assignacio || !assignacio.data_inici) {
+      return res.status(404).json({ error: 'Asignación no encontrada o sin fecha de inicio' });
+    }
+
+    const dates = SessionService.generateSessionDates(new Date(assignacio.data_inici));
+
+    // Map to simple structure with status
+    const sessions = await Promise.all(dates.map(async (date, index) => {
+      const sessionNum = index + 1;
+      const status = await SessionService.getSessionStatus(assignacio.id_assignacio, sessionNum);
+      return {
+        sessionNum,
+        date,
+        status
+      };
+    }));
+
+    res.json(sessions);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al calcular sesiones' });
+  }
+};
+
+// GET: Get attendees for a specific session
+export const getSessionAttendance = async (req: Request, res: Response) => {
+  const { idAssignacio, sessionNum } = req.params;
+  const sNum = parseInt(sessionNum as string);
+  const idAss = parseInt(idAssignacio as string);
+
+  try {
+    // 1. Ensure date correctness (re-calculate to be safe)
+    const assignacio = await prisma.assignacio.findUnique({
+      where: { id_assignacio: idAss }
+    });
+
+    if (!assignacio || !assignacio.data_inici) {
+      return res.status(404).json({ error: 'Asignación inválida' });
+    }
+
+    const dates = SessionService.generateSessionDates(new Date(assignacio.data_inici));
+    const sessionDate = dates[sNum - 1];
+
+    if (!sessionDate) {
+      return res.status(400).json({ error: 'Número de sesión inválido' });
+    }
+
+    // 2. Ensure records exist (Lazy initialization)
+    await SessionService.ensureAttendanceRecords(idAss, sNum, sessionDate);
+
+    // 3. Fetch records with student info
+    const attendance = await prisma.assistencia.findMany({
+      where: {
+        inscripcio: { id_assignacio: idAss },
+        numero_sessio: sNum
+      },
+      include: {
+        inscripcio: {
+          include: { alumne: true }
+        }
+      },
+      orderBy: { inscripcio: { alumne: { cognoms: 'asc' } } }
+    });
+
+    res.json(attendance);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener asistencia' });
+  }
+};
+
+// POST: Update attendance for a session
+export const registerAttendance = async (req: Request, res: Response) => {
+  const { idAssignacio, sessionNum } = req.params;
+  const { attendanceData } = req.body; // Array of { id_assistencia, estat, observacions }
+
+  if (!Array.isArray(attendanceData)) {
+    return res.status(400).json({ error: 'Formato de datos inválido' });
+  }
+
+  try {
+    // Bulk update approach using transaction or Promise.all
+    // Prisma doesn't support bulk update with different values easily yet, so loop is okay for small classroom sizes
+    await prisma.$transaction(
+      attendanceData.map((item: any) =>
+        prisma.assistencia.update({
+          where: { id_assistencia: item.id_assistencia },
+          data: {
+            estat: item.estat as EstatAssistencia,
+            observacions: item.observacions
+          }
+        })
+      )
+    );
+
+    res.json({ success: true, count: attendanceData.length });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al guardar asistencia' });
   }
 };
