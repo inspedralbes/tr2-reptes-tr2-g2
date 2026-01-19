@@ -29,7 +29,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="animate-in fade-in slide-in-from-left duration-500">
               {title && (
-                <h2 className="text-4xl font-black text-gray-900 tracking-tight" style={{ fontFamily: THEME.fonts.primary }}>
+                <h2 className="text-4xl font-bold text-consorci-darkBlue tracking-tight" style={{ fontFamily: THEME.fonts.primary }}>
                   {title}
                 </h2>
               )}

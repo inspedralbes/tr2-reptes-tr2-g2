@@ -55,7 +55,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
   ];
 
   return (
-    <nav className="shadow-sm border-b sticky top-0 z-50 transition-all" style={{ backgroundColor: THEME.colors.primary, borderColor: THEME.colors.primary }}>
+    <nav className="border-b sticky top-0 z-50 transition-all" style={{ backgroundColor: THEME.colors.primary, borderColor: THEME.colors.primary }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-4">
@@ -64,8 +64,8 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
               href={getInicioPath()} 
               className="flex items-center gap-4 hover:opacity-80 transition-opacity group"
             >
-              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-110">
-                <span className="text-blue-900 font-black text-xs">E</span>
+              <div className="w-8 h-8 bg-white flex items-center justify-center transition-transform group-hover:scale-110">
+                <span className="text-blue-900 font-bold text-xs">E</span>
               </div>
               <h1 className="text-xl font-bold text-white tracking-tight">{title}</h1>
             </Link>
@@ -73,7 +73,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
             <nav className="ml-8 hidden md:flex items-center space-x-4">
               <Link 
                 href={isAdmin ? '/admin' : '/centro'} 
-                className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/admin' || pathname === '/centro' ? 'text-white bg-white/10' : ''}`}
+                className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 hover:bg-white/10 ${pathname === '/admin' || pathname === '/centro' ? 'text-white bg-white/10' : ''}`}
               >
                 Inicio
               </Link>
@@ -97,8 +97,8 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
                   Avisos
                   {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 text-[8px] font-black items-center justify-center text-white">
+                      <span className="animate-ping absolute inline-flex h-full w-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex h-4 w-4 bg-red-500 text-[8px] font-black items-center justify-center text-white">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     </span>
@@ -118,7 +118,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
             
             <button
               onClick={logout}
-              className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all border border-white/20 backdrop-blur-sm active:scale-95"
+              className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all border border-white/20 backdrop-blur-sm active:scale-95"
             >
               Cerrar Sesión
             </button>

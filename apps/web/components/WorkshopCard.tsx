@@ -14,7 +14,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ item, onPress }) => {
   return (
     <button
       onClick={onPress}
-      className="mb-6 border border-gray-300 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+      className="mb-6 border border-gray-300 overflow-hidden cursor-pointer transition-colors hover:border-consorci-lightBlue"
     >
       <div className="h-48 w-full bg-gray-200 relative">
         <img 
