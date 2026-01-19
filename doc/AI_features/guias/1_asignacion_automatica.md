@@ -2,6 +2,14 @@
 
 Esta guía detalla paso a paso cómo implementar el motor de asignación automática de alumnos a talleres (Modalidad C), garantizando la heterogeneidad y el cumplimiento de restricciones.
 
+## Workflow Simplificado (Lógica "Slots First")
+El sistema sigue estos pasos lógicos:
+1.  **Cálculo de Plazas**: Si hay 50 alumnos apuntados a un taller, el sistema calcula cuántos grupos de 16 se necesitan (50/16 = 4 grupos).
+2.  **Creación de "Cubos"**: Se generan 4 grupos vacíos (Group ID 1, 2, 3, 4).
+3.  **Distribución**: El algoritmo toma alumno por alumno y busca el mejor "cubo" donde encajarlo, respetando que no haya más de 4 del mismo instituto en ese cubo.
+
+---
+
 ## 1. Modificación de Base de Datos (Prisma)
 
 **Archivo**: `apps/api/prisma/schema.prisma`
