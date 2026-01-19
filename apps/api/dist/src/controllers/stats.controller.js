@@ -1,6 +1,9 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOccupancyByZone = exports.bookWorkshopPlace = exports.cleanupLogs = exports.addChecklistStep = exports.queryByStep = exports.getAdvancedSearch = exports.getRecentActivity = exports.getPopularWorkshops = exports.getStatsByStatus = void 0;
+exports.runRiskAnalysis = exports.getOccupancyByZone = exports.bookWorkshopPlace = exports.cleanupLogs = exports.addChecklistStep = exports.queryByStep = exports.getAdvancedSearch = exports.getRecentActivity = exports.getPopularWorkshops = exports.getStatsByStatus = void 0;
 const mongodb_1 = require("../lib/mongodb");
 /**
  * GET /stats/peticions-by-status
@@ -248,3 +251,36 @@ const getOccupancyByZone = async (req, res) => {
     }
 };
 exports.getOccupancyByZone = getOccupancyByZone;
+// POST: Ejecutar análisis de riesgo de abandono
+const risk_analysis_service_1 = require("../services/risk-analysis.service");
+const prisma_1 = __importDefault(require("../lib/prisma")); // Import prisma for this function
+const runRiskAnalysis = async (req, res) => {
+    try {
+        const { studentId } = req.body;
+        const service = new risk_analysis_service_1.RiskAnalysisService();
+        if (studentId) {
+            // Analyze single student
+            const result = await service.analyzeStudentRisk(parseInt(studentId));
+            return res.json({ processed: 1, results: [result] });
+        }
+        else {
+            // Analyze all active students (or those in Phase 3/Execution)
+            // For now, let's just analyze all who have attendance records to avoid scanning thousands
+            const studentsWithAttendance = await prisma_1.default.assistencia.findMany({
+                select: { inscripcio: { select: { id_alumne: true } } },
+                distinct: ['id_inscripcio']
+            });
+            const uniqueIds = [...new Set(studentsWithAttendance.map((a) => a.inscripcio.id_alumne))];
+            const results = [];
+            for (const id of uniqueIds) {
+                results.push(await service.analyzeStudentRisk(Number(id)));
+            }
+            res.json({ processed: results.length, active_risks: results.filter(r => r.riskLevel === 'CRITICAL' || r.riskLevel === 'HIGH') });
+        }
+    }
+    catch (error) {
+        console.error("Error in risk analysis:", error);
+        res.status(500).json({ error: 'Error al ejecutar análisis de riesgo' });
+    }
+};
+exports.runRiskAnalysis = runRiskAnalysis;

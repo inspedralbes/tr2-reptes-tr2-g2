@@ -90,7 +90,44 @@ export const createIncidencia = async (req: Request, res: Response) => {
     });
     res.status(201).json(nuevaIncidencia);
   } catch (error) {
-    res.status(500).json({ error: 'Error al crear incidencia' });
+    res.status(500).json({ error: 'Error al ejecutar análisis de riesgo' });
+  }
+};
+
+// POST: Validar subida de documento (Vision AI)
+import { VisionService } from '../services/vision.service';
+
+export const validateDocumentUpload = async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se ha subido ningún archivo.' });
+    }
+
+    const visionService = new VisionService();
+    const validation = await visionService.validateDocument(req.file);
+
+    if (!validation.valid) {
+      // Rechazar subida
+      return res.status(400).json({
+        error: 'Documento rechazado por la IA.',
+        details: validation.errors,
+        metadata: validation.metadata
+      });
+    }
+
+    // Si es válido, aquí iría la lógica para guardar en S3/Disco
+    // const s3Url = await uploadToS3(req.file);
+
+    res.json({
+      success: true,
+      message: 'Documento validado y aceptado correctamente.',
+      metadata: validation.metadata
+      // url: s3Url
+    });
+
+  } catch (error) {
+    console.error("Error en validación de documento:", error);
+    res.status(500).json({ error: 'Error al procesar el documento.' });
   }
 };
 

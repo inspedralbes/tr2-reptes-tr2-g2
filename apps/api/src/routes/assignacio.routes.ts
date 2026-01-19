@@ -22,5 +22,6 @@ router.post('/auto-generate', authenticateToken, assignacioController.generateAu
 router.post('/tetris', authenticateToken, tetrisController.triggerTetris);
 router.post('/:idAssignacio/enrollment/excel', authenticateToken, upload.single('file'), enrollmentController.enrollStudentsViaExcel);
 router.patch('/checklist/designate-profs/:idAssignacio', authenticateToken, assignacioController.designateProfessors);
+router.post('/upload/validate', authenticateToken, upload.single('file'), assignacioController.validateDocumentUpload);
 
 export default router;
