@@ -56,25 +56,7 @@ export default function CalendarPage() {
       subtitle="Visualitza totes les fites, tallers i terminis en un sol lloc."
     >
       <div className="max-w-6xl mx-auto space-y-6">
-        {activeFase && (
-          <div className="bg-gray-50 border border-gray-200 p-6 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-consorci-darkBlue flex items-center justify-center text-white">
-                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Fase Actual del Programa</p>
-                <h3 className="text-xl font-bold text-consorci-darkBlue">{activeFase.nom}</h3>
-              </div>
-            </div>
-            <div className="hidden md:block text-right">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Termini de la Fase</p>
-              <p className="font-bold text-sm text-consorci-darkBlue">
-                {new Date(activeFase.data_inici).toLocaleDateString()} — {new Date(activeFase.data_fi).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-        )}
+
 
         {loading ? (
           <div className="py-20 text-center">
@@ -91,7 +73,7 @@ export default function CalendarPage() {
             </div>
             
             <div className="space-y-6">
-              <div className="bg-white p-8 border border-gray-200">
+              <div className="bg-white border border-gray-200">
                 <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-8">Llegenda</h3>
                 <div className="space-y-5">
                   <div className="flex items-center gap-4 group cursor-default">

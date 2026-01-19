@@ -67,7 +67,7 @@ export default function LoginPage() {
           <div className="w-16 h-16 bg-gray-50 border border-gray-200 flex items-center justify-center mx-auto mb-4">
              <span className="text-consorci-darkBlue font-bold text-2xl">E</span>
           </div>
-          <h2 className="text-3xl font-black tracking-tight" style={{ color: THEME.colors.primary, fontFamily: THEME.fonts.primary }}>Programa Iter</h2>
+          <h2 className="text-3xl font-black tracking-tight" style={{ color: THEME.colors.primary, fontFamily: THEME.fonts.primary }}>Iter</h2>
           <p className="text-gray-400 font-medium mt-2">Gestió de tallers i centres</p>
         </div>
         

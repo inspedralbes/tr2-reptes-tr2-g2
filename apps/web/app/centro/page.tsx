@@ -68,7 +68,7 @@ export default function CentroDashboard() {
   return (
     <DashboardLayout 
       title={`Panell de Centre: ${user.centre?.nom || 'Educatiu'}`}
-      subtitle="Procés de gestió de tallers del Programa Iter."
+      subtitle="Procés de gestió de tallers d'Iter."
       actions={headerActions}
     >
       {/* Timeline Secció Compacta */}

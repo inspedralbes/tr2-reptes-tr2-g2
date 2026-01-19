@@ -11,7 +11,7 @@ interface NavbarProps {
   title?: string;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
+const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const [unreadCount, setUnreadCount] = useState(0);
@@ -47,6 +47,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
 
   const navLinks = [
     { label: 'Inicio', path: getInicioPath(), show: true },
+    { label: 'Avisos', path: '/centro/avisos', show: isCoordinator || isAdmin, isAvisos: true },
     { label: 'Talleres', path: '/admin/talleres', show: isAdmin },
     { label: 'Centros', path: '/admin/centros', show: isAdmin },
     { label: 'Calendari', path: '/calendar', show: true },
@@ -60,42 +61,22 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-4">
             {/* Logo placeholder or icon */}
-            <Link 
-              href={getInicioPath()} 
-              className="flex items-center gap-4 hover:opacity-80 transition-opacity group"
-            >
-              <div className="w-8 h-8 bg-white flex items-center justify-center transition-transform group-hover:scale-110">
-                <span className="text-blue-900 font-bold text-xs">E</span>
+            <div className="flex items-center gap-4">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <img src="/logo-invers.png" alt="Iter Logo" className="w-full h-full object-contain" />
               </div>
               <h1 className="text-xl font-bold text-white tracking-tight">{title}</h1>
-            </Link>
+            </div>
 
-            <nav className="ml-8 hidden md:flex items-center space-x-4">
-              <Link 
-                href={isAdmin ? '/admin' : '/centro'} 
-                className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 hover:bg-white/10 ${pathname === '/admin' || pathname === '/centro' ? 'text-white bg-white/10' : ''}`}
-              >
-                Inicio
-              </Link>
-              <Link 
-                href="/calendar" 
-                className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/calendar' ? 'text-white bg-white/10' : ''}`}
-              >
-                Calendari
-              </Link>
-              <Link 
-                href="/perfil" 
-                className={`text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/perfil' ? 'text-white bg-white/10' : ''}`}
-              >
-                Perfil
-              </Link>
-              {isCoordinator && (
+            <nav className="ml-8 hidden xl:flex items-center space-x-2">
+              {navLinks.filter(link => link.show).map((link) => (
                 <Link 
-                  href="/centro/avisos" 
-                  className={`relative text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-white/10 ${pathname === '/centro/avisos' ? 'text-white bg-white/10' : ''}`}
+                  key={link.path}
+                  href={link.path} 
+                  className={`relative text-white/70 hover:text-white font-bold text-sm transition-colors px-3 py-2 hover:bg-white/10 ${pathname === link.path ? 'text-white bg-white/10' : ''}`}
                 >
-                  Avisos
-                  {unreadCount > 0 && (
+                  {link.label}
+                  {link.isAvisos && unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 flex h-4 w-4">
                       <span className="animate-ping absolute inline-flex h-full w-full bg-red-400 opacity-75"></span>
                       <span className="relative inline-flex h-4 w-4 bg-red-500 text-[8px] font-black items-center justify-center text-white">
@@ -104,7 +85,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Programa Iter' }) => {
                     </span>
                   )}
                 </Link>
-              )}
+              ))}
             </nav>
           </div>
           

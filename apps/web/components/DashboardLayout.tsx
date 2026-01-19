@@ -27,7 +27,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         
         {(title || actions) && (
           <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="animate-in fade-in slide-in-from-left duration-500">
+            <div>
               {title && (
                 <h2 className="text-4xl font-bold text-consorci-darkBlue tracking-tight" style={{ fontFamily: THEME.fonts.primary }}>
                   {title}
@@ -37,14 +37,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             </div>
             
             {actions && (
-              <div className="flex items-center gap-3 animate-in fade-in slide-in-from-right duration-500">
+              <div className="flex items-center gap-3">
                 {actions}
               </div>
             )}
           </header>
         )}
         
-        <div className="animate-in fade-in duration-700">
+        <div>
           {children}
         </div>
       </main>
@@ -52,7 +52,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       <footer className="py-8 border-t bg-white/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">
-            © {new Date().getFullYear()} Programa Iter • Consorci d'Educació de Barcelona
+            © {new Date().getFullYear()} Iter • Consorci d'Educació de Barcelona
           </p>
         </div>
       </footer>

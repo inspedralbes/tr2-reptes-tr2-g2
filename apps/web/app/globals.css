@@ -22,9 +22,6 @@
 * {
   border-radius: 0 !important;
   box-shadow: none !important;
-  transition:
-    transform 0.2s ease,
-    opacity 0.2s ease !important; /* Keep subtle transitions but no animations that feel "flashy" */
 }
 
 body {
