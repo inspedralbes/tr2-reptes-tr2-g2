@@ -165,6 +165,8 @@ model Assignacio {
   checklist    ChecklistAssignacio[]
   inscripcions Inscripcio[]
   respostes    RespostesQuestionari[]
+  enquestes    Enquesta[]
+  certificats  Certificat[]
 
   @@index([data_inici, data_fi])
   @@map("assignacions")
@@ -214,6 +216,7 @@ model Alumne {
 
   inscripcions Inscripcio[]
   peticions    Peticio[]    @relation("AlumnesPeticio")
+  certificats  Certificat[]
 
   @@map("alumnes")
 }
@@ -370,4 +373,30 @@ model calendariEvent {
   tipus      String // milestone, deadline, assignment
 
   @@map("calendari_events")
+}
+
+model Enquesta {
+  id_enquesta    String      @id @default(uuid())
+  id_assignacio  Int
+  assignacio     Assignacio  @relation(fields: [id_assignacio], references: [id_assignacio])
+  destinatari    Destinatari
+  token          String      @unique
+  completa       Boolean     @default(false)
+  data_creacio   DateTime    @default(now())
+  data_completat DateTime?
+
+  @@map("enquestes")
+}
+
+model Certificat {
+  id_certificat String     @id @default(uuid())
+  id_alumne     Int
+  alumne        Alumne     @relation(fields: [id_alumne], references: [id_alumne])
+  id_assignacio Int
+  assignacio    Assignacio @relation(fields: [id_assignacio], references: [id_assignacio])
+  data_emissio  DateTime   @default(now())
+  url_pdf       String?
+
+  @@unique([id_alumne, id_assignacio])
+  @@map("certificats")
 }

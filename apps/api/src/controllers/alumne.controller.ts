@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 
 export const getAlumnes = async (req: Request, res: Response) => {
   const { centreId, role } = (req as any).user || {};
-  
+
   try {
     const where: any = {};
     if (role === 'COORDINADOR' && centreId) {
@@ -38,10 +38,14 @@ export const createAlumne = async (req: Request, res: Response) => {
 
 export const updateAlumne = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const { nom, cognoms, curs, id_centre_procedencia, idalu } = req.body;
   try {
     const alumne = await prisma.alumne.update({
-      where: { id_alumne: parseInt(id) },
-      data: req.body
+      where: { id_alumne: parseInt(id as string) },
+      data: {
+        nom, cognoms, curs, idalu,
+        id_centre_procedencia: id_centre_procedencia ? parseInt(id_centre_procedencia as string) : undefined
+      }
     });
     res.json(alumne);
   } catch (error) {
@@ -53,7 +57,7 @@ export const deleteAlumne = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     await prisma.alumne.delete({
-      where: { id_alumne: parseInt(id) }
+      where: { id_alumne: parseInt(id as string) }
     });
     res.json({ message: 'Alumno eliminado' });
   } catch (error) {

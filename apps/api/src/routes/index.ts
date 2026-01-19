@@ -13,6 +13,8 @@ import calendarRoutes from './calendar.routes';
 import faseRoutes from './fase.routes';
 import statsRoutes from './stats.routes';
 import sectorRoutes from './sector.routes';
+import enquestaRoutes from './enquesta.routes';
+import certificatRoutes from './certificat.routes';
 
 // --- Definir las rutas base ---
 
@@ -38,6 +40,10 @@ router.use('/fases', faseRoutes);
 
 // Rutas de Estadísticas (MongoDB)
 router.use('/stats', statsRoutes);
+
+// Phase 4
+router.use('/enquestes', enquestaRoutes);
+router.use('/certificats', certificatRoutes);
 
 // Health Check (Para ver si la API respira)
 router.get('/health', (req, res) => {

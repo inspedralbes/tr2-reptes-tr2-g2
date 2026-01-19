@@ -15,4 +15,7 @@ router.get('/:idAssignacio/sessions', authenticateToken, assignacioController.ge
 router.get('/:idAssignacio/sessions/:sessionNum', authenticateToken, assignacioController.getSessionAttendance);
 router.post('/:idAssignacio/sessions/:sessionNum', authenticateToken, assignacioController.registerAttendance);
 
+// Phase 4: Closing
+router.post('/:idAssignacio/close', authenticateToken, assignacioController.closeAssignacio);
+
 export default router;
