@@ -8,7 +8,7 @@ import { connectToDatabase } from '../lib/mongodb';
 export const getStatsByStatus = async (req: Request, res: Response) => {
   try {
     const { db } = await connectToDatabase();
-    
+
     const stats = await db.collection('request_checklists').aggregate([
       // En un caso real podríamos filtrar por fecha con $match
       {
@@ -44,7 +44,7 @@ export const getStatsByStatus = async (req: Request, res: Response) => {
 export const getPopularWorkshops = async (req: Request, res: Response) => {
   try {
     const { db } = await connectToDatabase();
-    
+
     const stats = await db.collection('activity_logs').aggregate([
       {
         $match: { tipus_accio: 'CREATE_PETICIO' }
@@ -77,14 +77,14 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
 export const getRecentActivity = async (req: Request, res: Response) => {
   try {
     const { db } = await connectToDatabase();
-    
+
     // Buscar actividades que tengan una modalidad específica en el objeto imbricado 'detalls'
     const activity = await db.collection('activity_logs').find({
       "detalls.alumnes_aprox": { $gt: 0 }
     })
-    .sort({ timestamp: -1 })
-    .limit(10)
-    .toArray();
+      .sort({ timestamp: -1 })
+      .limit(10)
+      .toArray();
 
     res.json(activity);
   } catch (error) {
@@ -131,7 +131,7 @@ export const getAdvancedSearch = async (req: Request, res: Response) => {
 export const queryByStep = async (req: Request, res: Response) => {
   try {
     const { db } = await connectToDatabase();
-    
+
     // Buscar checklists que tengan un paso específico completado
     const results = await db.collection('request_checklists').find({
       passos: {
@@ -157,9 +157,9 @@ export const addChecklistStep = async (req: Request, res: Response) => {
 
     const result = await db.collection('request_checklists').updateOne(
       { id_peticio: parseInt(id as string) },
-      { 
-        $push: { 
-          passos: { pas: pas_nom, completat: false, data: new Date() } 
+      {
+        $push: {
+          passos: { pas: pas_nom, completat: false, data: new Date() }
         } as any,
         $set: { last_modified: new Date() }
       }
@@ -178,7 +178,7 @@ export const addChecklistStep = async (req: Request, res: Response) => {
 export const cleanupLogs = async (req: Request, res: Response) => {
   try {
     const { db } = await connectToDatabase();
-    
+
     // Primero verificamos cuántos hay (verificación previa)
     const countBefore = await db.collection('activity_logs').countDocuments({
       timestamp: { $lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } // Más viejos de 30 días
@@ -192,8 +192,8 @@ export const cleanupLogs = async (req: Request, res: Response) => {
       timestamp: { $lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
     });
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       deletedCount: result.deletedCount,
       message: `Se han limpiado ${result.deletedCount} logs antiguos.`
     });
@@ -213,11 +213,11 @@ export const bookWorkshopPlace = async (req: Request, res: Response) => {
 
     // Actualización atómica con verificación: solo si hay plazas disponibles
     const result = await db.collection('workshop_metadata').updateOne(
-      { 
+      {
         id_taller: parseInt(id as string),
         $expr: { $lt: ["$places_ocupades", "$places_totals"] } // Evita race condition
       },
-      { 
+      {
         $inc: { places_ocupades: 1 } // Operación atómica
       }
     );
@@ -239,7 +239,7 @@ export const bookWorkshopPlace = async (req: Request, res: Response) => {
 export const getOccupancyByZone = async (req: Request, res: Response) => {
   try {
     const { db } = await connectToDatabase();
-    
+
     const stats = await db.collection('workshop_metadata').aggregate([
       {
         $group: {
@@ -251,8 +251,8 @@ export const getOccupancyByZone = async (req: Request, res: Response) => {
       {
         $project: {
           zona: "$_id",
-          percentatge_ocupacio: { 
-            $multiply: [ { $divide: ["$total_ocupades", "$total_places"] }, 100 ] 
+          percentatge_ocupacio: {
+            $multiply: [{ $divide: ["$total_ocupades", "$total_places"] }, 100]
           },
           _id: 0
         }
@@ -263,5 +263,42 @@ export const getOccupancyByZone = async (req: Request, res: Response) => {
     res.json(stats);
   } catch (error) {
     res.status(500).json({ error: 'Error al calcular ocupació per zones' });
+  }
+};
+
+// POST: Ejecutar análisis de riesgo de abandono
+import { RiskAnalysisService } from '../services/risk-analysis.service';
+import prisma from '../lib/prisma'; // Import prisma for this function
+
+export const runRiskAnalysis = async (req: Request, res: Response) => {
+  try {
+    const { studentId } = req.body;
+    const service = new RiskAnalysisService();
+
+    if (studentId) {
+      // Analyze single student
+      const result = await service.analyzeStudentRisk(parseInt(studentId));
+      return res.json({ processed: 1, results: [result] });
+    } else {
+      // Analyze all active students (or those in Phase 3/Execution)
+      // For now, let's just analyze all who have attendance records to avoid scanning thousands
+      const studentsWithAttendance = await prisma.assistencia.findMany({
+        select: { inscripcio: { select: { id_alumne: true } } },
+        distinct: ['id_inscripcio']
+      });
+
+      const uniqueIds = [...new Set(studentsWithAttendance.map((a: any) => a.inscripcio.id_alumne))];
+
+      const results = [];
+      for (const id of uniqueIds) {
+        results.push(await service.analyzeStudentRisk(Number(id)));
+      }
+
+      res.json({ processed: results.length, active_risks: results.filter(r => r.riskLevel === 'CRITICAL' || r.riskLevel === 'HIGH') });
+    }
+
+  } catch (error) {
+    console.error("Error in risk analysis:", error);
+    res.status(500).json({ error: 'Error al ejecutar análisis de riesgo' });
   }
 };

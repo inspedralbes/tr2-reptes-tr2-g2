@@ -10,5 +10,6 @@ router.get('/search', statsController.getAdvancedSearch);
 router.get('/query-step', statsController.queryByStep);
 router.patch('/checklist/:id/step', statsController.addChecklistStep);
 router.delete('/logs/cleanup', statsController.cleanupLogs);
+router.post('/risk-analysis', statsController.runRiskAnalysis);
 
 export default router;
