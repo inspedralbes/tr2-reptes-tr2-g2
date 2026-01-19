@@ -15,6 +15,7 @@ import statsRoutes from './stats.routes';
 import sectorRoutes from './sector.routes';
 import assistenciaRoutes from './assistencia.routes';
 import notificacioRoutes from './notificacio.routes';
+import evaluationRoutes from './evaluation.routes'; // Importar rutas de evaluación
 
 // --- Definir las rutas base ---
 
@@ -30,6 +31,7 @@ router.use('/sectors', sectorRoutes);
 router.use('/peticions', peticioRoutes);
 router.use('/assignacions', assignacioRoutes);
 router.use('/notificacions', notificacioRoutes);
+router.use('/evaluation', evaluationRoutes); // Usar rutas de evaluación
 
 // Rutas de Alumnos y Profesores
 router.use('/alumnes', alumneRoutes);
