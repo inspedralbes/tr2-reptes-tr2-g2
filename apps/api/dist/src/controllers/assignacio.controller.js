@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateAutomaticAssignments = exports.designateProfessors = exports.createInscripcions = exports.createAssignacioFromPeticio = exports.createIncidencia = exports.getIncidenciesByCentre = exports.updateChecklistItem = exports.getChecklist = exports.getAssignacionsByCentre = void 0;
+exports.generateAutomaticAssignments = exports.designateProfessors = exports.createInscripcions = exports.createAssignacioFromPeticio = exports.validateDocumentUpload = exports.createIncidencia = exports.getIncidenciesByCentre = exports.updateChecklistItem = exports.getChecklist = exports.getAssignacionsByCentre = void 0;
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const shared_1 = require("@iter/shared");
 // GET: Listar asignaciones de un centro
@@ -95,10 +95,42 @@ const createIncidencia = async (req, res) => {
         res.status(201).json(nuevaIncidencia);
     }
     catch (error) {
-        res.status(500).json({ error: 'Error al crear incidencia' });
+        res.status(500).json({ error: 'Error al ejecutar análisis de riesgo' });
     }
 };
 exports.createIncidencia = createIncidencia;
+// POST: Validar subida de documento (Vision AI)
+const vision_service_1 = require("../services/vision.service");
+const validateDocumentUpload = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No se ha subido ningún archivo.' });
+        }
+        const visionService = new vision_service_1.VisionService();
+        const validation = await visionService.validateDocument(req.file);
+        if (!validation.valid) {
+            // Rechazar subida
+            return res.status(400).json({
+                error: 'Documento rechazado por la IA.',
+                details: validation.errors,
+                metadata: validation.metadata
+            });
+        }
+        // Si es válido, aquí iría la lógica para guardar en S3/Disco
+        // const s3Url = await uploadToS3(req.file);
+        res.json({
+            success: true,
+            message: 'Documento validado y aceptado correctamente.',
+            metadata: validation.metadata
+            // url: s3Url
+        });
+    }
+    catch (error) {
+        console.error("Error en validación de documento:", error);
+        res.status(500).json({ error: 'Error al procesar el documento.' });
+    }
+};
+exports.validateDocumentUpload = validateDocumentUpload;
 // POST: Crear Asignación desde Petición (Admin Only)
 const createAssignacioFromPeticio = async (req, res) => {
     const { idPeticio } = req.body;

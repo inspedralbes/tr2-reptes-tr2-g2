@@ -27,14 +27,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const statsController = __importStar(require("../controllers/stats.controller"));
 const router = express_1.default.Router();
-router.get('/status', statsController.getStatsByStatus);
-router.get('/popular', statsController.getPopularWorkshops);
-router.get('/activity', statsController.getRecentActivity);
-router.get('/search', statsController.getAdvancedSearch);
-router.get('/query-step', statsController.queryByStep);
-router.patch('/checklist/:id/step', statsController.addChecklistStep);
-router.delete('/logs/cleanup', statsController.cleanupLogs);
-router.post('/risk-analysis', statsController.runRiskAnalysis);
+const evaluationController = __importStar(require("../controllers/evaluation.controller"));
+const authMiddleware_1 = require("../middlewares/authMiddleware");
+router.post('/voice-process', authMiddleware_1.authenticateToken, evaluationController.processVoiceEvaluation);
 exports.default = router;

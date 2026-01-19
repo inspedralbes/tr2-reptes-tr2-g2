@@ -19,6 +19,7 @@ const stats_routes_1 = __importDefault(require("./stats.routes"));
 const sector_routes_1 = __importDefault(require("./sector.routes"));
 const assistencia_routes_1 = __importDefault(require("./assistencia.routes"));
 const notificacio_routes_1 = __importDefault(require("./notificacio.routes"));
+const evaluation_routes_1 = __importDefault(require("./evaluation.routes")); // Importar rutas de evaluación
 // --- Definir las rutas base ---
 // Rutas de Autenticación (Login, Registro)
 router.use('/auth', auth_routes_1.default);
@@ -30,6 +31,7 @@ router.use('/sectors', sector_routes_1.default);
 router.use('/peticions', peticio_routes_1.default);
 router.use('/assignacions', assignacio_routes_1.default);
 router.use('/notificacions', notificacio_routes_1.default);
+router.use('/evaluation', evaluation_routes_1.default); // Usar rutas de evaluación
 // Rutas de Alumnos y Profesores
 router.use('/alumnes', alumne_routes_1.default);
 router.use('/professors', professor_routes_1.default);
