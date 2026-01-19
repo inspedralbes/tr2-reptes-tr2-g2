@@ -173,7 +173,9 @@ export const createInscripcions = async (req: Request, res: Response) => {
     // 1. Crear las inscripciones
     const inscripcions = await Promise.all(
       ids_alumnes.map((idAlumne: number) =>
+      ids_alumnes.map((idAlumne: number) =>
         prisma.inscripcio.upsert({
+          where: {
           where: {
             // Necesitaríamos una clave única para inscripciones si quisiéramos upsert real,
             // pero como no hay, usaremos create o simplemente borraremos las anteriores
@@ -245,6 +247,23 @@ export const designateProfessors = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error al designar profesores:", error);
     res.status(500).json({ error: 'Error al designar profesores.' });
+  }
+};
+
+// POST: Generar Asignaciones Automáticas (AI)
+import { AutoAssignmentService } from '../services/auto-assignment.service';
+
+export const generateAutomaticAssignments = async (req: Request, res: Response) => {
+  const { role } = (req as any).user;
+  // if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
+
+  try {
+    const service = new AutoAssignmentService();
+    const result = await service.generateAssignments();
+    res.json(result);
+  } catch (error) {
+    console.error("Error en asignación automática:", error);
+    res.status(500).json({ error: 'Error al ejecutar el motor de asignación.' });
   }
 };
 

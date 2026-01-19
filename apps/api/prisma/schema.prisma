@@ -141,7 +141,7 @@ model Peticio {
   ids_alumnes Int[]
   alumnes     Alumne[] @relation("AlumnesPeticio")
 
-  assignacio Assignacio?
+  assignacions Assignacio[]
 
   @@index([estat])
   @@map("peticions")
@@ -155,7 +155,7 @@ enum EstatPeticio {
 
 model Assignacio {
   id_assignacio Int             @id @default(autoincrement())
-  id_peticio    Int?            @unique
+  id_peticio    Int?
   peticio       Peticio?        @relation(fields: [id_peticio], references: [id_peticio])
   id_centre     Int
   centre        Centre          @relation(fields: [id_centre], references: [id_centre])
@@ -164,6 +164,7 @@ model Assignacio {
   data_inici    DateTime?       @db.Date
   data_fi       DateTime?       @db.Date
   estat         EstatAssignacio @default(En_curs)
+  grup          Int             @default(1)
 
   prof1_id Int?
   prof1    Professor? @relation("AssigProf1", fields: [prof1_id], references: [id_professor])

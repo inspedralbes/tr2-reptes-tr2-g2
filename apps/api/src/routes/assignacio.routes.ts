@@ -16,6 +16,7 @@ router.get('/incidencies/centre/:idCentre', authenticateToken, assignacioControl
 router.post('/incidencies', authenticateToken, assignacioController.createIncidencia);
 router.post('/', authenticateToken, assignacioController.createAssignacioFromPeticio);
 router.post('/:idAssignacio/inscripcions', authenticateToken, assignacioController.createInscripcions);
+router.post('/auto-generate', authenticateToken, assignacioController.generateAutomaticAssignments);
 
 // Phase 2 Specifics
 router.post('/tetris', authenticateToken, tetrisController.triggerTetris);
