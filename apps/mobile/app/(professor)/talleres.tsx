@@ -1,66 +1,49 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, Linking, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, Linking, Platform, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { THEME } from '@iter/shared';
+import { getMyAssignments } from '../../services/api';
 
 export default function AgendaScreen() {
   const router = useRouter();
+  const [assignments, setAssignments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const workshops = [
-    {
-      id: 1,
-      title: 'Taller de Robótica Avanzada',
-      place: 'Carrer de la Llacuna, 162, 08018 Barcelona',
-      schedule: '09:00 - 13:00',
-      date: 'LUNES, 19 ENE',
-      lat: 41.4036,
-      lng: 2.1937,
-    },
-    {
-      id: 2,
-      title: 'Impresión 3D y Prototipado',
-      place: 'Gran Via de les Corts Catalanes, 585, 08007 Barcelona',
-      schedule: '15:00 - 18:00',
-      date: 'MIÉRCOLES, 21 ENE',
-      lat: 41.3871,
-      lng: 2.1641,
-    },
-    {
-      id: 3,
-      title: 'Electrónica Modular',
-      place: 'Avinguda Diagonal, 647, 08028 Barcelona',
-      schedule: '08:30 - 12:30',
-      date: 'VIERNES, 23 ENE',
-      lat: 41.3843,
-      lng: 2.1186,
-    },
-  ];
+  useEffect(() => {
+    getMyAssignments()
+      .then(res => setAssignments(res.data))
+      .catch(err => console.error("Error fetching assignments:", err))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const openMaps = (item) => {
+  const openMaps = (item: any) => {
+    if (!item?.centre?.adreca) return;
     const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
-    const latLng = `${item.lat},${item.lng}`;
-    const label = item.title;
+    const label = item.taller.titol;
     const url = Platform.select({
-      ios: `${scheme}${label}@${latLng}`,
-      android: `${scheme}${latLng}(${label})`
+      ios: `${scheme}${label}@${item.centre.adreca}`,
+      android: `${scheme}0,0?q=${item.centre.adreca}(${label})`
     });
 
     if (url) Linking.openURL(url);
   };
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: { item: any }) => (
     <View className="bg-white p-6 border-b-4 border-gray-100 mb-6">
       <View className="flex-row justify-between items-center mb-4">
-        <Text className="text-[10px] font-black text-secondary uppercase tracking-[2px]">{item.date}</Text>
+        <Text className="text-[10px] font-black text-secondary uppercase tracking-[2px]">
+          {new Date(item.data_inici).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+        </Text>
         <View className="w-1 h-6 bg-secondary" />
       </View>
       
-      <Text className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-tight">{item.title}</Text>
+      <Text className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-tight">{item.taller.titol}</Text>
+      <Text className="text-gray-500 font-bold mb-4 text-[11px] uppercase tracking-wider">{item.centre.nom}</Text>
       
       <View className="flex-row items-center mb-4">
         <Ionicons name="time-outline" size={14} color="#6B7280" />
-        <Text className="text-gray-500 font-bold ml-3 text-[10px] uppercase tracking-wider">{item.schedule}</Text>
+        <Text className="text-gray-500 font-bold ml-3 text-[10px] uppercase tracking-wider">09:00 - 13:00</Text>
       </View>
 
       <TouchableOpacity 
@@ -69,19 +52,19 @@ export default function AgendaScreen() {
       >
         <Ionicons name="location-outline" size={16} color={THEME.colors.secondary} />
         <Text className="text-gray-900 font-bold ml-3 flex-1 text-xs" numberOfLines={1}>
-          {item.place}
+          {item.centre.adreca || 'Sin dirección registrada'}
         </Text>
       </TouchableOpacity>
 
       <View className="flex-row space-x-3">
         <TouchableOpacity 
-          onPress={() => router.push(`/sesion/${item.id}`)}
+          onPress={() => router.push(`/(professor)/sesion/${item.id_assignacio}`)}
           className="flex-1 bg-primary py-4 items-center"
         >
           <Text className="text-white font-black text-[10px] uppercase tracking-widest">Asistencia</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          onPress={() => router.push(`/evaluacion/${item.id}`)}
+          onPress={() => router.push(`/(professor)/evaluacion/${item.id_assignacio}`)}
           className="flex-1 border-2 border-primary py-4 items-center"
         >
           <Text className="text-primary font-black text-[10px] uppercase tracking-widest">Evaluar</Text>
@@ -90,13 +73,26 @@ export default function AgendaScreen() {
     </View>
   );
 
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color={THEME.colors.primary} />
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1 bg-white">
       <FlatList
-        data={workshops}
+        data={assignments}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id_assignacio.toString()}
         contentContainerStyle={{ paddingBottom: 40 }}
+        ListEmptyComponent={() => (
+          <View className="p-10 items-center">
+            <Text className="text-gray-400 font-bold uppercase tracking-widest text-center">No tienes talleres asignados</Text>
+          </View>
+        )}
         ListHeaderComponent={() => (
           <View className="p-6 pt-10 mb-2">
             <View className="flex-row items-center mb-4">
