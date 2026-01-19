@@ -83,3 +83,19 @@ router.post('/auto-generate', authenticateToken, assignacioController.generateAu
 Para ejecutar la asignación automática, enviar una petición POST:
 -   **URL**: `/api/assignacions/auto-generate`
 -   **Header**: `Authorization: Bearer <token>`
+
+---
+
+## Preguntas sobre el Funcionamiento
+
+### 1. ¿Qué IA utiliza?
+Utiliza una **IA Simbólica de Optimización** (Constraint Satisfaction Problem). No es una "red neuronal" tipo ChatGPT, sino un algoritmo matemático (Randomized Greedy) que evalúa miles de combinaciones para cumplir reglas estrictas (máximo 16 alumnos, mezcla de centros).
+
+### 2. ¿Es automático o hay un botón?
+Funciona **con un botón**. La asignación se hace **bajo demanda** cuando el administrador lo decide (ej. al cerrar inscripciones). Esto permite tener todos los datos para equilibrar los grupos perfectamente.
+
+### 3. ¿Cómo verificar que funciona?
+En el panel de control, al ver la lista de alumnos del taller:
+-   Verificarás que están asignados a "Grupo 1", "Grupo 2", etc.
+-   Ningún grupo superará los **16 alumnos**.
+-   Verás **mezcla de institutos** en cada grupo (no más de 4 del mismo centro).
