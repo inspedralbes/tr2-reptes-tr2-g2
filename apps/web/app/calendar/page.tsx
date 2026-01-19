@@ -73,7 +73,7 @@ export default function CalendarPage() {
             </div>
             
             <div className="space-y-6">
-              <div className="bg-white border border-gray-200">
+              <div className="bg-white p-8 border border-gray-200">
                 <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-8">Llegenda</h3>
                 <div className="space-y-5">
                   <div className="flex items-center gap-4 group cursor-default">
