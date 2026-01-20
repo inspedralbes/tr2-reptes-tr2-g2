@@ -25,21 +25,14 @@ export default function AgendaScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-white">
+      <View className="flex-1 justify-center items-center bg-[#F9FAFB]">
         <ActivityIndicator size="large" color={THEME.colors.primary} />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="px-6 pt-10 pb-4">
-        <View className="flex-row items-center">
-          <View className="w-8 h-2 bg-primary mr-3" />
-          <Text className="text-3xl font-black text-gray-900 tracking-tighter uppercase">TU AGENDA</Text>
-        </View>
-      </View>
+    <View className="flex-1 bg-[#F9FAFB] pt-4">
 
       <CalendarView 
         events={calendarEvents} 

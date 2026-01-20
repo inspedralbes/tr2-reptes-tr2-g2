@@ -89,7 +89,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-[#F9FAFB]">
       {/* Header */}
       <View className="flex-row items-center justify-between px-6 py-4 border-b border-gray-100">
         <Text className="text-xl font-black text-gray-900 uppercase tracking-tighter">
@@ -165,12 +165,21 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
           dayEvents.map(event => (
             <View 
               key={event.id}
-              className="mb-6 bg-white border-2 border-gray-900 p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.05)]"
+              className="mb-6 bg-white border border-gray-200 p-6"
             >
-              <View className="flex-row justify-between items-start mb-4">
-                <Text className="flex-1 text-lg font-black text-gray-900 uppercase tracking-tight mr-2">{event.title}</Text>
-                <View className="px-2 py-1" style={{ backgroundColor: getEventColor(event.type) }}>
-                  <Text className="text-[8px] font-black text-white uppercase tracking-widest">{event.type === 'assignment' ? 'Taller' : event.type}</Text>
+              <View className="flex-row items-center mb-6">
+                <View className={`p-3 mr-4 ${event.type === 'assignment' ? 'bg-blue-50' : event.type === 'milestone' ? 'bg-indigo-50' : 'bg-red-50'}`}>
+                  <Ionicons 
+                    name={event.type === 'assignment' ? 'hardware-chip' : event.type === 'milestone' ? 'flag' : 'alert-circle'} 
+                    size={20} 
+                    color={event.type === 'assignment' ? '#3B82F6' : event.type === 'milestone' ? '#6366F1' : '#EF4444'} 
+                  />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-lg font-bold text-gray-900 leading-tight uppercase tracking-tight">{event.title}</Text>
+                  <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">
+                    {event.type === 'assignment' ? 'Taller' : event.type === 'milestone' ? 'Milla' : 'Límit'}
+                  </Text>
                 </View>
               </View>
 
@@ -196,15 +205,15 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
                   <View className="flex-row space-x-3">
                     <TouchableOpacity 
                       onPress={() => router.push(`/(professor)/sesion/${event.metadata.id_assignacio}`)}
-                      className="flex-1 bg-primary py-4 items-center"
+                      className="flex-1 bg-primary py-3 items-center"
                     >
-                      <Text className="text-white font-black text-[10px] uppercase tracking-widest">Assistència</Text>
+                      <Text className="text-white font-bold text-xs uppercase tracking-wider">Assistència</Text>
                     </TouchableOpacity>
                     <TouchableOpacity 
                       onPress={() => router.push(`/(professor)/evaluacion/${event.metadata.id_assignacio}`)}
-                      className="flex-1 border-2 border-primary py-4 items-center"
+                      className="flex-1 border border-primary py-3 items-center"
                     >
-                      <Text className="text-primary font-black text-[10px] uppercase tracking-widest">Avaluar</Text>
+                      <Text className="text-primary font-bold text-xs uppercase tracking-wider">Avaluar</Text>
                     </TouchableOpacity>
                   </View>
                 </View>

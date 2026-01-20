@@ -65,35 +65,31 @@ export default function PerfilScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-white" showsVerticalScrollIndicator={false}>
-      <View className="p-6 pt-10 border-b-2 border-gray-900">
-        <View className="flex-row items-center mb-6">
-          <View className="w-8 h-2 bg-primary mr-3" />
-          <Text className="text-2xl font-black uppercase tracking-tight">EL MEU COMPTE</Text>
-        </View>
-      </View>
+    <ScrollView className="flex-1 bg-[#F9FAFB] pt-4" showsVerticalScrollIndicator={false}>
 
       <View className="p-6 pt-10">
         {/* User Info Section */}
-        <View className="bg-gray-50 p-8 border-2 border-gray-900 mb-10 flex-row items-center">
-          <View className="w-20 h-20 bg-primary items-center justify-center mr-8">
-            <Text className="text-3xl font-black text-white">{getUserInitials()}</Text>
+        <View className="bg-white p-8 border border-gray-200 mb-10 flex-row items-center">
+          <View className="w-20 h-20 bg-blue-50 items-center justify-center mr-8 border border-blue-100">
+            <Text className="text-3xl font-bold text-[#3B82F6]">{getUserInitials()}</Text>
           </View>
           <View className="flex-1">
-            <Text className="text-2xl font-black text-gray-900 uppercase tracking-tighter">{user?.nom_complet || 'Usuario'}</Text>
-            <Text className="text-primary font-black text-[10px] uppercase tracking-[2px] mt-2">{user?.role === 'PROFESSOR' ? 'Professor' : 'Administrador'}</Text>
-            <Text className="text-gray-500 font-bold text-[9px] uppercase tracking-widest mt-1">Connectat a Iter</Text>
+            <Text className="text-2xl font-bold text-gray-900 tracking-tight">{user?.nom_complet || 'Usuari'}</Text>
+            <Text className="text-primary font-bold text-xs mt-1 uppercase tracking-wider">{user?.role === 'PROFESSOR' ? 'Professor' : 'Administrador'}</Text>
+            <Text className="text-gray-400 font-medium text-[10px] mt-1">Connectat a Iter</Text>
           </View>
         </View>
 
         {/* Settings Section */}
-        <Text className="text-sm font-black text-gray-900 uppercase tracking-[2px] mb-6">CONFIGURACIÓ</Text>
+        <Text className="text-sm font-bold text-gray-800 uppercase tracking-wider mb-6">Configuració</Text>
         
-        <View className="bg-white border-2 border-gray-900 mb-6">
+        <View className="bg-white border border-gray-200 mb-6">
           <View className="p-6 flex-row justify-between items-center border-b border-gray-100">
             <View className="flex-row items-center">
-              <Ionicons name="notifications-outline" size={20} color="black" />
-              <Text className="ml-4 font-black text-xs uppercase tracking-widest text-gray-900">Notificacions Push</Text>
+              <View className="bg-gray-50 p-2 mr-4">
+                <Ionicons name="notifications-outline" size={18} color="#64748B" />
+              </View>
+              <Text className="font-bold text-xs text-gray-700">Notificacions Push</Text>
             </View>
             <Switch 
               value={notifications}
@@ -105,27 +101,34 @@ export default function PerfilScreen() {
           
           <TouchableOpacity className="p-6 flex-row justify-between items-center border-b border-gray-100">
             <View className="flex-row items-center">
-              <Ionicons name="lock-closed-outline" size={20} color="black" />
-              <Text className="ml-4 font-black text-xs uppercase tracking-widest text-gray-900">Canviar Contrasenya</Text>
+              <View className="bg-gray-50 p-2 mr-4">
+                <Ionicons name="lock-closed-outline" size={18} color="#64748B" />
+              </View>
+              <Text className="font-bold text-xs text-gray-700">Canviar Contrasenya</Text>
             </View>
-            <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
+            <Ionicons name="chevron-forward" size={16} color="#CBD5E1" />
           </TouchableOpacity>
 
-          <TouchableOpacity className="p-6 flex-row justify-between items-center">
+          <TouchableOpacity className="p-6 flex-row justify-between items-center border-b border-gray-100">
             <View className="flex-row items-center">
-              <Ionicons name="help-circle-outline" size={20} color="black" />
-              <Text className="ml-4 font-black text-xs uppercase tracking-widest text-gray-900">Centre d'Ajuda</Text>
+              <View className="bg-gray-50 p-2 mr-4">
+                <Ionicons name="help-circle-outline" size={18} color="#64748B" />
+              </View>
+              <Text className="font-bold text-xs text-gray-700">Centre d'Ajuda</Text>
             </View>
-            <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
+            <Ionicons name="chevron-forward" size={16} color="#CBD5E1" />
+          </TouchableOpacity>
+
+            <TouchableOpacity onPress={handleLogout} className="p-6 flex-row justify-between items-center">
+            <View className="flex-row items-center">
+              <View className="bg-red-50 p-2 mr-4">
+                <Ionicons name="log-out-outline" size={18} color="#EF4444" />
+              </View>
+              <Text className="font-bold text-xs text-red-500">Tancar Sessió</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color="#FEE2E2" />
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity 
-          onPress={handleLogout}
-          className="bg-accent py-5 items-center mt-10 active:opacity-80 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.1)]"
-        >
-          <Text className="text-white font-black text-sm uppercase tracking-[3px]">TANCAR SESSIÓ</Text>
-        </TouchableOpacity>
 
         <View className="mt-12 items-center">
           <Text className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Iter App v1.0.0</Text>
