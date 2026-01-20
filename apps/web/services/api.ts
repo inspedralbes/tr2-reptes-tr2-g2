@@ -1,36 +1,71 @@
 import axios, { AxiosInstance } from 'axios';
 
-let apiInstance: AxiosInstance | null = null;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const getApi = (): AxiosInstance => {
-  if (!apiInstance) {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    if (!API_URL) {
-      throw new Error('La variable de entorno NEXT_PUBLIC_API_URL no está definida.');
+if (!API_URL) {
+  console.warn('⚠️ NEXT_PUBLIC_API_URL is not defined. API calls might fail.');
+}
+
+// Create a singleton instance
+const apiInstance: AxiosInstance = axios.create({
+  baseURL: API_URL,
+  timeout: 15000, // Slightly longer timeout
+  headers: {
+    'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
+  },
+});
+
+// Request Interceptor: Inject Token
+apiInstance.interceptors.request.use(
+  (config) => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
-    apiInstance = axios.create({
-      baseURL: API_URL,
-      timeout: 10000,
-      headers: {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
-      },
-    });
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-    apiInstance.interceptors.request.use(
-      async (config) => {
-        if (typeof window !== 'undefined') {
-          const token = localStorage.getItem('token');
-          if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-          }
+// Response Interceptor: Handle 401 and Redirect
+apiInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error.response ? error.response.status : null;
+
+    if (status === 401) {
+      console.error('[AUTH-API] 401 Unauthorized detected. Redirecting to login...');
+
+      if (typeof window !== 'undefined') {
+        // Clear local session
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+
+        // Prevent redirect loops
+        if (!window.location.pathname.includes('/login')) {
+          // Hard redirect using replace to clear history and avoid back-button issues
+          console.log('[AUTH-API] Triggering window.location.replace(/login)');
+          window.location.replace('/login');
+
+          // Fallback forced redirect
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 200);
         }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
+      }
+    }
+
+    return Promise.reject(error);
   }
-  return apiInstance;
-};
+);
+
+/**
+ * Returns the global API instance.
+ * For context-specific hooks, use AuthContext instead.
+ */
+const getApi = (): AxiosInstance => apiInstance;
 
 export default getApi;
