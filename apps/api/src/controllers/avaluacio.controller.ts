@@ -6,7 +6,7 @@ const avaluacioService = new AvaluacioService();
 export const getAvaluacioInscripcio = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-        const avaluacio = await avaluacioService.getAvaluacioByInscripcio(parseInt(id as string));
+        const avaluacio = await avaluacioService.getAvaluacioInscripcio(parseInt(id as string));
         if (!avaluacio) {
             return res.status(404).json({ error: 'Evaluación no encontrada' });
         }
@@ -18,7 +18,7 @@ export const getAvaluacioInscripcio = async (req: Request, res: Response) => {
 
 export const upsetAvaluacioDocent = async (req: Request, res: Response) => {
     try {
-        const result = await avaluacioService.upsetAvaluacioDocent(req.body);
+        const result = await avaluacioService.upsertAvaluacio(req.body);
         res.json(result);
     } catch (error) {
         console.error(error);
