@@ -1,0 +1,102 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export class AvaluacioService {
+    /**
+     * Obtiene la evaluación docente de una inscripción específica.
+     */
+    async getAvaluacioInscripcio(id_inscripcio: number) {
+        return await prisma.avaluacioDocent.findUnique({
+            where: { id_inscripcio },
+            include: {
+                competencies: {
+                    include: {
+                        competencia: true,
+                    },
+                },
+            },
+        });
+    }
+
+    /**
+     * Crea o actualiza una evaluación docente.
+     */
+    async upsertAvaluacio(data: {
+        id_inscripcio: number;
+        percentatge_asistencia: number;
+        numero_retards: number;
+        observacions?: string;
+        competencies: { id_competencia: number; puntuacio: number }[];
+    }) {
+        // 1. Crear o actualizar la evaluación docente principal
+        const avaluacioDocent = await prisma.avaluacioDocent.upsert({
+            where: { id_inscripcio: data.id_inscripcio },
+            update: {
+                percentatge_asistencia: data.percentatge_asistencia,
+                numero_retards: data.numero_retards,
+                observacions: data.observacions,
+            },
+            create: {
+                id_inscripcio: data.id_inscripcio,
+                percentatge_asistencia: data.percentatge_asistencia,
+                numero_retards: data.numero_retards,
+                observacions: data.observacions,
+            },
+        });
+
+        // 2. Eliminar competencias previas si existen (para re-crearlas)
+        await prisma.avaluacioCompetencial.deleteMany({
+            where: { id_avaluacio_docent: avaluacioDocent.id_avaluacio_docent },
+        });
+
+        // 3. Crear las nuevas puntuaciones de competencias
+        const competenciesCreated = await prisma.avaluacioCompetencial.createMany({
+            data: data.competencies.map((c) => ({
+                id_avaluacio_docent: avaluacioDocent.id_avaluacio_docent,
+                id_competencia: c.id_competencia,
+                puntuacio: c.puntuacio,
+            })),
+        });
+
+        return { ...avaluacioDocent, competenciesCount: competenciesCreated.count };
+    }
+
+    /**
+     * MOCK AI: Simula el análisis de Speech-to-Text y sentimientos/puntuaciones.
+     * En una versión real, esto llamaría a OpenAI o un servicio similar.
+     */
+    async analyzeObservationsAI(text: string) {
+        console.log('Analyzing observations with AI (Mock):', text);
+
+        // Simulación de delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Lógica de mock: busca palabras clave para sugerir puntuaciones
+        const keywordsPositive = ['bueno', 'excelente', 'bien', 'disciplinado', 'responsable', 'proactivo'];
+        const keywordsNegative = ['mal', 'falta', 'atención', 'distraído', 'pasivo'];
+
+        let scoreSuggestion = 3; // Suficiente por defecto
+
+        const words = text.toLowerCase().split(/\s+/);
+        const positiveCount = words.filter(w => keywordsPositive.includes(w)).length;
+        const negativeCount = words.filter(w => keywordsNegative.includes(w)).length;
+
+        if (positiveCount > negativeCount) scoreSuggestion = 4 + (positiveCount > 3 ? 1 : 0);
+        if (negativeCount > positiveCount) scoreSuggestion = 2 - (negativeCount > 3 ? 1 : 0);
+
+        return {
+            transcription: text,
+            sentiment: positiveCount >= negativeCount ? 'Positive' : 'Negative',
+            suggestedScore: Math.max(1, Math.min(5, scoreSuggestion)),
+            summary: `Análisis automático: El alumno muestra una actitud ${positiveCount >= negativeCount ? 'favorable' : 'a mejorar'}.`
+        };
+    }
+
+    /**
+     * Obtiene todas las competencias disponibles en el sistema.
+     */
+    async getCompetencies() {
+        return await prisma.competencia.findMany();
+    }
+}

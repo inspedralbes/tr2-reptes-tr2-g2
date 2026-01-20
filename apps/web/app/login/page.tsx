@@ -164,9 +164,6 @@ export default function LoginPage() {
           </form>
         )}
       </div>
-      <div className="fixed bottom-8 text-center w-full">
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.4em]">Iter • Consorci d'Educació de Barcelona</p>
-      </div>
     </div>
   );
 }
