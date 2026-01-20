@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
-import { THEME } from '@iter/shared';
+import { THEME, PHASES } from '@iter/shared';
+import getApi from '@/services/api';
 
 export default function AssignacionsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [assignacions, setAssignacions] = useState<any[]>([]);
+  const [fases, setFases] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,20 +22,27 @@ export default function AssignacionsPage() {
 
     // Fetch asignaciones
     if (currentUser.id_centre) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignacions/centre/${currentUser.id_centre}`, {
-        headers: { 'ngrok-skip-browser-warning': 'true' }
-      })
-        .then(res => res.json())
-        .then(setAssignacions);
+      const api = getApi();
+
+      api.get(`/assignacions/centre/${currentUser.id_centre}`)
+        .then(res => setAssignacions(res.data));
+
+      api.get("/fases")
+        .then(res => setFases(res.data.data));
     }
   }, []);
+
+  const isPhaseActive = (nomFase: string) => {
+    const fase = fases.find(f => f.nom === nomFase);
+    return fase ? fase.activa : false;
+  };
 
   if (!user) return null;
 
   return (
     <div className="min-h-screen p-8" style={{ backgroundColor: THEME.colors.background }}>
       <div className="max-w-6xl mx-auto">
-        <button 
+        <button
           onClick={() => router.push('/centro')}
           className="mb-6 text-sm flex items-center gap-2 hover:underline"
           style={{ color: THEME.colors.primary }}
@@ -59,9 +68,8 @@ export default function AssignacionsPage() {
                     <span className="text-xs font-bold uppercase tracking-wider text-blue-500 mb-1 block">Taller Iter</span>
                     <h3 className="text-xl font-bold">{a.taller?.titol}</h3>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    a.estat === 'En curs' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
-                  }`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${a.estat === 'En curs' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
+                    }`}>
                     {a.estat}
                   </span>
                 </div>
@@ -81,64 +89,93 @@ export default function AssignacionsPage() {
                   </div>
                 </div>
 
-                <div className="border-t pt-4">
+                <div className="border-t pt-4 mb-4">
                   <h4 className="text-sm font-bold mb-3 uppercase tracking-tight text-gray-400">Progreso de Validación</h4>
                   <div className="space-y-2">
                     {a.checklist?.map((item: any) => (
                       <div key={item.id_checklist} className="flex items-center gap-3 text-sm">
-                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          item.completat ? 'bg-green-500 border-green-500' : 'bg-white border-gray-300'
-                        }`}>
-                          {item.completat && <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>}
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${item.completat ? 'bg-green-500 border-green-500' : 'bg-white border-gray-300'
+                          }`}>
+                          {item.completat && <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" /></svg>}
                         </div>
                         <span className={item.completat ? 'text-gray-400 line-through' : 'text-gray-700'}>{item.pas_nom}</span>
                       </div>
                     ))}
                   </div>
                 </div>
+
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  <button
+                    onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push(`/centro/assignacions/${a.id_assignacio}/profesores`)}
+                    disabled={!isPhaseActive(PHASES.PLANIFICACION)}
+                    className={`py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${isPhaseActive(PHASES.PLANIFICACION)
+                        ? 'border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white'
+                        : 'border-gray-200 text-gray-300 cursor-not-allowed'
+                      }`}
+                  >
+                    Designar Professors
+                  </button>
+                  <button
+                    onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push(`/centro/assignacions/${a.id_assignacio}/alumnos`)}
+                    disabled={!isPhaseActive(PHASES.PLANIFICACION)}
+                    className={`py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${isPhaseActive(PHASES.PLANIFICACION)
+                        ? 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
+                        : 'border-gray-200 text-gray-300 cursor-not-allowed'
+                      }`}
+                  >
+                    Registro Nominal
+                  </button>
+                </div>
+                <div className="mt-3">
+                  <button
+                    onClick={() => (isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) ? router.push(`/centro/assignacions/${a.id_assignacio}/evaluacions`) : alert('Documentació encara no disponible')}
+                    className={`w-full py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${(isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE))
+                        ? 'border-accent text-accent hover:bg-accent hover:text-white'
+                        : 'border-gray-100 text-gray-300'
+                      }`}
+                  >
+                    {(isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) ? 'Avaluar Alumnes' : 'Consultar Documentació'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Sección de Incidencias */}
-        <section className="mt-16 bg-white p-8 rounded-xl shadow-sm border border-red-50">
-          <h3 className="text-xl font-bold text-red-800 mb-4">Gestión de Incidencias y Vacantes</h3>
-          <p className="text-sm text-gray-600 mb-6">
-            Durante el mes de noviembre, puedes reportar incidencias o solicitar plazas vacantes a través de este formulario.
-          </p>
-          
-          <div className="flex gap-4">
-            <input 
-              id="incidencia-input"
-              type="text" 
-              placeholder="Describe el problema o la vacante detectada..." 
-              className="flex-1 p-3 border rounded-lg text-sm"
-            />
-            <button 
-              onClick={async () => {
-                const input = document.getElementById('incidencia-input') as HTMLInputElement;
-                if (!input.value) return;
-                await fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignacions/incidencies`, {
-                  method: 'POST',
-                  headers: { 
-                    'Content-Type': 'application/json',
-                    'ngrok-skip-browser-warning': 'true'
-                  },
-                  body: JSON.stringify({
+        {/* Sección de Incidencias (Solo disponible en Fase 3) */}
+        {isPhaseActive(PHASES.EJECUCION) && (
+          <section className="mt-16 bg-white p-8 border-2 border-red-600 shadow-[8px_8px_0px_0px_rgba(242,97,120,0.1)]">
+            <h3 className="text-xl font-black text-gray-900 mb-4 uppercase tracking-tighter">Gestión de Incidencias y Vacantes</h3>
+            <p className="text-xs font-bold text-gray-500 mb-6 uppercase tracking-widest">
+              REPORTAR PROBLEMES DE COMPORTAMENT O SOL·LICITAR PLACES VACANTS.
+            </p>
+
+            <div className="flex gap-4">
+              <input
+                id="incidencia-input"
+                type="text"
+                placeholder="Descriu el problema..."
+                className="flex-1 p-4 border-2 border-gray-100 text-sm font-bold focus:border-red-600 outline-none transition-all"
+              />
+              <button
+                onClick={async () => {
+                  const input = document.getElementById('incidencia-input') as HTMLInputElement;
+                  if (!input.value) return;
+                  const api = getApi();
+                  await api.post('/assignacions/incidencies', {
                     id_centre: user.id_centre,
                     descripcio: input.value
-                  })
-                });
-                input.value = '';
-                alert('Incidencia reportada. El CEB la revisará próximamente.');
-              }}
-              className="px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition"
-            >
-              Reportar
-            </button>
-          </div>
-        </section>
+                  });
+                  input.value = '';
+                  alert('Incidència reportada. El CEB la revisarà properament.');
+                }}
+                className="px-8 py-4 bg-red-600 text-white font-black uppercase text-xs tracking-widest hover:bg-red-700 transition"
+              >
+                Reportar
+              </button>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

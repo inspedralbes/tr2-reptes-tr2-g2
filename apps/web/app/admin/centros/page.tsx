@@ -107,7 +107,7 @@ export default function CentrosScreen() {
   return (
     <DashboardLayout 
       title="Gestión de Centros" 
-      subtitle="Administración de centros educativos participantes en el Programa Iter."
+      subtitle="Administración de centros educativos participantes en Iter."
       actions={headerActions}
     >
       {/* Buscador */}

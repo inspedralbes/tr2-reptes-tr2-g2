@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const uri = process.env.MONGODB_URI || '';
-const dbName = process.env.MONGODB_DB_NAME || 'enginy_db';
+const dbName = process.env.MONGODB_DB_NAME || 'iter_db';
 
 if (!uri || uri.includes('<db_password>')) {
   console.warn('⚠️ MONGODB_URI no configurada: Debes poner tu contraseña en apps/api/.env');

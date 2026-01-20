@@ -12,6 +12,17 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        action: "var(--action)",
+        consorci: {
+          darkBlue: "#00426B",
+          lightBlue: "#4197CB",
+          actionBlue: "#0775AB",
+          lightGray: "#CFD2D3",
+          pinkRed: "#F26178",
+          beige: "#E0C5AC",
+          bgGray: "#F2F2F3",
+          secondaryBg: "#EAEFF2",
+        },
       },
     },
   },

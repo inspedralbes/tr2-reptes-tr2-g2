@@ -111,7 +111,7 @@ export default function TallerScreen() {
   return (
     <DashboardLayout 
       title="Gestión de Talleres" 
-      subtitle="Creación, edición y supervisión del catálogo oficial del Programa Iter."
+      subtitle="Creación, edición y supervisión del catálogo oficial de Iter."
       actions={headerActions}
     >
       {/* Buscador */}

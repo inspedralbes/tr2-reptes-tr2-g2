@@ -3,15 +3,18 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME } from '@iter/shared';
+import { THEME, ESTADOS_PETICION, PHASES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import tallerService, { Taller } from '@/services/tallerService';
 import peticioService, { Peticio } from '@/services/peticioService';
+import assignacioService from '@/services/assignacioService';
+import api from '@/services/api';
 
 export default function AdminSolicitudesPage() {
   const { user, loading: authLoading } = useAuth();
   const [tallers, setTallers] = useState<Taller[]>([]);
   const [peticions, setPeticions] = useState<Peticio[]>([]);
+  const [fases, setFases] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,12 +29,15 @@ export default function AdminSolicitudesPage() {
     if (user) {
       const fetchData = async () => {
         try {
-          const [fetchedTallers, fetchedPeticions] = await Promise.all([
+          const apiInstance = api();
+          const [fetchedTallers, fetchedPeticions, fetchedFases] = await Promise.all([
             tallerService.getAll(),
-            peticioService.getAll()
+            peticioService.getAll(),
+            apiInstance.get('/fases')
           ]);
           setTallers(fetchedTallers);
           setPeticions(fetchedPeticions);
+          setFases(fetchedFases.data.data);
         } catch (err) {
           console.error(err);
           setError('No se pudieron cargar las solicitudes.');
@@ -42,6 +48,52 @@ export default function AdminSolicitudesPage() {
       fetchData();
     }
   }, [user, authLoading, router]);
+
+  const handleApprove = async (idPeticio: number) => {
+    if (!confirm('¿Seguro que quieres aprobar esta solicitud y generar la asignación?')) return;
+    try {
+      await peticioService.updateStatus(idPeticio, ESTADOS_PETICION.ACEPTADA);
+      await assignacioService.createFromPeticio(idPeticio);
+      // Refresh data
+      const updatedPeticions = await peticioService.getAll();
+      setPeticions(updatedPeticions);
+      alert('Solicitud aprovada i assignació generada.');
+    } catch (err) {
+      alert('Error en el procés d\'aprovació.');
+    }
+  };
+
+  const handleReject = async (idPeticio: number) => {
+    if (!confirm('¿Seguro que quieres rechazar esta solicitud?')) return;
+    try {
+      await peticioService.updateStatus(idPeticio, ESTADOS_PETICION.RECHAZADA);
+      const updatedPeticions = await peticioService.getAll();
+      setPeticions(updatedPeticions);
+    } catch (err) {
+      alert('Error al rebutjar la sol·licitud.');
+    }
+  };
+  
+  const handleRunTetris = async () => {
+    if (!confirm('Esta acción procesará todas las solicitudes aprobadas pendientes y generará asignaciones automáticamente respetando capacidades. ¿Continuar?')) return;
+    setLoading(true);
+    try {
+      const result = await assignacioService.runTetris();
+      alert(`Asignación completada: ${result.assignmentsCreated} nuevas asignaciones.\n\nEstadísticas:\n- Peticiones procesadas: ${result.stats.assignedPetitions}/${result.stats.totalPetitions}\n- Alumnos asignados: ${result.stats.assignedStudents}/${result.stats.totalStudents}`);
+      // Refresh data
+      const updatedPeticions = await peticioService.getAll();
+      setPeticions(updatedPeticions);
+    } catch (err: any) {
+      alert('Error al ejecutar Tetris: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isPhaseActive = (nomFase: string) => {
+    const fase = fases.find(f => f.nom === nomFase);
+    return fase ? fase.activa : false;
+  };
 
   const workshopRequests = useMemo(() => {
     const map: Record<number, Peticio[]> = {};
@@ -91,9 +143,20 @@ export default function AdminSolicitudesPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Peticiones:</span>
-          <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-black">{peticions.length}</span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Peticiones:</span>
+            <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-black">{peticions.length}</span>
+          </div>
+          <button 
+            onClick={handleRunTetris}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-purple-200 flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            Asignación Automática (Tetris)
+          </button>
         </div>
       </div>
 
@@ -160,13 +223,22 @@ export default function AdminSolicitudesPage() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Alumnos ({p.alumnes_aprox})</label>
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Alumnes ({p.alumnes_aprox})</label>
                           <div className="flex flex-wrap gap-2">
-                            {(p as any).alumnes?.map((a: any) => (
-                              <span key={a.id_alumne} className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold">
-                                {a.nom} {a.cognoms}
-                              </span>
-                            )) || <span className="text-gray-300 italic text-xs">Sin alumnos asignados</span>}
+                            {isPhaseActive(PHASES.SOLICITUD) ? (
+                              <div className="flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg border border-blue-100">
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="text-[10px] font-black uppercase tracking-tight">Identitats disponibles a la Fase 2</span>
+                              </div>
+                            ) : (
+                              (p as any).alumnes?.map((a: any) => (
+                                <span key={a.id_alumne} className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold">
+                                  {a.nom} {a.cognoms}
+                                </span>
+                              )) || <span className="text-gray-300 italic text-xs">Sense alumnes assignats</span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -184,6 +256,23 @@ export default function AdminSolicitudesPage() {
                         }`}>
                           {p.estat}
                         </div>
+                        
+                        {p.estat === 'Pendent' && (
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => handleApprove(p.id_peticio)}
+                              className="px-3 py-1 bg-green-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-green-700 transition"
+                            >
+                              Aprobar
+                            </button>
+                            <button 
+                              onClick={() => handleReject(p.id_peticio)}
+                              className="px-3 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition"
+                            >
+                              Rechazar
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

@@ -13,8 +13,10 @@ import calendarRoutes from './calendar.routes';
 import faseRoutes from './fase.routes';
 import statsRoutes from './stats.routes';
 import sectorRoutes from './sector.routes';
-import enquestaRoutes from './enquesta.routes';
-import certificatRoutes from './certificat.routes';
+import assistenciaRoutes from './assistencia.routes';
+import notificacioRoutes from './notificacio.routes';
+import avaluacioRoutes from './avaluacio.routes';
+import questionariRoutes from './questionari.routes';
 
 // --- Definir las rutas base ---
 
@@ -29,10 +31,12 @@ router.use('/sectors', sectorRoutes);
 // Rutas del Flujo de Negocio (Solicitudes y Asignaciones)
 router.use('/peticions', peticioRoutes);
 router.use('/assignacions', assignacioRoutes);
+router.use('/notificacions', notificacioRoutes);
 
 // Rutas de Alumnos y Profesores
 router.use('/alumnes', alumneRoutes);
 router.use('/professors', professorRoutes);
+router.use('/assistencia', assistenciaRoutes);
 
 // Rutas de Calendario
 router.use('/calendar', calendarRoutes);
@@ -41,9 +45,9 @@ router.use('/fases', faseRoutes);
 // Rutas de Estadísticas (MongoDB)
 router.use('/stats', statsRoutes);
 
-// Phase 4
-router.use('/enquestes', enquestaRoutes);
-router.use('/certificats', certificatRoutes);
+// Rutas de Evaluación y Cuestionarios
+router.use('/evaluacions', avaluacioRoutes);
+router.use('/questionaris', questionariRoutes);
 
 // Health Check (Para ver si la API respira)
 router.get('/health', (req, res) => {

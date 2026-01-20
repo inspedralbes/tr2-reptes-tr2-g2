@@ -1,8 +1,7 @@
 import prisma from '../lib/prisma';
 import { Request, Response } from 'express';
-import { AssignmentChecklistSchema } from '@iter/shared';
-import { SessionService } from '../services/session.service';
-import { EstatAssistencia } from '@prisma/client';
+import { AssignmentChecklistSchema, ROLES } from '@iter/shared';
+import { isPhaseActive, PHASES } from '../lib/phaseUtils';
 
 // GET: Listar asignaciones de un centro
 export const getAssignacionsByCentre = async (req: Request, res: Response) => {
@@ -13,6 +12,12 @@ export const getAssignacionsByCentre = async (req: Request, res: Response) => {
       include: {
         taller: true,
         checklist: true,
+        inscripcions: {
+          include: {
+            alumne: true,
+            avaluacio_docent: true
+          }
+        },
         peticio: {
           include: {
             centre: true
@@ -95,161 +100,150 @@ export const createIncidencia = async (req: Request, res: Response) => {
   }
 };
 
-// ==========================================
-// PHASE 3: SESSIONS & ATTENDANCE
-// ==========================================
+// POST: Crear Asignación desde Petición (Admin Only)
+export const createAssignacioFromPeticio = async (req: Request, res: Response) => {
+  const { idPeticio } = req.body;
+  const { role } = (req as any).user;
 
-// GET: Obtain calculated sessions for an assignment
-export const getSessions = async (req: Request, res: Response) => {
-  const { idAssignacio } = req.params;
-  try {
-    const assignacio = await prisma.assignacio.findUnique({
-      where: { id_assignacio: parseInt(idAssignacio as string) }
-    });
-
-    if (!assignacio || !assignacio.data_inici) {
-      return res.status(404).json({ error: 'Asignación no encontrada o sin fecha de inicio' });
-    }
-
-    const dates = SessionService.generateSessionDates(new Date(assignacio.data_inici));
-
-    // Map to simple structure with status
-    const sessions = await Promise.all(dates.map(async (date, index) => {
-      const sessionNum = index + 1;
-      const status = await SessionService.getSessionStatus(assignacio.id_assignacio, sessionNum);
-      return {
-        sessionNum,
-        date,
-        status
-      };
-    }));
-
-    res.json(sessions);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al calcular sesiones' });
+  if (role !== ROLES.ADMIN) {
+    return res.status(403).json({ error: 'Solo los administradores pueden realizar asignaciones.' });
   }
-};
-
-// GET: Get attendees for a specific session
-export const getSessionAttendance = async (req: Request, res: Response) => {
-  const { idAssignacio, sessionNum } = req.params;
-  const sNum = parseInt(sessionNum as string);
-  const idAss = parseInt(idAssignacio as string);
 
   try {
-    // 1. Ensure date correctness (re-calculate to be safe)
-    const assignacio = await prisma.assignacio.findUnique({
-      where: { id_assignacio: idAss }
+    const peticio = await prisma.peticio.findUnique({
+      where: { id_peticio: parseInt(idPeticio) },
+      include: { centre: true, taller: true }
     });
 
-    if (!assignacio || !assignacio.data_inici) {
-      return res.status(404).json({ error: 'Asignación inválida' });
+    if (!peticio) {
+      return res.status(404).json({ error: 'Petición no encontrada.' });
     }
 
-    const dates = SessionService.generateSessionDates(new Date(assignacio.data_inici));
-    const sessionDate = dates[sNum - 1];
-
-    if (!sessionDate) {
-      return res.status(400).json({ error: 'Número de sesión inválido' });
+    if (peticio.estat !== 'Aprovada') {
+      return res.status(400).json({ error: 'La petición debe estar aprobada para crear una asignación.' });
     }
 
-    // 2. Ensure records exist (Lazy initialization)
-    await SessionService.ensureAttendanceRecords(idAss, sNum, sessionDate);
+    // Comprobar si ya existe una asignación para esta petición
+    const existing = await prisma.assignacio.findUnique({
+      where: { id_peticio: peticio.id_peticio }
+    });
 
-    // 3. Fetch records with student info
-    const attendance = await prisma.assistencia.findMany({
-      where: {
-        inscripcio: { id_assignacio: idAss },
-        numero_sessio: sNum
-      },
-      include: {
-        inscripcio: {
-          include: { alumne: true }
+    if (existing) {
+      return res.status(400).json({ error: 'Ya existe una asignación para esta petición.' });
+    }
+
+    const nuevaAssignacio = await prisma.assignacio.create({
+      data: {
+        id_peticio: peticio.id_peticio,
+        id_centre: peticio.id_centre,
+        id_taller: peticio.id_taller,
+        estat: 'En_curs',
+        // Inicializar checklist por defecto para Fase 2
+        checklist: {
+          create: [
+            { pas_nom: 'Designar Profesores Referentes', completat: false },
+            { pas_nom: 'Subir Registro Nominal (Excel)', completat: false },
+            { pas_nom: 'Gestionar Acuerdo Pedagógico (Modalidad C)', completat: peticio.modalitat !== 'C' }
+          ]
         }
-      },
-      orderBy: { inscripcio: { alumne: { cognoms: 'asc' } } }
+      }
     });
 
-    res.json(attendance);
+    res.status(201).json(nuevaAssignacio);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener asistencia' });
+    console.error("Error al crear asignación:", error);
+    res.status(500).json({ error: 'Error al crear la asignación.' });
   }
 };
 
-// POST: Update attendance for a session
-export const registerAttendance = async (req: Request, res: Response) => {
-  const { idAssignacio, sessionNum } = req.params;
-  const { attendanceData } = req.body; // Array of { id_assistencia, estat, observacions }
-
-  if (!Array.isArray(attendanceData)) {
-    return res.status(400).json({ error: 'Formato de datos inválido' });
-  }
+// POST: Realizar Registro Nominal (Inscribir alumnos en una asignación)
+export const createInscripcions = async (req: Request, res: Response) => {
+  const idAssignacio = req.params.idAssignacio as string;
+  const { ids_alumnes } = req.body; // Array de IDs de alumnos
 
   try {
-    // Bulk update approach using transaction or Promise.all
-    // Prisma doesn't support bulk update with different values easily yet, so loop is okay for small classroom sizes
-    await prisma.$transaction(
-      attendanceData.map((item: any) =>
-        prisma.assistencia.update({
-          where: { id_assistencia: item.id_assistencia },
-          data: {
-            estat: item.estat as EstatAssistencia,
-            observacions: item.observacions
+    const assignacio = await prisma.assignacio.findUnique({
+      where: { id_assignacio: parseInt(idAssignacio) }
+    });
+
+    if (!assignacio) {
+      return res.status(404).json({ error: 'Asignación no encontrada.' });
+    }
+
+    // 1. Crear las inscripciones
+    const inscripcions = await Promise.all(
+      ids_alumnes.map((idAlumne: number) =>
+        prisma.inscripcio.upsert({
+          where: {
+            // Necesitaríamos una clave única para inscripciones si quisiéramos upsert real,
+            // pero como no hay, usaremos create o simplemente borraremos las anteriores
+            id_inscripcio: -1 // Truco para forzar el fallo si no existe y crear
+          },
+          update: {},
+          create: {
+            id_assignacio: parseInt(idAssignacio),
+            id_alumne: idAlumne
           }
-        })
+        }).catch(() =>
+          // Si falla (porque el ID -1 no existe), creamos normalmente
+          prisma.inscripcio.create({
+            data: {
+              id_assignacio: parseInt(idAssignacio),
+              id_alumne: idAlumne
+            }
+          })
+        )
       )
     );
 
-    res.json({ success: true, count: attendanceData.length });
+    // 2. Marcar el ítem del checklist como completado
+    await prisma.checklistAssignacio.updateMany({
+      where: {
+        id_assignacio: parseInt(idAssignacio as string),
+        pas_nom: { contains: 'Registro Nominal' }
+      },
+      data: {
+        completat: true,
+        data_completat: new Date()
+      }
+    });
+
+    res.json({ message: 'Registro nominal completado', count: inscripcions.length });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al guardar asistencia' });
+    console.error("Error al realizar registro nominal:", error);
+    res.status(500).json({ error: 'Error al realizar el registro nominal.' });
   }
 };
 
-// POST: Cerrar asignación (Fase 4)
-export const closeAssignacio = async (req: Request, res: Response) => {
+// PATCH: Designar profesores para una asignación
+export const designateProfessors = async (req: Request, res: Response) => {
   const { idAssignacio } = req.params;
-  const id = parseInt(idAssignacio as string);
+  const { prof1_id, prof2_id } = req.body;
 
   try {
-    // 1. Validaciones previas
-    const assignacio = await prisma.assignacio.findUnique({
-      where: { id_assignacio: id },
-      include: { checklist: true }
+    const updated = await prisma.assignacio.update({
+      where: { id_assignacio: parseInt(idAssignacio as string) },
+      data: {
+        prof1_id,
+        prof2_id
+      }
     });
 
-    if (!assignacio) return res.status(404).json({ error: 'Asignación no encontrada' });
-    if (assignacio.estat === 'Finalitzada') return res.status(400).json({ error: 'La asignación ya está finalizada' });
-
-    // Verificar checklist (opcional: exigir 100% completado)
-    const incompleteItems = assignacio.checklist.filter(i => !i.completat);
-    if (incompleteItems.length > 0) {
-      // Warning o Block, depende reglas. Dejamos pasar con warning en log
-      console.warn(`Cerrando asignación ${id} con items pendientes en checklist.`);
-    }
-
-    // 2. Cambiar estado
-    await prisma.assignacio.update({
-      where: { id_assignacio: id },
-      data: { estat: 'Finalitzada' }
+    // Actualizar checklist
+    await prisma.checklistAssignacio.updateMany({
+      where: {
+        id_assignacio: parseInt(idAssignacio as string),
+        pas_nom: { contains: 'Profesores Referentes' }
+      },
+      data: {
+        completat: true,
+        data_completat: new Date()
+      }
     });
 
-    // 3. Trigger Automático: Certificados y Encuestas
-    // Llamar a funciones internas o hacer fetch local. 
-    // Aquí simulamos llamada interna o simplemente indicamos al frontend que lo haga.
-    // Lo ideal es hacerlo aquí:
-
-    // Generar Encuestas
-    // (Llamada al servicio/lógica de encuesta, simulación aquí para brevedad, idealmente extraer lógica a servicio)
-    // await EnquestaService.generateForOr(id);
-
-    res.json({ message: 'Asignación cerrada correctamente. Se pueden generar certificados y encuestas.' });
-
+    res.json(updated);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al cerrar asignación' });
+    console.error("Error al designar profesores:", error);
+    res.status(500).json({ error: 'Error al designar profesores.' });
   }
 };

@@ -1,60 +1,138 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { THEME } from '@iter/shared';
+import { THEME, PHASES } from '@iter/shared';
+import { getAttendance, postAttendance, postIncidencia, getFases } from '../../../services/api';
+
+interface Student {
+  id: number;
+  id_inscripcio: number;
+  name: string;
+  status: string;
+  institute: string;
+  permissions: string;
+  flag?: boolean;
+}
 
 export default function SesionScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [incidentModal, setIncidentModal] = useState(false);
   const [incidentText, setIncidentText] = useState('');
+  const [sessionNumber, setSessionNumber] = useState(4); // Default to current
+  const [sessionModal, setSessionModal] = useState(false);
 
-  const [students, setStudents] = useState([
-    { id: 1, name: 'Pau Claris', status: 'pending', institute: 'Inst. Martí i Pous', permissions: 'Vuelve solo a casa' },
-    { id: 2, name: 'Laia Sanz', status: 'present', institute: 'Inst. Bosc de Montjuïc', permissions: 'Recogida por tutor' },
-    { id: 3, name: 'Èric Vila', status: 'absent', institute: 'Inst. Martí i Pous', permissions: 'Vuelve solo a casa', flag: true },
-    { id: 4, name: 'Alba Ruiz', status: 'late', institute: 'Inst. Bosc de Montjuïc', permissions: 'Vuelve solo a casa' },
-    { id: 5, name: 'Marc Font', status: 'pending', institute: 'Inst. Martí i Pous', permissions: 'Recogida por tutor' },
-  ]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isEjecucion, setIsEjecucion] = useState(false);
+  const [assignmentInfo, setAssignmentInfo] = useState<any>(null);
 
-  const updateStatus = (studentId, newStatus) => {
-    setStudents(students.map(s => 
-      s.id === studentId ? { ...s, status: newStatus, flag: newStatus === 'absent' } : s
-    ));
-    setModalVisible(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [fasesRes, attendanceRes] = await Promise.all([
+          getFases(),
+          getAttendance(id as string)
+        ]);
+
+        const active = fasesRes.data.data.find((f: any) => f.nom === PHASES.EJECUCION)?.activa;
+        setIsEjecucion(!!active);
+
+        const attendanceData = attendanceRes.data;
+        if (attendanceData.length > 0) {
+          setAssignmentInfo(attendanceData[0].inscripcio.assignacio);
+          
+          const mapped = attendanceData.map((a: any) => ({
+            id: a.inscripcio.id_alumne,
+            id_inscripcio: a.id_inscripcio,
+            name: `${a.inscripcio.alumne.nom} ${a.inscripcio.alumne.cognoms}`,
+            status: a.estat.toLowerCase(),
+            institute: a.inscripcio.alumne.centre_procedencia?.nom || 'Centro N/A',
+            permissions: 'Permís estàndard'
+          }));
+          setStudents(mapped);
+        }
+      } catch (error) {
+        console.error("Error fetching session data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  const updateStatus = async (studentId: number, idInscripcio: number, newStatus: string) => {
+    if (!isEjecucion) {
+      Alert.alert('Fase No Activa', 'Només es pot registrar assistència durant la fase d\'execució.');
+      return;
+    }
+
+    try {
+      const estatMapeado = newStatus === 'late' ? 'Retard' : newStatus === 'present' ? 'Present' : 'Absència';
+      
+      await postAttendance({
+        id_inscripcio: idInscripcio,
+        numero_sessio: sessionNumber,
+        data_sessio: new Date().toISOString().split('T')[0],
+        estat: estatMapeado,
+        observacions: ''
+      });
+
+      setStudents(students.map(s => 
+        s.id === studentId ? { ...s, status: newStatus, flag: newStatus === 'absent' } : s
+      ));
+    } catch (error) {
+      Alert.alert('Error', 'No s\'ha pogut desar l\'assistència.');
+    }
   };
 
-  const toggleFlag = (studentId) => {
+  const handleReportIncidencía = async () => {
+    if (!incidentText.trim()) return;
+    try {
+      await postIncidencia({
+        id_centre: assignmentInfo.id_centre,
+        descripcio: `[Assignació ${id}] - Sessió ${sessionNumber}: ${incidentText}`
+      });
+      setIncidentModal(false);
+      setIncidentText('');
+      Alert.alert('Èxit', 'Incidència reportada correctament.');
+    } catch (error) {
+      Alert.alert('Error', 'No s\'ha pogut reportar la incidència.');
+    }
+  };
+
+  const toggleFlag = (studentId: number) => {
     setStudents(students.map(s => 
       s.id === studentId ? { ...s, flag: !s.flag } : s
     ));
   };
 
-  const getStatusBorder = (status) => {
-    switch (status) {
-      case 'present': return 'border-green-600';
-      case 'late': return 'border-yellow-500';
-      case 'absent': return 'border-red-600';
-      default: return 'border-gray-300';
-    }
+  const getStatusBorder = (status: string) => {
+    if (status.includes('retard')) return 'border-yellow-500';
+    if (status.includes('abs')) return 'border-red-600';
+    if (status.includes('pres')) return 'border-green-600';
+    return 'border-gray-300';
   };
 
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 'present': return 'PRESENTE';
-      case 'late': return 'RETRASO';
-      case 'absent': return 'AUSENTE';
-      default: return 'PENDIENTE';
-    }
+  const getStatusLabel = (status: string) => {
+    if (status.includes('retard')) return 'RETRASO';
+    if (status.includes('abs')) return 'AUSENTE';
+    if (status.includes('pres')) return 'PRESENTE';
+    return 'PENDIENTE';
   };
 
-  const openStudentInfo = (student) => {
-    setSelectedStudent(student);
-    setModalVisible(true);
-  };
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color={THEME.colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-white">
@@ -65,8 +143,18 @@ export default function SesionScreen() {
           </TouchableOpacity>
           <Text className="text-2xl font-black uppercase tracking-tight">PASE DE LISTA</Text>
         </View>
-        <Text className="text-primary font-black text-xs uppercase tracking-widest mb-1">Taller de Robótica Avanzada</Text>
-        <Text className="text-gray-500 font-bold text-[10px] uppercase tracking-wider">Sesión 4/12 • 19 de Enero</Text>
+        <Text className="text-primary font-black text-xs uppercase tracking-widest mb-1">
+          {assignmentInfo?.taller?.titol || 'Cargando taller...'}
+        </Text>
+        <TouchableOpacity 
+          onPress={() => setSessionModal(true)}
+          className="flex-row items-center"
+        >
+          <Text className="text-gray-500 font-bold text-[10px] uppercase tracking-wider">
+            SESIÓN {sessionNumber}/10 • {new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
+          </Text>
+          <Ionicons name="chevron-down" size={12} color="#6B7280" style={{ marginLeft: 4 }} />
+        </TouchableOpacity>
       </View>
 
       <View className="flex-1 bg-gray-50 px-6 pt-8">
@@ -85,7 +173,7 @@ export default function SesionScreen() {
           {students.map((student) => (
             <View key={student.id} className="bg-white p-5 border-2 border-gray-900 mb-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.05)]">
               <View className="flex-row justify-between items-start mb-6">
-                <TouchableOpacity onPress={() => openStudentInfo(student)} className="flex-1">
+                <TouchableOpacity onPress={() => { setSelectedStudent(student); setModalVisible(true); }} className="flex-1">
                   <Text className="text-lg font-black text-gray-900 uppercase tracking-tight">{student.name}</Text>
                   <Text className="text-gray-500 font-bold text-[10px] uppercase tracking-widest mt-1">{student.institute}</Text>
                 </TouchableOpacity>
@@ -96,22 +184,22 @@ export default function SesionScreen() {
 
               <View className="flex-row space-x-2">
                 <TouchableOpacity 
-                  onPress={() => updateStatus(student.id, 'present')}
-                  className={`flex-1 py-3 items-center border-2 ${student.status === 'present' ? 'bg-green-600 border-green-600' : 'bg-white border-gray-200'}`}
+                  onPress={() => updateStatus(student.id, student.id_inscripcio, 'present')}
+                  className={`flex-1 py-3 items-center border-2 ${student.status.includes('pres') ? 'bg-green-600 border-green-600' : 'bg-white border-gray-200'}`}
                 >
-                  <Ionicons name="checkmark" size={18} color={student.status === 'present' ? 'white' : '#10B981'} />
+                  <Ionicons name="checkmark" size={18} color={student.status.includes('pres') ? 'white' : '#10B981'} />
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  onPress={() => updateStatus(student.id, 'late')}
-                  className={`flex-1 py-3 items-center border-2 ${student.status === 'late' ? 'bg-yellow-500 border-yellow-500' : 'bg-white border-gray-200'}`}
+                  onPress={() => updateStatus(student.id, student.id_inscripcio, 'late')}
+                  className={`flex-1 py-3 items-center border-2 ${student.status.includes('retard') ? 'bg-yellow-500 border-yellow-500' : 'bg-white border-gray-200'}`}
                 >
-                  <Ionicons name="time" size={18} color={student.status === 'late' ? 'white' : '#F59E0B'} />
+                  <Ionicons name="time" size={18} color={student.status.includes('retard') ? 'white' : '#F59E0B'} />
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  onPress={() => updateStatus(student.id, 'absent')}
-                  className={`flex-1 py-3 items-center border-2 ${student.status === 'absent' ? 'bg-red-600 border-red-600' : 'bg-white border-gray-200'}`}
+                  onPress={() => updateStatus(student.id, student.id_inscripcio, 'absent')}
+                  className={`flex-1 py-3 items-center border-2 ${student.status.includes('abs') ? 'bg-red-600 border-red-600' : 'bg-white border-gray-200'}`}
                 >
-                  <Ionicons name="close" size={18} color={student.status === 'absent' ? 'white' : '#EF4444'} />
+                  <Ionicons name="close" size={18} color={student.status.includes('abs') ? 'white' : '#EF4444'} />
                 </TouchableOpacity>
                 <TouchableOpacity 
                   onPress={() => toggleFlag(student.id)}
@@ -180,14 +268,37 @@ export default function SesionScreen() {
               </TouchableOpacity>
               <TouchableOpacity 
                 className="flex-1 bg-accent py-5 items-center"
-                onPress={() => {
-                  setIncidentModal(false);
-                  setIncidentText('');
-                }}
+                onPress={handleReportIncidencía}
               >
                 <Text className="text-white font-black text-xs uppercase tracking-widest">REPORTAR</Text>
               </TouchableOpacity>
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Session Selector Modal */}
+      <Modal visible={sessionModal} animationType="slide" transparent={true}>
+        <View className="flex-1 justify-end bg-black/50">
+          <View className="bg-white p-6 pb-12 rounded-t-[40px]">
+            <Text className="text-xl font-black text-gray-900 mb-6 text-center uppercase tracking-widest">Seleccionar Sesión</Text>
+            <View className="flex-row flex-wrap justify-center">
+              {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                <TouchableOpacity 
+                  key={n}
+                  onPress={() => { setSessionNumber(n); setSessionModal(false); }}
+                  className={`w-14 h-14 m-2 items-center justify-center border-2 ${sessionNumber === n ? 'bg-primary border-primary' : 'bg-white border-gray-200'}`}
+                >
+                  <Text className={`font-black ${sessionNumber === n ? 'text-white' : 'text-gray-500'}`}>{n}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <TouchableOpacity 
+              onPress={() => setSessionModal(false)}
+              className="mt-8 bg-gray-100 py-4 items-center"
+            >
+              <Text className="text-gray-500 font-black uppercase tracking-widest">CERRAR</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>

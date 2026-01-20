@@ -42,10 +42,7 @@ export const updateAlumne = async (req: Request, res: Response) => {
   try {
     const alumne = await prisma.alumne.update({
       where: { id_alumne: parseInt(id as string) },
-      data: {
-        nom, cognoms, curs, idalu,
-        id_centre_procedencia: id_centre_procedencia ? parseInt(id_centre_procedencia as string) : undefined
-      }
+      data: req.body
     });
     res.json(alumne);
   } catch (error) {

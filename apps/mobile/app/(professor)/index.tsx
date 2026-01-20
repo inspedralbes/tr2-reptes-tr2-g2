@@ -1,38 +1,71 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Linking, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Linking, Platform, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { THEME } from '@iter/shared';
+import { THEME, PHASES } from '@iter/shared';
+import api, { getMyAssignments, getFases } from '../../services/api';
 
 export default function DashboardScreen() {
   const router = useRouter();
+  const [fases, setFases] = useState<any[]>([]);
+  const [assignments, setAssignments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const nextWorkshop = {
-    id: 1,
-    title: 'Taller de Robótica Avanzada',
-    place: 'Carrer de la Llacuna, 162, 08018 Barcelona',
-    schedule: '09:00 - 13:00',
-    date: 'LUNES, 19 ENERO',
-    lat: 41.4036,
-    lng: 2.1937,
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [fasesRes, assignmentsRes] = await Promise.all([
+          getFases(),
+          getMyAssignments()
+        ]);
+        setFases(fasesRes.data.data);
+        setAssignments(assignmentsRes.data);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const isPhaseActive = (nomFase: string) => {
+    const fase = fases.find(f => f.nom === nomFase);
+    return fase ? fase.activa : false;
   };
 
-  const notifications = [
-    { id: 1, title: 'Cambio de horario', message: 'La sesión del viernes se ha desplazado a las 10:00.', time: 'HACE 2H' },
-    { id: 2, title: 'Recordatorio de evaluación', message: 'No olvides completar la rúbrica del Taller de Impresión 3D.', time: 'HACE 5H' },
-  ];
+  const getNextSession = () => {
+    if (assignments.length === 0) return null;
+    // Simple logic: sort by start date and find the first one in the future or today
+    const now = new Date();
+    const sorted = [...assignments].sort((a, b) => 
+      new Date(a.data_inici || 0).getTime() - new Date(b.data_inici || 0).getTime()
+    );
+    
+    return sorted.find(a => new Date(a.data_inici).getTime() >= now.getTime() - 86400000) || sorted[0];
+  };
 
-  const openMaps = () => {
+  const nextWorkshop = getNextSession();
+
+  const openMaps = (workshop: any) => {
+    if (!workshop?.centre?.adreca) return;
     const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
-    const latLng = `${nextWorkshop.lat},${nextWorkshop.lng}`;
-    const label = nextWorkshop.title;
+    const label = workshop.taller.titol;
     const url = Platform.select({
-      ios: `${scheme}${label}@${latLng}`,
-      android: `${scheme}${latLng}(${label})`
+      ios: `${scheme}${label}@${workshop.centre.adreca}`,
+      android: `${scheme}0,0?q=${workshop.centre.adreca}(${label})`
     });
 
     if (url) Linking.openURL(url);
   };
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color={THEME.colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <ScrollView className="flex-1 bg-white" showsVerticalScrollIndicator={false}>
@@ -40,7 +73,7 @@ export default function DashboardScreen() {
         {/* Welcome Section */}
         <View className="mb-10 pt-4">
           <Text className="text-sm font-black uppercase tracking-[3px] text-primary mb-2">PANEL DOCENTE</Text>
-          <Text className="text-4xl font-bold text-gray-900 tracking-tighter leading-none">¡Hola, Marc!</Text>
+          <Text className="text-4xl font-bold text-gray-900 tracking-tighter leading-none">¡Hola!</Text>
         </View>
 
         {/* Section Title */}
@@ -49,76 +82,83 @@ export default function DashboardScreen() {
           <Text className="text-xl font-bold text-gray-900 uppercase tracking-widest">Próxima Sesión</Text>
         </View>
 
-        {/* Next Workshop Card - Square & Static */}
-        <View 
-          className="bg-white border-2 border-gray-900 p-6 mb-10 shadow-[8px_8px_0px_0px_rgba(0,66,107,0.1)]"
-        >
-          <View className="flex-row justify-between items-start mb-6">
-            <View className="bg-primary p-3">
-              <Ionicons name="hardware-chip" size={24} color="white" />
-            </View>
-            <View className="border border-green-600 px-3 py-1">
-              <Text className="text-green-700 text-[10px] font-black uppercase tracking-widest">En Curso</Text>
-            </View>
-          </View>
-          
-          <Text className="text-2xl font-black text-gray-900 mb-4 leading-tight uppercase tracking-tight">{nextWorkshop.title}</Text>
-          
-          <View className="space-y-3 mb-6">
-            <View className="flex-row items-center">
-              <Ionicons name="calendar-outline" size={16} color="#4B5563" />
-              <Text className="text-gray-600 font-bold ml-3 text-xs tracking-wider">{nextWorkshop.date}</Text>
+        {/* Next Workshop Card */}
+        {nextWorkshop ? (
+          <View className="bg-white border-2 border-gray-900 p-6 mb-10 shadow-[8px_8px_0px_0px_rgba(0,66,107,0.1)]">
+            <View className="flex-row justify-between items-start mb-6">
+              <View className="bg-primary p-3">
+                <Ionicons name="hardware-chip" size={24} color="white" />
+              </View>
+              <View className="border border-green-600 px-3 py-1">
+                <Text className="text-green-700 text-[10px] font-black uppercase tracking-widest">
+                  {isPhaseActive(PHASES.EJECUCION) ? 'EN CURSO' : 'PENDIENTE'}
+                </Text>
+              </View>
             </View>
             
-            <View className="flex-row items-center">
-              <Ionicons name="time-outline" size={16} color="#4B5563" />
-              <Text className="text-gray-600 font-bold ml-3 text-xs tracking-wider">{nextWorkshop.schedule}</Text>
-            </View>
-          </View>
-
-          <TouchableOpacity 
-            onPress={openMaps}
-            className="flex-row items-center bg-gray-50 p-4 border border-gray-200 mb-6"
-          >
-            <Ionicons name="location-outline" size={16} color={THEME.colors.secondary} />
-            <Text className="text-gray-900 font-bold ml-3 flex-1 text-xs" numberOfLines={1}>
-              {nextWorkshop.place}
+            <Text className="text-2xl font-black text-gray-900 mb-4 leading-tight uppercase tracking-tight">
+              {nextWorkshop.taller.titol}
             </Text>
-          </TouchableOpacity>
+            
+            <View className="space-y-3 mb-6">
+              <View className="flex-row items-center">
+                <Ionicons name="calendar-outline" size={16} color="#4B5563" />
+                <Text className="text-gray-600 font-bold ml-3 text-xs tracking-wider uppercase">
+                  {new Date(nextWorkshop.data_inici).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+                </Text>
+              </View>
+              
+              <View className="flex-row items-center">
+                <Ionicons name="time-outline" size={16} color="#4B5563" />
+                <Text className="text-gray-600 font-bold ml-3 text-xs tracking-wider">09:00 - 13:00</Text> 
+              </View>
+            </View>
 
-          <TouchableOpacity 
-            onPress={() => router.push(`/sesion/${nextWorkshop.id}`)}
-            className="bg-primary py-5 items-center active:bg-blue-900"
-          >
-            <Text className="text-white font-black text-sm uppercase tracking-[2px]">GESTIONAR ASISTENCIA</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity 
+              onPress={() => openMaps(nextWorkshop)}
+              className="flex-row items-center bg-gray-50 p-4 border border-gray-200 mb-6"
+            >
+              <Ionicons name="location-outline" size={16} color={THEME.colors.secondary} />
+              <Text className="text-gray-900 font-bold ml-3 flex-1 text-xs" numberOfLines={1}>
+                {nextWorkshop.centre.nom} - {nextWorkshop.centre.adreca || 'Sin dirección'}
+              </Text>
+            </TouchableOpacity>
 
-        {/* Notifications Section */}
+            <TouchableOpacity 
+              onPress={() => isPhaseActive(PHASES.EJECUCION) ? router.push(`/(professor)/sesion/${nextWorkshop.id_assignacio}`) : alert('El període d\'execució encara no ha començat')}
+              className={`py-5 items-center ${isPhaseActive(PHASES.EJECUCION) ? 'bg-primary active:bg-blue-900' : 'bg-gray-200'}`}
+            >
+              <Text className="text-white font-black text-sm uppercase tracking-[2px]">
+                {isPhaseActive(PHASES.EJECUCION) ? 'GESTIONAR ASISTENCIA' : 'SESIÓN PENDIENTE'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View className="bg-gray-50 p-8 border-2 border-dashed border-gray-300 items-center mb-10">
+            <Text className="text-gray-500 font-bold uppercase tracking-widest text-center">No tienes talleres asignados próximamente</Text>
+          </View>
+        )}
+
         <View className="flex-row justify-between items-center mb-6">
           <View className="flex-row items-center">
             <View className="w-2 h-8 bg-accent mr-3" />
             <Text className="text-xl font-bold text-gray-900 uppercase tracking-widest">Alertas</Text>
           </View>
-          <TouchableOpacity>
-            <Text className="text-primary font-black text-[10px] uppercase tracking-widest">Ver Todo</Text>
-          </TouchableOpacity>
         </View>
 
-        {notifications.map((notif) => (
-          <View key={notif.id} className="bg-white p-5 border border-gray-200 mb-4 flex-row items-start">
-            <View className="bg-accent p-2 mr-4">
-              <Ionicons name="notifications" size={18} color="white" />
-            </View>
-            <View className="flex-1">
-              <View className="flex-row justify-between items-center mb-1">
-                <Text className="font-black text-gray-900 text-xs uppercase tracking-wider">{notif.title}</Text>
-                <Text className="text-[10px] text-gray-400 font-bold">{notif.time}</Text>
-              </View>
-              <Text className="text-gray-600 text-xs leading-5">{notif.message}</Text>
-            </View>
+        <View className="bg-white p-5 border border-gray-200 mb-4 flex-row items-start">
+          <View className="bg-accent p-2 mr-4">
+            <Ionicons name="notifications" size={18} color="white" />
           </View>
-        ))}
+          <View className="flex-1">
+            <View className="flex-row justify-between items-center mb-1">
+              <Text className="font-black text-gray-900 text-xs uppercase tracking-wider">FASE ACTUAL</Text>
+            </View>
+            <Text className="text-gray-600 text-xs leading-5">
+              Estamos en la fase de {fases.find(f => f.activa)?.nom || 'Carga de datos'}.
+            </Text>
+          </View>
+        </View>
       </View>
     </ScrollView>
   );

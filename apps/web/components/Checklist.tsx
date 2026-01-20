@@ -32,17 +32,17 @@ export default function Checklist({ items, onUpdate }: ChecklistProps) {
       {items.map((item) => (
         <div 
           key={item.id_checklist}
-          className={`flex items-start gap-4 p-4 rounded-lg border transition ${
-            item.completat ? 'bg-gray-50 border-gray-100' : 'bg-white border-gray-200 shadow-sm'
+          className={`flex items-start gap-4 p-4 border transition ${
+            item.completat ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-300'
           }`}
         >
           <button
             onClick={() => handleToggle(item)}
             disabled={loading === item.id_checklist}
-            className={`mt-1 w-6 h-6 rounded flex items-center justify-center border-2 transition ${
+            className={`mt-1 w-6 h-6 flex items-center justify-center border-2 transition ${
               item.completat 
-              ? 'bg-green-500 border-green-500 text-white' 
-              : 'bg-white border-gray-300 hover:border-blue-500'
+              ? 'bg-green-600 border-green-600 text-white' 
+              : 'bg-white border-gray-300 hover:border-consorci-lightBlue'
             }`}
           >
             {item.completat && (
@@ -67,7 +67,7 @@ export default function Checklist({ items, onUpdate }: ChecklistProps) {
                 <input 
                   type="text"
                   placeholder="URL de la evidencia (Google Drive, etc.)"
-                  className="text-xs w-full p-2 border rounded"
+                  className="text-xs w-full p-2 border border-gray-300 focus:border-consorci-lightBlue outline-none"
                   defaultValue={item.url_evidencia}
                   onBlur={(e) => onUpdate(item.id_checklist, item.completat, e.target.value)}
                 />

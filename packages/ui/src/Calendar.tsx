@@ -61,25 +61,15 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
   }, [currentDate]);
 
   const getEventStyles = (type: string, title: string = '') => {
-    const isPhase = title.toLowerCase().includes('fase');
-    
-    if (isPhase) {
-      if (title.includes('Solicitud')) return 'bg-blue-600 text-white shadow-[0_4px_12px_rgba(37,99,235,0.2)]';
-      if (title.includes('Planificación')) return 'bg-[#00426B] text-white shadow-[0_4px_12px_rgba(0,66,107,0.2)]';
-      if (title.includes('Ejecución')) return 'bg-indigo-500 text-white shadow-[0_4px_12px_rgba(99,102,241,0.2)]';
-      if (title.includes('Cierre')) return 'bg-emerald-600 text-white shadow-[0_4px_12px_rgba(5,150,105,0.2)]';
-      return 'bg-blue-700 text-white';
-    }
-
     switch (type) {
       case 'milestone': 
-        return 'bg-blue-600 text-white shadow-[0_4px_12px_rgba(37,99,235,0.2)]';
+        return 'bg-consorci-darkBlue text-white';
       case 'deadline': 
-        return 'bg-[#F26178] text-white shadow-[0_4px_12px_rgba(242,97,120,0.2)]';
+        return 'bg-consorci-pinkRed text-white';
       case 'assignment': 
-        return 'bg-[#4197CB] text-white shadow-[0_4px_12px_rgba(65,151,203,0.2)] shadow-inner';
+        return 'bg-consorci-lightBlue text-white';
       case 'session': 
-        return 'bg-[#00426B] text-white shadow-[0_4px_12px_rgba(0,66,107,0.2)]';
+        return 'bg-consorci-darkBlue text-white';
       default: 
         return 'bg-gray-500 text-white';
     }
@@ -88,18 +78,18 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
   const isSameDay = (d1: string, d2: string) => d1.split('T')[0] === d2.split('T')[0];
 
   return (
-    <div className="bg-white rounded-[48px] shadow-[0_40px_100px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden font-sans animate-in fade-in duration-1000">
+    <div className="bg-white border border-gray-200 overflow-hidden font-sans">
       {/* Header */}
-      <div className="flex items-center justify-between p-12 bg-white sticky top-0 z-30 border-b border-gray-50/50">
+      <div className="flex items-center justify-between p-12 bg-white sticky top-0 z-30 border-b border-gray-200">
         <div className="flex items-center gap-4">
-          <h2 className="text-5xl font-black tracking-[-0.04em] capitalize text-[#00426B] flex items-baseline gap-3">
-            {monthName} <span className="text-[#00426B]/20 font-black tracking-tight">{year}</span>
+          <h2 className="text-5xl font-bold tracking-tight capitalize text-consorci-darkBlue flex items-baseline gap-3">
+            {monthName} <span className="text-gray-200 font-bold tracking-tight">{year}</span>
           </h2>
         </div>
-        <div className="flex bg-[#F8FAFB] p-2.5 rounded-[32px] gap-2 border border-gray-100 shadow-inner">
+        <div className="flex bg-gray-50 p-2 gap-2 border border-gray-200">
           <button 
             onClick={prevMonth}
-            className="w-12 h-12 flex items-center justify-center hover:bg-white hover:shadow-xl rounded-[24px] transition-all duration-500 text-[#00426B]/40 hover:text-[#00426B] active:scale-90"
+            className="w-12 h-12 flex items-center justify-center hover:bg-gray-200 transition-colors text-consorci-darkBlue/40 hover:text-consorci-darkBlue"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
@@ -107,13 +97,13 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
           </button>
           <button 
             onClick={() => setCurrentDate(new Date())}
-            className="px-10 h-12 bg-white shadow-sm rounded-[24px] text-[11px] font-black uppercase tracking-[0.25em] text-[#00426B] hover:shadow-xl transition-all active:scale-95 border border-gray-50"
+            className="px-10 h-12 bg-white border border-gray-200 text-[11px] font-bold uppercase tracking-widest text-consorci-darkBlue hover:bg-gray-50 transition-colors"
           >
             Avui
           </button>
           <button 
             onClick={nextMonth}
-            className="w-12 h-12 flex items-center justify-center hover:bg-white hover:shadow-xl rounded-[24px] transition-all duration-500 text-[#00426B]/40 hover:text-[#00426B] active:scale-90"
+            className="w-12 h-12 flex items-center justify-center hover:bg-gray-200 transition-colors text-consorci-darkBlue/40 hover:text-consorci-darkBlue"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
@@ -123,10 +113,10 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
       </div>
 
       {/* Weekdays Labels */}
-      <div className="grid grid-cols-7 border-b border-gray-50 bg-[#F8FAFB]/30">
+      <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
         {['dl', 'dt', 'dc', 'dj', 'dv', 'ds', 'dg'].map(d => (
           <div key={d} className="py-6 text-center">
-            <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#CFD2D3]">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-gray-400">
               {d}
             </span>
           </div>
@@ -184,8 +174,8 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
               {week.map((dateObj, dayIdx) => (
                 <div 
                   key={dayIdx} 
-                  className={`relative p-5 border-r border-gray-50 last:border-r-0 transition-colors duration-500 ${
-                    dayIdx === 5 || dayIdx === 6 ? 'bg-[#F8FAFB]/60' : ''
+                  className={`relative p-5 border-r border-gray-100 last:border-r-0 ${
+                    dayIdx === 5 || dayIdx === 6 ? 'bg-gray-50' : ''
                   }`}
                 >
                   {dateObj.day && (
@@ -208,20 +198,17 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
                       <button
                         key={event.id}
                         onClick={() => onEventClick?.(event)}
-                        className={`absolute h-full pointer-events-auto flex items-center px-4 transition-all hover:scale-[1.01] hover:brightness-105 active:scale-[0.98] group/event ${getEventStyles(event.type, event.title)}`}
+                        className={`absolute h-full pointer-events-auto flex items-center px-4 transition-colors hover:bg-opacity-90 active:opacity-80 group/event ${getEventStyles(event.type, event.title)}`}
                         style={{
                           left: `${(event.start * 100) / 7}%`,
                           width: `${(event.span * 100) / 7}%`,
-                          marginLeft: event.continuesBefore ? '0' : '4px',
-                          marginRight: event.continuesAfter ? '0' : '4px',
-                          borderRadius: event.isPhase 
-                            ? `${event.continuesBefore ? '0' : '8px'} ${event.continuesAfter ? '0' : '8px'} ${event.continuesAfter ? '0' : '8px'} ${event.continuesBefore ? '0' : '8px'}`
-                            : '20px'
+                          marginLeft: event.continuesBefore ? '0' : '2px',
+                          marginRight: event.continuesAfter ? '0' : '2px',
                         }}
                       >
                         <div className="flex items-center gap-2 overflow-hidden w-full">
-                           <div className="w-1.5 h-1.5 bg-white/60 rounded-full shrink-0"></div>
-                           <span className="text-[10px] font-black text-white truncate uppercase tracking-[0.1em] leading-none">
+                           <div className="w-1 h-1 bg-white/60 shrink-0"></div>
+                           <span className="text-[10px] font-bold text-white truncate uppercase tracking-widest leading-none">
                              {event.title}
                            </span>
                         </div>

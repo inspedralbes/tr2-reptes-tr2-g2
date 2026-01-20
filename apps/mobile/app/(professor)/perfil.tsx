@@ -1,10 +1,68 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME } from '@iter/shared';
+import * as SecureStore from 'expo-secure-store';
+import { useRouter } from 'expo-router';
 
 export default function PerfilScreen() {
-  const [notifications, setNotifications] = React.useState(true);
+  const router = useRouter();
+  const [notifications, setNotifications] = useState(true);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        let userData = null;
+        if (Platform.OS === 'web') {
+          userData = localStorage.getItem('user');
+        } else {
+          userData = await SecureStore.getItemAsync('user');
+        }
+        if (userData) setUser(JSON.parse(userData));
+      } catch (e) {
+        console.error("Error loading user", e);
+      }
+    }
+    loadUser();
+  }, []);
+
+  const handleLogout = async () => {
+    const performLogout = async () => {
+      try {
+        if (Platform.OS === 'web') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        } else {
+          await SecureStore.deleteItemAsync('token');
+          await SecureStore.deleteItemAsync('user');
+        }
+        router.replace('/login');
+      } catch (e) {
+        console.error("Error during logout", e);
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        await performLogout();
+      }
+    } else {
+      Alert.alert(
+        'Cerrar Sesión',
+        '¿Estás seguro de que quieres cerrar tu sesión actual?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Cerrar Sesión', style: 'destructive', onPress: performLogout }
+        ]
+      );
+    }
+  };
+
+  const getUserInitials = () => {
+    if (!user?.nom_complet) return '??';
+    return user.nom_complet.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
+  };
 
   return (
     <ScrollView className="flex-1 bg-white" showsVerticalScrollIndicator={false}>
@@ -19,12 +77,12 @@ export default function PerfilScreen() {
         {/* User Info Section */}
         <View className="bg-gray-50 p-8 border-2 border-gray-900 mb-10 flex-row items-center">
           <View className="w-20 h-20 bg-primary items-center justify-center mr-8">
-            <Text className="text-3xl font-black text-white">MF</Text>
+            <Text className="text-3xl font-black text-white">{getUserInitials()}</Text>
           </View>
           <View className="flex-1">
-            <Text className="text-2xl font-black text-gray-900 uppercase tracking-tighter">Marc Font</Text>
-            <Text className="text-primary font-black text-[10px] uppercase tracking-[2px] mt-2">Profesor Referente</Text>
-            <Text className="text-gray-500 font-bold text-[9px] uppercase tracking-widest mt-1">Inst. Martí i Pous</Text>
+            <Text className="text-2xl font-black text-gray-900 uppercase tracking-tighter">{user?.nom_complet || 'Usuario'}</Text>
+            <Text className="text-primary font-black text-[10px] uppercase tracking-[2px] mt-2">{user?.role === 'PROFESSOR' ? 'Profesor' : 'Administrador'}</Text>
+            <Text className="text-gray-500 font-bold text-[9px] uppercase tracking-widest mt-1">Conectado a Iter</Text>
           </View>
         </View>
 
@@ -63,7 +121,8 @@ export default function PerfilScreen() {
         </View>
 
         <TouchableOpacity 
-          className="bg-accent py-5 items-center mt-10"
+          onPress={handleLogout}
+          className="bg-accent py-5 items-center mt-10 active:opacity-80"
         >
           <Text className="text-white font-black text-sm uppercase tracking-[3px]">CERRAR SESIÓN</Text>
         </TouchableOpacity>
