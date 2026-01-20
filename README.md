@@ -106,7 +106,7 @@ Per evitar conflictes de lectura/escriptura de fitxers, hem implementat un flux 
 * [x] Arrencada Seqüencial Premium.
 * [x] Optimització amb **tsx** i **Turbopack**.
 * [ ] **Motor d'Assignació (AI Constraint Satisfaction):** Algorisme d'optimització per garantir l'heterogeneïtat de grups i respectar límits complexos de places per centre.
-* [ ] **Assistent d'Avaluació per Veu (NLP):** Sistema *Speech-to-Text* que omple automàticament rúbriques i observacions analitzant el dictat del professor.
+* [x] **Assistent d'Avaluació per Veu (NLP):** Sistema *Speech-to-Text* que omple automàticament rúbriques i observacions analitzant el dictat del professor.
 * [ ] **Predicció de Risc d'Abandonament:** Sistema *Early Warning* que alerta als tutors de possibles abandonaments basant-se en patrons d'assistència i baixada de rendiment.
 * [ ] **Validació Documental (Computer Vision):** Verificació automàtica de signatures i estructura de documents (ex: Acords Pedagògics) al pujar-los.
 
