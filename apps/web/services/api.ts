@@ -29,6 +29,21 @@ const getApi = (): AxiosInstance => {
       },
       (error) => Promise.reject(error)
     );
+
+    apiInstance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          if (typeof window !== 'undefined') {
+            console.warn('Sesión expirada (401). Redirigiendo a login...');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
   }
   return apiInstance;
 };

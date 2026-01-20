@@ -18,15 +18,6 @@ const MobileNavbar: React.FC<MobileNavbarProps> = ({ title = 'Programa Iter' }) 
           </View>
           <Text className="text-xl font-bold text-white tracking-tight">{title}</Text>
         </View>
-
-        <TouchableOpacity 
-          className="bg-white/10 px-3 py-2 border border-white/20 backdrop-blur-sm active:scale-95"
-          activeOpacity={0.7}
-        >
-          <Text className="text-white text-[10px] font-black uppercase tracking-widest">
-            SALIR
-          </Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

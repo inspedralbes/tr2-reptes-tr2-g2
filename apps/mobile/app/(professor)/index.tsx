@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Linking, Platform, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import { THEME, PHASES } from '@iter/shared';
 import api, { getMyAssignments, getFases } from '../../services/api';
 
@@ -12,21 +13,47 @@ export default function DashboardScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const checkRoleAndFetchData = async () => {
       try {
+        // Verificar rol antes de cargar nada
+        let userData = null;
+        try {
+          userData = Platform.OS === 'web' 
+            ? localStorage.getItem('user') 
+            : await SecureStore.getItemAsync('user');
+        } catch (storageError) {
+          console.warn("⚠️ [Dashboard] Error accedint al magatzem:", storageError);
+          // Si fallamos al leer, forzamos login por seguridad
+          router.replace('/login');
+          return;
+        }
+        
+        if (userData) {
+          const user = JSON.parse(userData);
+          if (user.rol?.nom_rol !== 'PROFESSOR') {
+            console.warn("[Dashboard] Accés no autoritzat per a aquest rol");
+            router.replace('/login');
+            return;
+          }
+        } else {
+          router.replace('/login');
+          return;
+        }
+
         const [fasesRes, assignmentsRes] = await Promise.all([
           getFases(),
           getMyAssignments()
         ]);
         setFases(fasesRes.data.data);
         setAssignments(assignmentsRes.data);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching dashboard data:", error);
+        // Si el error es de autenticación, el interceptor ya manejará la redirección
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+    checkRoleAndFetchData();
   }, []);
 
   const isPhaseActive = (nomFase: string) => {

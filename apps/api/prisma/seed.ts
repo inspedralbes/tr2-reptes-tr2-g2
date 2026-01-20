@@ -118,6 +118,15 @@ async function main() {
   const prof2 = await prisma.professor.create({
     data: { nom: 'Maria Soler', contacte: '934445566', id_centre: centroBrossa.id_centre }
   });
+  const prof3 = await prisma.professor.create({
+    data: { nom: 'Marta Gil', contacte: 'marta@pauclaris.cat', id_centre: creadosCentres.find(c => c.codi_centre === '08013147')!.id_centre }
+  });
+  const prof4 = await prisma.professor.create({
+    data: { nom: 'Sergi Roca', contacte: 'sergi@fortpius.cat', id_centre: creadosCentres.find(c => c.codi_centre === '08013111')!.id_centre }
+  });
+  const prof5 = await prisma.professor.create({
+    data: { nom: 'Clara Bosch', contacte: 'clara@montserrat.cat', id_centre: creadosCentres.find(c => c.codi_centre === '08013123')!.id_centre }
+  });
   await prisma.professor.create({
     data: { nom: 'Pere Pons', contacte: 'pere.pons@xtec.cat', id_centre: centroMila.id_centre }
   });
@@ -149,16 +158,25 @@ async function main() {
     }
   });
 
-  // 3. PROFESOR (Centro Milà)
-  await prisma.usuari.create({
-    data: {
-      nom_complet: 'Professor Ejemplo',
-      email: 'profe@profe.com',
-      password_hash: passProfe,
-      id_rol: rolProfe.id_rol,
-      id_centre: centroMila.id_centre
-    }
-  });
+  // 3. PROFESORS DE PROVA
+  const testProfessors = [
+    { name: 'Professor Ejemplo', email: 'profe@profe.com', center: centroMila.id_centre },
+    { name: 'Marta Gil', email: 'marta@test.com', center: prof3.id_centre },
+    { name: 'Sergi Roca', email: 'sergi@test.com', center: prof4.id_centre },
+    { name: 'Clara Bosch', email: 'clara@test.com', center: prof5.id_centre },
+  ];
+
+  for (const p of testProfessors) {
+    await prisma.usuari.create({
+      data: {
+        nom_complet: p.name,
+        email: p.email,
+        password_hash: passProfe,
+        id_rol: rolProfe.id_rol,
+        id_centre: p.center
+      }
+    });
+  }
 
   // 7. CREAR TALLERES
   const tallerFusta = await prisma.taller.create({
@@ -293,6 +311,41 @@ async function main() {
       modalitat: 'A',
       prof1_id: prof1.id_professor,
       prof2_id: prof2.id_professor
+    }
+  });
+
+  // 11. ASSIGNACIONS PER ALS PROFESSORS DE PROVA
+  console.log('📅 Creando Asignaciones para los profesores de prueba...');
+  await prisma.assignacio.create({
+    data: {
+      id_centre: prof3.id_centre,
+      id_taller: tallerRobotica.id_taller,
+      prof1_id: prof3.id_professor,
+      estat: 'En_curs',
+      data_inici: new Date('2026-03-20'),
+      data_fi: new Date('2026-03-25')
+    }
+  });
+
+  await prisma.assignacio.create({
+    data: {
+      id_centre: prof4.id_centre,
+      id_taller: tallerFusta.id_taller,
+      prof1_id: prof4.id_professor,
+      estat: 'En_curs',
+      data_inici: new Date('2026-04-10'),
+      data_fi: new Date('2026-04-15')
+    }
+  });
+
+  await prisma.assignacio.create({
+    data: {
+      id_centre: prof5.id_centre,
+      id_taller: tallerRobotica.id_taller,
+      prof1_id: prof5.id_professor,
+      estat: 'En_curs',
+      data_inici: new Date('2026-05-05'),
+      data_fi: new Date('2026-05-10')
     }
   });
 

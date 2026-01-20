@@ -79,11 +79,18 @@ docker compose down -v && docker compose up --build
 
 ### 🔑 Credencials de Prova (Seed)
 
-El sistema pobla automàticament la base de dades amb les següents credencials:
+El sistema pobla automàticament la base de dades amb les següents credencials per a proves:
 
-* **Admin Global:** `admin@iter.com` / `admin123`
-* **Professor (Brossa):** `profe.brossa@example.com` / `password123`
-* **Professor (Milà):** `profe.mila@example.com` / `password123`
+* **Administrador:** `admin@admin.com` / `Admin@1234`
+* **Coordinador:** `centros@centros.com` / `Centro@1234`
+* **Professors (Mòbil):** Tots usen la contrasenya **`Profe@1234`**
+
+| Professor/a | Email | Institut (Centre) |
+| :--- | :--- | :--- |
+| **Marta Gil** | `marta@test.com` | Institut Pau Claris |
+| **Sergi Roca** | `sergi@test.com` | Institut Fort Pius |
+| **Clara Bosch** | `clara@test.com` | Institut Montserrat |
+| **Professor Ejemplo** | `profe@profe.com` | Institut Milà i Fontanals |
 
 ## 🐳 Arquitectura Docker Seqüencial
 

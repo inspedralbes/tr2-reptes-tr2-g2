@@ -24,6 +24,16 @@ export default function LoginScreen() {
       const response = await login({ email, password });
       const { token, user } = response.data;
 
+      // Restricció de rol: Només els PROFESSORS poden entrar a l'app mòbil
+      if (user.rol?.nom_rol !== 'PROFESSOR') {
+        setLoading(false);
+        Alert.alert(
+          'Accés Denegat', 
+          'Aquesta aplicació mòbil és d\'ús exclusiu per a professors. Els administradors i coordinadors han d\'utilitzar la plataforma web.'
+        );
+        return;
+      }
+
       // Save token and user info
       if (Platform.OS === 'web') {
         localStorage.setItem('token', token);
@@ -54,7 +64,7 @@ export default function LoginScreen() {
           <View className="mb-16">
             <View className="w-16 h-4 bg-accent mb-6" />
             <Text className="text-5xl font-black text-gray-900 leading-[50px] uppercase tracking-tighter">
-              INICI DE{"\n"}SESSICÓ
+              INICI DE{"\n"}SESSIÓ
             </Text>
             <View className="flex-row items-center mt-4">
               <Text className="text-primary font-black text-xs uppercase tracking-widest">Plataforma Iter</Text>
