@@ -1,0 +1,21 @@
+﻿apps/api/src/controllers/alumne.controller.ts(43,36): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+apps/api/src/controllers/alumne.controller.ts(56,36): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+apps/api/src/controllers/enrollment.controller.ts(3,23): error TS2307: Cannot find module 'xlsx' or its corresponding type declarations.
+apps/api/src/controllers/enrollment.controller.ts(11,20): error TS2339: Property 'file' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+apps/api/src/controllers/peticio.controller.ts(3,32): error TS6059: File 'C:/Users/bielc/Pedralbes/Projecte2DAM2/tr2-reptes-tr2-g2/packages/shared/index.ts' is not under 'rootDir' 'C:/Users/bielc/Pedralbes/Projecte2DAM2/tr2-reptes-tr2-g2/apps/api'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via '@iter/shared' from file 'C:/Users/bielc/Pedralbes/Projecte2DAM2/tr2-reptes-tr2-g2/apps/api/src/controllers/peticio.controller.ts'
+    Imported via '@iter/shared' from file 'C:/Users/bielc/Pedralbes/Projecte2DAM2/tr2-reptes-tr2-g2/apps/api/src/lib/phaseUtils.ts'
+    Imported via '@iter/shared' from file 'C:/Users/bielc/Pedralbes/Projecte2DAM2/tr2-reptes-tr2-g2/apps/api/src/controllers/assignacio.controller.ts'
+    Imported via '@iter/shared' from file 'C:/Users/bielc/Pedralbes/Projecte2DAM2/tr2-reptes-tr2-g2/apps/api/src/services/tetris.service.ts'
+    Imported via '@iter/shared' from file 'C:/Users/bielc/Pedralbes/Projecte2DAM2/tr2-reptes-tr2-g2/apps/api/src/controllers/tetris.controller.ts'
+    Imported via '@iter/shared' from file 'C:/Users/bielc/Pedralbes/Projecte2DAM2/tr2-reptes-tr2-g2/apps/api/src/controllers/enrollment.controller.ts'
+    Imported via '@iter/shared' from file 'C:/Users/bielc/Pedralbes/Projecte2DAM2/tr2-reptes-tr2-g2/apps/api/src/controllers/calendar.controller.ts'
+    Imported via '@iter/shared' from file 'C:/Users/bielc/Pedralbes/Projecte2DAM2/tr2-reptes-tr2-g2/apps/api/src/routes/fase.routes.ts'
+apps/api/src/controllers/professor.controller.ts(43,39): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+apps/api/src/controllers/professor.controller.ts(56,39): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+apps/api/src/routes/assignacio.routes.ts(7,20): error TS2307: Cannot find module 'multer' or its corresponding type declarations.

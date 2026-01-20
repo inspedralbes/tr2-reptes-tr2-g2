@@ -27,14 +27,16 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    // 3. Generar JWT
+    const secret = process.env.JWT_SECRET || 'secreto_super_seguro';
+    console.log('[DEBUG] AuthController signing with secret:', secret);
+
     const token = jwt.sign(
-      { 
-        userId: usuari.id_usuari, 
-        role: usuari.rol.nom_rol, 
-        centreId: usuari.id_centre 
+      {
+        userId: usuari.id_usuari,
+        role: usuari.rol.nom_rol,
+        centreId: usuari.id_centre
       },
-      process.env.JWT_SECRET || 'secreto_super_seguro',
+      secret,
       { expiresIn: '8h' }
     );
 

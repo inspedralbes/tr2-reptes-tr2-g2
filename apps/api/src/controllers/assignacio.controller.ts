@@ -12,6 +12,12 @@ export const getAssignacionsByCentre = async (req: Request, res: Response) => {
       include: {
         taller: true,
         checklist: true,
+        inscripcions: {
+          include: {
+            alumne: true,
+            avaluacio_docent: true
+          }
+        },
         peticio: {
           include: {
             centre: true

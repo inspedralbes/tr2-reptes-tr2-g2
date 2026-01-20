@@ -66,11 +66,10 @@ const ResourcesWidget: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-3 px-6 py-3 font-black text-xs uppercase tracking-widest transition-all duration-300 border ${
-          isOpen 
-            ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' 
+        className={`flex items-center gap-3 px-6 py-3 font-black text-xs uppercase tracking-widest transition-all duration-300 border ${isOpen
+            ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue'
             : 'bg-white text-gray-600 border-gray-300 hover:border-consorci-lightBlue hover:text-consorci-darkBlue'
-        }`}
+          }`}
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -99,11 +98,6 @@ const ResourcesWidget: React.FC = () => {
                 </div>
               </a>
             ))}
-          </div>
-          <div className="mt-2 p-4 bg-gray-50 border border-gray-100">
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">
-              Consorci d'Educació de Barcelona
-            </p>
           </div>
         </div>
       )}

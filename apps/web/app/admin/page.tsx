@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 export default function AdminDashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  
+
   useEffect(() => {
     if (!authLoading && (!user || user.rol.nom_rol !== 'ADMIN')) {
       router.push('/login');
@@ -84,23 +84,34 @@ export default function AdminDashboardPage() {
   ];
 
   return (
-    <DashboardLayout 
-      title="Panel de Administración" 
+    <DashboardLayout
+      title="Panel de Administración"
       subtitle="Bienvenido al centro de control del programa Iter. Gestiona talleres, centros y solicitudes desde este panel."
     >
       <div className="flex justify-center">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
           {sections.map((section) => (
-            <div 
+            <div
               key={section.path}
               onClick={() => router.push(section.path)}
-              className="group bg-white p-8 border border-gray-100 shadow-sm cursor-pointer transition-all duration-300 hover:shadow-md"
+              className="group bg-white p-10 border border-gray-200 cursor-pointer transition-all duration-300 hover:border-[#0775AB] hover:shadow-xl relative overflow-hidden"
             >
-              <div className={`w-14 h-14 bg-${section.color}-50 flex items-center justify-center mb-6 text-${section.color}-600 shadow-inner group-hover:bg-${section.color}-600 group-hover:text-white transition-all duration-300`}>
-                {section.icon}
+              <div className="absolute top-0 right-0 w-16 h-16 bg-[#F2F2F3] -mr-8 -mt-8 rotate-45 group-hover:bg-[#0775AB] transition-colors duration-300"></div>
+
+              <div className={`w-16 h-16 bg-[#EAEFF2] flex items-center justify-center mb-8 border border-gray-100 group-hover:bg-[#00426B] group-hover:text-white transition-all duration-300`}>
+                <div className={`text-[#00426B] group-hover:text-white`}>
+                  {section.icon}
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{section.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{section.description}</p>
+              <h3 className="text-xl font-black text-[#00426B] mb-3 uppercase tracking-tight">{section.title}</h3>
+              <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">{section.description}</p>
+
+              <div className="mt-8 flex items-center text-[#0775AB] font-bold text-[10px] uppercase tracking-[0.2em] group-hover:translate-x-2 transition-transform">
+                Accedir al mòdul
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
             </div>
           ))}
         </div>
