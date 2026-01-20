@@ -57,7 +57,15 @@ export function logout() {
 export function getUser(): User | null {
   if (typeof window !== 'undefined') {
     const userStr = localStorage.getItem('user');
-    if (userStr) return JSON.parse(userStr);
+    const token = localStorage.getItem('token');
+    if (userStr && token) {
+      try {
+        return JSON.parse(userStr);
+      } catch (e) {
+        console.error("Error parsing user data", e);
+        return null;
+      }
+    }
   }
   return null;
 }

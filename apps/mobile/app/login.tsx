@@ -24,6 +24,16 @@ export default function LoginScreen() {
       const response = await login({ email, password });
       const { token, user } = response.data;
 
+      // Restricció de rol: Només els PROFESSORS poden entrar a l'app mòbil
+      if (user.rol?.nom_rol !== 'PROFESSOR') {
+        setLoading(false);
+        Alert.alert(
+          'Accés Denegat', 
+          'Aquesta aplicació mòbil és d\'ús exclusiu per a professors. Els administradors i coordinadors han d\'utilitzar la plataforma web.'
+        );
+        return;
+      }
+
       // Save token and user info
       if (Platform.OS === 'web') {
         localStorage.setItem('token', token);
@@ -52,22 +62,22 @@ export default function LoginScreen() {
         <View className="flex-1 px-8 pt-24 pb-12">
           {/* Logo / Header Area */}
           <View className="mb-16">
-            <View className="w-16 h-4 bg-accent mb-6" />
-            <Text className="text-5xl font-black text-gray-900 leading-[50px] uppercase tracking-tighter">
-              INICI DE{"\n"}SESSICÓ
+            <View className="w-16 h-2 bg-accent mb-6" />
+            <Text className="text-4xl font-bold text-[#00426B] leading-[45px] tracking-tight">
+              Inici de{"\n"}Sessió
             </Text>
             <View className="flex-row items-center mt-4">
-              <Text className="text-primary font-black text-xs uppercase tracking-widest">Plataforma Iter</Text>
-              <View className="h-[1px] flex-1 bg-gray-200 ml-4" />
+              <Text className="text-gray-400 font-bold text-xs uppercase tracking-widest">Plataforma Iter</Text>
+              <View className="h-[1px] flex-1 bg-gray-100 ml-4" />
             </View>
           </View>
 
           {/* Form */}
           <View className="space-y-6">
             <View>
-              <Text className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] mb-3 ml-1">Correu Electrònic</Text>
-              <View className="flex-row items-center border-2 border-gray-900 p-4 bg-gray-50">
-                <Ionicons name="mail-outline" size={20} color="#00426B" />
+              <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Correu Electrònic</Text>
+              <View className="flex-row items-center border border-gray-200 p-4 bg-gray-50">
+                <Ionicons name="mail-outline" size={20} color="#64748B" />
                 <TextInput
                   className="flex-1 ml-4 font-bold text-gray-900"
                   placeholder="exemple@email.cat"
@@ -81,9 +91,9 @@ export default function LoginScreen() {
             </View>
 
             <View className="mt-6">
-              <Text className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] mb-3 ml-1">Contrasenya</Text>
-              <View className="flex-row items-center border-2 border-gray-900 p-4 bg-gray-50">
-                <Ionicons name="lock-closed-outline" size={20} color="#00426B" />
+              <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Contrasenya</Text>
+              <View className="flex-row items-center border border-gray-200 p-4 bg-gray-50">
+                <Ionicons name="lock-closed-outline" size={20} color="#64748B" />
                 <TextInput
                   className="flex-1 ml-4 font-bold text-gray-900"
                   placeholder="••••••••"
@@ -101,14 +111,14 @@ export default function LoginScreen() {
 
           <View className="mt-12">
             <TouchableOpacity 
-              className={`bg-primary py-5 items-center justify-center shadow-[6px_6px_0px_0px_rgba(242,97,120,0.3)] ${loading ? 'opacity-70' : ''}`}
+              className={`bg-primary py-4 items-center justify-center ${loading ? 'opacity-70' : ''}`}
               onPress={handleLogin}
               disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator color="white" />
               ) : (
-                <Text className="text-white font-black text-sm uppercase tracking-[3px]">Entrar</Text>
+                <Text className="text-white font-bold text-sm uppercase tracking-wider">Entrar</Text>
               )}
             </TouchableOpacity>
 

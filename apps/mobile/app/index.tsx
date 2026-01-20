@@ -11,14 +11,41 @@ export default function Index() {
     async function checkAuth() {
       try {
         let token = null;
+        let userData = null;
+
         if (Platform.OS === 'web') {
           token = localStorage.getItem('token');
+          userData = localStorage.getItem('user');
         } else {
-          token = await SecureStore.getItemAsync('token');
+          try {
+            token = await SecureStore.getItemAsync('token');
+            userData = await SecureStore.getItemAsync('user');
+          } catch (ssError) {
+            console.warn("⚠️ [Auth] Error llegint SecureStore:", ssError);
+            token = null;
+            userData = null;
+          }
         }
-        setHasToken(!!token);
-      } catch (e) {
-        console.error("Auth check error", e);
+
+        if (token && userData) {
+          try {
+            const user = JSON.parse(userData);
+            if (user.rol?.nom_rol === 'PROFESSOR') {
+              setHasToken(true);
+            } else {
+              console.warn("⚠️ [Auth] Rol no permès en mòbil:", user.rol?.nom_rol);
+              setHasToken(false);
+            }
+          } catch (e) {
+            console.error("⚠️ [Auth] Error parsejant usuari:", e);
+            setHasToken(false);
+          }
+        } else {
+          setHasToken(false);
+        }
+      } catch (error) {
+        console.error("⚠️ [Auth] Error crític en checkAuth:", error);
+        setHasToken(false);
       } finally {
         setIsLoading(false);
       }
@@ -28,7 +55,7 @@ export default function Index() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
         <ActivityIndicator size="large" color="#00426B" />
       </View>
     );
