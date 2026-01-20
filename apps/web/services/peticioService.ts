@@ -27,7 +27,7 @@ const peticioService = {
   getAll: async (): Promise<Peticio[]> => {
     const api = getApi();
     try {
-      const response = await api.get<{ data: Peticio[], meta: any }>("/peticions");
+      const response = await api.get<{ data: Peticio[], meta: any }>("/peticions?limit=0");
       return response.data.data;
     } catch (error) {
       console.error("Error en peticioService.getAll:", error);

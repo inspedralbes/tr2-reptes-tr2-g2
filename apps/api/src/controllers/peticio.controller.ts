@@ -9,8 +9,9 @@ import { createNotificacioInterna } from './notificacio.controller';
 export const getPeticions = async (req: Request, res: Response) => {
   const { centreId, role } = (req as any).user || {};
   const { page = 1, limit = 10 } = req.query as any;
-  const skip = (Number(page) - 1) * Number(limit);
-  const take = Number(limit);
+  const isAll = Number(limit) === 0;
+  const skip = isAll ? undefined : (Number(page) - 1) * Number(limit);
+  const take = isAll ? undefined : Number(limit);
 
   try {
     const where: any = {};
@@ -43,7 +44,7 @@ export const getPeticions = async (req: Request, res: Response) => {
         total,
         page: Number(page),
         limit: Number(limit),
-        totalPages: Math.ceil(total / take),
+        totalPages: isAll ? 1 : Math.ceil(total / (Number(take) || 1)),
       },
     });
   } catch (error) {

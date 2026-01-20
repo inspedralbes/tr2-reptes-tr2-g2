@@ -119,25 +119,17 @@ async function main() {
   const centroMila = creadosCentres.find(c => c.codi_centre === '08013159')!;
 
   // 5. CREAR PROFESORES (PARA EL DESPLEGABLE)
-  console.log('👨‍🏫 Creando Profesores...');
-  const prof1 = await prisma.professor.create({
-    data: { nom: 'Joan Martí', contacte: 'joan.marti@xtec.cat', id_centre: centroBrossa.id_centre }
-  });
-  const prof2 = await prisma.professor.create({
-    data: { nom: 'Maria Soler', contacte: '934445566', id_centre: centroBrossa.id_centre }
-  });
-  const prof3 = await prisma.professor.create({
-    data: { nom: 'Marta Gil', contacte: 'marta@pauclaris.cat', id_centre: creadosCentres.find(c => c.codi_centre === '08013147')!.id_centre }
-  });
-  const prof4 = await prisma.professor.create({
-    data: { nom: 'Sergi Roca', contacte: 'sergi@fortpius.cat', id_centre: creadosCentres.find(c => c.codi_centre === '08013111')!.id_centre }
-  });
-  const prof5 = await prisma.professor.create({
-    data: { nom: 'Clara Bosch', contacte: 'clara@montserrat.cat', id_centre: creadosCentres.find(c => c.codi_centre === '08013123')!.id_centre }
-  });
-  await prisma.professor.create({
-    data: { nom: 'Pere Pons', contacte: 'pere.pons@xtec.cat', id_centre: centroMila.id_centre }
-  });
+  console.log('👨‍🏫 Creando Profesores para cada centro...');
+  const centerProfsMap = new Map<number, number[]>();
+  for (const centro of creadosCentres) {
+    const profA = await prisma.professor.create({
+      data: { nom: `Professor A de ${centro.nom}`, contacte: `prof.a@${centro.codi_centre}.cat`, id_centre: centro.id_centre }
+    });
+    const profB = await prisma.professor.create({
+      data: { nom: `Professor B de ${centro.nom}`, contacte: `93${Math.floor(1000000 + Math.random() * 9000000)}`, id_centre: centro.id_centre }
+    });
+    centerProfsMap.set(centro.id_centre, [profA.id_professor, profB.id_professor]);
+  }
 
   // 6. CREAR USUARIOS
   const salt = await bcrypt.genSalt(10);
@@ -439,17 +431,46 @@ async function main() {
     }
   });
 
-  // 10. PETICIÓN DE EJEMPLO
-  console.log('📝 Creando Petición de ejemplo...');
-  await prisma.peticio.create({
-    data: {
-      id_centre: centroBrossa.id_centre,
-      id_taller: tallerFusta.id_taller,
-      alumnes_aprox: 2,
-      estat: 'Pendent',
-      modalitat: 'A',
-      prof1_id: prof1.id_professor,
-      prof2_id: prof2.id_professor
+  // 10. GENERACIÓN MASIVA DE PETICIONES PARA TESTEO DE ASIGNACIÓN
+  console.log('📝 Generando muchíssimas peticiones para testeo de asignación...');
+  
+  for (let i = 0; i < creadosTallers.length; i++) {
+    const taller = creadosTallers[i];
+    
+    // Queremos que algunos talleres estén MUY sobresaturados (mínimo 6 solicitudes de 4 plazas = 24, sobrepasando las 15-16 del taller)
+    // Sobresaturamos aproximadamente 1 cada 5 talleres para tener variedad
+    const isOversaturated = i % 5 === 0;
+    
+    let numRequests: number;
+    if (isOversaturated) {
+      // Mínimo 6 solicitudes, hasta 10 para asegurar sobrecupo masivo
+      numRequests = 7 + Math.floor(Math.random() * 4);
+    } else {
+      // Solicitudes normales (1 a 4)
+      numRequests = 1 + Math.floor(Math.random() * 4);
+    }
+
+    // Barajar centros para que las solicitudes sean de centros aleatorios
+    const shuffledCentres = [...creadosCentres].sort(() => 0.5 - Math.random());
+    const selectedCentres = shuffledCentres.slice(0, numRequests);
+
+    for (const centro of selectedCentres) {
+      const profs = centerProfsMap.get(centro.id_centre) || [];
+      await prisma.peticio.create({
+        data: {
+          id_centre: centro.id_centre,
+          id_taller: taller.id_taller,
+          alumnes_aprox: isOversaturated ? 4 : 1 + Math.floor(Math.random() * 4),
+          estat: 'Pendent',
+          modalitat: taller.modalitat as any,
+          prof1_id: profs[0] || null,
+          prof2_id: profs[1] || null
+        }
+      });
+    }
+    
+    if (isOversaturated) {
+        console.log(`🔥 Taller "${taller.titol}" (ID: ${taller.id_taller}) sobresaturado con ${numRequests} solicitudes.`);
     }
   });
 
