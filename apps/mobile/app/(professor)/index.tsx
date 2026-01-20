@@ -99,14 +99,14 @@ export default function DashboardScreen() {
       <View className="p-6">
         {/* Welcome Section */}
         <View className="mb-10 pt-4">
-          <Text className="text-sm font-black uppercase tracking-[3px] text-primary mb-2">PANEL DOCENTE</Text>
-          <Text className="text-4xl font-bold text-gray-900 tracking-tighter leading-none">¡Hola!</Text>
+          <Text className="text-sm font-black uppercase tracking-[3px] text-primary mb-2">PANELL DOCENT</Text>
+          <Text className="text-4xl font-bold text-gray-900 tracking-tighter leading-none">Hola!</Text>
         </View>
 
         {/* Section Title */}
         <View className="flex-row items-center mb-6">
           <View className="w-2 h-8 bg-primary mr-3" />
-          <Text className="text-xl font-bold text-gray-900 uppercase tracking-widest">Próxima Sesión</Text>
+          <Text className="text-xl font-bold text-gray-900 uppercase tracking-widest">Propera Sessió</Text>
         </View>
 
         {/* Next Workshop Card */}
@@ -156,7 +156,7 @@ export default function DashboardScreen() {
               className={`py-5 items-center ${isPhaseActive(PHASES.EJECUCION) ? 'bg-primary active:bg-blue-900' : 'bg-gray-200'}`}
             >
               <Text className="text-white font-black text-sm uppercase tracking-[2px]">
-                {isPhaseActive(PHASES.EJECUCION) ? 'GESTIONAR ASISTENCIA' : 'SESIÓN PENDIENTE'}
+                {isPhaseActive(PHASES.EJECUCION) ? 'GESTIONAR ASSISTÈNCIA' : 'SESSIÓ PENDENT'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -169,7 +169,7 @@ export default function DashboardScreen() {
         <View className="flex-row justify-between items-center mb-6">
           <View className="flex-row items-center">
             <View className="w-2 h-8 bg-accent mr-3" />
-            <Text className="text-xl font-bold text-gray-900 uppercase tracking-widest">Alertas</Text>
+            <Text className="text-xl font-bold text-gray-900 uppercase tracking-widest">Alertes</Text>
           </View>
         </View>
 
@@ -182,7 +182,7 @@ export default function DashboardScreen() {
               <Text className="font-black text-gray-900 text-xs uppercase tracking-wider">FASE ACTUAL</Text>
             </View>
             <Text className="text-gray-600 text-xs leading-5">
-              Estamos en la fase de {fases.find(f => f.activa)?.nom || 'Carga de datos'}.
+              Estem en la fase de {fases.find(f => f.activa)?.nom || 'Càrrega de dades'}.
             </Text>
           </View>
         </View>

@@ -85,5 +85,6 @@ export const getAttendance = (idAssignacio: string) => api.get(`assistencia/assi
 export const postAttendance = (data: any) => api.post('assistencia', data);
 export const postIncidencia = (data: any) => api.post('assignacions/incidencies', data);
 export const getFases = () => api.get('fases');
+export const getCalendar = () => api.get('calendar');
 
 export default api;

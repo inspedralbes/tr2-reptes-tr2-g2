@@ -12,22 +12,22 @@ export default function ProfessorLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: THEME.colors.primary,
-          tabBarInactiveTintColor: THEME.colors.text.secondary,
+          tabBarActiveTintColor: THEME.colors.secondary,
+          tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.6)',
           tabBarStyle: {
-            borderTopWidth: 1,
-            borderTopColor: THEME.colors.neutral,
-            height: 60,
-            paddingBottom: 8,
+            borderTopWidth: 0,
+            height: 70,
+            paddingBottom: 12,
             paddingTop: 8,
-            backgroundColor: 'white',
-            borderRadius: 0, // Ensure square edges
+            backgroundColor: THEME.colors.primary,
+            borderRadius: 0,
           },
           tabBarLabelStyle: {
             fontSize: 10,
+            fontFamily: 'Helvetica Neue',
             fontWeight: 'bold',
             textTransform: 'uppercase',
-            letterSpacing: 0.5,
+            letterSpacing: 1,
           },
         }}
       >

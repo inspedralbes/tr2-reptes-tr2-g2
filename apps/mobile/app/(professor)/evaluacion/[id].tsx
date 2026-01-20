@@ -13,8 +13,8 @@ export default function EvaluacionScreen() {
   const [feedback, setFeedback] = useState('');
 
   const competencies = [
-    { title: 'COMPETENCIAS TRANSVERSALES', score: transversal, setScore: setTransversal, description: 'Trabajo en equipo, puntualidad y actitud.' },
-    { title: 'COMPETENCIAS TÉCNICAS', score: technical, setScore: setTechnical, description: 'Uso de herramientas y comprensión de conceptos.' },
+    { title: 'COMPETÈNCIES TRANSVERSALS', score: transversal, setScore: setTransversal, description: 'Treball en equip, puntualitat i actitud.' },
+    { title: 'COMPETÈNCIES TÈCNIQUES', score: technical, setScore: setTechnical, description: 'Ús d\'eines i comprensió de conceptes.' },
   ];
 
   return (
@@ -26,8 +26,8 @@ export default function EvaluacionScreen() {
           </TouchableOpacity>
           <Text className="text-2xl font-black uppercase tracking-tight">RÚBRICA DIGITAL</Text>
         </View>
-        <Text className="text-secondary font-black text-xs uppercase tracking-widest mb-1">Evaluación Semanal</Text>
-        <Text className="text-gray-500 font-bold text-[10px] uppercase tracking-wider">Taller de Robótica Avanzada</Text>
+        <Text className="text-secondary font-black text-xs uppercase tracking-widest mb-1">Avaluació Setmanal</Text>
+        <Text className="text-gray-500 font-bold text-[10px] uppercase tracking-wider">Seguiment del progrés</Text>
       </View>
 
       <View className="p-6 pt-10">
@@ -56,12 +56,12 @@ export default function EvaluacionScreen() {
         <View className="mb-12">
           <View className="flex-row items-center mb-4">
             <View className="w-2 h-8 bg-accent mr-3" />
-            <Text className="text-lg font-black text-gray-900 tracking-tight uppercase">Feedback Semanal</Text>
+            <Text className="text-lg font-black text-gray-900 tracking-tight uppercase">Feedback Setmanal</Text>
           </View>
           <TextInput
             className="bg-gray-50 border-2 border-gray-200 p-6 h-40 text-gray-900 font-bold text-xs"
             multiline
-            placeholder="Observaciones sobre el grupo o sesiones..."
+            placeholder="Observacions sobre el grup o sessions..."
             textAlignVertical="top"
             value={feedback}
             onChangeText={setFeedback}
@@ -69,20 +69,20 @@ export default function EvaluacionScreen() {
         </View>
 
         <TouchableOpacity 
-          className="bg-primary py-5 items-center mb-10"
+          className="bg-primary py-5 items-center mb-10 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.1)]"
           onPress={() => router.back()}
         >
-          <Text className="text-white font-black text-sm uppercase tracking-[2px]">GUARDAR EVALUACIÓN</Text>
+          <Text className="text-white font-black text-sm uppercase tracking-[2px]">GUARDAR AVALUACIÓ</Text>
         </TouchableOpacity>
 
         <View className="bg-beige/20 p-8 border-l-8 border-beige mb-12">
-          <Text className="text-xs font-black text-gray-900 uppercase tracking-widest mb-4">Encuesta Final de Proyecto</Text>
-          <Text className="text-gray-600 font-bold text-xs mb-6 leading-5">Solo debe completarse una vez finalizado el taller completo.</Text>
+          <Text className="text-xs font-black text-gray-900 uppercase tracking-widest mb-4">Enquesta Final de Projecte</Text>
+          <Text className="text-gray-600 font-bold text-xs mb-6 leading-5">Només s'ha de completar un cop finalitzat el taller complet.</Text>
           <TouchableOpacity 
             onPress={() => Linking.openURL('https://forms.gle/example')}
             className="flex-row items-center"
           >
-            <Text className="text-primary font-black text-xs uppercase tracking-widest">IR AL FORMULARIO</Text>
+            <Text className="text-primary font-black text-xs uppercase tracking-widest">ANAR AL FORMULARI</Text>
             <Ionicons name="open-outline" size={16} color={THEME.colors.primary} className="ml-2" />
           </TouchableOpacity>
         </View>

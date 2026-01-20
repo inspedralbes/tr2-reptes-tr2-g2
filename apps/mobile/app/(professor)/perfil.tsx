@@ -44,16 +44,16 @@ export default function PerfilScreen() {
     };
 
     if (Platform.OS === 'web') {
-      if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+      if (confirm('Estàs segur que vols tancar la sessió?')) {
         await performLogout();
       }
     } else {
       Alert.alert(
-        'Cerrar Sesión',
-        '¿Estás seguro de que quieres cerrar tu sesión actual?',
+        'Tancar Sessió',
+        'Estàs segur que vols tancar la teva sessió actual?',
         [
-          { text: 'Cancelar', style: 'cancel' },
-          { text: 'Cerrar Sesión', style: 'destructive', onPress: performLogout }
+          { text: 'Cancel·lar', style: 'cancel' },
+          { text: 'Tancar Sessió', style: 'destructive', onPress: performLogout }
         ]
       );
     }
@@ -122,9 +122,9 @@ export default function PerfilScreen() {
 
         <TouchableOpacity 
           onPress={handleLogout}
-          className="bg-accent py-5 items-center mt-10 active:opacity-80 shadow-[6px_6px_0px_0px_rgba(242,97,120,0.3)]"
+          className="bg-accent py-5 items-center mt-10 active:opacity-80 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.1)]"
         >
-          <Text className="text-white font-black text-sm uppercase tracking-[3px]">CERRAR SESSIÓ</Text>
+          <Text className="text-white font-black text-sm uppercase tracking-[3px]">TANCAR SESSIÓ</Text>
         </TouchableOpacity>
 
         <View className="mt-12 items-center">

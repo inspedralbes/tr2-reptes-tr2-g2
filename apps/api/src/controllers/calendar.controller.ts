@@ -73,11 +73,16 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
     if (a.data_inici) {
       events.push({
         id: `assign-${a.id_assignacio}`,
-        title: user.role === ROLES.COORDINADOR ? `Taller: ${a.taller.titol}` : `${a.taller.titol} @ ${a.centre.nom}`,
+        title: user.role === ROLES.COORDINADOR ? `Taller: ${a.titol}` : `${a.taller.titol}`,
         date: a.data_inici.toISOString(),
         endDate: a.data_fi?.toISOString(),
         type: 'assignment',
-        metadata: { id_assignacio: a.id_assignacio }
+        metadata: { 
+          id_assignacio: a.id_assignacio,
+          centre: a.centre?.nom,
+          adreca: a.centre?.adreca,
+          hora: '09:00 - 13:00' // Hardcoded for now as it's the standard
+        }
       });
     }
   });

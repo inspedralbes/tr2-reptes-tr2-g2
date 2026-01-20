@@ -111,7 +111,7 @@ export default function LoginScreen() {
 
           <View className="mt-12">
             <TouchableOpacity 
-              className={`bg-primary py-5 items-center justify-center shadow-[6px_6px_0px_0px_rgba(242,97,120,0.3)] ${loading ? 'opacity-70' : ''}`}
+              className={`bg-primary py-5 items-center justify-center shadow-[6px_6px_0px_0px_rgba(0,66,107,0.1)] ${loading ? 'opacity-70' : ''}`}
               onPress={handleLogin}
               disabled={loading}
             >

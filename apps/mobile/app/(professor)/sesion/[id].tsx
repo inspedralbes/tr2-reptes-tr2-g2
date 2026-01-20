@@ -120,10 +120,10 @@ export default function SesionScreen() {
   };
 
   const getStatusLabel = (status: string) => {
-    if (status.includes('retard')) return 'RETRASO';
-    if (status.includes('abs')) return 'AUSENTE';
-    if (status.includes('pres')) return 'PRESENTE';
-    return 'PENDIENTE';
+    if (status.includes('retard')) return 'RETARD';
+    if (status.includes('abs')) return 'ABSENT';
+    if (status.includes('pres')) return 'PRESENT';
+    return 'PENDENT';
   };
 
   if (loading) {
@@ -141,17 +141,17 @@ export default function SesionScreen() {
           <TouchableOpacity onPress={() => router.back()} className="mr-6">
             <Ionicons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
-          <Text className="text-2xl font-black uppercase tracking-tight">PASE DE LISTA</Text>
+          <Text className="text-2xl font-black uppercase tracking-tight">CONTROL D'ASSISTÈNCIA</Text>
         </View>
         <Text className="text-primary font-black text-xs uppercase tracking-widest mb-1">
-          {assignmentInfo?.taller?.titol || 'Cargando taller...'}
+          {assignmentInfo?.taller?.titol || 'Carregant taller...'}
         </Text>
         <TouchableOpacity 
           onPress={() => setSessionModal(true)}
           className="flex-row items-center"
         >
           <Text className="text-gray-500 font-bold text-[10px] uppercase tracking-wider">
-            SESIÓN {sessionNumber}/10 • {new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
+            SESSIÓ {sessionNumber}/10 • {new Date().toLocaleDateString('ca-ES', { day: 'numeric', month: 'long' })}
           </Text>
           <Ionicons name="chevron-down" size={12} color="#6B7280" style={{ marginLeft: 4 }} />
         </TouchableOpacity>
@@ -159,13 +159,13 @@ export default function SesionScreen() {
 
       <View className="flex-1 bg-gray-50 px-6 pt-8">
         <View className="flex-row justify-between items-center mb-8">
-          <Text className="text-lg font-black text-gray-900 uppercase">ALUMNOS ({students.length})</Text>
+          <Text className="text-lg font-black text-gray-900 uppercase">ALUMNES ({students.length})</Text>
           <TouchableOpacity 
             onPress={() => setIncidentModal(true)}
-            className="bg-accent px-4 py-3 flex-row items-center"
+            className="bg-accent px-4 py-3 flex-row items-center shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]"
           >
             <Ionicons name="warning" size={16} color="white" />
-            <Text className="text-white font-black text-[10px] uppercase tracking-widest ml-2">INCIDENCIA</Text>
+            <Text className="text-white font-black text-[10px] uppercase tracking-widest ml-2">INCIDÈNCIA</Text>
           </TouchableOpacity>
         </View>
 
@@ -219,12 +219,12 @@ export default function SesionScreen() {
           <View className="bg-white border-4 border-gray-900 p-8">
             {selectedStudent && (
               <>
-                <Text className="text-sm font-black text-secondary mb-2 uppercase tracking-[2px]">FICHA ALUMNO</Text>
+                <Text className="text-sm font-black text-secondary mb-2 uppercase tracking-[2px]">FITXA ALUMNE</Text>
                 <Text className="text-3xl font-black text-gray-900 mb-2 uppercase tracking-tight">{selectedStudent.name}</Text>
                 <Text className="text-gray-500 font-bold mb-8 uppercase tracking-widest text-xs">{selectedStudent.institute}</Text>
                 
                 <View className="bg-gray-100 p-6 mb-10 border-l-8 border-primary">
-                  <Text className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-3">PERMISOS DE SALIDA</Text>
+                  <Text className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-3">PERMISOS DE SORTIDA</Text>
                   <View className="flex-row items-center">
                     <Ionicons name="information-circle" size={20} color={THEME.colors.primary} />
                     <Text className="text-gray-900 ml-3 font-black text-xs uppercase">{selectedStudent.permissions}</Text>
@@ -235,7 +235,7 @@ export default function SesionScreen() {
                   className="bg-primary py-5 items-center"
                   onPress={() => setModalVisible(false)}
                 >
-                  <Text className="text-white font-black text-sm uppercase tracking-widest">CERRAR</Text>
+                  <Text className="text-white font-black text-sm uppercase tracking-widest">TANCAR</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -247,8 +247,8 @@ export default function SesionScreen() {
       <Modal visible={incidentModal} animationType="none" transparent={true}>
         <View className="flex-1 justify-center bg-gray-900/90 px-6">
           <View className="bg-white border-4 border-gray-900 p-8">
-            <Text className="text-2xl font-black text-gray-900 mb-2 uppercase tracking-tighter">REGISTRAR INCIDENCIA</Text>
-            <Text className="text-gray-500 font-bold mb-8 uppercase tracking-widest text-[10px]">Describa brevemente el problema de comportamiento.</Text>
+            <Text className="text-2xl font-black text-gray-900 mb-2 uppercase tracking-tighter">REGISTRAR INCIDÈNCIA</Text>
+            <Text className="text-gray-500 font-bold mb-8 uppercase tracking-widest text-[10px]">Descriu breument el problema de comportament.</Text>
             
             <TextInput 
               className="bg-gray-50 border-2 border-gray-200 p-5 h-40 text-gray-900 font-bold text-xs mb-8"
@@ -280,8 +280,8 @@ export default function SesionScreen() {
       {/* Session Selector Modal */}
       <Modal visible={sessionModal} animationType="slide" transparent={true}>
         <View className="flex-1 justify-end bg-black/50">
-          <View className="bg-white p-6 pb-12 rounded-t-[40px]">
-            <Text className="text-xl font-black text-gray-900 mb-6 text-center uppercase tracking-widest">Seleccionar Sesión</Text>
+          <View className="bg-white p-6 pb-12 border-t-4 border-gray-900">
+            <Text className="text-xl font-black text-gray-900 mb-6 text-center uppercase tracking-widest">Seleccionar Sessió</Text>
             <View className="flex-row flex-wrap justify-center">
               {[1,2,3,4,5,6,7,8,9,10].map(n => (
                 <TouchableOpacity 
@@ -295,9 +295,9 @@ export default function SesionScreen() {
             </View>
             <TouchableOpacity 
               onPress={() => setSessionModal(false)}
-              className="mt-8 bg-gray-100 py-4 items-center"
+              className="mt-8 bg-gray-100 py-4 items-center border border-gray-200"
             >
-              <Text className="text-gray-500 font-black uppercase tracking-widest">CERRAR</Text>
+              <Text className="text-gray-500 font-black uppercase tracking-widest">TANCAR</Text>
             </TouchableOpacity>
           </View>
         </View>
