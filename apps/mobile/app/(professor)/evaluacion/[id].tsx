@@ -13,55 +13,51 @@ export default function EvaluacionScreen() {
   const [feedback, setFeedback] = useState('');
 
   const competencies = [
-    { title: 'COMPETENCIAS TRANSVERSALES', score: transversal, setScore: setTransversal, description: 'Trabajo en equipo, puntualidad y actitud.' },
-    { title: 'COMPETENCIAS TÉCNICAS', score: technical, setScore: setTechnical, description: 'Uso de herramientas y comprensión de conceptos.' },
+    { title: 'COMPETÈNCIES TRANSVERSALS', score: transversal, setScore: setTransversal, description: 'Treball en equip, puntualitat i actitud.' },
+    { title: 'COMPETÈNCIES TÈCNIQUES', score: technical, setScore: setTechnical, description: 'Ús d\'eines i comprensió de conceptes.' },
   ];
 
   return (
-    <ScrollView className="flex-1 bg-white" showsVerticalScrollIndicator={false}>
-      <View className="p-6 pt-10 border-b-2 border-gray-900">
-        <View className="flex-row items-center mb-6">
-          <TouchableOpacity onPress={() => router.back()} className="mr-6">
-            <Ionicons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity>
-          <Text className="text-2xl font-black uppercase tracking-tight">RÚBRICA DIGITAL</Text>
-        </View>
-        <Text className="text-secondary font-black text-xs uppercase tracking-widest mb-1">Evaluación Semanal</Text>
-        <Text className="text-gray-500 font-bold text-[10px] uppercase tracking-wider">Taller de Robótica Avanzada</Text>
-      </View>
+    <ScrollView className="flex-1 bg-[#F9FAFB] pt-4" showsVerticalScrollIndicator={false}>
 
       <View className="p-6 pt-10">
         {competencies.map((comp, index) => (
-          <View key={index} className="mb-12">
+          <View key={index} className="mb-12 bg-white p-6 border border-gray-200">
             <View className="flex-row items-center mb-4">
-              <View className="w-2 h-8 bg-primary mr-3" />
-              <Text className="text-lg font-black text-gray-900 tracking-tight uppercase">{comp.title}</Text>
+              <View className={`p-3 mr-4 ${index === 0 ? 'bg-indigo-50' : 'bg-blue-50'}`}>
+                <Ionicons name={index === 0 ? 'people' : 'construct'} size={20} color={index === 0 ? '#6366F1' : '#3B82F6'} />
+              </View>
+              <View className="flex-1">
+                <Text className="text-lg font-bold text-gray-900 tracking-tight">{comp.title}</Text>
+              </View>
             </View>
-            <Text className="text-gray-500 font-bold text-[10px] uppercase tracking-[1px] mb-6 leading-4">{comp.description}</Text>
+            <Text className="text-gray-500 font-medium text-[11px] mb-6 leading-4">{comp.description}</Text>
             
             <View className="flex-row justify-between">
               {[1, 2, 3, 4, 5].map((num) => (
                 <TouchableOpacity
                   key={num}
                   onPress={() => comp.setScore(num)}
-                  className={`w-14 h-14 items-center justify-center border-2 ${comp.score === num ? 'bg-primary border-primary' : 'bg-white border-gray-200'}`}
+                  className={`w-12 h-12 items-center justify-center border ${comp.score === num ? 'bg-primary border-primary' : 'bg-gray-50 border-gray-100'}`}
                 >
-                  <Text className={`text-xl font-black ${comp.score === num ? 'text-white' : 'text-gray-400'}`}>{num}</Text>
+                  <Text className={`text-lg font-bold ${comp.score === num ? 'text-white' : 'text-gray-400'}`}>{num}</Text>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
         ))}
 
-        <View className="mb-12">
+        <View className="mb-12 bg-white p-6 border border-gray-200">
           <View className="flex-row items-center mb-4">
-            <View className="w-2 h-8 bg-accent mr-3" />
-            <Text className="text-lg font-black text-gray-900 tracking-tight uppercase">Feedback Semanal</Text>
+            <View className="bg-orange-50 p-3 mr-4">
+              <Ionicons name="chatbox-ellipses" size={20} color="#F97316" />
+            </View>
+            <Text className="text-lg font-bold text-gray-900 tracking-tight">Feedback Setmanal</Text>
           </View>
           <TextInput
-            className="bg-gray-50 border-2 border-gray-200 p-6 h-40 text-gray-900 font-bold text-xs"
+            className="bg-gray-50 border border-gray-200 p-4 h-40 text-gray-900 font-medium text-sm"
             multiline
-            placeholder="Observaciones sobre el grupo o sesiones..."
+            placeholder="Observacions sobre el grup o sessions..."
             textAlignVertical="top"
             value={feedback}
             onChangeText={setFeedback}
@@ -69,20 +65,25 @@ export default function EvaluacionScreen() {
         </View>
 
         <TouchableOpacity 
-          className="bg-primary py-5 items-center mb-10"
+          className="bg-primary py-4 items-center mb-10"
           onPress={() => router.back()}
         >
-          <Text className="text-white font-black text-sm uppercase tracking-[2px]">GUARDAR EVALUACIÓN</Text>
+          <Text className="text-white font-bold text-sm uppercase tracking-wider">Guardar Avaluació</Text>
         </TouchableOpacity>
 
-        <View className="bg-beige/20 p-8 border-l-8 border-beige mb-12">
-          <Text className="text-xs font-black text-gray-900 uppercase tracking-widest mb-4">Encuesta Final de Proyecto</Text>
-          <Text className="text-gray-600 font-bold text-xs mb-6 leading-5">Solo debe completarse una vez finalizado el taller completo.</Text>
+        <View className="bg-white p-8 border border-gray-200 mb-12">
+          <View className="flex-row items-center mb-4">
+            <View className="bg-green-50 p-3 mr-4">
+              <Ionicons name="document-text" size={20} color="#10B981" />
+            </View>
+            <Text className="text-sm font-bold text-gray-900 tracking-tight">Enquesta Final de Projecte</Text>
+          </View>
+          <Text className="text-gray-500 font-medium text-xs mb-6 leading-5">Només s'ha de completar un cop finalitzat el taller complet.</Text>
           <TouchableOpacity 
             onPress={() => Linking.openURL('https://forms.gle/example')}
-            className="flex-row items-center"
+            className="bg-gray-50 py-3 items-center border border-gray-100 flex-row justify-center"
           >
-            <Text className="text-primary font-black text-xs uppercase tracking-widest">IR AL FORMULARIO</Text>
+            <Text className="text-primary font-bold text-xs uppercase tracking-wider mr-2">Anar al formulari</Text>
             <Ionicons name="open-outline" size={16} color={THEME.colors.primary} className="ml-2" />
           </TouchableOpacity>
         </View>
