@@ -334,7 +334,7 @@ model AutoconsultaAlumne {
 }
 
 enum ImpacteVocacional {
-  SI          @map("Sí, m'ha aclarat les idees")
+  SI          @map("Sí, m’ha aclarat les idees")
   NO          @map("No, ja ho tenia clar o no és per a mi")
   CONSIDERANT @map("Ho estic considerant ara mateix")
 }
