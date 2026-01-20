@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { THEME, PHASES } from '@iter/shared';
-import api, { getMyAssignments, getFases } from '../../services/api';
+import api, { getMyAssignments, getFases } from '../../../services/api';
 
 export default function DashboardScreen() {
   const router = useRouter();

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME } from '@iter/shared';
-import { getMyAssignments } from '../../services/api';
+import { getMyAssignments } from '../../../services/api';
 
 export default function CoordinacionScreen() {
   const [assignments, setAssignments] = useState<any[]>([]);

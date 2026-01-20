@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { THEME } from '@iter/shared';
-import { getCalendar } from '../../services/api';
-import CalendarView, { CalendarEvent } from '../../components/CalendarView';
+import { getCalendar } from '../../../services/api';
+import CalendarView, { CalendarEvent } from '../../../components/CalendarView';
 
 export default function AgendaScreen() {
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
