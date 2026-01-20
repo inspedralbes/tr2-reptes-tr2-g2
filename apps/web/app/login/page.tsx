@@ -62,17 +62,17 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4" style={{ backgroundColor: THEME.colors.background }}>
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100 animate-in fade-in zoom-in duration-500">
+      <div className="w-full max-w-md bg-white p-8 border border-gray-300">
         <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
-             <span className="text-blue-600 font-black text-2xl">E</span>
+          <div className="w-16 h-16 bg-gray-50 border border-gray-200 flex items-center justify-center mx-auto mb-4">
+             <span className="text-consorci-darkBlue font-bold text-2xl">E</span>
           </div>
-          <h2 className="text-3xl font-black tracking-tight" style={{ color: THEME.colors.primary, fontFamily: THEME.fonts.primary }}>Programa Iter</h2>
+          <h2 className="text-3xl font-black tracking-tight" style={{ color: THEME.colors.primary, fontFamily: THEME.fonts.primary }}>Iter</h2>
           <p className="text-gray-400 font-medium mt-2">Gestió de tallers i centres</p>
         </div>
         
         {error && (
-          <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl mb-8 text-sm font-bold flex items-center gap-3 animate-shake">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 mb-8 text-sm font-bold flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
@@ -81,14 +81,14 @@ export default function LoginPage() {
         )}
 
         {showProfessorLink ? (
-          <div className="bg-blue-50 border border-blue-100 p-8 rounded-2xl text-center animate-in slide-in-from-bottom duration-500">
-            <h3 className="text-xl font-black text-blue-900 mb-2">Accés via App Mòbil</h3>
-            <p className="text-sm text-blue-700/70 font-medium mb-8 leading-relaxed">
+          <div className="bg-blue-50 border border-blue-200 p-8 text-center animate-in slide-in-from-bottom duration-500">
+            <h3 className="text-xl font-bold text-consorci-darkBlue mb-2">Accés via App Mòbil</h3>
+            <p className="text-sm text-gray-600 font-medium mb-8 leading-relaxed">
               Com a professor, has d'utilitzar l'aplicació mòbil d'Iter per gestionar les teves sessions d'aprenentatge.
             </p>
             <a 
               href="#" 
-              className="group relative flex items-center justify-center w-full py-4 bg-blue-600 text-white font-black rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-200 active:scale-95"
+              className="group relative flex items-center justify-center w-full py-4 bg-consorci-darkBlue text-white font-bold transition-colors hover:bg-consorci-lightBlue"
               onClick={(e) => { e.preventDefault(); alert('Enllaç de descàrrega próximament (Expo)'); }}
             >
               <span className="mr-2">Descarregar App Iter</span>
@@ -98,7 +98,7 @@ export default function LoginPage() {
             </a>
             <button 
               onClick={() => setShowProfessorLink(false)}
-              className="mt-6 text-xs font-bold text-blue-400 hover:text-blue-600 tracking-widest uppercase transition-colors"
+              className="mt-6 text-xs font-bold text-consorci-lightBlue hover:text-consorci-darkBlue tracking-widest uppercase transition-colors"
             >
               ← Tornar al login
             </button>
@@ -112,7 +112,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all font-bold text-gray-900 placeholder:text-gray-300"
+                  className="w-full px-5 py-4 bg-gray-50 border border-gray-200 focus:border-consorci-darkBlue transition-all font-bold text-gray-900 placeholder:text-gray-300 outline-none"
                   placeholder="coordinador@centre.cat"
                   required
                 />
@@ -129,7 +129,7 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 transition-all font-bold text-gray-900 placeholder:text-gray-300 pr-12"
+                  className="w-full px-5 py-4 bg-gray-50 border border-gray-200 focus:border-consorci-darkBlue transition-all font-bold text-gray-900 placeholder:text-gray-300 pr-12 outline-none"
                   placeholder="••••••••"
                   required
                 />
@@ -156,7 +156,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 rounded-2xl text-white font-black transition-all duration-200 disabled:opacity-50 shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5 active:translate-y-0"
+              className="w-full py-4 text-white font-bold transition-all duration-200 disabled:opacity-50"
               style={{ backgroundColor: THEME.colors.primary }}
             >
               {loading ? (

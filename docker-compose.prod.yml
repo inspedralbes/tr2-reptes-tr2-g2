@@ -1,22 +1,8 @@
 services:
-  # En producción REAL, la DB suele estar fuera (AWS RDS, Atlas, etc).
-  # Pero si la quieres en Docker también, descomenta estas líneas:
-  # db:
-  #   image: postgres:15-alpine
-  #   restart: always
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: root
-  #     POSTGRES_DB: iter_db
-  #   volumes:
-  #     - postgres_prod_data:/var/lib/postgresql/data
-  #   networks:
-  #     - iter-network-prod
-
   web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
       target: runner-web
     restart: always
     ports:
@@ -29,19 +15,21 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
       target: runner-api
     restart: always
     ports:
       - "3000:3000"
     env_file:
       - ./apps/api/.env
+    # Afegeix extra_hosts per permetre la connexió a la base de dades local del host.
+    # Al teu arxiu .env a apps/api, configura la DATABASE_URL així:
+    # DATABASE_URL="postgresql://USER:PASSWORD@host.docker.internal:5432/DATABASE"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - iter-network-prod
 
 networks:
   iter-network-prod:
     driver: bridge
-
-# volumes:
-#   postgres_prod_data:

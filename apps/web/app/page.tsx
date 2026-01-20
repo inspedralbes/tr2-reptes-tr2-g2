@@ -25,7 +25,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen justify-center items-center" style={{ backgroundColor: THEME.colors.background }}>
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: THEME.colors.primary }}></div>
+      <div className="animate-spin h-12 w-12 border-b-2 mx-auto" style={{ borderColor: THEME.colors.primary }}></div>
     </div>
   );
 }

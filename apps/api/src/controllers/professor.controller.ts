@@ -60,3 +60,40 @@ export const deleteProfessor = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al eliminar profesor' });
   }
 };
+
+export const getProfessorAssignments = async (req: Request, res: Response) => {
+  const { userId, centreId } = (req as any).user;
+
+  try {
+    if (!centreId) {
+        return res.json([]);
+    }
+
+    const assignments = await prisma.assignacio.findMany({
+      where: {
+        id_centre: parseInt(centreId)
+      },
+      include: {
+        taller: true,
+        centre: true,
+        prof1: true,
+        prof2: true,
+        professors: {
+          include: {
+            usuari: {
+              select: {
+                nom_complet: true,
+                email: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    res.json(assignments);
+  } catch (error) {
+    console.error("Error fetching professor assignments:", error);
+    res.status(500).json({ error: 'Error al obtener las asignaciones del centro.' });
+  }
+};

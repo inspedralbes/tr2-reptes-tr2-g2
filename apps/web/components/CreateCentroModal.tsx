@@ -89,8 +89,8 @@ const CreateCentroModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transform transition-all scale-100">
-        <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
+      <div className="bg-white border-l border-r shadow-none w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="bg-gray-50 px-6 py-4 border-b border-gray-300 flex justify-between items-center sticky top-0 z-10">
           <div>
             <h2 className="text-xl font-bold text-gray-800">
               {initialData ? "Editar Centro" : "Crear Nuevo Centro"}
@@ -101,7 +101,7 @@ const CreateCentroModal = ({
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 transition-colors focus:outline-none focus:ring-1 focus:ring-consorci-darkBlue"
             aria-label="Cerrar"
           >
             <svg
@@ -122,7 +122,7 @@ const CreateCentroModal = ({
 
         <div className="p-6 overflow-y-auto custom-scrollbar">
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r">
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg
@@ -150,7 +150,7 @@ const CreateCentroModal = ({
                 Código del Centro <span className="text-red-500">*</span>
               </label>
               <input
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-black"
+                className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none text-black"
                 placeholder="Ej: 08012345"
                 value={codiCentre}
                 onChange={(e) => setCodiCentre(e.target.value)}
@@ -162,7 +162,7 @@ const CreateCentroModal = ({
                 Nombre del Centro <span className="text-red-500">*</span>
               </label>
               <input
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-black"
+                className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none text-black"
                 placeholder="Ej: Institut Pedralbes"
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
@@ -174,7 +174,7 @@ const CreateCentroModal = ({
                 Dirección
               </label>
               <input
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-black"
+                className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none text-black"
                 placeholder="Ej: Calle Mayor, 123"
                 value={adreca}
                 onChange={(e) => setAdreca(e.target.value)}
@@ -186,7 +186,7 @@ const CreateCentroModal = ({
                 Teléfono de Contacto
               </label>
               <input
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-black"
+                className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none text-black"
                 placeholder="Ej: 931234567"
                 value={telefonContacte}
                 onChange={(e) => setTelefonContacte(e.target.value)}
@@ -198,7 +198,7 @@ const CreateCentroModal = ({
                 Email de Contacto
               </label>
               <input
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-black"
+                className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none text-black"
                 placeholder="Ej: contacto@centro.edu"
                 value={emailContacte}
                 onChange={(e) => setEmailContacte(e.target.value)}
@@ -209,7 +209,7 @@ const CreateCentroModal = ({
               <input
                 id="asistencia"
                 type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-consorci-darkBlue focus:ring-consorci-darkBlue border-gray-300"
                 checked={asistenciaReunion}
                 onChange={(e) => setAsistenciaReunion(e.target.checked)}
               />
@@ -223,14 +223,14 @@ const CreateCentroModal = ({
         <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end space-x-3">
           <button
             onClick={onClose}
-            className="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
+            className="px-6 py-2.5 border border-gray-300 text-gray-700 font-medium hover:bg-gray-100 focus:outline-none transition-colors"
           >
             Cancelar
           </button>
           <button
-            className={`px-6 py-2.5 rounded-lg text-white font-bold shadow-md transform transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${loading
-              ? "bg-blue-400 cursor-not-allowed"
-              : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+            className={`px-6 py-2.5 text-white font-bold transition-colors focus:outline-none ${loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-consorci-darkBlue hover:bg-consorci-lightBlue"
               }`}
             onClick={handleSubmit}
             disabled={loading}

@@ -49,17 +49,32 @@ export default function AvisosPage() {
 
   const getImportanceStyles = (imp: string) => {
     switch(imp) {
-      case 'URGENT': return 'bg-red-50 text-red-700 border-red-100';
-      case 'WARNING': return 'bg-orange-50 text-orange-700 border-orange-100';
-      default: return 'bg-blue-50 text-blue-700 border-blue-100';
+      case 'URGENT': return 'bg-red-50 text-red-700 border-red-200';
+      case 'WARNING': return 'bg-orange-50 text-orange-700 border-orange-200';
+      default: return 'bg-gray-50 text-consorci-darkBlue border-gray-200';
     }
   };
 
   const getTypeIcon = (tipus: string) => {
     switch(tipus) {
-      case 'PETICIO': return '📝';
-      case 'FASE': return '🗓️';
-      default: return '🔔';
+      case 'PETICIO': 
+        return (
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        );
+      case 'FASE': 
+        return (
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        );
+      default: 
+        return (
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        );
     }
   };
 
@@ -68,50 +83,57 @@ export default function AvisosPage() {
       title="Avisos i Notificacions" 
       subtitle="Estigues al dia dels canvis de fase, resolucions de sol·licituds i comunicacions oficials."
     >
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto pb-12">
         {loading ? (
           <div className="py-20 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-400 text-sm font-bold uppercase tracking-widest">Carregant avisos...</p>
+            <div className="animate-spin h-10 w-10 border-4 border-consorci-darkBlue border-t-transparent mx-auto mb-6"></div>
+            <p className="text-gray-400 text-xs font-black uppercase tracking-widest">Carregant avisos oficials...</p>
           </div>
         ) : notificacions.length > 0 ? (
-          <div className="space-y-4">
-            {notificacions.map(notif => (
+          <div className="flex flex-col border border-gray-200 bg-gray-50/30">
+            {notificacions.map((notif, index) => (
               <div 
                 key={notif.id_notificacio} 
-                className={`p-6 border rounded-2xl transition-all ${notif.llegida ? 'bg-white opacity-70' : 'bg-white shadow-md border-transparent ring-1 ring-gray-100'}`}
+                className={`p-6 border-b border-gray-100 last:border-b-0 transition-colors hover:bg-white relative ${notif.llegida ? 'bg-transparent' : 'bg-white'}`}
               >
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-2xl">
+                {!notif.llegida && (
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-consorci-darkBlue" />
+                )}
+                
+                <div className="flex justify-between items-start gap-6">
+                  <div className="flex gap-6 flex-1">
+                    <div className={`shrink-0 w-12 h-12 flex items-center justify-center border border-gray-100 ${notif.llegida ? 'bg-gray-50 text-gray-400' : 'bg-white text-consorci-darkBlue ring-1 ring-gray-100'}`}>
                       {getTypeIcon(notif.tipus)}
                     </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <h3 className={`font-bold transition-all ${notif.llegida ? 'text-gray-600' : 'text-gray-900 text-lg'}`}>
-                          {notif.titol}
-                        </h3>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border ${getImportanceStyles(notif.importancia)}`}>
+                    
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center gap-3 mb-2">
+                        <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-wider border ${getImportanceStyles(notif.importancia)}`}>
                           {notif.importancia}
                         </span>
-                        {!notif.llegida && (
-                          <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
-                        )}
+                        <h3 className={`font-black tracking-tight leading-tight ${notif.llegida ? 'text-gray-500' : 'text-consorci-darkBlue text-lg'}`}>
+                          {notif.titol}
+                        </h3>
                       </div>
-                      <p className={`text-sm mb-3 ${notif.llegida ? 'text-gray-400' : 'text-gray-600'}`}>
+                      
+                      <p className={`text-sm leading-relaxed mb-4 ${notif.llegida ? 'text-gray-400' : 'text-gray-600'}`}>
                         {notif.missatge}
                       </p>
-                      <div className="text-[10px] font-black text-gray-300 uppercase tracking-widest">
+                      
+                      <div className="text-[10px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-2">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                         {new Date(notif.data_creacio).toLocaleString()}
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex flex-col gap-2">
+                  <div className="flex gap-2">
                     {!notif.llegida && (
                       <button 
                         onClick={() => markRead(notif.id_notificacio)}
-                        className="p-2 hover:bg-blue-50 text-blue-600 rounded-lg transition-colors group"
+                        className="p-2 bg-gray-50 hover:bg-consorci-darkBlue hover:text-white border border-gray-100 transition-all active:scale-90"
                         title="Marcar com a llegit"
                       >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -121,7 +143,7 @@ export default function AvisosPage() {
                     )}
                     <button 
                       onClick={() => deleteNotif(notif.id_notificacio)}
-                      className="p-2 hover:bg-red-50 text-red-400 rounded-lg transition-colors"
+                      className="p-2 bg-gray-50 hover:bg-red-50 hover:text-red-600 border border-gray-100 transition-all active:scale-90"
                       title="Eliminar"
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -134,12 +156,14 @@ export default function AvisosPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-3xl p-20 text-center border border-dashed border-gray-200">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">📭</span>
+          <div className="p-20 text-center border-2 border-dashed border-gray-200 bg-gray-50/30">
+            <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mx-auto mb-6 text-gray-300">
+              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
             </div>
-            <h4 className="text-lg font-bold text-gray-800">No tens avisos pendents</h4>
-            <p className="text-sm text-gray-400 mt-1">Quan hi hagi canvis en les teves sol·licituds o dates clau, apareixeran aquí.</p>
+            <h4 className="text-consorci-darkBlue font-black uppercase tracking-widest text-sm mb-2">No tens avisos pendents</h4>
+            <p className="text-gray-400 text-xs font-bold leading-relaxed max-w-xs mx-auto">Quan hi hagi canvis en les teves sol·licituds o dates clau, apareixeran aquí.</p>
           </div>
         )}
       </div>

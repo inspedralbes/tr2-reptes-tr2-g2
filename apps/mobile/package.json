@@ -13,8 +13,8 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@iter/shared": "file:../../packages/shared",
     "@expo/vector-icons": "^15.0.3",
+    "@iter/shared": "file:../../packages/shared",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/material-top-tabs": "^7.4.11",
@@ -47,6 +47,7 @@
     "react-native-tab-view": "^4.2.2",
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.5.1",
+    "semver": "^7.7.3",
     "tailwindcss": "^3.4.19"
   },
   "devDependencies": {
