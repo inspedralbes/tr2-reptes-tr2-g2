@@ -8,7 +8,7 @@ import { ROLES } from '@iter/shared';
  */
 export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
   const { idAssignacio } = req.params;
-  const file = req.file;
+  const file = (req as any).file;
 
   if (!file) {
     return res.status(400).json({ error: 'No files were uploaded.' });
@@ -65,18 +65,18 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
           id_alumne: alumne.id_alumne
         }
       }).catch(async () => {
-         // Manual check for existing
-         const existing = await prisma.inscripcio.findFirst({
-           where: { id_assignacio: assignacio.id_assignacio, id_alumne: alumne.id_alumne }
-         });
-         if (!existing) {
-           return prisma.inscripcio.create({
-             data: { id_assignacio: assignacio.id_assignacio, id_alumne: alumne.id_alumne }
-           });
-         }
-         return existing;
+        // Manual check for existing
+        const existing = await prisma.inscripcio.findFirst({
+          where: { id_assignacio: assignacio.id_assignacio, id_alumne: alumne.id_alumne }
+        });
+        if (!existing) {
+          return prisma.inscripcio.create({
+            data: { id_assignacio: assignacio.id_assignacio, id_alumne: alumne.id_alumne }
+          });
+        }
+        return existing;
       });
-      
+
       results.push(inscripcio);
     }
 

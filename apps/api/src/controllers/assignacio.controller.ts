@@ -12,6 +12,12 @@ export const getAssignacionsByCentre = async (req: Request, res: Response) => {
       include: {
         taller: true,
         checklist: true,
+        inscripcions: {
+          include: {
+            alumne: true,
+            avaluacio_docent: true
+          }
+        },
         peticio: {
           include: {
             centre: true
@@ -166,9 +172,9 @@ export const createInscripcions = async (req: Request, res: Response) => {
 
     // 1. Crear las inscripciones
     const inscripcions = await Promise.all(
-      ids_alumnes.map((idAlumne: number) => 
+      ids_alumnes.map((idAlumne: number) =>
         prisma.inscripcio.upsert({
-          where: { 
+          where: {
             // Necesitaríamos una clave única para inscripciones si quisiéramos upsert real,
             // pero como no hay, usaremos create o simplemente borraremos las anteriores
             id_inscripcio: -1 // Truco para forzar el fallo si no existe y crear
@@ -178,7 +184,7 @@ export const createInscripcions = async (req: Request, res: Response) => {
             id_assignacio: parseInt(idAssignacio),
             id_alumne: idAlumne
           }
-        }).catch(() => 
+        }).catch(() =>
           // Si falla (porque el ID -1 no existe), creamos normalmente
           prisma.inscripcio.create({
             data: {

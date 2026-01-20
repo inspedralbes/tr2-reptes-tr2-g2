@@ -16,15 +16,15 @@ export default function ProfilePage() {
   }
 
   return (
-    <DashboardLayout 
-      title="El meu Perfil" 
+    <DashboardLayout
+      title="El meu Perfil"
       subtitle="Gestiona la teva informació personal i preferències de l'acadèmia."
     >
       <div className="max-w-4xl mx-auto">
         <div className="bg-white shadow-sm border border-gray-100 overflow-hidden">
           {/* Header/Cover */}
           <div className="h-32 bg-gradient-to-r from-blue-600 to-blue-800"></div>
-          
+
           <div className="px-8 pb-10 relative">
             {/* Avatar */}
             <div className="absolute -top-12 left-8">
@@ -45,7 +45,7 @@ export default function ProfilePage() {
                     {user.rol.nom_rol} {user.centre?.nom ? `• ${user.centre.nom}` : ''}
                   </p>
                 </div>
-                
+
                 <button className="px-6 py-3 bg-gray-50 text-gray-400 font-bold text-xs uppercase tracking-widest cursor-not-allowed">
                   Editar Perfil
                 </button>
@@ -78,7 +78,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-6">
-                   <div>
+                  <div>
                     <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Seguretat</label>
                     <button className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors group">
                       <div className="flex items-center gap-3">
@@ -91,12 +91,6 @@ export default function ProfilePage() {
                     </button>
                   </div>
 
-                  <div className="p-6 bg-blue-50 border border-blue-100">
-                    <h4 className="text-xs font-black text-blue-900 uppercase tracking-widest mb-2">Privacitat</h4>
-                    <p className="text-xs text-blue-700 font-medium leading-relaxed">
-                      Les teves dades estan protegides segons la normativa del Consorci d'Educació de Barcelona. Només els administradors tenen accés a les teves dades de contacte.
-                    </p>
-                  </div>
                 </div>
               </div>
             </div>

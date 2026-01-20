@@ -61,19 +61,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4" style={{ backgroundColor: THEME.colors.background }}>
-      <div className="w-full max-w-md bg-white p-8 border border-gray-300">
-        <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-gray-50 border border-gray-200 flex items-center justify-center mx-auto mb-4">
-             <span className="text-consorci-darkBlue font-bold text-2xl">E</span>
+    <div className="flex min-h-screen items-center justify-center p-4 bg-[#F2F2F3]">
+      <div className="w-full max-w-md bg-white p-12 border border-gray-200 shadow-xl">
+        <div className="text-center mb-12">
+          <div className="w-20 h-20 border-4 border-[#00426B] flex items-center justify-center mx-auto mb-6 p-2">
+            <img src="/logo-invers.png" alt="Iter Logo" className="w-full h-full object-contain brightness-0 contrast-200" style={{ filter: 'invert(16%) sepia(85%) saturate(1914%) hue-rotate(188deg) brightness(97%) contrast(101%)' }} />
           </div>
-          <h2 className="text-3xl font-black tracking-tight" style={{ color: THEME.colors.primary, fontFamily: THEME.fonts.primary }}>Iter</h2>
-          <p className="text-gray-400 font-medium mt-2">Gestió de tallers i centres</p>
+          <h2 className="text-4xl font-black tracking-tighter text-[#00426B] uppercase">Iter</h2>
+          <div className="h-1 w-12 bg-[#0775AB] mx-auto mt-2"></div>
+          <p className="text-[#4197CB] text-[10px] font-bold uppercase tracking-[0.3em] mt-4">Gestió d'Aprenentatge</p>
         </div>
-        
+
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 mb-8 text-sm font-bold flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 mb-8 text-xs font-bold flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
             {error}
@@ -81,62 +82,57 @@ export default function LoginPage() {
         )}
 
         {showProfessorLink ? (
-          <div className="bg-blue-50 border border-blue-200 p-8 text-center animate-in slide-in-from-bottom duration-500">
-            <h3 className="text-xl font-bold text-consorci-darkBlue mb-2">Accés via App Mòbil</h3>
-            <p className="text-sm text-gray-600 font-medium mb-8 leading-relaxed">
-              Com a professor, has d'utilitzar l'aplicació mòbil d'Iter per gestionar les teves sessions d'aprenentatge.
+          <div className="bg-[#EAEFF2] p-10 text-center animate-in fade-in zoom-in duration-300">
+            <h3 className="text-xl font-black text-[#00426B] uppercase mb-4 tracking-tight">Accés via App Mòbil</h3>
+            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-8 leading-relaxed">
+              Com a professor, has d'utilitzar l'aplicació mòbil d'Iter per gestionar les teves sessions.
             </p>
-            <a 
-              href="#" 
-              className="group relative flex items-center justify-center w-full py-4 bg-consorci-darkBlue text-white font-bold transition-colors hover:bg-consorci-lightBlue"
+            <a
+              href="#"
+              className="group relative flex items-center justify-center w-full py-4 bg-[#00426B] text-white text-xs font-bold uppercase tracking-widest transition-all hover:bg-[#0775AB] active:scale-95"
               onClick={(e) => { e.preventDefault(); alert('Enllaç de descàrrega próximament (Expo)'); }}
             >
-              <span className="mr-2">Descarregar App Iter</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <span>Descarregar App Iter</span>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </a>
-            <button 
+            <button
               onClick={() => setShowProfessorLink(false)}
-              className="mt-6 text-xs font-bold text-consorci-lightBlue hover:text-consorci-darkBlue tracking-widest uppercase transition-colors"
+              className="mt-8 text-[10px] font-black text-[#0775AB] hover:text-[#00426B] tracking-[0.2em] uppercase transition-colors"
             >
               ← Tornar al login
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">Correu Electrònic</label>
-              <div className="relative">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-5 py-4 bg-gray-50 border border-gray-200 focus:border-consorci-darkBlue transition-all font-bold text-gray-900 placeholder:text-gray-300 outline-none"
-                  placeholder="coordinador@centre.cat"
-                  required
-                />
-                <div className="absolute left-0 -translate-x-full pr-4 top-1/2 -translate-y-1/2 hidden lg:block">
-                   {/* Decorative icon or similar if needed */}
-                </div>
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="space-y-2">
+              <label className="block text-[#00426B] text-[10px] font-black uppercase tracking-widest px-1">Correu Electrònic</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-5 py-4 bg-gray-50 border border-gray-200 focus:border-[#0775AB] focus:bg-white transition-all font-bold text-sm text-gray-900 placeholder:text-gray-300 outline-none"
+                placeholder="coordinador@centre.cat"
+                required
+              />
             </div>
-            
-            <div>
-              <label className="block text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">Contrasenya</label>
+
+            <div className="space-y-2">
+              <label className="block text-[#00426B] text-[10px] font-black uppercase tracking-widest px-1">Contrasenya</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-5 py-4 bg-gray-50 border border-gray-200 focus:border-consorci-darkBlue transition-all font-bold text-gray-900 placeholder:text-gray-300 pr-12 outline-none"
+                  className="w-full px-5 py-4 bg-gray-50 border border-gray-200 focus:border-[#0775AB] focus:bg-white transition-all font-bold text-sm text-gray-900 placeholder:text-gray-300 pr-12 outline-none"
                   placeholder="••••••••"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-600 transition-colors p-1"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-[#00426B] transition-colors p-1"
                 >
                   {showPassword ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -156,11 +152,10 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 text-white font-bold transition-all duration-200 disabled:opacity-50"
-              style={{ backgroundColor: THEME.colors.primary }}
+              className="w-full py-4 bg-[#00426B] hover:bg-[#0775AB] text-white text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50 active:scale-[0.98] shadow-lg shadow-blue-900/10"
             >
               {loading ? (
-                <div className="flex items-center justify-center gap-2">
+                <div className="flex items-center justify-center gap-3">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   <span>Accedint...</span>
                 </div>

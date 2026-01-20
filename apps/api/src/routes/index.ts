@@ -15,6 +15,8 @@ import statsRoutes from './stats.routes';
 import sectorRoutes from './sector.routes';
 import assistenciaRoutes from './assistencia.routes';
 import notificacioRoutes from './notificacio.routes';
+import avaluacioRoutes from './avaluacio.routes';
+import questionariRoutes from './questionari.routes';
 
 // --- Definir las rutas base ---
 
@@ -42,6 +44,10 @@ router.use('/fases', faseRoutes);
 
 // Rutas de Estadísticas (MongoDB)
 router.use('/stats', statsRoutes);
+
+// Rutas de Evaluación y Cuestionarios
+router.use('/evaluacions', avaluacioRoutes);
+router.use('/questionaris', questionariRoutes);
 
 // Health Check (Para ver si la API respira)
 router.get('/health', (req, res) => {

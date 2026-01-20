@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 
 export const getAlumnes = async (req: Request, res: Response) => {
   const { centreId, role } = (req as any).user || {};
-  
+
   try {
     const where: any = {};
     if (role === 'COORDINADOR' && centreId) {
@@ -40,7 +40,7 @@ export const updateAlumne = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const alumne = await prisma.alumne.update({
-      where: { id_alumne: parseInt(id) },
+      where: { id_alumne: parseInt(id as string) },
       data: req.body
     });
     res.json(alumne);
@@ -53,7 +53,7 @@ export const deleteAlumne = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     await prisma.alumne.delete({
-      where: { id_alumne: parseInt(id) }
+      where: { id_alumne: parseInt(id as string) }
     });
     res.json({ message: 'Alumno eliminado' });
   } catch (error) {
