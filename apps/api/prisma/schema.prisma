@@ -175,6 +175,8 @@ model Assignacio {
   inscripcions Inscripcio[]
   respostes    RespostesQuestionari[]
   enviaments   EnviamentQuestionari[]
+  enquestes    Enquesta[]
+  certificats  Certificat[]
 
   @@index([data_inici, data_fi])
   @@map("assignacions")
