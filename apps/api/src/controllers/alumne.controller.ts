@@ -6,8 +6,13 @@ export const getAlumnes = async (req: Request, res: Response) => {
 
   try {
     const where: any = {};
-    if (role === 'COORDINADOR' && centreId) {
-      where.id_centre_procedencia = parseInt(centreId);
+    
+    // Scoping: Admin sees all, others only their center
+    if (role !== 'ADMIN') {
+      if (!centreId) {
+        return res.json([]); // No center assigned, no access
+      }
+      where.id_centre_procedencia = parseInt(centreId.toString());
     }
 
     const alumnes = await prisma.alumne.findMany({

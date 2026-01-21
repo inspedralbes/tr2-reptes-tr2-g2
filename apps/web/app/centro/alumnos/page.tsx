@@ -14,6 +14,10 @@ export default function AlumnesCRUD() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAlumne, setEditingAlumne] = useState<Alumne | null>(null);
   const [formData, setFormData] = useState({ nom: '', cognoms: '', idalu: '', curs: '' });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCurs, setSelectedCurs] = useState("Tots els cursos");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const router = useRouter();
 
   useEffect(() => {
@@ -34,6 +38,29 @@ export default function AlumnesCRUD() {
       setLoading(false);
     }
   };
+
+  const filteredAlumnes = alumnes.filter(a => {
+    const matchesSearch = !searchQuery || 
+      a.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.cognoms.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.idalu.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCurs = selectedCurs === "Tots els cursos" || a.curs === selectedCurs;
+    
+    return matchesSearch && matchesCurs;
+  });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCurs]);
+
+  const totalPages = Math.ceil(filteredAlumnes.length / itemsPerPage);
+  const paginatedAlumnes = filteredAlumnes.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const uniqueCursos = Array.from(new Set(alumnes.map(a => a.curs))).filter(Boolean).sort();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,79 +92,202 @@ export default function AlumnesCRUD() {
     }
   };
 
+  const headerActions = (
+    <button 
+      onClick={() => { setEditingAlumne(null); setFormData({ nom: '', cognoms: '', idalu: '', curs: '' }); setIsModalOpen(true); }}
+      className="bg-[#00426B] text-white px-6 py-3 font-black uppercase text-[10px] tracking-widest hover:bg-[#0775AB] transition-all flex items-center gap-2 shadow-lg"
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+      Nou Alumne
+    </button>
+  );
+
   return (
-    <DashboardLayout title="Gestión de Alumnos" subtitle="Administra los alumnos de tu centro educativo.">
-      <div className="mb-6 flex justify-end">
-        <button 
-          onClick={() => { setEditingAlumne(null); setFormData({ nom: '', cognoms: '', idalu: '', curs: '' }); setIsModalOpen(true); }}
-          className="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-          Nuevo Alumno
-        </button>
+    <DashboardLayout 
+      title="Gestió de l'Alumnat" 
+      subtitle="Administra els alumnes del teu centre educatiu i les seves dades nominals."
+      actions={headerActions}
+    >
+      {/* Panell de Filtres */}
+      <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8">
+        <div className="flex-1">
+          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Cerca per nom o IDALU</label>
+          <div className="relative">
+            <input 
+              type="text"
+              placeholder="Ex: Joan García, 1234567..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-11 pr-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] placeholder:text-gray-300 transition-all"
+            />
+            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="lg:w-64">
+          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Filtra per curs</label>
+          <select 
+            value={selectedCurs}
+            onChange={(e) => setSelectedCurs(e.target.value)}
+            className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] appearance-none"
+          >
+            <option value="Tots els cursos">Tots els cursos</option>
+            {uniqueCursos.map(c => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex items-end">
+          <button 
+            onClick={() => { setSearchQuery(""); setSelectedCurs("Tots els cursos"); }}
+            className="w-full lg:w-auto px-6 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
+          >
+            Netejar
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50 border-b border-gray-100">
-            <tr>
-              <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">Nombre</th>
-              <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">Apellidos</th>
-              <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">IDALU</th>
-              <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">Curso</th>
-              <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {alumnes.map(a => (
-              <tr key={a.id_alumne} className="hover:bg-blue-50/30 transition-colors">
-                <td className="px-6 py-4 text-sm font-bold text-gray-800">{a.nom}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{a.cognoms}</td>
-                <td className="px-6 py-4 text-sm text-gray-500 font-mono">{a.idalu}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">
-                  <span className="bg-gray-100 px-2 py-1 rounded text-xs font-bold">{a.curs}</span>
-                </td>
-                <td className="px-6 py-4 text-right space-x-2">
-                  <button onClick={() => handleEdit(a)} className="text-blue-600 hover:text-blue-800 text-sm font-bold">Editar</button>
-                  <button onClick={() => handleDelete(a.id_alumne)} className="text-red-500 hover:text-red-700 text-sm font-bold">Eliminar</button>
-                </td>
+      <div className="bg-white border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-[#F8FAFC] border-b border-gray-200">
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Informació de l'Alumne</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Identificació (IDALU)</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Curs / Nivell</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">Accions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {alumnes.length === 0 && !loading && (
-          <div className="p-20 text-center text-gray-400">No hay alumnos registrados.</div>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {paginatedAlumnes.map(a => (
+                <tr key={a.id_alumne} className="hover:bg-gray-50 transition-colors group">
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-[#EAEFF2] flex items-center justify-center text-[#00426B] group-hover:bg-[#00426B] group-hover:text-white transition-colors">
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{a.nom} {a.cognoms}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5">
+                    <span className="text-[10px] font-bold text-gray-400 font-mono tracking-widest uppercase">{a.idalu}</span>
+                  </td>
+                  <td className="px-6 py-5">
+                    <span className="px-2 py-0.5 bg-[#EAEFF2] text-[#00426B] text-[10px] font-black uppercase tracking-widest border border-[#EAEFF2]">
+                      {a.curs}
+                    </span>
+                  </td>
+                  <td className="px-6 py-5">
+                    <div className="flex justify-end items-center gap-2">
+                      <button onClick={() => handleEdit(a)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">Editar</button>
+                      <button onClick={() => handleDelete(a.id_alumne)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {filteredAlumnes.length === 0 && !loading && (
+          <div className="p-20 text-center">
+            <p className="text-[#00426B] font-black uppercase text-xs tracking-widest">No s'han trobat alumnes</p>
+            <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">Prova amb altres termes de cerca.</p>
+          </div>
         )}
       </div>
 
+      {/* Paginació */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white border border-gray-200 p-6">
+          <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
+            Mostrant <span className="text-[#00426B]">{paginatedAlumnes.length}</span> de <span className="text-[#00426B]">{filteredAlumnes.length}</span> alumnes
+          </div>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === 1 
+                ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
+                : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
+            >
+              Anterior
+            </button>
+            <div className="px-4 py-2 bg-[#F8FAFC] border border-gray-200 text-[10px] font-black text-[#00426B] tracking-[0.2em]">
+              Pàgina {currentPage} de {totalPages}
+            </div>
+            <button 
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === totalPages 
+                ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
+                : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
+            >
+              Següent
+            </button>
+          </div>
+        </div>
+      )}
+
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in zoom-in duration-200">
-            <h3 className="text-xl font-bold mb-6">{editingAlumne ? 'Editar Alumno' : 'Nuevo Alumno'}</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input 
-                type="text" placeholder="Nombre" value={formData.nom} 
-                onChange={e => setFormData({...formData, nom: e.target.value})}
-                className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500" required
-              />
-              <input 
-                type="text" placeholder="Apellidos" value={formData.cognoms} 
-                onChange={e => setFormData({...formData, cognoms: e.target.value})}
-                className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500" required
-              />
-              <input 
-                type="text" placeholder="IDALU" value={formData.idalu} 
-                onChange={e => setFormData({...formData, idalu: e.target.value})}
-                className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 font-mono" required
-              />
-              <input 
-                type="text" placeholder="Curso (Ej: 4t ESO)" value={formData.curs} 
-                onChange={e => setFormData({...formData, curs: e.target.value})}
-                className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500" required
-              />
-              <div className="flex gap-4 pt-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 font-bold text-gray-400">Cancelar</button>
-                <button type="submit" className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-200">Guardar</button>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white p-10 max-w-md w-full shadow-2xl relative border border-gray-100">
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-6 right-6 text-gray-300 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+
+            <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tight mb-8">
+              {editingAlumne ? 'Editar Alumne' : 'Nou Alumne'}
+            </h3>
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Nom de l'alumne</label>
+                <input 
+                  type="text" value={formData.nom} 
+                  onChange={e => setFormData({...formData, nom: e.target.value})}
+                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" required
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Cognoms</label>
+                <input 
+                  type="text" value={formData.cognoms} 
+                  onChange={e => setFormData({...formData, cognoms: e.target.value})}
+                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" required
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Codi IDALU</label>
+                <input 
+                  type="text" value={formData.idalu} 
+                  onChange={e => setFormData({...formData, idalu: e.target.value})}
+                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B] font-mono tracking-widest" required
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Curs / Nivell (Ex: 4t ESO)</label>
+                <input 
+                  type="text" value={formData.curs} 
+                  onChange={e => setFormData({...formData, curs: e.target.value})}
+                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" required
+                />
+              </div>
+
+              <div className="flex gap-4 pt-6">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 font-black text-[10px] uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">Cancel·lar</button>
+                <button type="submit" className="flex-1 py-3 bg-[#00426B] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#0775AB] transition-all shadow-lg">Guardar</button>
               </div>
             </form>
           </div>

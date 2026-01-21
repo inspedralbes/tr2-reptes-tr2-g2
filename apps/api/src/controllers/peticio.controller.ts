@@ -15,8 +15,13 @@ export const getPeticions = async (req: Request, res: Response) => {
 
   try {
     const where: any = {};
-    if (role === 'COORDINADOR' && centreId) {
-      where.id_centre = centreId;
+    
+    // Scoping: Admin sees all, others only their center
+    if (role !== 'ADMIN') {
+      if (!centreId) {
+        return res.json({ data: [], meta: { total: 0, page: Number(page), limit: Number(limit), totalPages: 0 } });
+      }
+      where.id_centre = parseInt(centreId.toString());
     }
 
     const [peticions, total] = await Promise.all([

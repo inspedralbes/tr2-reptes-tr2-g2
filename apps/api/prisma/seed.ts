@@ -16,10 +16,12 @@ async function main() {
   // 1. LIMPIEZA EXHAUSTIVA CON REINICIO DE IDENTIDADES
   console.log('🧹 Limpiando base de datos...');
   const tables = [
-    'respostes_questionari', 'preguntes', 'model_questionaris', 'avaluacio_competencial',
+    'respostes_questionari', 'enviaments_questionaris', 'preguntes', 'model_questionaris',
+    'autoconsultes_alumnes', 'avaluacio_competencial', 'avaluacions_docents',
     'assistencia', 'inscripcions', 'checklist_assignacio', 'assignacio_professors',
-    'assignacions', 'peticions', 'tallers', 'alumnes', 'professors', 'logs_auditoria',
-    'calendari_events', 'fases', 'usuaris', 'centres', 'sectors', 'rols', 'competencies'
+    'assignacions', 'peticions', 'tallers', 'alumnes', 'professors', 'incidencies',
+    'notificacions', 'logs_auditoria', 'calendari_events', 'fases', 'enquestes',
+    'certificats', 'usuaris', 'centres', 'sectors', 'rols', 'competencies'
   ];
 
   for (const table of tables) {
@@ -117,6 +119,7 @@ async function main() {
 
   const centroBrossa = creadosCentres.find(c => c.codi_centre === '08014231')!;
   const centroMila = creadosCentres.find(c => c.codi_centre === '08013159')!;
+  const centroPauClaris = creadosCentres.find(c => c.codi_centre === '08013147')!;
 
   // 5. CREAR PROFESORES (PARA EL DESPLEGABLE)
   console.log('👨‍🏫 Creando Profesores para cada centro...');
@@ -161,11 +164,22 @@ async function main() {
   // 3. PROFESOR (Centro Milà)
   await prisma.usuari.create({
     data: {
-      nom_complet: 'Professor Ejemplo',
+      nom_complet: 'Professor Exemple',
       email: 'profe@profe.com',
       password_hash: passProfe,
       id_rol: rolProfe.id_rol,
       id_centre: centroMila.id_centre
+    }
+  });
+
+  // 4. NUEVO COORDINADOR (Centro Pau Claris)
+  await prisma.usuari.create({
+    data: {
+      nom_complet: 'Coordinació Pau Claris',
+      email: 'coordinacion@instituto.com',
+      password_hash: passCentro,
+      id_rol: rolCoord.id_rol,
+      id_centre: centroPauClaris.id_centre
     }
   });
 

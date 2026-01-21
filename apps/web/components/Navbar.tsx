@@ -82,7 +82,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
 
   return (
     <div className="sticky top-0 z-50 bg-white border-t-4 border-t-[#00426B] border-b border-b-[#CFD2D3]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1440px] mx-auto container-responsive">
         <div className="flex justify-between h-16">
           {/* Logo & Brand Section */}
           <div className="flex items-center">

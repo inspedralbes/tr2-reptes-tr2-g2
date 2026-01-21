@@ -67,9 +67,9 @@ export default function CentroDashboard() {
       subtitle="Procés de gestió de tallers d'Iter."
     >
       {/* Timeline Secció Institucional */}
-      <section className="bg-white border border-gray-200 p-12 mb-12 relative overflow-hidden">
+      <section className="bg-white border border-gray-200 p-6 md:p-12 mb-8 md:mb-12 relative overflow-hidden">
         
-        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#00426B] mb-12 flex items-center gap-4">
+        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#00426B] mb-8 md:mb-12 flex items-center gap-4">
           <span className="w-12 h-1 bg-[#0775AB]"></span>
           Estat del Programa Iter 25-26
         </h3>
@@ -117,10 +117,10 @@ export default function CentroDashboard() {
       </section>
 
       {/* Accesos Directos - Targetes Estil edubcn */}
-      < div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
         <div
           onClick={() => isPhaseActive(PHASES.SOLICITUD) && router.push('/centro/peticions')}
-          className={`group p-10 border transition-all duration-500 relative overflow-hidden ${isPhaseActive(PHASES.SOLICITUD)
+          className={`group p-8 md:p-10 border transition-all duration-500 relative overflow-hidden ${isPhaseActive(PHASES.SOLICITUD)
             ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
             : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
@@ -138,7 +138,7 @@ export default function CentroDashboard() {
 
         <div
           onClick={() => (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD)) && router.push('/centro/alumnos')}
-          className={`group p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD))
+          className={`group p-8 md:p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD))
             ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
             : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
@@ -156,7 +156,7 @@ export default function CentroDashboard() {
 
         <div
           onClick={() => (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD)) && router.push('/centro/profesores')}
-          className={`group p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD))
+          className={`group p-8 md:p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD))
             ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
             : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
@@ -173,7 +173,7 @@ export default function CentroDashboard() {
 
         <div
           onClick={() => (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) && router.push('/centro/assignacions')}
-          className={`group p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE))
+          className={`group p-8 md:p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE))
             ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
             : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}

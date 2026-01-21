@@ -4,9 +4,9 @@ import * as professorController from '../controllers/professor.controller';
 import { authenticateToken } from '../middlewares/authMiddleware';
 
 router.get('/me/assignments', authenticateToken, professorController.getProfessorAssignments);
-router.get('/', professorController.getProfessors);
-router.post('/', professorController.createProfessor);
-router.put('/:id', professorController.updateProfessor);
-router.delete('/:id', professorController.deleteProfessor);
+router.get('/', authenticateToken, professorController.getProfessors);
+router.post('/', authenticateToken, professorController.createProfessor);
+router.put('/:id', authenticateToken, professorController.updateProfessor);
+router.delete('/:id', authenticateToken, professorController.deleteProfessor);
 
 export default router;

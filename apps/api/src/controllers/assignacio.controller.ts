@@ -6,6 +6,13 @@ import { isPhaseActive, PHASES } from '../lib/phaseUtils';
 // GET: Listar asignaciones de un centro
 export const getAssignacionsByCentre = async (req: Request, res: Response) => {
   const { idCentre } = req.params;
+  const { centreId, role } = (req as any).user;
+
+  // Security Scoping
+  if (role !== 'ADMIN' && parseInt(idCentre as string) !== centreId) {
+    return res.status(403).json({ error: 'Accés denegat: No pots veure les assignacions d\'altre centre' });
+  }
+
   try {
     const assignacions = await prisma.assignacio.findMany({
       where: { id_centre: parseInt(idCentre as string) },
@@ -73,6 +80,13 @@ export const updateChecklistItem = async (req: Request, res: Response) => {
 // GET: Incidencias de un centro
 export const getIncidenciesByCentre = async (req: Request, res: Response) => {
   const { idCentre } = req.params;
+  const { centreId, role } = (req as any).user;
+
+  // Security Scoping
+  if (role !== 'ADMIN' && parseInt(idCentre as string) !== centreId) {
+    return res.status(403).json({ error: 'Accés denegat: No pots veure les incidències d\'altre centre' });
+  }
+
   try {
     const incidencies = await prisma.incidencia.findMany({
       where: { id_centre: parseInt(idCentre as string) },
