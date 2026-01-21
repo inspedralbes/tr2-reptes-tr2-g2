@@ -76,7 +76,7 @@ export default function PerfilScreen() {
           <View className="flex-1">
             <Text className="text-2xl font-bold text-gray-900 tracking-tight">{user?.nom_complet || 'Usuari'}</Text>
             <Text className="text-primary font-bold text-xs mt-1 uppercase tracking-wider">{user?.role === 'PROFESSOR' ? 'Professor' : 'Administrador'}</Text>
-            <Text className="text-gray-400 font-medium text-[10px] mt-1">Connectat a Iter</Text>
+            <Text className="text-gray-400 font-medium text-xs mt-1">Connectat a Iter</Text>
           </View>
         </View>
 
@@ -131,7 +131,7 @@ export default function PerfilScreen() {
         </View>
 
         <View className="mt-12 items-center">
-          <Text className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Iter App v1.0.0</Text>
+          <Text className="text-xs text-gray-400 font-black uppercase tracking-widest">Iter App v1.0.0</Text>
           <Text className="text-[9px] text-gray-300 font-bold mt-2 uppercase">© 2026 Consorci d'Educació de Barcelona</Text>
         </View>
       </View>

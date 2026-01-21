@@ -145,7 +145,7 @@ export default function SesionScreen() {
             className="bg-red-50 px-4 py-2 flex-row items-center border border-red-100"
           >
             <Ionicons name="warning" size={16} color="#EF4444" />
-            <Text className="text-[#EF4444] font-bold text-[10px] uppercase tracking-wider ml-2">Incidència</Text>
+            <Text className="text-[#EF4444] font-bold text-xs uppercase tracking-wider ml-2">Incidència</Text>
           </TouchableOpacity>
         </View>
 
@@ -155,7 +155,7 @@ export default function SesionScreen() {
               <View className="flex-row justify-between items-start mb-6">
                 <TouchableOpacity onPress={() => { setSelectedStudent(student); setModalVisible(true); }} className="flex-1">
                   <Text className="text-lg font-bold text-gray-900 tracking-tight">{student.name}</Text>
-                  <Text className="text-gray-400 font-bold text-[10px] uppercase tracking-wider mt-1">{student.institute}</Text>
+                  <Text className="text-gray-400 font-bold text-xs uppercase tracking-wider mt-1">{student.institute}</Text>
                 </TouchableOpacity>
                 <View className={`px-2 py-0.5 border ${getStatusBorder(student.status)}`}>
                   <Text className="font-bold text-[8px] tracking-wider">{getStatusLabel(student.status)}</Text>
@@ -204,7 +204,7 @@ export default function SesionScreen() {
                 <Text className="text-gray-500 font-bold mb-8 uppercase tracking-widest text-xs">{selectedStudent.institute}</Text>
                 
                 <View className="bg-gray-100 p-6 mb-10 border-l-8 border-primary">
-                  <Text className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-3">PERMISOS DE SORTIDA</Text>
+                  <Text className="text-xs text-gray-400 uppercase tracking-widest font-black mb-3">PERMISOS DE SORTIDA</Text>
                   <View className="flex-row items-center">
                     <Ionicons name="information-circle" size={20} color={THEME.colors.primary} />
                     <Text className="text-gray-900 ml-3 font-black text-xs uppercase">{selectedStudent.permissions}</Text>

@@ -109,7 +109,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
       <View className="flex-row border-b border-gray-50 bg-gray-50/50">
         {['dl', 'dt', 'dc', 'dj', 'dv', 'ds', 'dg'].map(d => (
           <View key={d} className="flex-1 py-3 items-center">
-            <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{d}</Text>
+            <Text className="text-xs font-black text-gray-400 uppercase tracking-widest">{d}</Text>
           </View>
         ))}
       </View>
@@ -158,7 +158,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
         </View>
 
         {dayEvents.length === 0 ? (
-          <Text className="text-gray-400 font-bold text-[11px] uppercase tracking-widest text-center mt-10">
+          <Text className="text-gray-400 font-bold text-xs uppercase tracking-widest text-center mt-10">
             No hi ha esdeveniments per a aquest dia
           </Text>
         ) : (
@@ -177,7 +177,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
                 </View>
                 <View className="flex-1">
                   <Text className="text-lg font-bold text-gray-900 leading-tight uppercase tracking-tight">{event.title}</Text>
-                  <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">
+                  <Text className="text-gray-400 text-xs font-bold uppercase tracking-wider mt-0.5">
                     {event.type === 'assignment' ? 'Taller' : event.type === 'milestone' ? 'Milla' : 'Límit'}
                   </Text>
                 </View>
@@ -185,11 +185,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
 
               {event.type === 'assignment' && event.metadata && (
                 <View className="space-y-4">
-                  <Text className="text-gray-500 font-bold text-[11px] uppercase tracking-wider mb-3">{event.metadata.centre}</Text>
+                  <Text className="text-gray-500 font-bold text-xs uppercase tracking-wider mb-3">{event.metadata.centre}</Text>
                   
                   <View className="flex-row items-center mb-3">
                     <Ionicons name="time-outline" size={14} color="#6B7280" />
-                    <Text className="text-gray-500 font-bold ml-3 text-[10px] uppercase tracking-wider">{event.metadata.hora}</Text>
+                    <Text className="text-gray-500 font-bold ml-3 text-xs uppercase tracking-wider">{event.metadata.hora}</Text>
                   </View>
 
                   <TouchableOpacity 
@@ -197,7 +197,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
                     className="flex-row items-center bg-gray-50 p-4 border border-gray-200 mb-6"
                   >
                     <Ionicons name="location-outline" size={16} color={THEME.colors.secondary} />
-                    <Text className="text-gray-900 font-bold ml-3 flex-1 text-[10px]" numberOfLines={1}>
+                    <Text className="text-gray-900 font-bold ml-3 flex-1 text-xs" numberOfLines={1}>
                       {event.metadata.adreca || 'Sense adreça'}
                     </Text>
                   </TouchableOpacity>
@@ -220,7 +220,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
               )}
 
               {event.type !== 'assignment' && event.description && (
-                <Text className="text-gray-500 font-bold text-[11px] leading-5 italic">
+                <Text className="text-gray-500 font-bold text-xs leading-5 italic">
                   "{event.description}"
                 </Text>
               )}

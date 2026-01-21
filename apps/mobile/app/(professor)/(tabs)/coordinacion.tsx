@@ -40,7 +40,7 @@ export default function CoordinacionScreen() {
             <Ionicons name="star" size={20} color="#3B82F6" />
           </View>
           <View className="flex-1">
-            <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{label}</Text>
+            <Text className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{label}</Text>
             <Text className="text-xl font-bold text-gray-900 tracking-tight">{prof.nom}</Text>
           </View>
         </View>
@@ -86,7 +86,7 @@ export default function CoordinacionScreen() {
 
               {!assig.prof1 && !assig.prof2 && (
                 <View className="p-4 border-2 border-dashed border-gray-200">
-                   <Text className="text-gray-400 font-bold text-[10px] uppercase text-center">Sin referentes asignados todavía</Text>
+                   <Text className="text-gray-400 font-bold text-xs uppercase text-center">Sin referentes asignados todavía</Text>
                 </View>
               )}
             </View>

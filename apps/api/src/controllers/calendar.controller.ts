@@ -6,6 +6,25 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
   const { user } = req as any;
   const { start, end } = req.query;
 
+  // Buscar el profesor asociado al usuario (si es rol profesor)
+  let professorId: number | null = null;
+  if (user.role === ROLES.PROFESOR) {
+    // 1. Obtener el usuario completo para ver su nombre
+    const fullUser = await prisma.usuari.findUnique({
+      where: { id_usuari: user.userId }
+    });
+
+    if (fullUser) {
+      // 2. Buscar el profesor por nombre
+      const professor = await prisma.professor.findFirst({
+        where: { nom: fullUser.nom_complet } 
+      });
+      if (professor) {
+        professorId = professor.id_professor;
+      }
+    }
+  }
+
   // Filtros de fecha opcionales pero recomendados para escalabilidad
   const dateFilter = start && end ? {
     data: {
@@ -36,7 +55,16 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
       ? prisma.assignacio.findMany({ where: { ...assignmentDateFilter, id_centre: user.centreId }, include: { taller: true } })
       : user.role === ROLES.PROFESOR
       ? prisma.assignacio.findMany({ 
-          where: { ...assignmentDateFilter, professors: { some: { id_usuari: user.userId } } }, 
+          where: { 
+            ...assignmentDateFilter, 
+            OR: [
+              { professors: { some: { id_usuari: user.userId } } },
+              ...(professorId ? [
+                { prof1_id: professorId },
+                { prof2_id: professorId }
+              ] : [])
+            ]
+          }, 
           include: { taller: true, centre: true } 
         })
       : Promise.resolve([]),
@@ -75,7 +103,6 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
         id: `assign-${a.id_assignacio}`,
         title: user.role === ROLES.COORDINADOR ? `Taller: ${a.titol}` : `${a.taller.titol}`,
         date: a.data_inici.toISOString(),
-        endDate: a.data_fi?.toISOString(),
         type: 'assignment',
         metadata: { 
           id_assignacio: a.id_assignacio,

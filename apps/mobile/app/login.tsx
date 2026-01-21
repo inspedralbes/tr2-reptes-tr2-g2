@@ -75,7 +75,7 @@ export default function LoginScreen() {
           {/* Form */}
           <View className="space-y-6">
             <View>
-              <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Correu Electrònic</Text>
+              <Text className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Correu Electrònic</Text>
               <View className="flex-row items-center border border-gray-200 p-4 bg-gray-50">
                 <Ionicons name="mail-outline" size={20} color="#64748B" />
                 <TextInput
@@ -91,7 +91,7 @@ export default function LoginScreen() {
             </View>
 
             <View className="mt-6">
-              <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Contrasenya</Text>
+              <Text className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Contrasenya</Text>
               <View className="flex-row items-center border border-gray-200 p-4 bg-gray-50">
                 <Ionicons name="lock-closed-outline" size={20} color="#64748B" />
                 <TextInput
@@ -123,7 +123,7 @@ export default function LoginScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity className="mt-8 items-center">
-              <Text className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">He oblidat la contrasenya</Text>
+              <Text className="text-gray-400 font-bold text-xs uppercase tracking-widest">He oblidat la contrasenya</Text>
             </TouchableOpacity>
           </View>
 

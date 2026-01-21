@@ -31,7 +31,7 @@ export default function EvaluacionScreen() {
                 <Text className="text-lg font-bold text-gray-900 tracking-tight">{comp.title}</Text>
               </View>
             </View>
-            <Text className="text-gray-500 font-medium text-[11px] mb-6 leading-4">{comp.description}</Text>
+            <Text className="text-gray-500 font-medium text-xs mb-6 leading-4">{comp.description}</Text>
             
             <View className="flex-row justify-between">
               {[1, 2, 3, 4, 5].map((num) => (
