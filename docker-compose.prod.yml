@@ -8,7 +8,10 @@ services:
     ports:
       - "8002:8002"
     env_file:
-      - ./apps/web/.env
+      - path: .env
+        required: true
+      - path: ./apps/web/.env
+        required: false
     networks:
       - iter-network-prod
 
@@ -21,7 +24,10 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - ./apps/api/.env
+      - path: .env
+        required: true
+      - path: ./apps/api/.env
+        required: false
     # Afegeix extra_hosts per permetre la connexió a la base de dades local del host.
     # Al teu arxiu .env a apps/api, configura la DATABASE_URL així:
     # DATABASE_URL="postgresql://USER:PASSWORD@host.docker.internal:5432/DATABASE"

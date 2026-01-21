@@ -28,7 +28,7 @@ export const generateEnquestes = async (req: Request, res: Response) => {
         for (const inscripcio of assignacio.inscripcions) {
             enquestesData.push({
                 id_assignacio: assignacio.id_assignacio,
-                destinatari: Destinatari.Alumne,
+                destinatari: Destinatari.ALUMNE,
                 token: uuidv4(),
                 completa: false
             });
@@ -38,7 +38,7 @@ export const generateEnquestes = async (req: Request, res: Response) => {
         for (const prof of assignacio.professors) {
             enquestesData.push({
                 id_assignacio: assignacio.id_assignacio,
-                destinatari: Destinatari.Professor,
+                destinatari: Destinatari.PROFESSOR,
                 token: uuidv4(),
                 completa: false
             });
@@ -47,7 +47,7 @@ export const generateEnquestes = async (req: Request, res: Response) => {
         // Centro (1 por asignación)
         enquestesData.push({
             id_assignacio: assignacio.id_assignacio,
-            destinatari: Destinatari.Centre,
+            destinatari: Destinatari.CENTRE,
             token: uuidv4(),
             completa: false
         });
