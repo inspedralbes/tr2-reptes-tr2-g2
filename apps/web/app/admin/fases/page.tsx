@@ -68,79 +68,120 @@ export default function PhaseManagementPage() {
   return (
     <DashboardLayout
       title="Gestió de Fases Iter"
-      subtitle="Controla el cicle de vida del programa i simula dates per a test."
+      subtitle="Full de ruta i control d'estats del programa actual"
     >
       <div className="w-full space-y-8">
-        <div className="bg-blue-50 border border-blue-100 p-6">
+        {/* Institutional Notice */}
+        <div className="bg-[#00426B]/5 border border-[#00426B]/20 p-6 rounded-none">
           <div className="flex gap-4">
-            <div className="w-10 h-10 bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-lg">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div className="w-12 h-12 bg-[#00426B] flex items-center justify-center text-white shrink-0">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
             <div>
-              <h3 className="font-black text-blue-900 uppercase text-xs tracking-widest mb-1">Eina de Desenvolupador</h3>
-              <p className="text-sm text-blue-700 font-medium">Mitjançant aquest panell pots activar/desactivar fases per provar el comportament del calendari i els diferents dashboards en temps real.</p>
+              <h3 className="font-black text-[#00426B] uppercase text-[10px] tracking-widest mb-1">Panell de Control Temporal</h3>
+              <p className="text-sm text-gray-600 font-medium leading-relaxed">
+                Cada fase habilita funcionalitats específiques per als coordinadors de centre. 
+                Pots activar una fase per forçar la transició de l'aplicació i provar els flujos de treball.
+              </p>
             </div>
           </div>
         </div>
 
         {loading ? (
           <div className="py-20 text-center">
-            <div className="animate-spin h-10 w-10 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin h-8 w-8 border-t-2 border-[#00426B] mx-auto"></div>
+            <p className="mt-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Sincronitzant fases...</p>
           </div>
         ) : (
           <div className="grid gap-6">
-            {fases.map((fase) => (
+            {fases.sort((a, b) => a.ordre - b.ordre).map((fase) => (
               <div
                 key={fase.id_fase}
-                className={`p-8 bg-white border-2 ${fase.activa ? 'border-blue-500' : 'border-gray-100 opacity-60 grayscale-[0.5]'
-                  }`}
+                className={`border bg-white ${
+                  fase.activa 
+                  ? 'border-l-8 border-[#00426B] border-t-gray-200 border-r-gray-200 border-b-gray-200' 
+                  : 'border-l-8 border-gray-200 border-t-gray-100 border-r-gray-100 border-b-gray-100 opacity-70'
+                }`}
               >
-                <div className="flex flex-col md:flex-row justify-between gap-6">
+                <div className="p-8 flex flex-col md:flex-row justify-between gap-8">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-xs font-black text-gray-400">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-10 h-10 border border-gray-200 flex items-center justify-center bg-gray-50 text-xs font-black text-gray-500">
                         {fase.ordre}
-                      </span>
-                      <h3 className="text-xl font-black text-gray-900">{fase.nom}</h3>
-                      {fase.activa && (
-                        <span className="px-3 py-1 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest animate-pulse">ACTIVA</span>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-500 font-medium mb-6">{fase.descripcio}</p>
-
-                    <div className="grid grid-cols-2 gap-4">
+                      </div>
                       <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Data Inici</label>
+                        <h3 className="text-lg font-black text-[#00426B] uppercase tracking-tight">{fase.nom}</h3>
+                        {fase.activa ? (
+                          <span className="inline-block mt-1 px-2 py-0.5 bg-[#00426B] text-white text-[9px] font-black uppercase tracking-widest">
+                            Fase Activa
+                          </span>
+                        ) : (
+                          <span className="inline-block mt-1 px-2 py-0.5 bg-gray-100 text-gray-400 text-[9px] font-black uppercase tracking-widest">
+                            No Activa
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <p className="text-xs text-gray-500 font-medium mb-8 max-w-2xl leading-relaxed">
+                      {fase.descripcio}
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4 bg-gray-50/50 border border-gray-100">
+                      <div>
+                        <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                          Data obertura
+                        </label>
                         <input
                           type="date"
                           value={fase.data_inici.split('T')[0]}
                           onChange={(e) => updatePhaseDate(fase.id_fase, 'data_inici', e.target.value)}
-                          className="w-full bg-gray-50 border-none text-sm font-bold text-gray-700 px-4 py-3 focus:ring-2 focus:ring-blue-500"
+                          className="w-full bg-white border border-gray-200 text-xs font-bold text-gray-700 px-4 py-3 focus:outline-none focus:border-[#00426B] rounded-none shadow-sm"
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Data Fi</label>
+                        <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                          Data tancament
+                        </label>
                         <input
                           type="date"
                           value={fase.data_fi.split('T')[0]}
                           onChange={(e) => updatePhaseDate(fase.id_fase, 'data_fi', e.target.value)}
-                          className="w-full bg-gray-50 border-none text-sm font-bold text-gray-700 px-4 py-3 focus:ring-2 focus:ring-blue-500"
+                          className="w-full bg-white border border-gray-200 text-xs font-bold text-gray-700 px-4 py-3 focus:outline-none focus:border-[#00426B] rounded-none shadow-sm"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="md:w-48 flex items-center justify-center">
+                  <div className="md:w-56 flex flex-col justify-center border-l border-gray-100 pl-8">
                     <button
                       onClick={() => togglePhase(fase.id_fase, fase.activa)}
                       disabled={updating === fase.id_fase}
-                      className={`w-full py-4 font-black text-xs uppercase tracking-widest transition-all shadow-lg active:scale-95 ${fase.activa
-                          ? 'bg-gray-100 text-gray-400 hover:bg-gray-200 shadow-none'
-                          : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200'
-                        }`}
+                      className={`w-full py-5 font-black text-[10px] uppercase tracking-widest transition-all ${
+                        fase.activa
+                        ? 'bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed'
+                        : 'bg-[#00426B] text-white hover:bg-[#0775AB] hover:shadow-lg active:translate-y-0.5'
+                      }`}
                     >
-                      {updating === fase.id_fase ? 'Procesant...' : fase.activa ? 'Desactivar' : 'Activar Fase'}
+                      {updating === fase.id_fase 
+                        ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="w-3 h-3 border-2 border-white/20 border-t-white animate-spin"></div>
+                            Processant
+                          </div>
+                        ) 
+                        : (fase.activa ? 'Fase Activada' : 'Activar aquesta Fase')
+                      }
                     </button>
+                    {!fase.activa && (
+                      <p className="mt-3 text-[9px] text-gray-400 font-bold uppercase text-center tracking-tighter">
+                        L'activació és immediata
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

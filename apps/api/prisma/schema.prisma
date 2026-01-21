@@ -27,6 +27,7 @@ model Taller {
   durada_h         Int
   places_maximes   Int          @default(25)
   modalitat        Modalitat
+  icona            String       @default("🧩")
   id_sector        Int
   sector           Sector       @relation(fields: [id_sector], references: [id_sector])
   peticions        Peticio[]

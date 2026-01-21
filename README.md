@@ -79,18 +79,16 @@ docker compose down -v && docker compose up --build
 
 ### 🔑 Credencials de Prova (Seed)
 
-El sistema pobla automàticament la base de dades amb les següents credencials per a proves:
+El sistema pobla automàticament la base de dades amb les següents credencials per a proves. Tots els usuaris utilitzen la contrasenya: **`Iter@1234`**.
 
-* **Administrador:** `admin@admin.com` / `Admin@1234`
-* **Coordinador:** `centros@centros.com` / `Centro@1234`
-* **Professors (Mòbil):** Tots usen la contrasenya **`Profe@1234`**
-
-| Professor/a | Email | Institut (Centre) |
+| Rol | Usuari (Email) | Descripció |
 | :--- | :--- | :--- |
-| **Marta Gil** | `marta@test.com` | Institut Pau Claris |
-| **Sergi Roca** | `sergi@test.com` | Institut Fort Pius |
-| **Clara Bosch** | `clara@test.com` | Institut Montserrat |
-| **Professor Ejemplo** | `profe@profe.com` | Institut Milà i Fontanals |
+| **Administrador** | `admin@admin.com` | Gestió global de tot el catàleg i centres. |
+| **Coordinador** | `coordinacion@brossa.cat` | Coord. Institut Joan Brossa (Dades aïllades). |
+| **Coordinador** | `coordinacion@pauclaris.cat` | Coord. Institut Pau Claris (Dades aïllades). |
+
+> [!NOTE]
+> Actualment el `seed` genera múltiples **peticions pendents** perquè puguis provar el flux d'assignació (Tetris o manual) directament des del panell d'administració.
 
 ## 🐳 Arquitectura Docker Seqüencial
 
