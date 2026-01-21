@@ -3,8 +3,10 @@ import { View, Text, ActivityIndicator } from 'react-native';
 import { THEME } from '@iter/shared';
 import { getCalendar } from '../../../services/api';
 import CalendarView, { CalendarEvent } from '../../../components/CalendarView';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AgendaScreen() {
+  const insets = useSafeAreaInsets();
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,7 +34,16 @@ export default function AgendaScreen() {
   }
 
   return (
-    <View className="flex-1 bg-[#F9FAFB] pt-4">
+    <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#F9FAFB]">
+      {/* Professional Header */}
+      <View className="px-6 pb-6 pt-4 bg-white border-b border-gray-100 mb-6">
+         <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
+           Agenda Acadèmica
+         </Text>
+         <Text className="text-3xl font-extrabold text-slate-900 leading-tight">
+           Calendari
+         </Text>
+      </View>
 
       <CalendarView 
         events={calendarEvents} 
