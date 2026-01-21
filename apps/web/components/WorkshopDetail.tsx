@@ -4,6 +4,17 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Taller } from '../services/tallerService';
 
+const SVG_ICONS: Record<string, React.ReactNode> = {
+  PUZZLE: <path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />,
+  ROBOT: <path d="M12 2a2 2 0 012 2v1h2a2 2 0 012 2v2h1a2 2 0 012 2v4a2 2 0 01-2 2h-1v2a2 2 0 01-2 2H7a2 2 0 01-2-2v-2H4a2 2 0 01-2-2v-4a2 2 0 012-2h1V7a2 2 0 012-2h2V4a2 2 0 012-2zM9 9H7v2h2V9zm8 0h-2v2h2V9z" />,
+  CODE: <path d="M10 20l-7-7 7-7m4 0l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor" />,
+  PAINT: <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10c1 0 1.8-.8 1.8-1.8 0-.46-.17-.9-.47-1.24-.3-.33-.47-.78-.47-1.26 0-.96.79-1.75 1.75-1.75H17c2.76 0 5-2.24 5-5 0-4.42-4.48-8-10-8z" />,
+  FILM: <path d="M7 4V20M17 4V20M3 8H7M17 8H21M3 12H21M3 16H7M17 16H21M3 4H21V20H3V4Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor" />,
+  TOOLS: <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6-3.8 3.8L11 11.6a1 1 0 00-1.4 0L3.3 18a1 1 0 000 1.4l1.3 1.3a1 1 0 001.4 0l6.4-6.4 1.5 1.5a1 1 0 001.4 0l3.8-3.8 1.6 1.6a1 1 0 001.4 0l1.3-1.3a1 1 0 000-1.4L14.7 6.3z" />,
+  LEAF: <path d="M12 2a10 10 0 00-10 10c0 5.52 4.48 10 10 10s10-4.48 10-10A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z" />,
+  GEAR: <path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z" />
+};
+
 interface Props {
   visible: boolean;
   onClose: () => void;
@@ -67,7 +78,12 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
             <div className="flex justify-between items-start mb-6 gap-4">
               <div className="flex-1">
                 <p className="text-consorci-lightBlue font-black text-[10px] uppercase tracking-widest mb-2">Detalls del Taller</p>
-                <h1 className="text-consorci-darkBlue text-4xl font-black leading-none tracking-tight">
+                <h1 className="text-consorci-darkBlue text-4xl font-black leading-none tracking-tight flex items-center gap-4">
+                  <div className="w-12 h-12 flex items-center justify-center bg-gray-50 border border-gray-100 shrink-0">
+                    <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                      {SVG_ICONS[selectedWorkshop.icona || "PUZZLE"] || SVG_ICONS.PUZZLE}
+                    </svg>
+                  </div>
                   {selectedWorkshop.titol}
                 </h1>
               </div>
@@ -144,27 +160,21 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
             )}
 
             {/* Action Buttons */}
-            <div className="mt-auto pt-6 border-t border-gray-100 flex gap-4">
+            <div className="mt-auto pt-6 border-t border-gray-100 flex justify-end gap-4">
               <button
                 onClick={() => console.log('Download PDF')}
-                className="flex items-center justify-center px-6 py-4 border border-gray-200 hover:bg-gray-50 transition-all font-black text-xs uppercase tracking-widest text-consorci-darkBlue active:scale-95"
+                className="flex items-center justify-center px-6 py-3 border border-gray-200 hover:bg-gray-50 transition-all font-black text-[10px] uppercase tracking-widest text-[#00426B]"
               >
-                <svg className="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Baixar PDF
+                Baixar Fitxa Tècnica (PDF)
               </button>
               <button
-                onClick={() => {
-                  onClose();
-                  router.push('/statistics');
-                }}
-                className="flex-1 bg-consorci-darkBlue hover:bg-consorci-darkBlue/90 text-white font-black text-xs uppercase tracking-widest flex items-center justify-center px-6 py-4 transition-all active:scale-[0.98]"
+                onClick={onClose}
+                className="bg-[#00426B] hover:bg-[#0775AB] text-white font-black text-[10px] uppercase tracking-widest px-8 py-3 transition-all"
               >
-                Inscriure's al Taller
-                <svg className="w-5 h-5 ml-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
+                Tancar
               </button>
             </div>
           </div>

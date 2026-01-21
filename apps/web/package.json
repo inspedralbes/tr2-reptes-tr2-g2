@@ -3,20 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@iter/shared": "*",
+    "@iter/ui": "*",
     "axios": "^1.13.2",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "@iter/shared": "*",
-    "@iter/ui": "*"
+    "sonner": "^2.0.7"
   },
-"devDependencies": {
+  "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

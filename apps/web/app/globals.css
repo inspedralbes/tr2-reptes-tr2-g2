@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: #f7f8f9;
   --foreground: #00426b;
   --action: #0775ab;
   --secondary-bg: #eaeff2;
@@ -12,20 +12,13 @@
   --consorci-light-gray: #cfd2d3;
   --consorci-pink-red: #f26178;
   --consorci-beige: #e0c5ac;
-  --card-bg: #f2f2f3;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #cfd2d3;
-  }
+  --card-bg: #ffffff;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -36,14 +29,34 @@ h3,
 h4,
 h5,
 h6 {
-  font-weight: 700;
+  font-weight: 900;
   color: var(--consorci-dark-blue);
+  letter-spacing: -0.02em;
 }
 
 .btn-primary {
-  @apply bg-[#0775AB] hover:bg-[#00426B] text-white font-bold py-2 px-4 transition-colors;
+  @apply bg-[#00426B] hover:bg-[#0775AB] text-white font-black uppercase text-[10px] tracking-widest py-3 px-6 transition-all active:scale-95;
 }
 
 .btn-secondary {
-  @apply bg-[#EAEFF2] hover:bg-[#CFD2D3] text-[#00426B] font-bold py-2 px-4 transition-colors;
+  @apply bg-white border border-[#EAEFF2] hover:bg-[#EAEFF2] text-[#00426B] font-black uppercase text-[10px] tracking-widest py-3 px-6 transition-all active:scale-95;
+}
+
+.card-premium {
+  @apply bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#0775AB] transition-all duration-300;
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .container-responsive {
+    @apply px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24;
+  }
 }

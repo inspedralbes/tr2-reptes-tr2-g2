@@ -5,8 +5,10 @@ import { Request, Response } from 'express';
 // GET: Listar todos los talleres con paginación
 export const getTallers = async (req: Request, res: Response) => {
   const { page = 1, limit = 10 } = req.query;
-  const skip = (Number(page) - 1) * Number(limit);
-  const take = Number(limit);
+  const isAll = Number(limit) === 0;
+  
+  const skip = isAll ? undefined : (Number(page) - 1) * Number(limit);
+  const take = isAll ? undefined : Number(limit);
 
   const [tallers, total] = await Promise.all([
     prisma.taller.findMany({
@@ -25,7 +27,7 @@ export const getTallers = async (req: Request, res: Response) => {
       total,
       page: Number(page),
       limit: Number(limit),
-      totalPages: Math.ceil(total / take),
+      totalPages: isAll ? 1 : Math.ceil(total / (take || 1)),
     },
   });
 };

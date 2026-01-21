@@ -13,17 +13,17 @@ app.set('trust proxy', 1);
 
 // ... (allowedOrigins logic remains same)
 const allowedOrigins = [
-  'https://iter.kore29.com',
+  'https://iter.kore29.com', // Prod Web
   'http://iter.kore29.com',
-  'https://iter-api.kore29.com',  
+  'https://iter-api.kore29.com', // Prod API
   'http://iter-api.kore29.com',
   'http://localhost:8002',
   'http://localhost:3000',
 ];
 
 if (process.env.CORS_ORIGIN) {
-  const envOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim());
-  envOrigins.forEach(origin => {
+  const envOrigins = process.env.CORS_ORIGIN.split(',').map((o) => o.trim());
+  envOrigins.forEach((origin) => {
     if (!allowedOrigins.includes(origin)) {
       allowedOrigins.push(origin);
     }
@@ -34,7 +34,7 @@ app.use(cors({
   origin: function (origin, callback) {
     return callback(null, true);
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'ngrok-skip-browser-warning'],
   credentials: true,
   optionsSuccessStatus: 200

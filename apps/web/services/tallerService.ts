@@ -7,6 +7,7 @@ export interface Taller {
   id_sector?: number;
   modalitat: string;
   trimestre: string;
+  icona?: string;
   detalls_tecnics?: {
     descripcio: string;
     durada_hores: number;
@@ -24,7 +25,7 @@ const tallerService = {
   getAll: async (): Promise<Taller[]> => {
     const api = getApi();
     try {
-      const response = await api.get<{ data: any[], meta: any }>("/tallers");
+      const response = await api.get<{ data: any[], meta: any }>("/tallers?limit=0");
       const tallersData = response.data.data;
 
       return tallersData.map((t: any) => ({
@@ -34,6 +35,7 @@ const tallerService = {
         id_sector: t.id_sector,
         modalitat: t.modalitat,
         trimestre: "1r",
+        icona: t.icona || "🧩",
         detalls_tecnics: {
           descripcio: t.descripcio_curta || t.descripcio || "",
           durada_hores: t.durada_h || 0,
@@ -61,6 +63,7 @@ const tallerService = {
         durada_h: tallerData.detalls_tecnics?.durada_hores,
         places_maximes: tallerData.detalls_tecnics?.places_maximes,
         modalitat: tallerData.modalitat,
+        icona: tallerData.icona || "🧩",
         id_sector: tallerData.id_sector || 1,
       };
 
@@ -100,6 +103,7 @@ const tallerService = {
       if (tallerData.titol) payload.titol = tallerData.titol;
       if (tallerData.modalitat) payload.modalitat = tallerData.modalitat;
       if (tallerData.id_sector) payload.id_sector = tallerData.id_sector;
+      if (tallerData.icona) payload.icona = tallerData.icona;
       if (tallerData.detalls_tecnics) {
         if (tallerData.detalls_tecnics.descripcio) payload.descripcio = tallerData.detalls_tecnics.descripcio;
         if (tallerData.detalls_tecnics.durada_hores) payload.durada_h = tallerData.detalls_tecnics.durada_hores;
@@ -116,6 +120,7 @@ const tallerService = {
         id_sector: t.id_sector,
         modalitat: t.modalitat,
         trimestre: "1r",
+        icona: t.icona || "🧩",
         detalls_tecnics: {
           descripcio: t.descripcio_curta || t.descripcio || "",
           durada_hores: t.durada_h || 0,

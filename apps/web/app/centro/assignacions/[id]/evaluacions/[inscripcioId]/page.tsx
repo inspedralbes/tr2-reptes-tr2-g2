@@ -7,6 +7,9 @@ import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import { avaluacioService } from '@/services/avaluacioService';
 import getApi from '@/services/api';
+import Loading from '@/components/Loading';
+import { toast } from 'sonner';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function StudentEvaluationFormPage({ params }: { params: Promise<{ id: string, inscripcioId: string }> }) {
     const { id, inscripcioId } = use(params);
@@ -28,6 +31,20 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
 
     // Voice State
     const [isListening, setIsListening] = useState(false);
+    
+    // Dialog states
+    const [confirmConfig, setConfirmConfig] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        isDestructive?: boolean;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => {},
+    });
 
     useEffect(() => {
         const currentUser = getUser();
@@ -50,14 +67,14 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                 const assignment = resAssig.data.find((a: any) => a.id_assignacio === parseInt(id));
 
                 if (!assignment) {
-                    alert('Assignació no trobada.');
+                    toast.error('Assignació no trobada.');
                     router.push('/centro/assignacions');
                     return;
                 }
 
                 const ins = assignment.inscripcions.find((i: any) => i.id_inscripcio === parseInt(inscripcioId));
                 if (!ins) {
-                    alert('Inscripció no trobada.');
+                    toast.error('Inscripció no trobada.');
                     router.push(`/centro/assignacions/${id}/evaluacions`);
                     return;
                 }
@@ -105,7 +122,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
 
     const startVoiceRecognition = () => {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            alert("El seu navegador no suporta el reconeixement de veu.");
+            toast.error("El seu navegador no suporta el reconeixement de veu.");
             return;
         }
 
@@ -131,14 +148,20 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
         try {
             const res = await avaluacioService.analyzeObservations(form.observacions);
             const { suggestedScore, summary } = res.data;
-            if (confirm(`L'IA suggereix una puntuació mitjana de ${suggestedScore}. Resum de l'anàlisi: ${summary}\nVols moure tota l'avaluació a aquest nivell?`)) {
-                setForm(prev => ({
-                    ...prev,
-                    competencies: prev.competencies.map(c => ({ ...c, puntuacio: suggestedScore }))
-                }));
-            }
+            setConfirmConfig({
+                isOpen: true,
+                title: 'Anàlisi de l\'IA',
+                message: `L'IA suggereix una puntuació mitjana de ${suggestedScore}. Resum: ${summary}\nVols moure tota l'avaluació a aquest nivell?`,
+                onConfirm: () => {
+                   setForm(prev => ({
+                        ...prev,
+                        competencies: prev.competencies.map(c => ({ ...c, puntuacio: suggestedScore }))
+                    }));
+                    setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+                }
+            });
         } catch (err) {
-            alert("Error en l'anàlisi de l'IA.");
+            toast.error("Error en l'anàlisi de l'IA.");
         } finally {
             setAnalyzing(false);
         }
@@ -152,21 +175,17 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                 id_inscripcio: parseInt(inscripcioId),
                 ...form
             });
-            alert("Avaluació desada amb èxit.");
+            toast.success("Avaluació desada amb èxit.");
             router.push(`/centro/assignacions/${id}/evaluacions`);
         } catch (err) {
-            alert("Error al desar l'avaluació.");
+            toast.error("Error al desar l'avaluació.");
         } finally {
             setSaving(false);
         }
     };
 
     if (loading || !inscripcio) {
-        return (
-            <div className="flex min-h-screen justify-center items-center">
-                <div className="animate-spin h-10 w-10 border-b-2 border-primary"></div>
-            </div>
-        );
+        return <Loading fullScreen message="Carregant formulari d'avaluació..." />;
     }
 
     const competenciesT = competencies.filter(c => c.tipus === 'TECNICA');
@@ -177,7 +196,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
             title={`Avaluació d'Alumne`}
             subtitle={`${inscripcio.alumne?.nom} ${inscripcio.alumne?.cognoms}`}
         >
-            <div className="max-w-4xl mx-auto pb-20">
+            <div className="w-full pb-20">
                 <button
                     onClick={() => router.push(`/centro/assignacions/${id}/evaluacions`)}
                     className="mb-8 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black transition-colors flex items-center gap-2"
@@ -237,8 +256,8 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                                                         type="button"
                                                         onClick={() => handleRatingChange(c.id_competencia, v)}
                                                         className={`w-10 h-10 border-2 font-black transition-all ${form.competencies.find(comp => comp.id_competencia === c.id_competencia)?.puntuacio === v
-                                                                ? 'bg-blue-900 border-blue-900 text-white shadow-md scale-110'
-                                                                : 'bg-white border-gray-200 text-gray-300 hover:border-blue-200'
+                                                            ? 'bg-blue-900 border-blue-900 text-white shadow-md scale-110'
+                                                            : 'bg-white border-gray-200 text-gray-300 hover:border-blue-200'
                                                             }`}
                                                     >
                                                         {v}
@@ -268,8 +287,8 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                                                         type="button"
                                                         onClick={() => handleRatingChange(c.id_competencia, v)}
                                                         className={`w-10 h-10 border-2 font-black transition-all ${form.competencies.find(comp => comp.id_competencia === c.id_competencia)?.puntuacio === v
-                                                                ? 'bg-blue-900 border-blue-900 text-white shadow-md scale-110'
-                                                                : 'bg-white border-gray-200 text-gray-300 hover:border-blue-200'
+                                                            ? 'bg-blue-900 border-blue-900 text-white shadow-md scale-110'
+                                                            : 'bg-white border-gray-200 text-gray-300 hover:border-blue-200'
                                                             }`}
                                                     >
                                                         {v}
@@ -335,6 +354,14 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                     </div>
                 </form>
             </div>
+            <ConfirmDialog 
+                isOpen={confirmConfig.isOpen}
+                title={confirmConfig.title}
+                message={confirmConfig.message}
+                onConfirm={confirmConfig.onConfirm}
+                onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+                isDestructive={confirmConfig.isDestructive}
+            />
         </DashboardLayout>
     );
 }

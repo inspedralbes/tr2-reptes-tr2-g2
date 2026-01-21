@@ -21,7 +21,10 @@ config.resolver.nodeModulesPaths = [
 // 3. Make sure typescript files in the monorepo are discoverable
 config.resolver.sourceExts.push('mjs', 'ts', 'tsx');
 
-// 4. Force Metro to resolve (sub)dependencies only from the `node_modules` folders
-config.resolver.disableHierarchicalLookup = true;
+// Enable package exports support (required for semver v7 subpath imports)
+config.resolver.unstable_enablePackageExports = true;
+
+// Allow Metro to look up nested node_modules (required for hoisted dependencies with nested children)
+config.resolver.disableHierarchicalLookup = false;
 
 module.exports = withNativeWind(config, { input: './global.css' });

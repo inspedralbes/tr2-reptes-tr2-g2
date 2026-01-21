@@ -6,6 +6,13 @@ import { isPhaseActive, PHASES } from '../lib/phaseUtils';
 // GET: Listar asignaciones de un centro
 export const getAssignacionsByCentre = async (req: Request, res: Response) => {
   const { idCentre } = req.params;
+  const { centreId, role } = (req as any).user;
+
+  // Security Scoping
+  if (role !== 'ADMIN' && parseInt(idCentre as string) !== centreId) {
+    return res.status(403).json({ error: 'Accés denegat: No pots veure les assignacions d\'altre centre' });
+  }
+
   try {
     const assignacions = await prisma.assignacio.findMany({
       where: { id_centre: parseInt(idCentre as string) },
@@ -73,6 +80,13 @@ export const updateChecklistItem = async (req: Request, res: Response) => {
 // GET: Incidencias de un centro
 export const getIncidenciesByCentre = async (req: Request, res: Response) => {
   const { idCentre } = req.params;
+  const { centreId, role } = (req as any).user;
+
+  // Security Scoping
+  if (role !== 'ADMIN' && parseInt(idCentre as string) !== centreId) {
+    return res.status(403).json({ error: 'Accés denegat: No pots veure les incidències d\'altre centre' });
+  }
+
   try {
     const incidencies = await prisma.incidencia.findMany({
       where: { id_centre: parseInt(idCentre as string) },
@@ -96,7 +110,44 @@ export const createIncidencia = async (req: Request, res: Response) => {
     });
     res.status(201).json(nuevaIncidencia);
   } catch (error) {
-    res.status(500).json({ error: 'Error al crear incidencia' });
+    res.status(500).json({ error: 'Error al ejecutar análisis de riesgo' });
+  }
+};
+
+// POST: Validar subida de documento (Vision AI)
+import { VisionService } from '../services/vision.service';
+
+export const validateDocumentUpload = async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se ha subido ningún archivo.' });
+    }
+
+    const visionService = new VisionService();
+    const validation = await visionService.validateDocument(req.file);
+
+    if (!validation.valid) {
+      // Rechazar subida
+      return res.status(400).json({
+        error: 'Documento rechazado por la IA.',
+        details: validation.errors,
+        metadata: validation.metadata
+      });
+    }
+
+    // Si es válido, aquí iría la lógica para guardar en S3/Disco
+    // const s3Url = await uploadToS3(req.file);
+
+    res.json({
+      success: true,
+      message: 'Documento validado y aceptado correctamente.',
+      metadata: validation.metadata
+      // url: s3Url
+    });
+
+  } catch (error) {
+    console.error("Error en validación de documento:", error);
+    res.status(500).json({ error: 'Error al procesar el documento.' });
   }
 };
 
@@ -124,7 +175,7 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
     }
 
     // Comprobar si ya existe una asignación para esta petición
-    const existing = await prisma.assignacio.findUnique({
+    const existing = await prisma.assignacio.findFirst({
       where: { id_peticio: peticio.id_peticio }
     });
 
@@ -138,6 +189,8 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
         id_centre: peticio.id_centre,
         id_taller: peticio.id_taller,
         estat: 'En_curs',
+        prof1_id: peticio.prof1_id ?? undefined,
+        prof2_id: peticio.prof2_id ?? undefined,
         // Inicializar checklist por defecto para Fase 2
         checklist: {
           create: [
@@ -158,59 +211,58 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
 
 // POST: Realizar Registro Nominal (Inscribir alumnos en una asignación)
 export const createInscripcions = async (req: Request, res: Response) => {
-  const idAssignacio = req.params.idAssignacio as string;
+  const idAssignacio = parseInt(req.params.idAssignacio as string);
   const { ids_alumnes } = req.body; // Array de IDs de alumnos
 
   try {
-    const assignacio = await prisma.assignacio.findUnique({
-      where: { id_assignacio: parseInt(idAssignacio) }
-    });
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Verificar existencia de la asignación
+      const assignacio = await tx.assignacio.findUnique({
+        where: { id_assignacio: idAssignacio }
+      });
 
-    if (!assignacio) {
-      return res.status(404).json({ error: 'Asignación no encontrada.' });
-    }
+      if (!assignacio) {
+        throw new Error('Asignación no encontrada.');
+      }
 
-    // 1. Crear las inscripciones
-    const inscripcions = await Promise.all(
-      ids_alumnes.map((idAlumne: number) =>
-        prisma.inscripcio.upsert({
-          where: {
-            // Necesitaríamos una clave única para inscripciones si quisiéramos upsert real,
-            // pero como no hay, usaremos create o simplemente borraremos las anteriores
-            id_inscripcio: -1 // Truco para forzar el fallo si no existe y crear
-          },
-          update: {},
-          create: {
-            id_assignacio: parseInt(idAssignacio),
-            id_alumne: idAlumne
-          }
-        }).catch(() =>
-          // Si falla (porque el ID -1 no existe), creamos normalmente
-          prisma.inscripcio.create({
+      // 2. Eliminar inscripciones previas para esta asignación
+      await tx.inscripcio.deleteMany({
+        where: { id_assignacio: idAssignacio }
+      });
+
+      // 3. Crear las nuevas inscripciones
+      const newInscripcions = await Promise.all(
+        ids_alumnes.map((idAlumne: number) =>
+          tx.inscripcio.create({
             data: {
-              id_assignacio: parseInt(idAssignacio),
+              id_assignacio: idAssignacio,
               id_alumne: idAlumne
             }
           })
         )
-      )
-    );
+      );
 
-    // 2. Marcar el ítem del checklist como completado
-    await prisma.checklistAssignacio.updateMany({
-      where: {
-        id_assignacio: parseInt(idAssignacio as string),
-        pas_nom: { contains: 'Registro Nominal' }
-      },
-      data: {
-        completat: true,
-        data_completat: new Date()
-      }
+      // 4. Marcar el ítem del checklist como completado
+      await tx.checklistAssignacio.updateMany({
+        where: {
+          id_assignacio: idAssignacio,
+          pas_nom: { contains: 'Registro Nominal' }
+        },
+        data: {
+          completat: true,
+          data_completat: new Date()
+        }
+      });
+
+      return newInscripcions;
     });
 
-    res.json({ message: 'Registro nominal completado', count: inscripcions.length });
-  } catch (error) {
+    res.json({ message: 'Registro nominal completado', count: result.length });
+  } catch (error: any) {
     console.error("Error al realizar registro nominal:", error);
+    if (error.message === 'Asignación no encontrada.') {
+      return res.status(404).json({ error: error.message });
+    }
     res.status(500).json({ error: 'Error al realizar el registro nominal.' });
   }
 };
@@ -246,4 +298,39 @@ export const designateProfessors = async (req: Request, res: Response) => {
     console.error("Error al designar profesores:", error);
     res.status(500).json({ error: 'Error al designar profesores.' });
   }
+};
+
+// POST: Generar Asignaciones Automáticas (AI)
+import { AutoAssignmentService } from '../services/auto-assignment.service';
+
+export const generateAutomaticAssignments = async (req: Request, res: Response) => {
+  const { role } = (req as any).user;
+  // if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
+
+  try {
+    const service = new AutoAssignmentService();
+    const result = await service.generateAssignments();
+    res.json(result);
+  } catch (error) {
+    console.error("Error en asignación automática:", error);
+    res.status(500).json({ error: 'Error al ejecutar el motor de asignación.' });
+  }
+};
+
+// Phase 3: Sessions & Attendance
+export const getSessions = async (req: Request, res: Response) => {
+  res.json({ message: 'Stub: getSessions implemented' });
+};
+
+export const getSessionAttendance = async (req: Request, res: Response) => {
+  res.json({ message: 'Stub: getSessionAttendance implemented' });
+};
+
+export const registerAttendance = async (req: Request, res: Response) => {
+  res.json({ message: 'Stub: registerAttendance implemented' });
+};
+
+// Phase 4: Closing
+export const closeAssignacio = async (req: Request, res: Response) => {
+  res.json({ message: 'Stub: closeAssignacio implemented' });
 };

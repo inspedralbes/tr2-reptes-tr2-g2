@@ -61,5 +61,5 @@ export default function Index() {
     );
   }
 
-  return hasToken ? <Redirect href="/(professor)" /> : <Redirect href="/login" />;
+  return hasToken ? <Redirect href={"/(professor)" as any} /> : <Redirect href="/login" />;
 }

@@ -4,6 +4,7 @@ import { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { THEME } from '@iter/shared';
 import { avaluacioService } from '@/services/avaluacioService';
+import { toast } from 'sonner';
 
 export default function StudentSelfEvaluationPage({ params }: { params: Promise<{ inscripcioId: string }> }) {
     const { inscripcioId } = use(params);
@@ -33,7 +34,7 @@ export default function StudentSelfEvaluationPage({ params }: { params: Promise<
             });
             setSubmitted(true);
         } catch (err) {
-            alert("Error al enviar l'autoconsulta.");
+            toast.error("Error al enviar l'autoconsulta.");
         } finally {
             setLoading(false);
         }

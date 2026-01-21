@@ -7,10 +7,23 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { THEME } from "@iter/shared";
 import WorkshopDetail from "../../../components/WorkshopDetail";
-import WorkshopCard from "../../../components/WorkshopCard";
 import tallerService, { Taller } from "../../../services/tallerService";
 import DashboardLayout from "../../../components/DashboardLayout";
 import CreateWorkshopModal from "../../../components/CreateWorkshopModal";
+import Loading from "@/components/Loading";
+import { toast } from "sonner";
+import ConfirmDialog from "@/components/ConfirmDialog";
+
+const SVG_ICONS: Record<string, React.ReactNode> = {
+  PUZZLE: <path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />,
+  ROBOT: <path d="M12 2a2 2 0 012 2v1h2a2 2 0 012 2v2h1a2 2 0 012 2v4a2 2 0 01-2 2h-1v2a2 2 0 01-2 2H7a2 2 0 01-2-2v-2H4a2 2 0 01-2-2v-4a2 2 0 012-2h1V7a2 2 0 012-2h2V4a2 2 0 012-2zM9 9H7v2h2V9zm8 0h-2v2h2V9z" />,
+  CODE: <path d="M10 20l-7-7 7-7m4 0l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor" />,
+  PAINT: <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10c1 0 1.8-.8 1.8-1.8 0-.46-.17-.9-.47-1.24-.3-.33-.47-.78-.47-1.26 0-.96.79-1.75 1.75-1.75H17c2.76 0 5-2.24 5-5 0-4.42-4.48-8-10-8z" />,
+  FILM: <path d="M7 4V20M17 4V20M3 8H7M17 8H21M3 12H21M3 16H7M17 16H21M3 4H21V20H3V4Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor" />,
+  TOOLS: <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6-3.8 3.8L11 11.6a1 1 0 00-1.4 0L3.3 18a1 1 0 000 1.4l1.3 1.3a1 1 0 001.4 0l6.4-6.4 1.5 1.5a1 1 0 001.4 0l3.8-3.8 1.6 1.6a1 1 0 001.4 0l1.3-1.3a1 1 0 000-1.4L14.7 6.3z" />,
+  LEAF: <path d="M12 2a10 10 0 00-10 10c0 5.52 4.48 10 10 10s10-4.48 10-10A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z" />,
+  GEAR: <path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z" />
+};
 
 export default function TallerScreen() {
   const { user, loading: authLoading } = useAuth();
@@ -28,7 +41,23 @@ export default function TallerScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSector, setSelectedSector] = useState("Tots els sectors");
+  const [selectedModalitat, setSelectedModalitat] = useState("Totes les modalitats");
   const [isCreateModalVisible, setCreateModalVisible] = useState(false);
+  
+  // Dialog states
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isDestructive?: boolean;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   const fetchTalleres = useCallback(async () => {
     try {
@@ -49,11 +78,23 @@ export default function TallerScreen() {
   }, [fetchTalleres, user]);
 
   const filteredTalleres = useMemo(() => {
-    if (!searchQuery) return talleres;
-    return talleres.filter((taller) =>
-      taller.titol?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [talleres, searchQuery]);
+    return talleres.filter((taller) => {
+      const matchesSearch = !searchQuery || taller.titol?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSector = selectedSector === "Tots els sectors" || taller.sector === selectedSector;
+      const matchesModalitat = selectedModalitat === "Totes les modalitats" || taller.modalitat === selectedModalitat;
+      return matchesSearch && matchesSector && matchesModalitat;
+    });
+  }, [talleres, searchQuery, selectedSector, selectedModalitat]);
+
+  const uniqueSectors = useMemo(() => {
+    const sectors = Array.from(new Set(talleres.map(t => t.sector))).filter(Boolean);
+    return ["Tots els sectors", ...sectors.sort()];
+  }, [talleres]);
+
+  const uniqueModalitats = useMemo(() => {
+    const modalitats = Array.from(new Set(talleres.map(t => t.modalitat))).filter(Boolean);
+    return ["Totes les modalitats", ...modalitats.sort()];
+  }, [talleres]);
 
   const handleWorkshopSaved = (savedWorkshop: Taller) => {
     setTalleres((prev) => {
@@ -64,6 +105,7 @@ export default function TallerScreen() {
       return [savedWorkshop, ...prev];
     });
     setEditingWorkshop(null);
+    toast.success("Taller desat amb èxit.");
   };
 
   const handleEdit = (taller: Taller) => {
@@ -72,24 +114,28 @@ export default function TallerScreen() {
     setCreateModalVisible(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('¿Seguro que quieres eliminar este taller?')) return;
-    try {
-      await tallerService.delete(id);
-      setTalleres((prev) => prev.filter((t) => t._id !== id));
-      setSelectedWorkshop(null);
-    } catch (err) {
-      console.error(err);
-      alert("Error al eliminar el taller");
-    }
+  const handleDelete = (id: string) => {
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Eliminar Taller',
+      message: 'Estàs segur que vols eliminar aquest taller? Aquesta acció eliminarà el taller del catàleg permanentment.',
+      isDestructive: true,
+      onConfirm: async () => {
+        try {
+          await tallerService.delete(id);
+          setTalleres((prev) => prev.filter((t) => t._id !== id));
+          setSelectedWorkshop(null);
+          toast.success("Taller eliminat correctament.");
+        } catch (err) {
+          toast.error("Error al eliminar el taller.");
+        }
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   if (authLoading || !user || user.rol.nom_rol !== 'ADMIN') {
-    return (
-      <div className="flex min-h-screen justify-center items-center" style={{ backgroundColor: THEME.colors.background }}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: THEME.colors.primary }}></div>
-      </div>
-    );
+    return <Loading fullScreen message="Verificant permisos d'administrador..." />;
   }
 
   const headerActions = (
@@ -114,104 +160,158 @@ export default function TallerScreen() {
       subtitle="Creación, edición y supervisión del catálogo oficial de Iter."
       actions={headerActions}
     >
-      {/* Buscador */}
-      <div className="mb-8 flex justify-between items-center bg-white shadow-sm border border-gray-100 p-6">
-        <div className="max-w-md w-full">
-          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Buscador ràpid</label>
+      {/* Panell de Filtres */}
+      <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8">
+        {/* Cercador de Text */}
+        <div className="flex-1">
+          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Cerca per títol</label>
           <div className="relative">
             <input 
               type="text"
-              placeholder="Ej: Fusta, Robòtica..."
+              placeholder="Ex: Fusta, Robòtica..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 font-medium text-gray-700"
+              className="w-full pl-11 pr-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] placeholder:text-gray-300 transition-all"
             />
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-3.5 h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
         </div>
+
+        {/* Filtre Sector */}
+        <div className="lg:w-64">
+          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Filtra per sector</label>
+          <select 
+            value={selectedSector}
+            onChange={(e) => setSelectedSector(e.target.value)}
+            className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] appearance-none"
+          >
+            {uniqueSectors.map(s => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Filtre Modalitat */}
+        <div className="lg:w-64">
+          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Filtrar per modalitat</label>
+          <select 
+            value={selectedModalitat}
+            onChange={(e) => setSelectedModalitat(e.target.value)}
+            className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] appearance-none"
+          >
+            {uniqueModalitats.map(m => (
+              <option key={m} value={m}>{m}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Acció: Netejar */}
+        <div className="flex items-end">
+          <button 
+            onClick={() => {
+              setSearchQuery("");
+              setSelectedSector("Tots els sectors");
+              setSelectedModalitat("Totes les modalitats");
+            }}
+            className="w-full lg:w-auto px-6 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
+          >
+            Netejar
+          </button>
+        </div>
       </div>
 
-      {/* Grid de Talleres */}
+      {/* Taula de Tallers */}
       {loading ? (
-        <div className="py-20 text-center">
-          <div className="animate-spin h-10 w-10 border-b-2 mx-auto mb-4" style={{ borderColor: THEME.colors.primary }}></div>
-          <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Carregant catàleg...</p>
-        </div>
+        <Loading message="Carregant catàleg..." />
       ) : filteredTalleres.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {filteredTalleres.map((taller) => (
-            <div key={taller._id} className="group bg-white shadow-sm border border-gray-100 p-6 relative overflow-hidden transition-all duration-300">
-              <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                <svg className="h-24 w-24" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
-                </svg>
-              </div>
-
-              <div className="relative">
-                <div className="flex justify-between items-start mb-6">
-                  <div className="w-12 h-12 bg-blue-50 flex items-center justify-center text-blue-600 shadow-inner group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
-                    </svg>
-                  </div>
-                  <span className="text-[10px] font-black uppercase text-gray-300 tracking-tighter">ID: {taller._id}</span>
-                </div>
-                
-                <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight group-hover:text-blue-700 transition-colors">{taller.titol}</h3>
-                <p className="text-sm text-gray-500 mb-6 h-10 line-clamp-2 leading-relaxed">{taller.detalls_tecnics?.descripcio}</p>
-                
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-orange-50 text-orange-700 font-bold text-[10px] uppercase tracking-wide">
-                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    {taller.detalls_tecnics?.durada_hores}h
-                  </div>
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 font-bold text-[10px] uppercase tracking-wide">
-                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    {taller.detalls_tecnics?.places_maximes} p.
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <button 
-                    onClick={() => setSelectedWorkshop(taller)}
-                    className="flex-1 py-3 px-4 text-xs font-bold text-blue-800 bg-blue-50/50 hover:bg-blue-600 hover:text-white transition-all duration-300"
-                  >
-                    Detalles
-                  </button>
-                  <button 
-                    onClick={() => handleEdit(taller)}
-                    className="p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
-                    title="Editar"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(taller._id)}
-                    className="p-3 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all"
-                    title="Eliminar"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="bg-white border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-[#F8FAFC] border-b border-gray-200">
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Informació del Taller</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Detalls Tècnics</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Capacitat</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">Accions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredTalleres.map((taller) => (
+                  <tr key={taller._id} className="hover:bg-gray-50 transition-colors group">
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-[#EAEFF2] flex items-center justify-center text-[#00426B] group-hover:bg-[#00426B] group-hover:text-white transition-colors">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            {SVG_ICONS[taller.icona || "PUZZLE"] || SVG_ICONS.PUZZLE}
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{taller.titol}</div>
+                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">ID: {taller._id} • {taller.modalitat}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-wide">
+                          <span className="w-1 h-1 bg-[#4197CB]"></span>
+                          {taller.detalls_tecnics?.durada_hores} Hores Lectives
+                        </div>
+                        <div className="text-[10px] text-gray-400 font-medium line-clamp-1 max-w-[200px]">
+                          {taller.detalls_tecnics?.descripcio}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-2">
+                        <div className="px-2 py-0.5 bg-green-50 text-green-700 text-[10px] font-black uppercase tracking-widest border border-green-100">
+                          {taller.detalls_tecnics?.places_maximes} PLACES
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex justify-end items-center gap-2">
+                        <button 
+                          onClick={() => setSelectedWorkshop(taller)}
+                          className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors"
+                        >
+                          Detalles
+                        </button>
+                        <button 
+                          onClick={() => handleEdit(taller)}
+                          className="p-1.5 text-gray-400 hover:text-[#0775AB] hover:bg-[#EAEFF2] transition-all"
+                        >
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(taller._id)}
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all"
+                        >
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : (
-        <div className="text-center py-32 bg-white border border-dashed border-gray-200 animate-in fade-in zoom-in duration-500">
+        <div className="text-center py-32 bg-white border border-dashed border-gray-200">
           <div className="w-16 h-16 bg-gray-50 flex items-center justify-center mx-auto mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <p className="text-gray-500 font-black uppercase text-xs tracking-widest">No s'han trobat tallers</p>
-          <p className="text-gray-400 text-sm mt-1">Prova amb altres termes de cerca.</p>
+          <p className="text-[#00426B] font-black uppercase text-xs tracking-widest">No s'han trobat tallers</p>
+          <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">Prova amb altres termes de cerca.</p>
         </div>
       )}
 
@@ -231,6 +331,14 @@ export default function TallerScreen() {
         }}
         onWorkshopCreated={handleWorkshopSaved}
         initialData={editingWorkshop}
+      />
+      <ConfirmDialog 
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        onConfirm={confirmConfig.onConfirm}
+        onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        isDestructive={confirmConfig.isDestructive}
       />
     </DashboardLayout>
   );

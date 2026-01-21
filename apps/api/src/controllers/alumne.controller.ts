@@ -6,8 +6,13 @@ export const getAlumnes = async (req: Request, res: Response) => {
 
   try {
     const where: any = {};
-    if (role === 'COORDINADOR' && centreId) {
-      where.id_centre_procedencia = parseInt(centreId);
+    
+    // Scoping: Admin sees all, others only their center
+    if (role !== 'ADMIN') {
+      if (!centreId) {
+        return res.json([]); // No center assigned, no access
+      }
+      where.id_centre_procedencia = parseInt(centreId.toString());
     }
 
     const alumnes = await prisma.alumne.findMany({
@@ -38,6 +43,7 @@ export const createAlumne = async (req: Request, res: Response) => {
 
 export const updateAlumne = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const { nom, cognoms, curs, id_centre_procedencia, idalu } = req.body;
   try {
     const alumne = await prisma.alumne.update({
       where: { id_alumne: parseInt(id as string) },

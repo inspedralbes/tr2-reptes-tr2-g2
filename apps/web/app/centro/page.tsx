@@ -61,25 +61,15 @@ export default function CentroDashboard() {
     );
   }
 
-  const headerActions = (
-    <ResourcesWidget />
-  );
-
   return (
     <DashboardLayout
       title={`Panell de Centre: ${user.centre?.nom || 'Educatiu'}`}
       subtitle="Procés de gestió de tallers d'Iter."
-      actions={headerActions}
     >
       {/* Timeline Secció Institucional */}
-      <section className="bg-white border border-gray-200 p-12 mb-12 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-12 opacity-[0.05]">
-          <svg className="h-32 w-32 text-[#00426B]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-
-        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#00426B] mb-12 flex items-center gap-4">
+      <section className="bg-white border border-gray-200 p-6 md:p-12 mb-8 md:mb-12 relative overflow-hidden">
+        
+        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#00426B] mb-8 md:mb-12 flex items-center gap-4">
           <span className="w-12 h-1 bg-[#0775AB]"></span>
           Estat del Programa Iter 25-26
         </h3>
@@ -103,8 +93,8 @@ export default function CentroDashboard() {
                 <div key={fase.id_fase} className="relative flex flex-col items-center text-center group/phase flex-1">
                   <div
                     className={`w-14 h-14 flex items-center justify-center mb-6 z-10 border-4 transition-all duration-500 scale-100 ${fase.activa
-                        ? 'border-[#0775AB] bg-[#00426B] text-white shadow-xl scale-110'
-                        : 'border-[#EAEFF2] bg-white text-gray-300 group-hover/phase:border-[#0775AB] group-hover/phase:text-[#0775AB]'
+                      ? 'border-[#EAEFF2] bg-[#00426B] text-white shadow-xl scale-110 group-hover/phase:border-[#0775AB]'
+                      : 'border-[#EAEFF2] bg-white text-gray-300 group-hover/phase:border-[#0775AB] group-hover/phase:text-[#0775AB]'
                       }`}
                   >
                     <span className="text-lg font-black italic tracking-tighter">
@@ -119,11 +109,6 @@ export default function CentroDashboard() {
                     }`}>
                     {new Date(fase.data_inici).toLocaleDateString('ca-ES', { day: 'numeric', month: 'short' })}
                   </div>
-                  {fase.activa && (
-                    <div className="mt-4">
-                      <span className="px-3 py-1 bg-[#0775AB] text-white text-[9px] font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-500/20">Activa</span>
-                    </div>
-                  )}
                 </div>
               ))
             )}
@@ -132,12 +117,12 @@ export default function CentroDashboard() {
       </section>
 
       {/* Accesos Directos - Targetes Estil edubcn */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
         <div
           onClick={() => isPhaseActive(PHASES.SOLICITUD) && router.push('/centro/peticions')}
-          className={`group p-10 border transition-all duration-500 relative overflow-hidden ${isPhaseActive(PHASES.SOLICITUD)
-              ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
-              : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
+          className={`group p-8 md:p-10 border transition-all duration-500 relative overflow-hidden ${isPhaseActive(PHASES.SOLICITUD)
+            ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
+            : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
         >
           <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${isPhaseActive(PHASES.SOLICITUD) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
@@ -152,13 +137,13 @@ export default function CentroDashboard() {
         </div>
 
         <div
-          onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push('/centro/alumnos')}
-          className={`group p-10 border transition-all duration-500 relative overflow-hidden ${isPhaseActive(PHASES.PLANIFICACION)
-              ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
-              : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
+          onClick={() => (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD)) && router.push('/centro/alumnos')}
+          className={`group p-8 md:p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD))
+            ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
+            : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
         >
-          <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${isPhaseActive(PHASES.PLANIFICACION) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
+          <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD)) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
             }`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -166,17 +151,17 @@ export default function CentroDashboard() {
           </div>
           <h3 className="text-xl font-black text-[#00426B] mb-3 uppercase tracking-tight">Gestió Alumnat</h3>
           <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">Inscriu els alumnes als tallers assignats de forma nominal.</p>
-          {!isPhaseActive(PHASES.PLANIFICACION) && <span className="text-[9px] font-black uppercase text-[#0775AB] mt-6 block tracking-widest px-2 py-1 bg-blue-50 w-fit">Propera Fase</span>}
+          {!isPhaseActive(PHASES.PLANIFICACION) && !isPhaseActive(PHASES.SOLICITUD) && <span className="text-[9px] font-black uppercase text-[#0775AB] mt-6 block tracking-widest px-2 py-1 bg-blue-50 w-fit">Propera Fase</span>}
         </div>
 
         <div
-          onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push('/centro/profesores')}
-          className={`group p-10 border transition-all duration-500 relative overflow-hidden ${isPhaseActive(PHASES.PLANIFICACION)
-              ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
-              : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
+          onClick={() => (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD)) && router.push('/centro/profesores')}
+          className={`group p-8 md:p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD))
+            ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
+            : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
         >
-          <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${isPhaseActive(PHASES.PLANIFICACION) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
+          <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD)) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
             }`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -188,9 +173,9 @@ export default function CentroDashboard() {
 
         <div
           onClick={() => (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) && router.push('/centro/assignacions')}
-          className={`group p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE))
-              ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
-              : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
+          className={`group p-8 md:p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE))
+            ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
+            : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
         >
           <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
@@ -202,7 +187,7 @@ export default function CentroDashboard() {
           <h3 className="text-xl font-black text-[#00426B] mb-3 uppercase tracking-tight">Assignacions</h3>
           <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">Consulta la planificació i estat dels tallers adjudicats.</p>
         </div>
-      </div>
-    </DashboardLayout>
+      </div >
+    </DashboardLayout >
   );
 }

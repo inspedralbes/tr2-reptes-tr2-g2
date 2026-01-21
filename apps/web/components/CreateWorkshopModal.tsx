@@ -27,8 +27,20 @@ const CreateWorkshopModal = ({
   const [placesMaximes, setPlacesMaximes] = useState("");
   const [ubicacioDefecte, setUbicacioDefecte] = useState("");
   const [diesExecucio, setDiesExecucio] = useState("");
+  const [icona, setIcona] = useState("PUZZLE");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const SVG_ICONS = {
+    PUZZLE: <path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />,
+    ROBOT: <path d="M12 2a2 2 0 012 2v1h2a2 2 0 012 2v2h1a2 2 0 012 2v4a2 2 0 01-2 2h-1v2a2 2 0 01-2 2H7a2 2 0 01-2-2v-2H4a2 2 0 01-2-2v-4a2 2 0 012-2h1V7a2 2 0 012-2h2V4a2 2 0 012-2zM9 9H7v2h2V9zm8 0h-2v2h2V9z" />,
+    CODE: <path d="M10 20l-7-7 7-7m4 0l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor" />,
+    PAINT: <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10c1 0 1.8-.8 1.8-1.8 0-.46-.17-.9-.47-1.24-.3-.33-.47-.78-.47-1.26 0-.96.79-1.75 1.75-1.75H17c2.76 0 5-2.24 5-5 0-4.42-4.48-8-10-8z" />,
+    FILM: <path d="M7 4V20M17 4V20M3 8H7M17 8H21M3 12H21M3 16H7M17 16H21M3 4H21V20H3V4Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor" />,
+    TOOLS: <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6-3.8 3.8L11 11.6a1 1 0 00-1.4 0L3.3 18a1 1 0 000 1.4l1.3 1.3a1 1 0 001.4 0l6.4-6.4 1.5 1.5a1 1 0 001.4 0l3.8-3.8 1.6 1.6a1 1 0 001.4 0l1.3-1.3a1 1 0 000-1.4L14.7 6.3z" />,
+    LEAF: <path d="M12 2a10 10 0 00-10 10c0 5.52 4.48 10 10 10s10-4.48 10-10A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z" />,
+    GEAR: <path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z" />
+  };
 
   useEffect(() => {
     const fetchSectors = async () => {
@@ -49,6 +61,7 @@ const CreateWorkshopModal = ({
         setIdSector(initialData.id_sector || "");
         setModalitat(initialData.modalitat);
         setTrimestre(initialData.trimestre);
+        setIcona(initialData.icona || "🧩");
         setDescripcio(initialData.detalls_tecnics?.descripcio || "");
         setDuradaHores(initialData.detalls_tecnics?.durada_hores?.toString() || "");
         setPlacesMaximes(initialData.detalls_tecnics?.places_maximes?.toString() || "");
@@ -60,6 +73,7 @@ const CreateWorkshopModal = ({
         setIdSector("");
         setModalitat("A");
         setTrimestre("1r");
+        setIcona("🧩");
         setDescripcio("");
         setDuradaHores("");
         setPlacesMaximes("");
@@ -84,6 +98,7 @@ const CreateWorkshopModal = ({
       id_sector: idSector === "" ? undefined : idSector,
       modalitat,
       trimestre,
+      icona,
       detalls_tecnics: {
         descripcio,
         durada_hores: parseInt(duradaHores, 10) || 0,
@@ -175,11 +190,34 @@ const CreateWorkshopModal = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
+              <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">
+                Icona del Taller
+              </label>
+              <div className="flex flex-wrap gap-2 p-4 bg-gray-50 border border-gray-100">
+                {Object.entries(SVG_ICONS).map(([key, path]) => (
+                  <button
+                    key={key}
+                    onClick={() => setIcona(key)}
+                    className={`w-12 h-12 flex items-center justify-center transition-all border ${
+                      icona === key 
+                        ? 'bg-[#00426B] border-[#00426B] scale-105 shadow-md text-white' 
+                        : 'bg-white border-gray-200 text-[#00426B] hover:border-[#0775AB] hover:bg-gray-50'
+                    }`}
+                  >
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      {path}
+                    </svg>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Título del Taller <span className="text-red-500">*</span>
               </label>
               <input
-                className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none text-black"
+                className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none text-black font-bold uppercase tracking-tight"
                 placeholder="Ej: Robótica Avanzada"
                 value={titol}
                 onChange={(e) => setTitol(e.target.value)}
@@ -191,7 +229,7 @@ const CreateWorkshopModal = ({
                 Descripción
               </label>
               <textarea
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none h-28 resize-y text-black"
+                className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none h-28 resize-y text-black font-medium"
                 placeholder="Describe los objetivos y contenido del taller..."
                 value={descripcio}
                 onChange={(e) => setDescripcio(e.target.value)}

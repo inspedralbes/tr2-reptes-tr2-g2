@@ -18,6 +18,15 @@ module.exports = {
         sans: ['Arial', 'sans-serif'], // Para documentos editables
         corporate: ['Helvetica Neue', 'sans-serif'], // Para uso corporativo
       },
+      fontSize: {
+        'xs': '14px',
+        'sm': '16px',
+        'base': '18px',
+        'lg': '20px',
+        'xl': '24px',
+        '2xl': '30px',
+        '3xl': '36px',
+      },
     },
   },
   plugins: [],

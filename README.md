@@ -79,18 +79,21 @@ docker compose down -v && docker compose up --build
 
 ### 🔑 Credencials de Prova (Seed)
 
-El sistema pobla automàticament la base de dades amb les següents credencials per a proves:
+El sistema pobla automàticament la base de dades amb les següents credencials per a totes les plataformes. Tots els usuaris utilitzen la contrasenya: **`Iter@1234`**.
 
-* **Administrador:** `admin@admin.com` / `Admin@1234`
-* **Coordinador:** `centros@centros.com` / `Centro@1234`
-* **Professors (Mòbil):** Tots usen la contrasenya **`Profe@1234`**
+| Rol | Usuari (Email) | Plataforma | Descripció |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | `admin@admin.com` | **Web** | Gestió global del programa, fases i sectors. |
+| **Coordinador** | `coordinacion@brossa.cat` | **Web** | Coordinador de l'Institut Joan Brossa. |
+| **Coordinador** | `coordinacion@pauclaris.cat` | **Web** | Coordinador de l'Institut Pau Claris. |
+| **Professor (B1)** | `prof.b1@brossa.cat` | **Mòbil** | Professor de l'Inst. Brossa (Accés a App Expo). |
+| **Professor (P1)** | `prof.p1@pauclaris.cat` | **Mòbil** | Professor de l'Inst. Pau Claris (Accés a App Expo). |
 
-| Professor/a | Email | Institut (Centre) |
-| :--- | :--- | :--- |
-| **Marta Gil** | `marta@test.com` | Institut Pau Claris |
-| **Sergi Roca** | `sergi@test.com` | Institut Fort Pius |
-| **Clara Bosch** | `clara@test.com` | Institut Montserrat |
-| **Professor Ejemplo** | `profe@profe.com` | Institut Milà i Fontanals |
+> [!TIP]
+> Hi ha 4 professors creats per centre (`prof.b1` a `prof.b4` i `prof.p1` a `prof.p4`). Tots tenen la mateixa contrasenya i estan llestos per ser utilitzats a l'App mòbil.
+
+> [!NOTE]
+> Actualment el `seed` genera múltiples **peticions pendents** perquè puguis provar el flux d'assignació (Tetris o manual) directament des del panell d'administració.
 
 ## 🐳 Arquitectura Docker Seqüencial
 

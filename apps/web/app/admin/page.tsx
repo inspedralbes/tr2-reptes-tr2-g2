@@ -71,7 +71,7 @@ export default function AdminDashboardPage() {
       color: 'purple'
     },
     {
-      title: 'Estadísticas MongoDB',
+      title: 'Estadísticas',
       description: 'Analítica avanzada de uso, talleres más demandados y actividad del sistema.',
       path: '/admin/stats',
       icon: (
@@ -88,13 +88,13 @@ export default function AdminDashboardPage() {
       title="Panel de Administración"
       subtitle="Bienvenido al centro de control del programa Iter. Gestiona talleres, centros y solicitudes desde este panel."
     >
-      <div className="flex justify-center">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+      <div className="flex justify-center w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
           {sections.map((section) => (
             <div
               key={section.path}
               onClick={() => router.push(section.path)}
-              className="group bg-white p-10 border border-gray-200 cursor-pointer transition-all duration-300 hover:border-[#0775AB] hover:shadow-xl relative overflow-hidden"
+              className="group bg-white p-8 md:p-10 border border-gray-200 cursor-pointer transition-all duration-300 hover:border-[#0775AB] hover:shadow-xl relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-16 h-16 bg-[#F2F2F3] -mr-8 -mt-8 rotate-45 group-hover:bg-[#0775AB] transition-colors duration-300"></div>
 
