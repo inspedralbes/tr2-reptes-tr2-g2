@@ -437,16 +437,13 @@ async function main() {
   for (let i = 0; i < creadosTallers.length; i++) {
     const taller = creadosTallers[i];
     
-    // Queremos que algunos talleres estén MUY sobresaturados (mínimo 6 solicitudes de 4 plazas = 24, sobrepasando las 15-16 del taller)
-    // Sobresaturamos aproximadamente 1 cada 5 talleres para tener variedad
+    // Queremos que algunos talleres estén MUY sobresaturados
     const isOversaturated = i % 5 === 0;
     
     let numRequests: number;
     if (isOversaturated) {
-      // Mínimo 6 solicitudes, hasta 10 para asegurar sobrecupo masivo
       numRequests = 7 + Math.floor(Math.random() * 4);
     } else {
-      // Solicitudes normales (1 a 4)
       numRequests = 1 + Math.floor(Math.random() * 4);
     }
 
@@ -456,17 +453,37 @@ async function main() {
 
     for (const centro of selectedCentres) {
       const profs = centerProfsMap.get(centro.id_centre) || [];
-      await prisma.peticio.create({
+      
+      // All petitions start as Pendent for user practice
+      const estat = 'Pendent';
+
+      const nuevaPeticion = await prisma.peticio.create({
         data: {
           id_centre: centro.id_centre,
           id_taller: taller.id_taller,
           alumnes_aprox: isOversaturated ? 4 : 1 + Math.floor(Math.random() * 4),
-          estat: 'Pendent',
+          estat: estat as any,
           modalitat: taller.modalitat as any,
           prof1_id: profs[0] || null,
           prof2_id: profs[1] || null
         }
       });
+
+      // Link real students to Modalitat C petitions (regardless of status)
+      if (taller.modalitat === 'C') {
+        // Use some of the students created earlier (creados)
+        const numToLink = nuevaPeticion.alumnes_aprox || 4;
+        const studentsToLink = creados.slice(0, numToLink);
+        
+        await prisma.peticio.update({
+          where: { id_peticio: nuevaPeticion.id_peticio },
+          data: {
+            alumnes: {
+              connect: studentsToLink.map(s => ({ id_alumne: s.id_alumne }))
+            }
+          }
+        });
+      }
     }
     
     if (isOversaturated) {
