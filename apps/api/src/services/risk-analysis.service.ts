@@ -57,7 +57,9 @@ export class RiskAnalysisService {
         // 3. Fetch Competence Evaluations (Low engagement?)
         const lowEvaluations = await prisma.avaluacioCompetencial.count({
             where: {
-                inscripcio: { id_alumne: studentId },
+                avaluacio_docent: {
+                    inscripcio: { id_alumne: studentId }
+                },
                 puntuacio: { lt: 3 }
             }
         });

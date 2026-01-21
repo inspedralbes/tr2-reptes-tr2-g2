@@ -1,5 +1,5 @@
 import prisma from '../lib/prisma';
-import { ESTADOS_PETICION } from '@iter/shared';
+import { EstatPeticio } from '@prisma/client';
 
 export interface TetrisStats {
   totalPetitions: number;
@@ -28,8 +28,8 @@ export async function runTetris() {
   // 1. Get all approved petitions that don't have an assignment yet
   const petitions = await prisma.peticio.findMany({
     where: {
-      estat: ESTADOS_PETICION.ACEPTADA,
-      assignacio: null
+      estat: EstatPeticio.Aprovada,
+      assignacions: { none: {} }
     },
     include: {
       taller: true,
@@ -56,7 +56,7 @@ export async function runTetris() {
 
   for (const tallerId in tallerGroups) {
     const tallerPetitions = tallerGroups[tallerId];
-    const taller = tallerPetitions[0].taller;
+    const taller = (tallerPetitions[0] as any).taller;
     let currentCapacity = taller.places_maximes;
 
     // Diversity bookkeeping for Modalidad C (if applicable)

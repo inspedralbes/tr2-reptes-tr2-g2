@@ -161,7 +161,7 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
     }
 
     // Comprobar si ya existe una asignación para esta petición
-    const existing = await prisma.assignacio.findUnique({
+    const existing = await prisma.assignacio.findFirst({
       where: { id_peticio: peticio.id_peticio }
     });
 
@@ -175,6 +175,8 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
         id_centre: peticio.id_centre,
         id_taller: peticio.id_taller,
         estat: 'En_curs',
+        prof1_id: peticio.prof1_id ?? undefined,
+        prof2_id: peticio.prof2_id ?? undefined,
         // Inicializar checklist por defecto para Fase 2
         checklist: {
           create: [

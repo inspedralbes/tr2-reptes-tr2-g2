@@ -1,0 +1,2 @@
+src/controllers/evaluation.controller.ts(79,25): error TS2353: Object literal may only specify known properties, and 'id_inscripcio' does not exist in type 'Without<AvaluacioCompetencialCreateInput, AvaluacioCompetencialUncheckedCreateInput> & AvaluacioCompetencialUncheckedCreateInput'.
+src/services/risk-analysis.service.ts(60,17): error TS2353: Object literal may only specify known properties, and 'inscripcio' does not exist in type 'AvaluacioCompetencialWhereInput'.
