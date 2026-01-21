@@ -64,12 +64,16 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center p-4 bg-[#F2F2F3]">
       <div className="w-full max-w-md bg-white p-12 border border-gray-200 shadow-xl">
         <div className="text-center mb-12">
-          <div className="w-20 h-20 border-4 border-[#00426B] flex items-center justify-center mx-auto mb-6 p-2">
-            <img src="/logo-invers.png" alt="Iter Logo" className="w-full h-full object-contain brightness-0 contrast-200" style={{ filter: 'invert(16%) sepia(85%) saturate(1914%) hue-rotate(188deg) brightness(97%) contrast(101%)' }} />
+          <div className="w-32 h-32 bg-white flex items-center justify-center mx-auto mb-6">
+            <img
+              src="/logo.png"
+              alt="Iter Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <h2 className="text-4xl font-black tracking-tighter text-[#00426B] uppercase">Iter</h2>
-          <div className="h-1 w-12 bg-[#0775AB] mx-auto mt-2"></div>
-          <p className="text-[#4197CB] text-[10px] font-bold uppercase tracking-[0.3em] mt-4">Gestió d'Aprenentatge</p>
+          <h2 className="text-4xl font-black tracking-tighter text-[#00426B] uppercase leading-none">Iter</h2>
+          <div className="h-1 w-12 bg-[#00426B] mx-auto mt-2"></div>
+          <p className="text-[#00426B] text-[10px] font-black uppercase tracking-[0.3em] mt-4 opacity-70">Gestió d'Aprenentatge</p>
         </div>
 
         {error && (
@@ -112,7 +116,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-5 py-4 bg-gray-50 border border-gray-200 focus:border-[#0775AB] focus:bg-white transition-all font-bold text-sm text-gray-900 placeholder:text-gray-300 outline-none"
+                className="w-full px-5 py-4 bg-gray-50 border border-gray-200 focus:border-[#00426B] focus:bg-white transition-all font-bold text-sm text-gray-900 placeholder:text-gray-300 outline-none"
                 placeholder="coordinador@centre.cat"
                 required
               />
@@ -125,7 +129,7 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-5 py-4 bg-gray-50 border border-gray-200 focus:border-[#0775AB] focus:bg-white transition-all font-bold text-sm text-gray-900 placeholder:text-gray-300 pr-12 outline-none"
+                  className="w-full px-5 py-4 bg-gray-50 border border-gray-200 focus:border-[#00426B] focus:bg-white transition-all font-bold text-sm text-gray-900 placeholder:text-gray-300 pr-12 outline-none"
                   placeholder="••••••••"
                   required
                 />
@@ -152,7 +156,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-[#00426B] hover:bg-[#0775AB] text-white text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50 active:scale-[0.98] shadow-lg shadow-blue-900/10"
+              className="w-full py-4 bg-[#00426B] hover:bg-black text-white text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50 active:scale-[0.98] shadow-lg shadow-blue-900/10"
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-3">

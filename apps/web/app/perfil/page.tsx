@@ -23,13 +23,13 @@ export default function ProfilePage() {
       <div className="w-full">
         <div className="bg-white shadow-sm border border-gray-100 overflow-hidden">
           {/* Header/Cover */}
-          <div className="h-32 bg-gradient-to-r from-blue-600 to-blue-800"></div>
+          <div className="h-32 bg-[#00426B]"></div>
 
           <div className="px-8 pb-10 relative">
             {/* Avatar */}
             <div className="absolute -top-12 left-8">
               <div className="w-24 h-24 bg-white shadow-xl flex items-center justify-center border-4 border-white">
-                <span className="text-4xl font-black text-blue-600">
+                <span className="text-4xl font-black text-[#00426B]">
                   {user.nom_complet.charAt(0)}
                 </span>
               </div>
@@ -41,7 +41,7 @@ export default function ProfilePage() {
                   <h3 className="text-3xl font-black text-gray-900 leading-tight">
                     {user.nom_complet}
                   </h3>
-                  <p className="text-blue-600 font-bold tracking-tight uppercase text-xs mt-1">
+                  <p className="text-[#0775AB] font-bold tracking-tight uppercase text-xs mt-1">
                     {user.rol.nom_rol} {user.centre?.nom ? `• ${user.centre.nom}` : ''}
                   </p>
                 </div>
@@ -82,7 +82,7 @@ export default function ProfilePage() {
                     <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Seguretat</label>
                     <button className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors group">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-white flex items-center justify-center text-gray-400 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all">
+                        <div className="w-10 h-10 bg-white flex items-center justify-center text-gray-400 shadow-sm group-hover:bg-[#00426B] group-hover:text-white transition-all">
                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                         </div>
                         <span className="text-sm font-bold text-gray-700">Canviar Contrasenya</span>

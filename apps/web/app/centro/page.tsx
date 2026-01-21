@@ -142,13 +142,13 @@ export default function CentroDashboard() {
         </div>
 
         <div
-          onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push('/centro/alumnos')}
-          className={`group p-10 border transition-all duration-500 relative overflow-hidden ${isPhaseActive(PHASES.PLANIFICACION)
+          onClick={() => (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD)) && router.push('/centro/alumnos')}
+          className={`group p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD))
             ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
             : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
         >
-          <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${isPhaseActive(PHASES.PLANIFICACION) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
+          <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD)) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
             }`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -156,17 +156,17 @@ export default function CentroDashboard() {
           </div>
           <h3 className="text-xl font-black text-[#00426B] mb-3 uppercase tracking-tight">Gestió Alumnat</h3>
           <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">Inscriu els alumnes als tallers assignats de forma nominal.</p>
-          {!isPhaseActive(PHASES.PLANIFICACION) && <span className="text-[9px] font-black uppercase text-[#0775AB] mt-6 block tracking-widest px-2 py-1 bg-blue-50 w-fit">Propera Fase</span>}
+          {!isPhaseActive(PHASES.PLANIFICACION) && !isPhaseActive(PHASES.SOLICITUD) && <span className="text-[9px] font-black uppercase text-[#0775AB] mt-6 block tracking-widest px-2 py-1 bg-blue-50 w-fit">Propera Fase</span>}
         </div>
 
         <div
-          onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push('/centro/profesores')}
-          className={`group p-10 border transition-all duration-500 relative overflow-hidden ${isPhaseActive(PHASES.PLANIFICACION)
+          onClick={() => (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD)) && router.push('/centro/profesores')}
+          className={`group p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD))
             ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
             : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
         >
-          <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${isPhaseActive(PHASES.PLANIFICACION) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
+          <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD)) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
             }`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
