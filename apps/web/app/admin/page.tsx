@@ -71,7 +71,7 @@ export default function AdminDashboardPage() {
       color: 'purple'
     },
     {
-      title: 'Estadísticas MongoDB',
+      title: 'Estadísticas',
       description: 'Analítica avanzada de uso, talleres más demandados y actividad del sistema.',
       path: '/admin/stats',
       icon: (

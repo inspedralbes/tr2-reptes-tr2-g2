@@ -68,12 +68,7 @@ export default function CentroDashboard() {
     >
       {/* Timeline Secció Institucional */}
       <section className="bg-white border border-gray-200 p-12 mb-12 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-12 opacity-[0.05]">
-          <svg className="h-32 w-32 text-[#00426B]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-
+        
         <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#00426B] mb-12 flex items-center gap-4">
           <span className="w-12 h-1 bg-[#0775AB]"></span>
           Estat del Programa Iter 25-26
@@ -98,7 +93,7 @@ export default function CentroDashboard() {
                 <div key={fase.id_fase} className="relative flex flex-col items-center text-center group/phase flex-1">
                   <div
                     className={`w-14 h-14 flex items-center justify-center mb-6 z-10 border-4 transition-all duration-500 scale-100 ${fase.activa
-                      ? 'border-[#0775AB] bg-[#00426B] text-white shadow-xl scale-110'
+                      ? 'border-[#EAEFF2] bg-[#00426B] text-white shadow-xl scale-110 group-hover/phase:border-[#0775AB]'
                       : 'border-[#EAEFF2] bg-white text-gray-300 group-hover/phase:border-[#0775AB] group-hover/phase:text-[#0775AB]'
                       }`}
                   >

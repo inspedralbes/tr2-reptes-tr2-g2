@@ -212,9 +212,7 @@ export const createInscripcions = async (req: Request, res: Response) => {
     // 1. Crear las inscripciones
     const inscripcions = await Promise.all(
       ids_alumnes.map((idAlumne: number) =>
-      ids_alumnes.map((idAlumne: number) =>
         prisma.inscripcio.upsert({
-          where: {
           where: {
             // Necesitaríamos una clave única para inscripciones si quisiéramos upsert real,
             // pero como no hay, usaremos create o simplemente borraremos las anteriores
@@ -304,4 +302,22 @@ export const generateAutomaticAssignments = async (req: Request, res: Response) 
     console.error("Error en asignación automática:", error);
     res.status(500).json({ error: 'Error al ejecutar el motor de asignación.' });
   }
+};
+
+// Phase 3: Sessions & Attendance
+export const getSessions = async (req: Request, res: Response) => {
+  res.json({ message: 'Stub: getSessions implemented' });
+};
+
+export const getSessionAttendance = async (req: Request, res: Response) => {
+  res.json({ message: 'Stub: getSessionAttendance implemented' });
+};
+
+export const registerAttendance = async (req: Request, res: Response) => {
+  res.json({ message: 'Stub: registerAttendance implemented' });
+};
+
+// Phase 4: Closing
+export const closeAssignacio = async (req: Request, res: Response) => {
+  res.json({ message: 'Stub: closeAssignacio implemented' });
 };
