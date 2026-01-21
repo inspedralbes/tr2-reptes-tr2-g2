@@ -24,7 +24,7 @@ const tallerService = {
   getAll: async (): Promise<Taller[]> => {
     const api = getApi();
     try {
-      const response = await api.get<{ data: any[], meta: any }>("/tallers");
+      const response = await api.get<{ data: any[], meta: any }>("/tallers?limit=0");
       const tallersData = response.data.data;
 
       return tallersData.map((t: any) => ({

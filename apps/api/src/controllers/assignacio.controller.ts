@@ -96,7 +96,44 @@ export const createIncidencia = async (req: Request, res: Response) => {
     });
     res.status(201).json(nuevaIncidencia);
   } catch (error) {
-    res.status(500).json({ error: 'Error al crear incidencia' });
+    res.status(500).json({ error: 'Error al ejecutar análisis de riesgo' });
+  }
+};
+
+// POST: Validar subida de documento (Vision AI)
+import { VisionService } from '../services/vision.service';
+
+export const validateDocumentUpload = async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se ha subido ningún archivo.' });
+    }
+
+    const visionService = new VisionService();
+    const validation = await visionService.validateDocument(req.file);
+
+    if (!validation.valid) {
+      // Rechazar subida
+      return res.status(400).json({
+        error: 'Documento rechazado por la IA.',
+        details: validation.errors,
+        metadata: validation.metadata
+      });
+    }
+
+    // Si es válido, aquí iría la lógica para guardar en S3/Disco
+    // const s3Url = await uploadToS3(req.file);
+
+    res.json({
+      success: true,
+      message: 'Documento validado y aceptado correctamente.',
+      metadata: validation.metadata
+      // url: s3Url
+    });
+
+  } catch (error) {
+    console.error("Error en validación de documento:", error);
+    res.status(500).json({ error: 'Error al procesar el documento.' });
   }
 };
 
@@ -124,7 +161,7 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
     }
 
     // Comprobar si ya existe una asignación para esta petición
-    const existing = await prisma.assignacio.findUnique({
+    const existing = await prisma.assignacio.findFirst({
       where: { id_peticio: peticio.id_peticio }
     });
 
@@ -138,6 +175,8 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
         id_centre: peticio.id_centre,
         id_taller: peticio.id_taller,
         estat: 'En_curs',
+        prof1_id: peticio.prof1_id ?? undefined,
+        prof2_id: peticio.prof2_id ?? undefined,
         // Inicializar checklist por defecto para Fase 2
         checklist: {
           create: [
@@ -173,7 +212,9 @@ export const createInscripcions = async (req: Request, res: Response) => {
     // 1. Crear las inscripciones
     const inscripcions = await Promise.all(
       ids_alumnes.map((idAlumne: number) =>
+      ids_alumnes.map((idAlumne: number) =>
         prisma.inscripcio.upsert({
+          where: {
           where: {
             // Necesitaríamos una clave única para inscripciones si quisiéramos upsert real,
             // pero como no hay, usaremos create o simplemente borraremos las anteriores
@@ -245,6 +286,23 @@ export const designateProfessors = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error al designar profesores:", error);
     res.status(500).json({ error: 'Error al designar profesores.' });
+  }
+};
+
+// POST: Generar Asignaciones Automáticas (AI)
+import { AutoAssignmentService } from '../services/auto-assignment.service';
+
+export const generateAutomaticAssignments = async (req: Request, res: Response) => {
+  const { role } = (req as any).user;
+  // if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
+
+  try {
+    const service = new AutoAssignmentService();
+    const result = await service.generateAssignments();
+    res.json(result);
+  } catch (error) {
+    console.error("Error en asignación automática:", error);
+    res.status(500).json({ error: 'Error al ejecutar el motor de asignación.' });
   }
 };
 

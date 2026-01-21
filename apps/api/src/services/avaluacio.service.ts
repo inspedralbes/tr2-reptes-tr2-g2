@@ -67,7 +67,7 @@ export class AvaluacioService {
      * En una versión real, esto llamaría a OpenAI o un servicio similar.
      */
     async analyzeObservationsAI(text: string) {
-        console.log('Analyzing observations with AI (Mock):', text);
+
 
         // Simulación de delay
         await new Promise(resolve => setTimeout(resolve, 1000));

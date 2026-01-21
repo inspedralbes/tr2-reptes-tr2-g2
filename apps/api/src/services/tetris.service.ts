@@ -1,5 +1,5 @@
 import prisma from '../lib/prisma';
-import { ESTADOS_PETICION } from '@iter/shared';
+import { EstatPeticio } from '@prisma/client';
 
 export interface TetrisStats {
   totalPetitions: number;
@@ -25,23 +25,29 @@ export async function runTetris() {
     workshopsFull: 0
   };
 
-  // 1. Get all approved petitions that don't have an assignment yet
+  // 1. Get all approved (or pending) petitions that don't have an assignment yet
   const petitions = await prisma.peticio.findMany({
     where: {
-      estat: ESTADOS_PETICION.ACEPTADA,
-      assignacio: null
+      estat: { in: [EstatPeticio.Aprovada, EstatPeticio.Pendent] },
+      assignacions: { none: {} }
     },
     include: {
       taller: true,
       centre: true
     },
     orderBy: {
-      data_peticio: 'asc' // First come, first served for ahora
+      data_peticio: 'asc' // Strict FIFO: First come, first served
     }
   });
 
   stats.totalPetitions = petitions.length;
   stats.totalStudents = petitions.reduce((acc: number, p: any) => acc + (p.alumnes_aprox || 0), 0);
+
+  if (petitions.length === 0) {
+    console.log('ℹ️ TetrisService: No approved petitions found waiting for assignment.');
+  } else {
+    console.log(`🚀 TetrisService: Starting assignment for ${petitions.length} petitions...`);
+  }
 
   // Group by Taller
   const tallerGroups: Record<number, typeof petitions> = {};
@@ -56,17 +62,41 @@ export async function runTetris() {
 
   for (const tallerId in tallerGroups) {
     const tallerPetitions = tallerGroups[tallerId];
-    const taller = tallerPetitions[0].taller;
-    let currentCapacity = taller.places_maximes;
+    const taller = (tallerPetitions[0] as any).taller;
+    
+    // 1. Calculate strictly occupied capacity from existing assignments
+    const existingAssignments = await prisma.assignacio.findMany({
+      where: { id_taller: parseInt(tallerId) },
+      include: { peticio: true }
+    });
 
-    // Diversity bookkeeping for Modalidad C (if applicable)
-    // Though the petitions themselves already restricted to 4, we need to ensure the TOTAL for the taller is correct.
+    const occupiedPlazas = existingAssignments.reduce((sum, a) => {
+      return sum + (a.peticio?.alumnes_aprox || 0);
+    }, 0);
 
+    let currentCapacity = taller.places_maximes - occupiedPlazas;
+
+    console.log(`📊 Taller ID ${tallerId} (${taller.titol}): Plazas Totales: ${taller.places_maximes}, Ocupadas: ${occupiedPlazas}, Disponibles: ${currentCapacity}`);
+
+    if (currentCapacity <= 0) {
+      console.log(`🚫 Taller ${tallerId} está lleno. Saltando ${tallerPetitions.length} peticiones.`);
+      stats.workshopsFull++;
+      continue;
+    }
     for (const petition of tallerPetitions) {
       const neededPlazas = petition.alumnes_aprox || 0;
 
       if (currentCapacity >= neededPlazas) {
-        // Create Assignment
+        // 1. If petition is Pendent, approve it automatically
+        if (petition.estat === EstatPeticio.Pendent) {
+          console.log(`✅ TetrisService: Auto-approving petition ${petition.id_peticio} for center ID ${petition.id_centre}`);
+          await prisma.peticio.update({
+            where: { id_peticio: petition.id_peticio },
+            data: { estat: EstatPeticio.Aprovada }
+          });
+        }
+
+        // 2. Create Assignment
         const assignacio = await prisma.assignacio.create({
           data: {
             id_peticio: petition.id_peticio,
@@ -90,6 +120,8 @@ export async function runTetris() {
         currentCapacity -= neededPlazas;
         stats.assignedPetitions++;
         stats.assignedStudents += neededPlazas;
+      } else {
+        console.log(`⚠️ TetrisService: Skipping petition ${petition.id_peticio} due to insufficient capacity in taller ${tallerId} (Needed: ${neededPlazas}, Available: ${currentCapacity})`);
       }
     }
 

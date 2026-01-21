@@ -5,8 +5,7 @@ import { connectToDatabase } from '../lib/mongodb';
 // GET: Ver notificaciones (Filtradas por centro o usuario)
 export const getNotificacions = async (req: Request, res: Response) => {
   const { centreId, userId } = (req as any).user || {};
-  console.log(`🔍 Buscando notificaciones para userId: ${userId}, centreId: ${centreId}`);
-  
+
   try {
     const where: any = { OR: [] };
     if (userId) where.OR.push({ id_usuari: userId });
@@ -35,13 +34,13 @@ export const getNotificacions = async (req: Request, res: Response) => {
 // PATCH: Marcar como leída
 export const markAsRead = async (req: Request, res: Response) => {
   const { id } = req.params;
-  
+
   try {
     const updated = await prisma.notificacio.update({
       where: { id_notificacio: parseInt(id as string) },
       data: { llegida: true }
     });
-    
+
     res.json(updated);
   } catch (error) {
     console.error("Error en notificacioController.markAsRead:", error);
@@ -52,12 +51,12 @@ export const markAsRead = async (req: Request, res: Response) => {
 // DELETE: Eliminar notificación
 export const deleteNotificacio = async (req: Request, res: Response) => {
   const { id } = req.params;
-  
+
   try {
     await prisma.notificacio.delete({
       where: { id_notificacio: parseInt(id as string) }
     });
-    
+
     res.json({ success: true });
   } catch (error) {
     console.error("Error en notificacioController.deleteNotificacio:", error);

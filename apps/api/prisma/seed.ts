@@ -36,17 +36,17 @@ async function main() {
   // 3. CREAR SECTORES
   console.log('🏗️ Creando Sectores...');
   const sectorsData = [
-    { nom: 'Agroalimentari' },
-    { nom: 'Manufacturer' },
-    { nom: 'Indústria del Metall i la Mobilitat' },
-    { nom: 'Construcció' },
-    { nom: 'Químic' },
-    { nom: 'Serveis a les empreses' },
-    { nom: 'Salut i atenció a les persones' },
-    { nom: 'Oci i Benestar' },
-    { nom: 'Energia i Sostenibilitat' },
-    { nom: 'Transformació Digital' },
-    { nom: 'Creació Artística' }
+    { nom: 'Agroalimentari' },                     // 0
+    { nom: 'Manufacturer' },                       // 1
+    { nom: 'Indústria del Metall i la Mobilitat' },// 2
+    { nom: 'Construcció' },                        // 3
+    { nom: 'Químic' },                             // 4
+    { nom: 'Serveis a les empreses' },             // 5
+    { nom: 'Salut i atenció a les persones' },     // 6
+    { nom: 'Oci i Benestar' },                     // 7
+    { nom: 'Energia i Sostenibilitat' },           // 8
+    { nom: 'Transformació Digital' },              // 9
+    { nom: 'Creació Artística' }                   // 10
   ];
 
   const creadosSectors = [];
@@ -56,8 +56,16 @@ async function main() {
   }
 
   const sectorAgro = creadosSectors[0];
-  const sectorMobilitat = creadosSectors[2]; // Metal i Mobilitat
-  const sectorOci = creadosSectors[7]; // Oci i Benestar
+  const sectorManufacturer = creadosSectors[1];
+  const sectorMobilitat = creadosSectors[2]; 
+  const sectorConstruccio = creadosSectors[3];
+  // const sectorQuimic = creadosSectors[4];
+  // const sectorServeis = creadosSectors[5];
+  const sectorSalut = creadosSectors[6];
+  const sectorOci = creadosSectors[7]; 
+  const sectorSostenibilitat = creadosSectors[8];
+  const sectorDigital = creadosSectors[9];
+  const sectorCreacio = creadosSectors[10];
 
   // 4. CREAR CENTROS
   console.log('🏫 Creando Centros de Barcelona...');
@@ -111,25 +119,17 @@ async function main() {
   const centroMila = creadosCentres.find(c => c.codi_centre === '08013159')!;
 
   // 5. CREAR PROFESORES (PARA EL DESPLEGABLE)
-  console.log('👨‍🏫 Creando Profesores...');
-  const prof1 = await prisma.professor.create({
-    data: { nom: 'Joan Martí', contacte: 'joan.marti@xtec.cat', id_centre: centroBrossa.id_centre }
-  });
-  const prof2 = await prisma.professor.create({
-    data: { nom: 'Maria Soler', contacte: '934445566', id_centre: centroBrossa.id_centre }
-  });
-  const prof3 = await prisma.professor.create({
-    data: { nom: 'Marta Gil', contacte: 'marta@pauclaris.cat', id_centre: creadosCentres.find(c => c.codi_centre === '08013147')!.id_centre }
-  });
-  const prof4 = await prisma.professor.create({
-    data: { nom: 'Sergi Roca', contacte: 'sergi@fortpius.cat', id_centre: creadosCentres.find(c => c.codi_centre === '08013111')!.id_centre }
-  });
-  const prof5 = await prisma.professor.create({
-    data: { nom: 'Clara Bosch', contacte: 'clara@montserrat.cat', id_centre: creadosCentres.find(c => c.codi_centre === '08013123')!.id_centre }
-  });
-  await prisma.professor.create({
-    data: { nom: 'Pere Pons', contacte: 'pere.pons@xtec.cat', id_centre: centroMila.id_centre }
-  });
+  console.log('👨‍🏫 Creando Profesores para cada centro...');
+  const centerProfsMap = new Map<number, number[]>();
+  for (const centro of creadosCentres) {
+    const profA = await prisma.professor.create({
+      data: { nom: `Professor A de ${centro.nom}`, contacte: `prof.a@${centro.codi_centre}.cat`, id_centre: centro.id_centre }
+    });
+    const profB = await prisma.professor.create({
+      data: { nom: `Professor B de ${centro.nom}`, contacte: `93${Math.floor(1000000 + Math.random() * 9000000)}`, id_centre: centro.id_centre }
+    });
+    centerProfsMap.set(centro.id_centre, [profA.id_professor, profB.id_professor]);
+  }
 
   // 6. CREAR USUARIOS
   const salt = await bcrypt.genSalt(10);
@@ -178,30 +178,161 @@ async function main() {
     });
   }
 
-  // 7. CREAR TALLERES
-  const tallerFusta = await prisma.taller.create({
-    data: { 
-      titol: 'Fusta', 
-      durada_h: 20, 
-      places_maximes: 16, 
-      modalitat: 'A', 
-      id_sector: sectorAgro.id_sector, 
-      descripcio_curta: 'Construcció en fusta',
-      ambit: 'Àmbit Medi Ambient i Sostenibilitat'
-    }
-  });
+  // 7. CREAR TALLERES (Actualitzat amb la llista completa)
+  console.log('🛠️ Creando Talleres...');
+  const tallersData = [
+    // 1. Circ i oficis de les arts escèniques
+    { titol: 'Circ i oficis de les arts escèniques', modalitat: 'A', id_sector: sectorCreacio.id_sector, ambit: 'Escènic', durada_h: 2, places_maximes: 16, descripcio_curta: 'Circ i oficis de les arts escèniques' },
+    { titol: 'Circ i oficis de les arts escèniques', modalitat: 'C', id_sector: sectorCreacio.id_sector, ambit: 'Escènic', durada_h: 3, places_maximes: 16, descripcio_curta: 'Circ i oficis de les arts escèniques' },
 
-  const tallerRobotica = await prisma.taller.create({
-    data: {
-      titol: 'Robòtica Avançada',
-      durada_h: 30,
-      places_maximes: 12,
-      modalitat: 'C',
-      id_sector: sectorMobilitat.id_sector,
-      descripcio_curta: 'Manteniment industrial i robòtica',
-      ambit: 'Àmbit Tecnològic / Indústria 4.0 / Indústria Avançada'
-    }
-  });
+    // 2. Fusta
+    { titol: 'Fusta', modalitat: 'A', id_sector: sectorManufacturer.id_sector, ambit: 'Indústria - Manufactura', durada_h: 2, places_maximes: 16, descripcio_curta: 'Impulsem (c/ Tàpies)' },
+    { titol: 'Fusta', modalitat: 'C', id_sector: sectorManufacturer.id_sector, ambit: 'Indústria - Manufactura', durada_h: 3, places_maximes: 16, descripcio_curta: 'Impulsem (c/ Tàpies)' },
+
+    // 3. Cuina comunitària
+    { titol: 'Cuina comunitària', modalitat: 'A', id_sector: sectorAgro.id_sector, ambit: 'Hoteleria - Alimentació', durada_h: 3, places_maximes: 16, descripcio_curta: 'Granja Escola Sinai / Mercat Sant Antoni' },
+    { titol: 'Cuina comunitària', modalitat: 'C', id_sector: sectorAgro.id_sector, ambit: 'Hoteleria - Alimentació', durada_h: 3, places_maximes: 16, descripcio_curta: 'Granja Escola Sinai / Mercat Sant Antoni' },
+
+    // 4. Metall i artesania
+    { titol: 'Metall i artesania', modalitat: 'A', id_sector: sectorMobilitat.id_sector, ambit: 'Indústria 4.0', durada_h: 2, places_maximes: 16, descripcio_curta: 'Impulsem (c/ Tàpies)' },
+    { titol: 'Metall i artesania', modalitat: 'C', id_sector: sectorMobilitat.id_sector, ambit: 'Indústria 4.0', durada_h: 3, places_maximes: 16, descripcio_curta: 'Impulsem (c/ Tàpies)' },
+
+    // 5. Serigrafia
+    { titol: 'Serigrafia', modalitat: 'A', id_sector: sectorManufacturer.id_sector, ambit: 'Indústria - Manufactura', durada_h: 2, places_maximes: 16, descripcio_curta: 'Impulsem (c/ Tàpies)' },
+    { titol: 'Serigrafia', modalitat: 'C', id_sector: sectorManufacturer.id_sector, ambit: 'Indústria - Manufactura', durada_h: 3, places_maximes: 16, descripcio_curta: 'Impulsem (c/ Tàpies)' },
+
+    // 6. Oficis gastronòmics
+    { titol: 'Oficis gastronòmics', modalitat: 'A', id_sector: sectorOci.id_sector, ambit: 'Oci i Benestar - Restauració', durada_h: 2, places_maximes: 16, descripcio_curta: 'Impulsem (c/ Tàpies)' },
+    { titol: 'Oficis gastronòmics', modalitat: 'C', id_sector: sectorOci.id_sector, ambit: 'Oci i Benestar - Restauració', durada_h: 3, places_maximes: 16, descripcio_curta: 'Impulsem (c/ Tàpies)' },
+
+    // 7. TMB es mou per l’educació
+    { titol: 'TMB es mou per l’educació', modalitat: 'A', id_sector: sectorMobilitat.id_sector, ambit: 'Indústria 4.0 - Mobilitat', durada_h: 2, places_maximes: 16, descripcio_curta: 'Instal·lacions TMB (La Sagrera/Zona Franca)' },
+    { titol: 'TMB es mou per l’educació', modalitat: 'C', id_sector: sectorMobilitat.id_sector, ambit: 'Indústria 4.0 - Mobilitat', durada_h: 3, places_maximes: 16, descripcio_curta: 'Instal·lacions TMB (La Sagrera/Zona Franca)' },
+
+    // 8. Vela
+    { titol: 'Vela', modalitat: 'A', id_sector: sectorOci.id_sector, ambit: 'Esportiu - Oci', durada_h: 3, places_maximes: 16, descripcio_curta: 'Centre Municipal de Vela (Port Olímpic)' },
+    { titol: 'Vela', modalitat: 'C', id_sector: sectorOci.id_sector, ambit: 'Esportiu - Oci', durada_h: 3, places_maximes: 16, descripcio_curta: 'Centre Municipal de Vela (Port Olímpic)' },
+
+    // 9. SmArt: professions creatives
+    { titol: 'SmArt: professions creatives', modalitat: 'A', id_sector: sectorCreacio.id_sector, ambit: 'Indústries creatives', durada_h: 2, places_maximes: 16, descripcio_curta: 'Visitant professionals' },
+
+    // 10. Imatge personal per a tothom
+    { titol: 'Imatge personal per a tothom', modalitat: 'B', id_sector: sectorOci.id_sector, ambit: 'Oci i Benestar', durada_h: 2, places_maximes: 20, descripcio_curta: 'Al propi centre / Centre Colomer (si és C)' },
+
+    // 11. Vinyeta a vinyeta (Còmic)
+    { titol: 'Vinyeta a vinyeta (Còmic)', modalitat: 'B', id_sector: sectorCreacio.id_sector, ambit: 'Artístic', durada_h: 2, places_maximes: 20, descripcio_curta: 'Al propi centre' },
+
+    // 12. Internet de les coses (IoT)
+    { titol: 'Internet de les coses (IoT)', modalitat: 'B', id_sector: sectorDigital.id_sector, ambit: 'Tecnològic - Indústria 4.0', durada_h: 2, places_maximes: 20, descripcio_curta: 'Al propi centre' },
+
+    // 13. Tecnologia digital (3D/Làser)
+    { titol: 'Tecnologia digital (3D/Làser)', modalitat: 'B', id_sector: sectorDigital.id_sector, ambit: 'Digital - Indústria', durada_h: 2, places_maximes: 20, descripcio_curta: 'Al propi centre' },
+
+    // 14. Fem jocs a l’aula (Gamificació)
+    { titol: 'Fem jocs a l’aula (Gamificació)', modalitat: 'B', id_sector: sectorCreacio.id_sector, ambit: 'Indústries creatives', durada_h: 2, places_maximes: 20, descripcio_curta: 'Al propi centre' },
+
+    // 15. Descobrim la nostra història
+    { titol: 'Descobrim la nostra història', modalitat: 'B', id_sector: sectorCreacio.id_sector, ambit: 'Científic - Humanístic', durada_h: 2, places_maximes: 20, descripcio_curta: 'Al propi centre (Arqueologia)' },
+
+    // 16. Taller de cinema / Fem cinema
+    { titol: 'Taller de cinema / Fem cinema', modalitat: 'B', id_sector: sectorCreacio.id_sector, ambit: 'Indústries creatives', durada_h: 2, places_maximes: 20, descripcio_curta: 'Rambla Santa Mònica (UGT)' },
+    { titol: 'Taller de cinema / Fem cinema', modalitat: 'C', id_sector: sectorCreacio.id_sector, ambit: 'Indústries creatives', durada_h: 3, places_maximes: 16, descripcio_curta: 'Rambla Santa Mònica (UGT)' },
+
+    // 17. Interpretació teatral
+    { titol: 'Interpretació teatral', modalitat: 'B', id_sector: sectorCreacio.id_sector, ambit: 'Arts escèniques', durada_h: 2, places_maximes: 20, descripcio_curta: 'Al propi centre' },
+
+    // 18. Percussió, moviment, música
+    { titol: 'Percussió, moviment, música', modalitat: 'B', id_sector: sectorCreacio.id_sector, ambit: 'Artístic - Musical', durada_h: 2, places_maximes: 20, descripcio_curta: 'Artixoc (Rambla de Badal)' },
+    { titol: 'Percussió, moviment, música', modalitat: 'C', id_sector: sectorCreacio.id_sector, ambit: 'Artístic - Musical', durada_h: 2, places_maximes: 16, descripcio_curta: 'Artixoc (Rambla de Badal)' },
+
+    // 19. Fem moda sostenible
+    { titol: 'Fem moda sostenible', modalitat: 'B', id_sector: sectorSostenibilitat.id_sector, ambit: 'Moda - Sostenibilitat', durada_h: 2, places_maximes: 20, descripcio_curta: 'Artixoc (Ciutat Vella)' },
+    { titol: 'Fem moda sostenible', modalitat: 'C', id_sector: sectorSostenibilitat.id_sector, ambit: 'Moda - Sostenibilitat', durada_h: 2, places_maximes: 16, descripcio_curta: 'Artixoc (Ciutat Vella)' },
+
+    // 20. El rap i Hip Hop en català
+    { titol: 'El rap i Hip Hop en català', modalitat: 'B', id_sector: sectorCreacio.id_sector, ambit: 'Música - Ritmes urbans', durada_h: 2, places_maximes: 20, descripcio_curta: 'Artixoc' },
+    { titol: 'El rap i Hip Hop en català', modalitat: 'C', id_sector: sectorCreacio.id_sector, ambit: 'Música - Ritmes urbans', durada_h: 2, places_maximes: 16, descripcio_curta: 'Artixoc' },
+
+    // 21. Tecnologia per millorar el món
+    { titol: 'Tecnologia per millorar el món', modalitat: 'B', id_sector: sectorDigital.id_sector, ambit: 'Tecnològic (Scratch)', durada_h: 2, places_maximes: 20, descripcio_curta: 'Al propi centre' },
+
+    // 22. Mur-Art / Murals de barri
+    { titol: 'Mur-Art / Murals de barri', modalitat: 'B', id_sector: sectorCreacio.id_sector, ambit: 'Artístic - Social', durada_h: 2, places_maximes: 20, descripcio_curta: 'Al propi centre o Espai públic' },
+    { titol: 'Mur-Art / Murals de barri', modalitat: 'C', id_sector: sectorCreacio.id_sector, ambit: 'Artístic - Social', durada_h: 3, places_maximes: 16, descripcio_curta: 'Al propi centre o Espai públic' },
+
+    // 23. Retratistes de la ciutat
+    { titol: 'Retratistes de la ciutat', modalitat: 'B', id_sector: sectorCreacio.id_sector, ambit: 'Artístic - Social', durada_h: 2, places_maximes: 20, descripcio_curta: 'Abaoaqu / Itinerant' },
+    { titol: 'Retratistes de la ciutat', modalitat: 'C', id_sector: sectorCreacio.id_sector, ambit: 'Artístic - Social', durada_h: 3, places_maximes: 16, descripcio_curta: 'Abaoaqu / Itinerant' },
+
+    // 24. Intervencions artístiques (IAC)
+    { titol: 'Intervencions artístiques (IAC)', modalitat: 'B', id_sector: sectorConstruccio.id_sector, ambit: 'Construcció - Artístic', durada_h: 2, places_maximes: 20, descripcio_curta: 'Al propi centre' },
+
+    // 25. Energies Renovables
+    { titol: 'Energies Renovables', modalitat: 'C', id_sector: sectorSostenibilitat.id_sector, ambit: 'Indústria - Sostenibilitat', durada_h: 3, places_maximes: 16, descripcio_curta: 'Indústria - Sostenibilitat' },
+
+    // 26. Talent femení tecnològic
+    { titol: 'Talent femení tecnològic', modalitat: 'C', id_sector: sectorDigital.id_sector, ambit: 'Digital (Només noies)', durada_h: 3, places_maximes: 16, descripcio_curta: 'INS Escola del Treball' },
+
+    // 27. Estètica
+    { titol: 'Estètica', modalitat: 'C', id_sector: sectorOci.id_sector, ambit: 'Oci i Benestar', durada_h: 3, places_maximes: 16, descripcio_curta: 'Oci i Benestar' },
+
+    // 28. Taller de costura
+    { titol: 'Taller de costura', modalitat: 'C', id_sector: sectorManufacturer.id_sector, ambit: 'Moda - Manufactura', durada_h: 3, places_maximes: 16, descripcio_curta: 'INS Anna Gironella de Mundet' },
+
+    // 29. Instal·lacions domèstiques
+    { titol: 'Instal·lacions domèstiques', modalitat: 'C', id_sector: sectorDigital.id_sector, ambit: 'Indústria avançada', durada_h: 3, places_maximes: 16, descripcio_curta: 'INS Anna Gironella de Mundet' },
+
+    // 30. Perruqueria
+    { titol: 'Perruqueria', modalitat: 'C', id_sector: sectorOci.id_sector, ambit: 'Oci i Benestar', durada_h: 3, places_maximes: 16, descripcio_curta: 'Centre Formació Colomer' },
+
+    // 31. Mecànica bàsica de bicicleta
+    { titol: 'Mecànica bàsica de bicicleta', modalitat: 'C', id_sector: sectorMobilitat.id_sector, ambit: 'Indústria 4.0', durada_h: 3, places_maximes: 16, descripcio_curta: 'Biciclot (c/ Verneda)' },
+
+    // 32. Xarxes d’aigua potable
+    { titol: 'Xarxes d’aigua potable', modalitat: 'C', id_sector: sectorSostenibilitat.id_sector, ambit: 'Indústria - Sostenibilitat', durada_h: 3, places_maximes: 16, descripcio_curta: 'Indústria - Sostenibilitat' },
+
+    // 33. Acompanyament a les persones
+    { titol: 'Acompanyament a les persones', modalitat: 'C', id_sector: sectorSalut.id_sector, ambit: 'Sanitari - Serveis', durada_h: 3, places_maximes: 16, descripcio_curta: 'INS Ferran Tallada' },
+
+    // 34. Jardineria
+    { titol: 'Jardineria', modalitat: 'C', id_sector: sectorSostenibilitat.id_sector, ambit: 'Medi ambient', durada_h: 3, places_maximes: 16, descripcio_curta: 'ISMAB (c/ Mollerussa)' },
+
+    // 35. Oficis de la mar
+    { titol: 'Oficis de la mar', modalitat: 'C', id_sector: sectorAgro.id_sector, ambit: 'Medi ambient - Alimentació', durada_h: 3, places_maximes: 16, descripcio_curta: 'Barceloneta / Cap a mar' },
+
+    // 36. Prepara el teu PC
+    { titol: 'Prepara el teu PC', modalitat: 'C', id_sector: sectorDigital.id_sector, ambit: 'Digital - Indústria', durada_h: 3, places_maximes: 16, descripcio_curta: '(A vegades a Escola del Treball)' },
+
+    // 37. Mobilitat i transport bici
+    { titol: 'Mobilitat i transport bici', modalitat: 'C', id_sector: sectorOci.id_sector, ambit: 'Esportiu - Social', durada_h: 3, places_maximes: 16, descripcio_curta: 'Biciclot (c/ Verneda)' },
+
+    // 38. De Picasso al Manga
+    { titol: 'De Picasso al Manga', modalitat: 'C', id_sector: sectorCreacio.id_sector, ambit: 'Creatiu - Artístic', durada_h: 3, places_maximes: 16, descripcio_curta: 'Museu Picasso' },
+
+    // 39. Tecnolab Makers
+    { titol: 'Tecnolab Makers', modalitat: 'C', id_sector: sectorDigital.id_sector, ambit: 'Indústria - Tecnològic', durada_h: 3, places_maximes: 16, descripcio_curta: 'ISMAB (c/ Mollerussa)' },
+
+    // 40. Saber parlar en públic
+    { titol: 'Saber parlar en públic', modalitat: 'C', id_sector: sectorCreacio.id_sector, ambit: 'Arts escèniques', durada_h: 3, places_maximes: 16, descripcio_curta: 'Sala Centre de Sant Pere' }
+  ];
+
+  const creadosTallers = [];
+  for (const t of tallersData) {
+    const created = await prisma.taller.create({
+      data: {
+        titol: t.titol,
+        durada_h: t.durada_h,
+        places_maximes: t.places_maximes,
+        modalitat: t.modalitat as any,
+        id_sector: t.id_sector,
+        descripcio_curta: t.descripcio_curta,
+        ambit: t.ambit
+      }
+    });
+    creadosTallers.push(created);
+  }
+
+  const tallerFusta = creadosTallers.find(t => t.titol === 'Fusta' && t.modalitat === 'A')!;
 
   // 8. CREAR ALUMNOS
   console.log('🎓 Creando Alumnos...');
@@ -300,17 +431,63 @@ async function main() {
     }
   });
 
-  // 10. PETICIÓN DE EJEMPLO
-  console.log('📝 Creando Petición de ejemplo...');
-  await prisma.peticio.create({
-    data: {
-      id_centre: centroBrossa.id_centre,
-      id_taller: tallerFusta.id_taller,
-      alumnes_aprox: 2,
-      estat: 'Pendent',
-      modalitat: 'A',
-      prof1_id: prof1.id_professor,
-      prof2_id: prof2.id_professor
+  // 10. GENERACIÓN MASIVA DE PETICIONES PARA TESTEO DE ASIGNACIÓN
+  console.log('📝 Generando muchíssimas peticiones para testeo de asignación...');
+  
+  for (let i = 0; i < creadosTallers.length; i++) {
+    const taller = creadosTallers[i];
+    
+    // Queremos que algunos talleres estén MUY sobresaturados
+    const isOversaturated = i % 5 === 0;
+    
+    let numRequests: number;
+    if (isOversaturated) {
+      numRequests = 7 + Math.floor(Math.random() * 4);
+    } else {
+      numRequests = 1 + Math.floor(Math.random() * 4);
+    }
+
+    // Barajar centros para que las solicitudes sean de centros aleatorios
+    const shuffledCentres = [...creadosCentres].sort(() => 0.5 - Math.random());
+    const selectedCentres = shuffledCentres.slice(0, numRequests);
+
+    for (const centro of selectedCentres) {
+      const profs = centerProfsMap.get(centro.id_centre) || [];
+      
+      // All petitions start as Pendent for user practice
+      const estat = 'Pendent';
+
+      const nuevaPeticion = await prisma.peticio.create({
+        data: {
+          id_centre: centro.id_centre,
+          id_taller: taller.id_taller,
+          alumnes_aprox: isOversaturated ? 4 : 1 + Math.floor(Math.random() * 4),
+          estat: estat as any,
+          modalitat: taller.modalitat as any,
+          prof1_id: profs[0] || null,
+          prof2_id: profs[1] || null
+        }
+      });
+
+      // Link real students to Modalitat C petitions (regardless of status)
+      if (taller.modalitat === 'C') {
+        // Use some of the students created earlier (creados)
+        const numToLink = nuevaPeticion.alumnes_aprox || 4;
+        const studentsToLink = creados.slice(0, numToLink);
+        
+        await prisma.peticio.update({
+          where: { id_peticio: nuevaPeticion.id_peticio },
+          data: {
+            alumnes: {
+              connect: studentsToLink.map(s => ({ id_alumne: s.id_alumne }))
+            }
+          }
+        });
+      }
+    }
+    
+    if (isOversaturated) {
+        console.log(`🔥 Taller "${taller.titol}" (ID: ${taller.id_taller}) sobresaturado con ${numRequests} solicitudes.`);
     }
   });
 
