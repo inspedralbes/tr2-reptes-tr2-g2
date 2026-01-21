@@ -4,11 +4,8 @@ Este directorio contiene la documentación técnica y funcional de las 4 caracte
 
 ## Índice de Documentos
 
-1.  **[Resumen General y Pruebas (Walkthrough)](./walkthrough.md)**: Visión global de las 4 ideas y cómo verificar que funcionan.
-2.  **Idea 1 - Motor de Asignación**: [Guía de Implementación](./guias/1_asignacion_automatica.md)
-3.  **Idea 2 - Asistente de Voz**: [Guía de Implementación](./guias/2_asistente_voz.md)
-4.  **Idea 3 - Riesgo de Abandono**: [Guía de Implementación](./guias/3_riesgo_abandono.md)
-5.  **Idea 4 - Validación Documental**: [Guía de Implementación](./guias/4_validacion_vision.md)
+1.  **[Documentación Completa (Todo en uno)](./DOCUMENTACION_IA_COMPLETA.md)**: Guía detallada de las 4 funcionalidades IA, sus workflows y detalles técnicos.
+2.  **[Resumen y Pruebas (Walkthrough)](./walkthrough.md)**: Visión global y cómo verificar que funcionan.
 
 ## Ubicación del Código
 El código fuente de estas funcionalidades se encuentra principalmente en `apps/api/src`:
