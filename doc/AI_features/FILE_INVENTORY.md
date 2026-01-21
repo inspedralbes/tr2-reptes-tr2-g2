@@ -22,12 +22,9 @@ Este documento lista todos los archivos y carpetas que han sido creados o modifi
 ### Documentación
 *   `doc/AI_features/README.md`
 *   `doc/AI_features/walkthrough.md`
-*   `doc/AI_features/CHANGELOG_FILES.md` (Este archivo)
-*   `doc/AI_features/guias/` (Carpeta con guías detalladas)
-    *   `1_asignacion_automatica.md`
-    *   `2_asistente_voz.md`
-    *   `3_riesgo_abandono.md`
-    *   `4_validacion_vision.md`
+*   `doc/AI_features/FILE_INVENTORY.md` (Este archivo)
+*   `doc/AI_features/DOCUMENTACION_IA_COMPLETA.md` (Guía consolidada de las 4 ideas)
+*   `doc/AI_features/AI_RECONSTRUCTION_PROMPT.md` (Prompt maestro de recuperación)
 
 ---
 
