@@ -6,6 +6,9 @@ import { getUser, User } from '@/lib/auth';
 import { THEME, PHASES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
+import Loading from '@/components/Loading';
+import { toast } from 'sonner';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function NominalRegisterPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -21,6 +24,21 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   
+  
+  // Dialog states
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isDestructive?: boolean;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+
   const router = useRouter();
 
   useEffect(() => {
@@ -41,7 +59,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
         const isPlanificacio = phasesData.find((f: any) => f.nom === PHASES.PLANIFICACION)?.activa;
 
         if (!isPlanificacio) {
-          alert('El període de registre nominal no està actiu.');
+          toast.error('El període de registre nominal no està actiu.');
           router.push('/centro/assignacions');
           return;
         }
@@ -51,7 +69,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
         const found = resAssig.data.find((a: any) => a.id_assignacio === parseInt(id));
 
         if (!found) {
-          alert('Assignació no trobada o no autoritzada.');
+          toast.error('Assignació no trobada o no autoritzada.');
           router.push('/centro/assignacions');
           return;
         }
@@ -81,7 +99,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
       const plazasMax = assignacio?.peticio?.alumnes_aprox || 0;
 
       if (!isSelected && prev.length >= plazasMax) {
-        alert(`Has arribat al límit de ${plazasMax} places sol·licitades.`);
+        toast.warning(`Has arribat al límit de ${plazasMax} places sol·licitades.`);
         return prev;
       }
 
@@ -97,7 +115,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
       const available = plazasMax - selectedIds.length;
       
       if (available <= 0) {
-        alert(`Has arribat al límit de ${plazasMax} places sol·licitades.`);
+        toast.error(`Has arribat al límit de ${plazasMax} places sol·licitades.`);
         return;
       }
 
@@ -125,10 +143,10 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
       setLoading(true);
       const api = getApi();
       await api.post(`/assignacions/${id}/inscripcions`, { ids_alumnes: selectedIds });
-      alert('Registre Nominal desat amb èxit.');
+      toast.success('Registre Nominal desat amb èxit.');
       router.push('/centro/assignacions');
     } catch (error) {
-      alert('Error al desar el registre nominal.');
+      toast.error('Error al desar el registre nominal.');
     } finally {
       setLoading(false);
     }
@@ -157,11 +175,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
   const uniqueCursos = Array.from(new Set(alumnes.map(a => a.curs))).filter(Boolean).sort();
 
-  if (loading && !assignacio) return (
-    <div className="flex min-h-screen justify-center items-center">
-      <div className="animate-spin h-10 w-10 border-b-2 border-primary"></div>
-    </div>
-  );
+  if (loading && !assignacio) return <Loading fullScreen message="Carregant dades de l'assignació..." />;
 
   const plazasAsignadas = assignacio?.peticio?.alumnes_aprox || 0;
   const isFull = selectedIds.length === plazasAsignadas;
@@ -372,6 +386,14 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
           </div>
         </div>
       </div>
+      <ConfirmDialog 
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        onConfirm={confirmConfig.onConfirm}
+        onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        isDestructive={confirmConfig.isDestructive}
+      />
     </DashboardLayout>
   );
 }

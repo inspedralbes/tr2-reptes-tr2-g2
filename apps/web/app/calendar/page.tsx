@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Calendar, CalendarEvent } from "@iter/ui";
 import getApi from "@/services/api";
+import Loading from "@/components/Loading";
 
 export default function CalendarPage() {
   const { user, loading: authLoading } = useAuth();
@@ -50,7 +51,7 @@ export default function CalendarPage() {
     }
   }, [user]);
 
-  if (authLoading) return null;
+  if (authLoading) return <Loading fullScreen message="Sincronitzant el teu calendari..." />;
 
   return (
     <DashboardLayout
@@ -74,10 +75,7 @@ export default function CalendarPage() {
         </div>
 
         {loading ? (
-          <div className="py-20 text-center bg-white border border-gray-100">
-            <div className="h-8 w-8 border-t-2 border-[#00426B] mx-auto animate-spin"></div>
-            <p className="text-[10px] font-black text-gray-400 mt-4 uppercase tracking-widest">Carregant dades...</p>
-          </div>
+          <Loading />
         ) : (
           <div className="bg-white border border-gray-200">
             <Calendar

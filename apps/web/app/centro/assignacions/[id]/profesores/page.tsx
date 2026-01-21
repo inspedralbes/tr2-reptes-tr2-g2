@@ -6,6 +6,8 @@ import { getUser, User } from '@/lib/auth';
 import { THEME, PHASES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
+import Loading from '@/components/Loading';
+import { toast } from 'sonner';
 
 export default function DesignateProfessorsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -35,7 +37,7 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
         const isPlanificacio = phasesData.find((f: any) => f.nom === PHASES.PLANIFICACION)?.activa;
         
         if (!isPlanificacio) {
-          alert('El període de designació de professors no està actiu.');
+          toast.error('El període de designació de professors no està actiu.');
           router.push('/centro/assignacions');
           return;
         }
@@ -45,7 +47,7 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
         const found = resAssig.data.find((a: any) => a.id_assignacio === parseInt(id));
         
         if (!found) {
-          alert('Assignació no trobada.');
+          toast.error('Assignació no trobada.');
           router.push('/centro/assignacions');
           return;
         }
@@ -68,12 +70,12 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
 
   const handleSave = async () => {
     if (!prof1Id || !prof2Id) {
-      alert('Has de designar dos professors responsables.');
+      toast.error('Has de designar dos professors responsables.');
       return;
     }
 
     if (prof1Id === prof2Id) {
-      alert('Els dos professors han de ser persones diferents.');
+      toast.error('Els dos professors han de ser persones diferents.');
       return;
     }
 
@@ -81,26 +83,21 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
       setLoading(true);
       const api = getApi();
       
-      // Update assignment
       await api.patch(`/assignacions/checklist/designate-profs/${id}`, {
         prof1_id: parseInt(prof1Id),
         prof2_id: parseInt(prof2Id)
       });
       
-      alert('Professors designats correctament.');
+      toast.success('Professors designats correctament.');
       router.push('/centro/assignacions');
     } catch (error) {
-      alert('Error al desar la designació.');
+      toast.error('Error al desar la designació.');
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading && !assignacio) return (
-    <div className="flex min-h-screen justify-center items-center">
-      <div className="animate-spin h-10 w-10 border-b-2 border-primary"></div>
-    </div>
-  );
+  if (loading && !assignacio) return <Loading fullScreen message="Carregant designació..." />;
 
   return (
     <DashboardLayout 

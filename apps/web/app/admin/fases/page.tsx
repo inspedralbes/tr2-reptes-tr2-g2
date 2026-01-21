@@ -5,6 +5,8 @@ import { useAuth } from "@/context/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import getApi from "@/services/api";
 import { THEME } from "@iter/shared";
+import Loading from "@/components/Loading";
+import { toast } from "sonner";
 
 interface Fase {
   id_fase: number;
@@ -46,8 +48,9 @@ export default function PhaseManagementPage() {
       const api = getApi();
       await api.put(`/fases/${id}`, { activa: !currentActiva });
       await fetchFases();
+      toast.success("Fase actualitzada correctament.");
     } catch (error) {
-      alert("Error al actualizar la fase");
+      toast.error("Error al actualitzar la fase.");
     } finally {
       setUpdating(null);
     }
@@ -58,8 +61,9 @@ export default function PhaseManagementPage() {
       const api = getApi();
       await api.put(`/fases/${id}`, { [field]: value });
       setFases(prev => prev.map(f => f.id_fase === id ? { ...f, [field]: value } : f));
+      toast.success("Data actualitzada.");
     } catch (error) {
-      alert("Error al actualizar la fecha");
+      toast.error("Error al actualitzar la data.");
     }
   };
 
@@ -90,10 +94,7 @@ export default function PhaseManagementPage() {
         </div>
 
         {loading ? (
-          <div className="py-20 text-center">
-            <div className="animate-spin h-8 w-8 border-t-2 border-[#00426B] mx-auto"></div>
-            <p className="mt-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Sincronitzant fases...</p>
-          </div>
+          <Loading message="Sincronitzant fases..." />
         ) : (
           <div className="grid gap-6">
             {fases.sort((a, b) => a.ordre - b.ordre).map((fase) => (

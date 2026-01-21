@@ -6,6 +6,9 @@ import { useAuth } from '@/context/AuthContext';
 import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import professorService, { Professor } from '@/services/professorService';
+import Loading from '@/components/Loading';
+import { toast } from 'sonner';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function ProfesoresCRUD() {
   const { user, loading: authLoading } = useAuth();
@@ -18,6 +21,21 @@ export default function ProfesoresCRUD() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  
+  // Dialog states
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isDestructive?: boolean;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+
   const router = useRouter();
 
   useEffect(() => {
@@ -60,15 +78,17 @@ export default function ProfesoresCRUD() {
     try {
       if (editingProf) {
         await professorService.update(editingProf.id_professor, formData);
+        toast.success("Professor actualitzat correctly.");
       } else {
         await professorService.create(formData);
+        toast.success("Professor creat correctly.");
       }
       setIsModalOpen(false);
       setEditingProf(null);
       setFormData({ nom: '', contacte: '', password: '' });
       loadProfessors();
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      toast.error(err.message || "Error al guardar el professor.");
     }
   };
 
@@ -78,11 +98,23 @@ export default function ProfesoresCRUD() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (confirm('¿Estás seguro de eliminar este profesor?')) {
-      await professorService.delete(id);
-      loadProfessors();
-    }
+  const handleDelete = (id: number) => {
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Eliminar Professor',
+      message: 'Estàs segur que vols eliminar aquest professor? També s\'eliminarà el seu accés a l\'App mòbil.',
+      isDestructive: true,
+      onConfirm: async () => {
+        try {
+          await professorService.delete(id);
+          loadProfessors();
+          toast.success("Professor eliminat.");
+        } catch (err) {
+          toast.error("Error al eliminar el professor.");
+        }
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
   const headerActions = (
     <button 
@@ -128,85 +160,91 @@ export default function ProfesoresCRUD() {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-[#F8FAFC] border-b border-gray-200">
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Professor/a</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Contacte</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">Accions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {paginatedProfessors.map(p => (
-                <tr key={p.id_professor} className="hover:bg-gray-50 transition-colors group">
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-[#EAEFF2] flex items-center justify-center text-[#00426B] group-hover:bg-[#00426B] group-hover:text-white transition-colors">
-                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{p.nom}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-5">
-                    <span className="text-sm font-bold text-gray-500">{p.contacte}</span>
-                  </td>
-                  <td className="px-6 py-5">
-                    <div className="flex justify-end items-center gap-2">
-                      <button onClick={() => handleEdit(p)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">Editar</button>
-                      <button onClick={() => handleDelete(p.id_professor)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {filteredProfessors.length === 0 && !loading && (
-          <div className="p-20 text-center">
-            <p className="text-[#00426B] font-black uppercase text-xs tracking-widest">No s'han trobat professors</p>
-            <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">Prova amb altres termes de cerca.</p>
-          </div>
-        )}
-      </div>
-
-      {/* Paginació */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white border border-gray-200 p-6">
-          <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
-            Mostrant <span className="text-[#00426B]">{paginatedProfessors.length}</span> de <span className="text-[#00426B]">{filteredProfessors.length}</span> professors
-          </div>
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === 1 
-                ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-                : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
-            >
-              Anterior
-            </button>
-            <div className="px-4 py-2 bg-[#F8FAFC] border border-gray-200 text-[10px] font-black text-[#00426B] tracking-[0.2em]">
-              Pàgina {currentPage} de {totalPages}
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+          <div className="bg-white border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-[#F8FAFC] border-b border-gray-200">
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Professor/a</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Contacte</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">Accions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {paginatedProfessors.map(p => (
+                    <tr key={p.id_professor} className="hover:bg-gray-50 transition-colors group">
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-[#EAEFF2] flex items-center justify-center text-[#00426B] group-hover:bg-[#00426B] group-hover:text-white transition-colors">
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{p.nom}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <span className="text-sm font-bold text-gray-500">{p.contacte}</span>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex justify-end items-center gap-2">
+                          <button onClick={() => handleEdit(p)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">Editar</button>
+                          <button onClick={() => handleDelete(p.id_professor)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <button 
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-              className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === totalPages 
-                ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-                : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
-            >
-              Següent
-            </button>
+            {filteredProfessors.length === 0 && (
+              <div className="p-20 text-center">
+                <p className="text-[#00426B] font-black uppercase text-xs tracking-widest">No s'han trobat professors</p>
+                <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">Prova amb altres termes de cerca.</p>
+              </div>
+            )}
           </div>
-        </div>
+
+          {/* Paginació */}
+          {totalPages > 1 && (
+            <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white border border-gray-200 p-6">
+              <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                Mostrant <span className="text-[#00426B]">{paginatedProfessors.length}</span> de <span className="text-[#00426B]">{filteredProfessors.length}</span> professors
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === 1 
+                    ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
+                    : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
+                >
+                  Anterior
+                </button>
+                <div className="px-4 py-2 bg-[#F8FAFC] border border-gray-200 text-[10px] font-black text-[#00426B] tracking-[0.2em]">
+                  Pàgina {currentPage} de {totalPages}
+                </div>
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === totalPages 
+                    ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
+                    : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
+                >
+                  Següent
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {isModalOpen && (
@@ -277,6 +315,14 @@ export default function ProfesoresCRUD() {
           </div>
         </div>
       )}
+      <ConfirmDialog 
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        onConfirm={confirmConfig.onConfirm}
+        onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        isDestructive={confirmConfig.isDestructive}
+      />
     </DashboardLayout>
   );
 }

@@ -9,6 +9,9 @@ import { THEME } from "@iter/shared";
 import DashboardLayout from "../../../components/DashboardLayout";
 import CreateCentroModal from "../../../components/CreateCentroModal";
 import centroService, { Centre } from "../../../services/centroService";
+import Loading from "@/components/Loading";
+import { toast } from "sonner";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 export default function CentrosScreen() {
   const { user, loading: authLoading } = useAuth();
@@ -27,6 +30,20 @@ export default function CentrosScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedAsistencia, setSelectedAsistencia] = useState("Toti els estats");
   const [isModalVisible, setModalVisible] = useState(false);
+  
+  // Dialog states
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isDestructive?: boolean;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   const fetchCentros = useCallback(async () => {
     try {
@@ -69,6 +86,7 @@ export default function CentrosScreen() {
       return [saved, ...prev];
     });
     setEditingCentro(null);
+    toast.success("Centre desat amb èxit.");
   };
 
   const handleEdit = (centro: Centre) => {
@@ -76,23 +94,27 @@ export default function CentrosScreen() {
     setModalVisible(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('¿Seguro que quieres eliminar este centro?')) return;
-    try {
-      await centroService.delete(id);
-      setCentros((prev) => prev.filter((c) => c.id_centre !== id));
-    } catch (err) {
-      console.error(err);
-      alert("Error al eliminar el centro");
-    }
+  const handleDelete = (id: number) => {
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Eliminar Centre',
+      message: 'Estàs segur que vols eliminar aquest centre? S\'eliminaran totes les dades associades.',
+      isDestructive: true,
+      onConfirm: async () => {
+        try {
+          await centroService.delete(id);
+          setCentros((prev) => prev.filter((c) => c.id_centre !== id));
+          toast.success("Centre eliminat correctament.");
+        } catch (err) {
+          toast.error("Error al eliminar el centre.");
+        }
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   if (authLoading || !user || user.rol.nom_rol !== 'ADMIN') {
-    return (
-      <div className="flex min-h-screen justify-center items-center" style={{ backgroundColor: THEME.colors.background }}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: THEME.colors.primary }}></div>
-      </div>
-    );
+    return <Loading fullScreen message="Verificant permisos d'administrador..." />;
   }
 
   const headerActions = (
@@ -166,10 +188,7 @@ export default function CentrosScreen() {
 
       {/* Taula de Centres */}
       {loading ? (
-        <div className="py-20 text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 mx-auto mb-4" style={{ borderColor: THEME.colors.primary }}></div>
-          <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Carregant centres...</p>
-        </div>
+        <Loading message="Carregant centres..." />
       ) : filteredCentros.length > 0 ? (
         <div className="bg-white border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
@@ -261,6 +280,14 @@ export default function CentrosScreen() {
         }}
         onCentroSaved={handleCentroSaved}
         initialData={editingCentro}
+      />
+      <ConfirmDialog 
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        onConfirm={confirmConfig.onConfirm}
+        onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        isDestructive={confirmConfig.isDestructive}
       />
     </DashboardLayout>
   );

@@ -6,6 +6,9 @@ import { useAuth } from '@/context/AuthContext';
 import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import statsService, { StatusStat, PopularStat, ActivityLog } from '@/services/statsService';
+import Loading from '@/components/Loading';
+import { toast } from 'sonner';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function AdminStatsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -15,6 +18,21 @@ export default function AdminStatsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  
+  // Dialog states
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isDestructive?: boolean;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+
   const router = useRouter();
 
   const fetchData = async () => {
@@ -45,16 +63,23 @@ export default function AdminStatsPage() {
     }
   }, [user, authLoading, router]);
 
-  const handleCleanup = async () => {
-    if (confirm('Vols netejar els logs antics (>30 dies)?')) {
-      try {
-        const res = await statsService.cleanupLogs();
-        alert(res.message);
-        fetchData();
-      } catch (err) {
-        alert('Error en netejar els logs');
+  const handleCleanup = () => {
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Netejar Logs',
+      message: 'Vols netejar els logs antics (>30 dies)? Aquesta acció no es pot desfer.',
+      isDestructive: true,
+      onConfirm: async () => {
+        try {
+          const res = await statsService.cleanupLogs();
+          toast.success(res.message);
+          fetchData();
+        } catch (err) {
+          toast.error('Error en netejar els logs.');
+        }
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
-    }
+    });
   };
 
   const handleSearch = async () => {
@@ -71,19 +96,16 @@ export default function AdminStatsPage() {
     if (pas_nom) {
       try {
         await statsService.addChecklistStep(id, pas_nom);
+        toast.success("Pas afegit correctament.");
         handleSearch();
       } catch (err) {
-        alert('Error en afegir el pas');
+        toast.error('Error en afegir el pas.');
       }
     }
   };
 
   if (authLoading || !user) {
-    return (
-      <div className="flex min-h-screen justify-center items-center" style={{ backgroundColor: THEME.colors.background }}>
-        <div className="animate-spin h-8 w-8 border-2 border-t-transparent mx-auto" style={{ borderColor: THEME.colors.primary }}></div>
-      </div>
-    );
+    return <Loading fullScreen message="Carregant analítica..." />;
   }
 
   return (
@@ -269,6 +291,14 @@ export default function AdminStatsPage() {
           </div>
         </div>
       </div>
+      <ConfirmDialog 
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        onConfirm={confirmConfig.onConfirm}
+        onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        isDestructive={confirmConfig.isDestructive}
+      />
     </DashboardLayout>
   );
 }

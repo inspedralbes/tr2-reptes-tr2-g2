@@ -10,6 +10,9 @@ import peticioService, { Peticio } from '@/services/peticioService';
 import assignacioService from '@/services/assignacioService';
 import centroService, { Centre } from '@/services/centroService';
 import api from '@/services/api';
+import Loading from '@/components/Loading';
+import { toast } from 'sonner';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function AdminSolicitudesPage() {
   const { user, loading: authLoading } = useAuth();
@@ -25,6 +28,20 @@ export default function AdminSolicitudesPage() {
   const [selectedCenterId, setSelectedCenterId] = useState<string>('');
   const [selectedModality, setSelectedModality] = useState<string>('');
   
+  // Dialog states
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isDestructive?: boolean;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+
   const router = useRouter();
 
   const fetchData = async () => {
@@ -60,40 +77,63 @@ export default function AdminSolicitudesPage() {
     }
   }, [user, authLoading, router]);
 
-  const handleApprove = async (idPeticio: number) => {
-    if (!confirm('Segur que vols aprovar aquesta sol·licitud i generar l\'assignació?')) return;
-    try {
-      await peticioService.updateStatus(idPeticio, ESTADOS_PETICION.ACEPTADA);
-      await assignacioService.createFromPeticio(idPeticio);
-      await fetchData();
-      alert('Sol·licitud aprovada i assignació generada.');
-    } catch (err) {
-      alert('Error en el procés d\'aprovació.');
-    }
+  const handleApprove = (idPeticio: number) => {
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Aprovar Sol·licitud',
+      message: 'Estàs segur que vols aprovar aquesta sol·licitud i generar l\'assignació immediatament?',
+      onConfirm: async () => {
+        try {
+          await peticioService.updateStatus(idPeticio, ESTADOS_PETICION.ACEPTADA);
+          await assignacioService.createFromPeticio(idPeticio);
+          await fetchData();
+          toast.success('Sol·licitud aprovada i assignació generada correctly.');
+        } catch (err) {
+          toast.error('Error en el procés d\'aprovació.');
+        }
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleReject = async (idPeticio: number) => {
-    if (!confirm('Segur que vols rebutjar aquesta sol·licitud?')) return;
-    try {
-      await peticioService.updateStatus(idPeticio, ESTADOS_PETICION.RECHAZADA);
-      await fetchData();
-    } catch (err) {
-      alert('Error al rebutjar la sol·licitud.');
-    }
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Rebutjar Sol·licitud',
+      message: 'Segur que vols rebutjar aquesta sol·licitud? Aquesta acció no es pot desfer.',
+      isDestructive: true,
+      onConfirm: async () => {
+        try {
+          await peticioService.updateStatus(idPeticio, ESTADOS_PETICION.RECHAZADA);
+          await fetchData();
+          toast.success('Sol·licitud rebutjada.');
+        } catch (err) {
+          toast.error('Error al rebutjar la sol·licitud.');
+        }
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
   
-  const handleRunTetris = async () => {
-    if (!confirm('Aquesta acció processarà totes les sol·licituds aprovades pendents i generarà assignacions automàticament. Continuar?')) return;
-    setLoading(true);
-    try {
-      const result = await assignacioService.runTetris();
-      alert(`Assignació completada: ${result.assignmentsCreated} noves assignacions.`);
-      await fetchData();
-    } catch (err: any) {
-      alert('Error al executar Tetris: ' + (err.response?.data?.error || err.message));
-    } finally {
-      setLoading(false);
-    }
+  const handleRunTetris = () => {
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Executar Assignació Automàtica',
+      message: 'Aquesta acció processarà totes les sol·licituds aprovades pendents i generarà assignacions per a tots els centres. Continuar?',
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          const result = await assignacioService.runTetris();
+          toast.success(`Assignació completada: ${result.assignmentsCreated} noves assignacions.`);
+          await fetchData();
+        } catch (err: any) {
+          toast.error('Error al executar Tetris: ' + (err.response?.data?.error || err.message));
+        } finally {
+          setLoading(false);
+        }
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   // Filtered Peticions based on Center Selection
@@ -132,11 +172,7 @@ export default function AdminSolicitudesPage() {
   }, [tallers, searchQuery, selectedModality, workshopRequests]);
 
   if (authLoading || !user) {
-    return (
-      <div className="flex min-h-screen justify-center items-center" style={{ backgroundColor: THEME.colors.background }}>
-        <div className="animate-spin h-8 w-8 border-2 border-t-transparent border-[#00426B] mx-auto"></div>
-      </div>
-    );
+    return <Loading fullScreen message="Verificant credencials d'administrador..." />;
   }
 
   return (
@@ -214,10 +250,7 @@ export default function AdminSolicitudesPage() {
       </div>
 
       {loading ? (
-        <div className="py-20 text-center">
-          <div className="animate-spin h-10 w-10 border-t-2 border-[#00426B] mx-auto mb-4"></div>
-          <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Sincronitzant sol·licituds...</p>
-        </div>
+        <Loading message="Sincronitzant sol·licituds..." />
       ) : error ? (
         <div className="bg-red-50 border-l-4 border-red-500 p-6">
           <p className="text-red-700 font-bold text-sm">{error}</p>
@@ -311,6 +344,14 @@ export default function AdminSolicitudesPage() {
           <p className="text-gray-400 text-xs font-black uppercase tracking-widest">No s'han trobat sol·licituds amb els filtres aplicats</p>
         </div>
       )}
+      <ConfirmDialog 
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        onConfirm={confirmConfig.onConfirm}
+        onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        isDestructive={confirmConfig.isDestructive}
+      />
     </DashboardLayout>
   );
 }

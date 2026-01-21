@@ -6,6 +6,8 @@ import { getUser, User } from '@/lib/auth';
 import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
+import Loading from '@/components/Loading';
+import { toast } from 'sonner';
 
 export default function AssignmentEvaluationsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
@@ -30,7 +32,7 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
                 const found = res.data.find((a: any) => a.id_assignacio === parseInt(id));
 
                 if (!found) {
-                    alert('Assignació no trobada.');
+                    toast.error('Assignació no trobada.');
                     router.push('/centro/assignacions');
                     return;
                 }
@@ -46,11 +48,7 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
     }, [id, router]);
 
     if (loading || !assignacio) {
-        return (
-            <div className="flex min-h-screen justify-center items-center">
-                <div className="animate-spin h-10 w-10 border-b-2 border-primary"></div>
-            </div>
-        );
+        return <Loading fullScreen message="Carregant inscripcions..." />;
     }
 
     return (

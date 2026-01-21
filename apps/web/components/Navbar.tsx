@@ -88,9 +88,9 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
           <div className="flex items-center">
             <Link href={getInicioPath()} className="flex items-center">
               <img 
-                src="/logo-invers.png" 
+                src="/logo.png" 
                 alt="Iter Logo" 
-                className="w-10 h-10 object-contain brightness-0" 
+                className="w-10 h-10 object-contain" 
               />
             </Link>
           </div>

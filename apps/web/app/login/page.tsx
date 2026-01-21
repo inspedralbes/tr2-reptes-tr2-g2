@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { login as apiLogin } from '@/lib/auth';
 import { useAuth } from '@/context/AuthContext';
 import { THEME } from '@iter/shared';
+import Loading from '@/components/Loading';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -25,6 +27,10 @@ export default function LoginPage() {
       }
     }
   }, [user, authLoading, router]);
+
+  if (authLoading) {
+    return <Loading fullScreen message="Iniciant sessió..." />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +100,7 @@ export default function LoginPage() {
             <a
               href="#"
               className="group relative flex items-center justify-center w-full py-4 bg-[#00426B] text-white text-xs font-bold uppercase tracking-widest transition-all hover:bg-[#0775AB] active:scale-95"
-              onClick={(e) => { e.preventDefault(); alert('Enllaç de descàrrega próximament (Expo)'); }}
+              onClick={(e) => { e.preventDefault(); toast.info('Enllaç de descàrrega próximament (Expo Go / TestFlight)'); }}
             >
               <span>Descarregar App Iter</span>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">

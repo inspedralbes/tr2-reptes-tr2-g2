@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
+import { toast } from 'sonner';
 
 export default function QuestionnaireBuilderPage() {
     const router = useRouter();
@@ -40,7 +41,7 @@ export default function QuestionnaireBuilderPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!form.titol.trim() || form.preguntes.some(p => !p.enunciat.trim())) {
-            alert("Si us plau, emplena tots els camps.");
+            toast.error("Si us plau, emplena tots els camps.");
             return;
         }
 
@@ -48,10 +49,10 @@ export default function QuestionnaireBuilderPage() {
         try {
             const api = getApi();
             await api.post('/questionaris/model', form);
-            alert("Model de qüestionari creat amb èxit.");
+            toast.success("Model de qüestionari creat amb èxit.");
             router.push('/admin/questionaris');
         } catch (err) {
-            alert("Error al crear el qüestionari.");
+            toast.error("Error al crear el qüestionari.");
         } finally {
             setLoading(false);
         }

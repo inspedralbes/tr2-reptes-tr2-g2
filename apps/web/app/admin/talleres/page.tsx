@@ -10,6 +10,9 @@ import WorkshopDetail from "../../../components/WorkshopDetail";
 import tallerService, { Taller } from "../../../services/tallerService";
 import DashboardLayout from "../../../components/DashboardLayout";
 import CreateWorkshopModal from "../../../components/CreateWorkshopModal";
+import Loading from "@/components/Loading";
+import { toast } from "sonner";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const SVG_ICONS: Record<string, React.ReactNode> = {
   PUZZLE: <path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />,
@@ -41,6 +44,20 @@ export default function TallerScreen() {
   const [selectedSector, setSelectedSector] = useState("Tots els sectors");
   const [selectedModalitat, setSelectedModalitat] = useState("Totes les modalitats");
   const [isCreateModalVisible, setCreateModalVisible] = useState(false);
+  
+  // Dialog states
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isDestructive?: boolean;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   const fetchTalleres = useCallback(async () => {
     try {
@@ -88,6 +105,7 @@ export default function TallerScreen() {
       return [savedWorkshop, ...prev];
     });
     setEditingWorkshop(null);
+    toast.success("Taller desat amb èxit.");
   };
 
   const handleEdit = (taller: Taller) => {
@@ -96,24 +114,28 @@ export default function TallerScreen() {
     setCreateModalVisible(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('¿Seguro que quieres eliminar este taller?')) return;
-    try {
-      await tallerService.delete(id);
-      setTalleres((prev) => prev.filter((t) => t._id !== id));
-      setSelectedWorkshop(null);
-    } catch (err) {
-      console.error(err);
-      alert("Error al eliminar el taller");
-    }
+  const handleDelete = (id: string) => {
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Eliminar Taller',
+      message: 'Estàs segur que vols eliminar aquest taller? Aquesta acció eliminarà el taller del catàleg permanentment.',
+      isDestructive: true,
+      onConfirm: async () => {
+        try {
+          await tallerService.delete(id);
+          setTalleres((prev) => prev.filter((t) => t._id !== id));
+          setSelectedWorkshop(null);
+          toast.success("Taller eliminat correctament.");
+        } catch (err) {
+          toast.error("Error al eliminar el taller.");
+        }
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   if (authLoading || !user || user.rol.nom_rol !== 'ADMIN') {
-    return (
-      <div className="flex min-h-screen justify-center items-center" style={{ backgroundColor: THEME.colors.background }}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: THEME.colors.primary }}></div>
-      </div>
-    );
+    return <Loading fullScreen message="Verificant permisos d'administrador..." />;
   }
 
   const headerActions = (
@@ -202,10 +224,7 @@ export default function TallerScreen() {
 
       {/* Taula de Tallers */}
       {loading ? (
-        <div className="py-20 text-center">
-          <div className="animate-spin h-10 w-10 border-b-2 mx-auto mb-4" style={{ borderColor: THEME.colors.primary }}></div>
-          <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Carregant catàleg...</p>
-        </div>
+        <Loading message="Carregant catàleg..." />
       ) : filteredTalleres.length > 0 ? (
         <div className="bg-white border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
@@ -312,6 +331,14 @@ export default function TallerScreen() {
         }}
         onWorkshopCreated={handleWorkshopSaved}
         initialData={editingWorkshop}
+      />
+      <ConfirmDialog 
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        onConfirm={confirmConfig.onConfirm}
+        onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        isDestructive={confirmConfig.isDestructive}
       />
     </DashboardLayout>
   );

@@ -6,6 +6,9 @@ import { useAuth } from '@/context/AuthContext';
 import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import alumneService, { Alumne } from '@/services/alumneService';
+import Loading from '@/components/Loading';
+import { toast } from 'sonner';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function AlumnesCRUD() {
   const { user, loading: authLoading } = useAuth();
@@ -18,6 +21,21 @@ export default function AlumnesCRUD() {
   const [selectedCurs, setSelectedCurs] = useState("Tots els cursos");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  
+  // Dialog states
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isDestructive?: boolean;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+
   const router = useRouter();
 
   useEffect(() => {
@@ -67,15 +85,17 @@ export default function AlumnesCRUD() {
     try {
       if (editingAlumne) {
         await alumneService.update(editingAlumne.id_alumne, formData);
+        toast.success("Alumne actualitzat correctament.");
       } else {
         await alumneService.create(formData);
+        toast.success("Alumne creat correctament.");
       }
       setIsModalOpen(false);
       setEditingAlumne(null);
       setFormData({ nom: '', cognoms: '', idalu: '', curs: '' });
       loadAlumnes();
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      toast.error(err.message || "Error al guardar l'alumne.");
     }
   };
 
@@ -85,11 +105,23 @@ export default function AlumnesCRUD() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (confirm('¿Estás seguro de eliminar este alumno?')) {
-      await alumneService.delete(id);
-      loadAlumnes();
-    }
+  const handleDelete = (id: number) => {
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Eliminar Alumne',
+      message: 'Estàs segur que vols eliminar aquest alumne? Aquesta acció no es pot desfer.',
+      isDestructive: true,
+      onConfirm: async () => {
+        try {
+          await alumneService.delete(id);
+          loadAlumnes();
+          toast.success("Alumne eliminat.");
+        } catch (err) {
+          toast.error("Error al eliminar l'alumne.");
+        }
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const headerActions = (
@@ -150,60 +182,64 @@ export default function AlumnesCRUD() {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-[#F8FAFC] border-b border-gray-200">
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Informació de l'Alumne</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Identificació (IDALU)</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Curs / Nivell</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">Accions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {paginatedAlumnes.map(a => (
-                <tr key={a.id_alumne} className="hover:bg-gray-50 transition-colors group">
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-[#EAEFF2] flex items-center justify-center text-[#00426B] group-hover:bg-[#00426B] group-hover:text-white transition-colors">
-                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{a.nom} {a.cognoms}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-5">
-                    <span className="text-[10px] font-bold text-gray-400 font-mono tracking-widest uppercase">{a.idalu}</span>
-                  </td>
-                  <td className="px-6 py-5">
-                    <span className="px-2 py-0.5 bg-[#EAEFF2] text-[#00426B] text-[10px] font-black uppercase tracking-widest border border-[#EAEFF2]">
-                      {a.curs}
-                    </span>
-                  </td>
-                  <td className="px-6 py-5">
-                    <div className="flex justify-end items-center gap-2">
-                      <button onClick={() => handleEdit(a)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">Editar</button>
-                      <button onClick={() => handleDelete(a.id_alumne)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                      </button>
-                    </div>
-                  </td>
+      {loading ? (
+        <Loading />
+      ) : (
+        <div className="bg-white border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-[#F8FAFC] border-b border-gray-200">
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Informació de l'Alumne</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Identificació (IDALU)</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Curs / Nivell</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">Accions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {filteredAlumnes.length === 0 && !loading && (
-          <div className="p-20 text-center">
-            <p className="text-[#00426B] font-black uppercase text-xs tracking-widest">No s'han trobat alumnes</p>
-            <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">Prova amb altres termes de cerca.</p>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {paginatedAlumnes.map(a => (
+                  <tr key={a.id_alumne} className="hover:bg-gray-50 transition-colors group">
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-[#EAEFF2] flex items-center justify-center text-[#00426B] group-hover:bg-[#00426B] group-hover:text-white transition-colors">
+                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{a.nom} {a.cognoms}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className="text-[10px] font-bold text-gray-400 font-mono tracking-widest uppercase">{a.idalu}</span>
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className="px-2 py-0.5 bg-[#EAEFF2] text-[#00426B] text-[10px] font-black uppercase tracking-widest border border-[#EAEFF2]">
+                        {a.curs}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex justify-end items-center gap-2">
+                        <button onClick={() => handleEdit(a)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">Editar</button>
+                        <button onClick={() => handleDelete(a.id_alumne)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
-      </div>
+          {filteredAlumnes.length === 0 && !loading && (
+            <div className="p-20 text-center">
+              <p className="text-[#00426B] font-black uppercase text-xs tracking-widest">No s'han trobat alumnes</p>
+              <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">Prova amb altres termes de cerca.</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Paginació */}
       {totalPages > 1 && (
@@ -293,6 +329,14 @@ export default function AlumnesCRUD() {
           </div>
         </div>
       )}
+      <ConfirmDialog 
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        onConfirm={confirmConfig.onConfirm}
+        onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        isDestructive={confirmConfig.isDestructive}
+      />
     </DashboardLayout>
   );
 }

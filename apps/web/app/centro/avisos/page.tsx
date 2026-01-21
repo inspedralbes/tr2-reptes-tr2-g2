@@ -5,11 +5,28 @@ import { useAuth } from '@/context/AuthContext';
 import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import notificacioService, { Notificacio } from '@/services/notificacioService';
+import Loading from '@/components/Loading';
+import { toast } from 'sonner';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function AvisosPage() {
   const { user } = useAuth();
   const [notificacions, setNotificacions] = useState<Notificacio[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Dialog states
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isDestructive?: boolean;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   useEffect(() => {
     if (user) {
@@ -37,14 +54,23 @@ export default function AvisosPage() {
     }
   };
 
-  const deleteNotif = async (id: number) => {
-    if (!confirm('¿Estàs segur que vols eliminar aquest avís?')) return;
-    try {
-      await notificacioService.delete(id);
-      setNotificacions(prev => prev.filter(n => n.id_notificacio !== id));
-    } catch (error) {
-      console.error("Error deleting notification", error);
-    }
+  const deleteNotif = (id: number) => {
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Eliminar Avís',
+      message: 'Estàs segur que vols eliminar aquest avís? Aquesta acció no es pot desfer.',
+      isDestructive: true,
+      onConfirm: async () => {
+        try {
+          await notificacioService.delete(id);
+          setNotificacions(prev => prev.filter(n => n.id_notificacio !== id));
+          toast.success("Avís eliminat.");
+        } catch (error) {
+          toast.error("Error al eliminar l'avís.");
+        }
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const getImportanceStyles = (imp: string) => {
@@ -85,10 +111,7 @@ export default function AvisosPage() {
     >
       <div className="w-full pb-12">
         {loading ? (
-          <div className="py-20 text-center">
-            <div className="animate-spin h-10 w-10 border-4 border-consorci-darkBlue border-t-transparent mx-auto mb-6"></div>
-            <p className="text-gray-400 text-xs font-black uppercase tracking-widest">Carregant avisos oficials...</p>
-          </div>
+          <Loading message="Carregant avisos oficials..." />
         ) : notificacions.length > 0 ? (
           <div className="flex flex-col border border-gray-200 bg-gray-50/30">
             {notificacions.map((notif, index) => (
@@ -167,6 +190,14 @@ export default function AvisosPage() {
           </div>
         )}
       </div>
+      <ConfirmDialog 
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        onConfirm={confirmConfig.onConfirm}
+        onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        isDestructive={confirmConfig.isDestructive}
+      />
     </DashboardLayout>
   );
 }

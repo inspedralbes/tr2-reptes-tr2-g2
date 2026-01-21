@@ -6,6 +6,9 @@ import { getUser, User } from '@/lib/auth';
 import { THEME, PHASES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
+import Loading from '@/components/Loading';
+import { toast } from 'sonner';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function AssignacionsPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -14,6 +17,21 @@ export default function AssignacionsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("Tots els estats");
+  
+  // Dialog states
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isDestructive?: boolean;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+
   const router = useRouter();
 
   useEffect(() => {
@@ -103,10 +121,7 @@ export default function AssignacionsPage() {
         </div>
 
         {loading ? (
-          <div className="py-20 text-center">
-            <div className="animate-spin h-10 w-10 border-b-2 border-[#00426B] mx-auto mb-4"></div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Carregant assignacions...</p>
-          </div>
+          <Loading />
         ) : (
           <div className="bg-white border border-gray-200 overflow-hidden">
             <table className="w-full text-left border-collapse">
@@ -179,8 +194,8 @@ export default function AssignacionsPage() {
                         >
                           Registre Nominal
                         </button>
-                        <button
-                          onClick={() => (isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) ? router.push(`/centro/assignacions/${a.id_assignacio}/evaluacions`) : alert('Documentació encara no disponible')}
+                         <button
+                          onClick={() => (isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) ? router.push(`/centro/assignacions/${a.id_assignacio}/evaluacions`) : toast.info('La fase d\'avaluació encara no està activa')}
                           className={`px-3 py-2 text-[9px] font-black uppercase tracking-widest border transition-all whitespace-nowrap ${(isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE))
                             ? 'border-[#F26178] text-[#F26178] hover:bg-[#F26178] hover:text-white'
                             : 'border-gray-100 text-gray-300'
@@ -229,7 +244,7 @@ export default function AssignacionsPage() {
                     descripcio: input.value
                   });
                   input.value = '';
-                  alert('Incidència reportada. El CEB la revisarà properament.');
+                  toast.success('Incidència reportada. El CEB la revisarà properament.');
                 }}
                 className="px-8 py-4 bg-[#F26178] text-white font-black uppercase text-[10px] tracking-widest hover:bg-[#D94E64] transition-all"
               >
@@ -239,6 +254,14 @@ export default function AssignacionsPage() {
           </section>
         )}
       </div>
+      <ConfirmDialog 
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        onConfirm={confirmConfig.onConfirm}
+        onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        isDestructive={confirmConfig.isDestructive}
+      />
     </DashboardLayout>
   );
 }

@@ -8,6 +8,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import tallerService, { Taller } from '@/services/tallerService';
 import peticioService from '@/services/peticioService';
 import professorService, { Professor } from '@/services/professorService';
+import Loading from '@/components/Loading';
 
 export default function PeticionsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -101,11 +102,7 @@ export default function PeticionsPage() {
   };
 
   if (authLoading || !user) {
-    return (
-      <div className="flex min-h-screen justify-center items-center" style={{ backgroundColor: THEME.colors.background }}>
-        <div className="animate-spin h-8 w-8 border-2 border-t-transparent mx-auto" style={{ borderColor: THEME.colors.primary }}></div>
-      </div>
-    );
+    return <Loading fullScreen message="Verificant permisos de coordinador..." />;
   }
 
   return (
@@ -153,9 +150,8 @@ export default function PeticionsPage() {
               <tbody className="divide-y divide-gray-100">
                 {loading ? (
                   <tr>
-                    <td colSpan={3} className="px-6 py-12 text-center">
-                      <div className="animate-spin h-6 w-6 border-2 border-t-transparent border-[#00426B] mx-auto mb-2"></div>
-                      <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Carregant catàleg...</span>
+                    <td colSpan={3} className="px-6 py-12">
+                      <Loading message="Carregant catàleg..." />
                     </td>
                   </tr>
                 ) : filteredTallers.length > 0 ? (
