@@ -30,31 +30,15 @@ if (process.env.CORS_ORIGIN) {
   });
 }
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Permitir peticiones sin origen (como apps móviles o curl)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        logger.warn(`🚫 CORS Bloqueado para el origen: ${origin}`);
-        callback(new Error('No permitido por CORS'));
-      }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'X-Requested-With',
-      'Accept',
-      'ngrok-skip-browser-warning',
-    ],
-    credentials: true,
-    optionsSuccessStatus: 200,
-  })
-);
+app.use(cors({
+  origin: function (origin, callback) {
+    return callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'ngrok-skip-browser-warning'],
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
 
 app.use(express.json());
 

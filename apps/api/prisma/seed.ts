@@ -158,25 +158,16 @@ async function main() {
     }
   });
 
-  // 3. PROFESORS DE PROVA
-  const testProfessors = [
-    { name: 'Professor Ejemplo', email: 'profe@profe.com', center: centroMila.id_centre },
-    { name: 'Marta Gil', email: 'marta@test.com', center: prof3.id_centre },
-    { name: 'Sergi Roca', email: 'sergi@test.com', center: prof4.id_centre },
-    { name: 'Clara Bosch', email: 'clara@test.com', center: prof5.id_centre },
-  ];
-
-  for (const p of testProfessors) {
-    await prisma.usuari.create({
-      data: {
-        nom_complet: p.name,
-        email: p.email,
-        password_hash: passProfe,
-        id_rol: rolProfe.id_rol,
-        id_centre: p.center
-      }
-    });
-  }
+  // 3. PROFESOR (Centro Milà)
+  await prisma.usuari.create({
+    data: {
+      nom_complet: 'Professor Ejemplo',
+      email: 'profe@profe.com',
+      password_hash: passProfe,
+      id_rol: rolProfe.id_rol,
+      id_centre: centroMila.id_centre
+    }
+  });
 
   // 7. CREAR TALLERES (Actualitzat amb la llista completa)
   console.log('🛠️ Creando Talleres...');
@@ -489,42 +480,7 @@ async function main() {
     if (isOversaturated) {
         console.log(`🔥 Taller "${taller.titol}" (ID: ${taller.id_taller}) sobresaturado con ${numRequests} solicitudes.`);
     }
-  });
-
-  // 11. ASSIGNACIONS PER ALS PROFESSORS DE PROVA
-  console.log('📅 Creando Asignaciones para los profesores de prueba...');
-  await prisma.assignacio.create({
-    data: {
-      id_centre: prof3.id_centre,
-      id_taller: tallerRobotica.id_taller,
-      prof1_id: prof3.id_professor,
-      estat: 'En_curs',
-      data_inici: new Date('2026-03-20'),
-      data_fi: new Date('2026-03-25')
-    }
-  });
-
-  await prisma.assignacio.create({
-    data: {
-      id_centre: prof4.id_centre,
-      id_taller: tallerFusta.id_taller,
-      prof1_id: prof4.id_professor,
-      estat: 'En_curs',
-      data_inici: new Date('2026-04-10'),
-      data_fi: new Date('2026-04-15')
-    }
-  });
-
-  await prisma.assignacio.create({
-    data: {
-      id_centre: prof5.id_centre,
-      id_taller: tallerRobotica.id_taller,
-      prof1_id: prof5.id_professor,
-      estat: 'En_curs',
-      data_inici: new Date('2026-05-05'),
-      data_fi: new Date('2026-05-10')
-    }
-  });
+  }
 
   console.log('✅ Seed completado con éxito.');
 }

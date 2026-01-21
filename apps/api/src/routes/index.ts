@@ -15,6 +15,7 @@ import statsRoutes from './stats.routes';
 import sectorRoutes from './sector.routes';
 import assistenciaRoutes from './assistencia.routes';
 import notificacioRoutes from './notificacio.routes';
+import evaluationRoutes from './evaluation.routes'; // Rutas de IA (Voz)
 import avaluacioRoutes from './avaluacio.routes';
 import questionariRoutes from './questionari.routes';
 

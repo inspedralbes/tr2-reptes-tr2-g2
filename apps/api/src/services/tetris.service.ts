@@ -49,6 +49,12 @@ export async function runTetris() {
     console.log(`🚀 TetrisService: Starting assignment for ${petitions.length} petitions...`);
   }
 
+  if (petitions.length === 0) {
+    console.log('ℹ️ TetrisService: No approved petitions found waiting for assignment.');
+  } else {
+    console.log(`🚀 TetrisService: Starting assignment for ${petitions.length} petitions...`);
+  }
+
   // Group by Taller
   const tallerGroups: Record<number, typeof petitions> = {};
   for (const p of petitions) {
