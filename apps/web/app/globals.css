@@ -23,7 +23,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 900;
   color: var(--consorci-dark-blue);
   letter-spacing: -0.02em;
@@ -39,4 +44,15 @@ h1, h2, h3, h4, h5, h6 {
 
 .card-premium {
   @apply bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#0775AB] transition-all duration-300;
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
