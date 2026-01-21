@@ -137,25 +137,25 @@ export default function AdminSolicitudesPage() {
             placeholder="Buscar por taller o sector..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-blue-500 transition-all text-sm"
+            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-none shadow-none focus:border-consorci-darkBlue focus:ring-1 focus:ring-consorci-darkBlue transition-all text-sm outline-none"
           />
-          <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-consorci-darkBlue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Peticiones:</span>
-            <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-black">{peticions.length}</span>
+            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Total Peticiones:</span>
+            <span className="bg-consorci-darkBlue text-white px-3 py-1 text-xs font-black">{peticions.length}</span>
           </div>
           <button 
             onClick={handleRunTetris}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-purple-200 flex items-center gap-2"
+            className="bg-white border-2 border-consorci-darkBlue text-consorci-darkBlue hover:bg-consorci-darkBlue hover:text-white px-6 py-2.5 text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
-            Asignación Automática (Tetris)
+            Assignació Automàtica
           </button>
         </div>
       </div>
@@ -176,102 +176,105 @@ export default function AdminSolicitudesPage() {
             return (
               <section key={taller._id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="h-10 w-1 bg-blue-600 rounded-full"></div>
+                  <div className="h-8 w-1.5 bg-consorci-darkBlue"></div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">{taller.titol}</h3>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider">
+                    <h3 className="text-xl font-bold text-consorci-darkBlue uppercase tracking-tight">{taller.titol}</h3>
+                    <div className="flex items-center gap-3 mt-0.5">
+                      <span className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">
                         {taller.sector}
                       </span>
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                        taller.modalitat === 'A' ? 'bg-green-100 text-green-700' :
-                        taller.modalitat === 'B' ? 'bg-orange-100 text-orange-700' :
-                        'bg-purple-100 text-purple-700'
+                      <span className={`px-2 py-0.5 text-[10px] font-black uppercase border ${
+                        taller.modalitat === 'A' ? 'border-green-200 bg-green-50 text-green-700' :
+                        taller.modalitat === 'B' ? 'border-orange-200 bg-orange-50 text-orange-700' :
+                        'border-consorci-lightBlue bg-blue-50 text-consorci-lightBlue'
                       }`}>
-                        Modalidad {taller.modalitat}
+                        Modalitat {taller.modalitat}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-0 border-t border-l border-r border-gray-200 mb-12">
                   {requests.map(p => (
-                    <div key={p.id_peticio} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col lg:flex-row gap-8 items-start hover:shadow-md transition-shadow">
-                      {/* Center Info */}
-                      <div className="min-w-[200px] w-full lg:w-1/4">
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Centro</label>
-                        <h4 className="text-lg font-bold text-gray-800">{(p as any).centre?.nom}</h4>
-                        <div className="mt-2 text-xs text-gray-500 flex items-center gap-1">
-                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                          {new Date(p.data_peticio).toLocaleDateString()}
-                        </div>
-                      </div>
-
-                      {/* Request Details */}
-                      <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Profesores Referentes</label>
-                          <div className="space-y-2">
-                            <div className="text-sm">
-                              <span className="font-bold text-gray-700">1.</span> {(p as any).prof1?.nom || 'No asignado'} 
-                              <span className="text-gray-400 text-[10px] ml-2 italic">{(p as any).prof1?.contacte}</span>
-                            </div>
-                            <div className="text-sm">
-                              <span className="font-bold text-gray-700">2.</span> {(p as any).prof2?.nom || 'No asignado'}
-                              <span className="text-gray-400 text-[10px] ml-2 italic">{(p as any).prof2?.contacte}</span>
+                    <div key={p.id_peticio} className="bg-white border-b border-gray-200 flex flex-col lg:flex-row hover:bg-gray-50/30 transition-colors">
+                      {/* Data Section (Left) */}
+                      <div className="flex-1 p-6 flex flex-col gap-6">
+                        <div className="flex flex-col lg:flex-row gap-8 items-start">
+                          {/* Center Info */}
+                          <div className="min-w-[200px] w-full lg:w-1/4">
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Centre</label>
+                            <h4 className="text-lg font-bold text-consorci-darkBlue">{(p as any).centre?.nom}</h4>
+                            <div className="mt-2 text-xs text-gray-500 flex items-center gap-1">
+                              <svg className="h-3.5 w-3.5 text-consorci-lightBlue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                              {new Date(p.data_peticio).toLocaleDateString()}
                             </div>
                           </div>
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Alumnes ({p.alumnes_aprox})</label>
-                          <div className="flex flex-wrap gap-2">
-                            {isPhaseActive(PHASES.SOLICITUD) ? (
-                              <div className="flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg border border-blue-100">
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span className="text-[10px] font-black uppercase tracking-tight">Identitats disponibles a la Fase 2</span>
+
+                          {/* Request Details */}
+                          <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Professors Referents</label>
+                              <div className="space-y-2">
+                                <div className="text-sm">
+                                  <span className="font-bold text-consorci-darkBlue">1.</span> <span className="text-gray-700">{(p as any).prof1?.nom || 'No asignat'}</span> 
+                                  <span className="text-gray-400 text-[10px] ml-2 italic">{(p as any).prof1?.contacte}</span>
+                                </div>
+                                <div className="text-sm">
+                                  <span className="font-bold text-consorci-darkBlue">2.</span> <span className="text-gray-700">{(p as any).prof2?.nom || 'No asignat'}</span>
+                                  <span className="text-gray-400 text-[10px] ml-2 italic">{(p as any).prof2?.contacte}</span>
+                                </div>
                               </div>
-                            ) : (
-                              (p as any).alumnes?.map((a: any) => (
-                                <span key={a.id_alumne} className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold">
-                                  {a.nom} {a.cognoms}
-                                </span>
-                              )) || <span className="text-gray-300 italic text-xs">Sense alumnes assignats</span>
-                            )}
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Estat</label>
+                              <div className={`inline-block px-4 py-1 text-[10px] font-black uppercase tracking-widest border ${
+                                p.estat === 'Pendent' ? 'border-orange-200 bg-orange-50 text-orange-600' :
+                                p.estat === 'Aprovada' ? 'border-green-200 bg-green-50 text-green-600' :
+                                'border-consorci-pinkRed bg-red-50 text-consorci-pinkRed'
+                              }`}>
+                                {p.estat}
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Alumnes</label>
+                              <div className="text-sm font-bold text-consorci-darkBlue flex items-center gap-1.5">
+                                <svg className="w-4 h-4 text-consorci-lightBlue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                                {p.alumnes_aprox || 0} alumnes
+                              </div>
+                            </div>
                           </div>
                         </div>
+
+                        {/* Comments row - Conditional */}
+                        {p.comentaris && (
+                          <div className="border-t border-gray-50 pt-4">
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Comentaris</label>
+                            <p className="text-xs text-gray-600 italic leading-relaxed">{p.comentaris}</p>
+                          </div>
+                        )}
                       </div>
 
-                      {/* Comments & Status */}
-                      <div className="w-full lg:w-1/4 flex flex-col items-end gap-3 self-stretch justify-between">
-                        <div className="w-full text-right">
-                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Comentarios</label>
-                          <p className="text-xs text-gray-600 italic line-clamp-2">{p.comentaris || 'Sin comentarios'}</p>
-                        </div>
-                        <div className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest ${
-                          p.estat === 'Pendent' ? 'bg-orange-50 text-orange-600' :
-                          p.estat === 'Aprovada' ? 'bg-green-50 text-green-600' :
-                          'bg-red-50 text-red-600'
-                        }`}>
-                          {p.estat}
-                        </div>
-                        
-                        {p.estat === 'Pendent' && (
-                          <div className="flex gap-2">
+                      {/* Control Column (Right Sidebar) - Actions only */}
+                      <div className="w-full lg:w-48 bg-gray-50/80 border-t lg:border-t-0 lg:border-l border-gray-200 p-6 flex flex-col justify-center items-center">
+                        {p.estat === 'Pendent' ? (
+                          <div className="w-full space-y-2">
                             <button 
                               onClick={() => handleApprove(p.id_peticio)}
-                              className="px-3 py-1 bg-green-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-green-700 transition"
+                              className="w-full px-4 py-2.5 bg-consorci-darkBlue text-white text-[10px] font-black uppercase tracking-widest hover:bg-opacity-90 transition-all shadow-none"
                             >
-                              Aprobar
+                              Aprovar
                             </button>
                             <button 
                               onClick={() => handleReject(p.id_peticio)}
-                              className="px-3 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition"
+                              className="w-full px-4 py-2.5 border-2 border-consorci-pinkRed text-consorci-pinkRed text-[10px] font-black uppercase tracking-widest hover:bg-consorci-pinkRed hover:text-white transition-all shadow-none"
                             >
-                              Rechazar
+                              Rebutjar
                             </button>
                           </div>
+                        ) : (
+                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">Peticio gestionada</div>
                         )}
                       </div>
                     </div>
