@@ -15,13 +15,15 @@
       "dependsOn": ["^build"],
       "outputs": []
     },
+    "db:generate": {
+      "cache": false
+    },
     "db:push": {
+      "dependsOn": ["db:generate"],
       "cache": false
     },
     "db:seed": {
-      "cache": false
-    },
-    "db:generate": {
+      "dependsOn": ["db:push"],
       "cache": false
     }
   }

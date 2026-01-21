@@ -17,11 +17,8 @@ export class AutoAssignmentService {
         // We filter by Modalitat C as per requirement, but logic applies generally if needed
         const petitions = await prisma.peticio.findMany({
             where: {
-                estat: 'Aprovada',
+                estat: { in: ['Aprovada', 'Pendent'] },
                 modalitat: 'C',
-                // Optional: Filter out if already has assignments?
-                // For now we assume we are running this for pending stuff.
-                // But since we changed relation to 1:N, checking 'assignacions: { none: {} }' is safer
                 assignacions: {
                     none: {}
                 }
@@ -29,10 +26,18 @@ export class AutoAssignmentService {
             include: {
                 centre: true,
                 alumnes: true
+            },
+            orderBy: {
+                data_peticio: 'asc'
             }
         });
 
-        if (petitions.length === 0) return { message: 'No petitions found to process.' };
+        if (petitions.length === 0) {
+            console.log('ℹ️ AutoAssignmentService: No approved petitions of Modalitat C found that are not yet assigned.');
+            return { message: 'No petitions found to process.' };
+        }
+
+        console.log(`🚀 AutoAssignmentService: Processing ${petitions.length} petitions of Modalitat C...`);
 
         // 2. Group Students by Taller
         // Map TallerId -> Students[]
@@ -47,13 +52,13 @@ export class AutoAssignmentService {
             const list = studentsByTaller.get(p.id_taller)!;
 
             // If petition has specific students linked
-            if (p.alumnes.length > 0) {
-                p.alumnes.forEach((a) => {
+            if ((p as any).alumnes && (p as any).alumnes.length > 0) {
+                (p as any).alumnes.forEach((a: any) => {
                     list.push({ id: a.id_alumne, centerId: p.id_centre });
                     studentPeticioMap.set(a.id_alumne, p.id_peticio);
                 });
             } else {
-                // Validation: Modalitat C usually requires nominal registration beforehand.
+                console.warn(`⚠️ AutoAssignmentService: Petition ${p.id_peticio} (Centre ID ${p.id_centre}) has 0 linked students. Skipping nominal assignment for this petition.`);
             }
         });
 
@@ -65,11 +70,32 @@ export class AutoAssignmentService {
             const taller = await prisma.taller.findUnique({ where: { id_taller: tallerId } });
             if (!taller) continue;
 
-            // Calculate needed groups
-            // default capacity 16 per group
-            const GROUP_CAPACITY = 16;
+            // 1. Calculate occupied capacity from existing assignments
+            const existingAssignments = await prisma.assignacio.findMany({
+              where: { id_taller: tallerId },
+              include: { peticio: true }
+            });
+
+            const occupiedPlazas = existingAssignments.reduce((sum, a) => {
+              return sum + (a.peticio?.alumnes_aprox || 0);
+            }, 0);
+
+            const remainingCapacity = taller.places_maximes - occupiedPlazas;
+            console.log(`📊 AutoAssignment: Taller ID ${tallerId} (${taller.titol}): Plazas Totales: ${taller.places_maximes}, Ocupadas: ${occupiedPlazas}, Disponibles: ${remainingCapacity}`);
+
             const totalStudents = students.length;
-            const groupsNeeded = Math.ceil(totalStudents / GROUP_CAPACITY);
+
+            if (remainingCapacity <= 0) {
+              console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Cannot assign ${totalStudents} students.`);
+              continue;
+            }
+
+            // Calculate needed groups based on remaining capacity
+            const GROUP_CAPACITY = 16;
+            const groupsNeeded = Math.min(
+                Math.ceil(totalStudents / GROUP_CAPACITY),
+                Math.floor(remainingCapacity / GROUP_CAPACITY) || 1 // At least 1 if there is some capacity
+            );
 
             // Create Slots
             const slots: WorkshopSlot[] = [];
@@ -122,12 +148,20 @@ export class AutoAssignmentService {
             const peticio = await prisma.peticio.findUnique({ where: { id_peticio: group.peticioId } });
             if (!peticio) continue;
 
+            // 1. Auto-approve if it was Pendent
+            if (peticio.estat === 'Pendent') {
+                console.log(`✅ AutoAssignmentService: Auto-approving petition ${peticio.id_peticio} for center ID ${peticio.id_centre}`);
+                await prisma.peticio.update({
+                    where: { id_peticio: peticio.id_peticio },
+                    data: { estat: 'Aprovada' }
+                });
+            }
+
             const assignacio = await prisma.assignacio.create({
                 data: {
                     id_peticio: group.peticioId,
                     id_centre: peticio.id_centre,
                     id_taller: group.workshopId,
-                    grup: group.groupId,
                     estat: 'En_curs'
                 }
             });
