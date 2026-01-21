@@ -59,7 +59,7 @@ app.use(
 app.use(express.json());
 
 // Rutas API
-app.use('/api', routes);
+app.use('/', routes);
 
 // Error Handler (Debe ir después de las rutas)
 app.use(errorHandler);
