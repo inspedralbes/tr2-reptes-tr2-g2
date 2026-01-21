@@ -17,7 +17,7 @@ export interface AssignmentResult {
 }
 
 export class AssignmentSolver {
-  
+
   /**
    * Distributes students into workshop slots respecting constraints.
    * Constraints:
@@ -61,14 +61,14 @@ export class AssignmentSolver {
         // Let's pick the one with fewest students from this center to maximize diversity
         // Or fewest total students to balance load
         validSlots.sort((a, b) => {
-           // Primary: count of same center (ascending)
-           const countA = a.s.centerCounts[student.centerId] || 0;
-           const countB = b.s.centerCounts[student.centerId] || 0;
-           if (countA !== countB) return countA - countB;
-           // Secondary: total assigned (ascending) -> balances groups
-           return a.s.assigned.length - b.s.assigned.length;
+          // Primary: count of same center (ascending)
+          const countA = a.s.centerCounts[student.centerId] || 0;
+          const countB = b.s.centerCounts[student.centerId] || 0;
+          if (countA !== countB) return countA - countB;
+          // Secondary: total assigned (ascending) -> balances groups
+          return a.s.assigned.length - b.s.assigned.length;
         });
-        
+
         bestSlotIndex = validSlots[0].i;
       }
 
@@ -100,7 +100,6 @@ export class AssignmentSolver {
       });
     });
 
-    console.log(`Assignment Complete. Assigned: ${results.length}, Unassigned: ${unassigned.length}`);
     return results;
   }
 }

@@ -33,7 +33,7 @@ export class RiskAnalysisService {
             let absences = 0;
             let late = 0;
 
-            recentAttendance.forEach((a: any) => {
+            recentAttendance.forEach((a) => {
                 if (a.estat === 'Absencia') absences++;
                 if (a.estat === 'Retard') late++;
             });

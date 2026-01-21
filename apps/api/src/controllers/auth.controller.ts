@@ -28,7 +28,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const secret = process.env.JWT_SECRET || 'secreto_super_seguro';
-    console.log('[DEBUG] AuthController signing with secret:', secret);
+
 
     const token = jwt.sign(
       {
