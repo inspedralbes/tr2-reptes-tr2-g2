@@ -4,9 +4,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { THEME } from '@iter/shared';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function PerfilScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [notifications, setNotifications] = useState(true);
   const [user, setUser] = useState<any>(null);
 
@@ -65,76 +67,98 @@ export default function PerfilScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-[#F9FAFB] pt-4" showsVerticalScrollIndicator={false}>
-
-      <View className="p-6 pt-10">
-        {/* User Info Section */}
-        <View className="bg-white p-8 border border-gray-200 mb-10 flex-row items-center">
-          <View className="w-20 h-20 bg-blue-50 items-center justify-center mr-8 border border-blue-100">
-            <Text className="text-3xl font-bold text-[#3B82F6]">{getUserInitials()}</Text>
-          </View>
-          <View className="flex-1">
-            <Text className="text-2xl font-bold text-gray-900 tracking-tight">{user?.nom_complet || 'Usuari'}</Text>
-            <Text className="text-primary font-bold text-xs mt-1 uppercase tracking-wider">{user?.role === 'PROFESSOR' ? 'Professor' : 'Administrador'}</Text>
-            <Text className="text-gray-400 font-medium text-[10px] mt-1">Connectat a Iter</Text>
-          </View>
-        </View>
-
-        {/* Settings Section */}
-        <Text className="text-sm font-bold text-gray-800 uppercase tracking-wider mb-6">Configuració</Text>
+    <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#F9FAFB]">
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         
-        <View className="bg-white border border-gray-200 mb-6">
-          <View className="p-6 flex-row justify-between items-center border-b border-gray-100">
-            <View className="flex-row items-center">
-              <View className="bg-gray-50 p-2 mr-4">
-                <Ionicons name="notifications-outline" size={18} color="#64748B" />
-              </View>
-              <Text className="font-bold text-xs text-gray-700">Notificacions Push</Text>
-            </View>
-            <Switch 
-              value={notifications}
-              onValueChange={setNotifications}
-              trackColor={{ false: '#D1D5DB', true: THEME.colors.primary }}
-              thumbColor="white"
-            />
-          </View>
+        {/* Professional Header */}
+        <View className="px-6 pb-6 pt-4 bg-white border-b border-gray-100 mb-6">
+           <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
+             Espai Personal
+           </Text>
+           <Text className="text-3xl font-extrabold text-slate-900 leading-tight">
+             El Meu Perfil
+           </Text>
+        </View>
+
+        <View className="px-6"> 
           
-          <TouchableOpacity className="p-6 flex-row justify-between items-center border-b border-gray-100">
-            <View className="flex-row items-center">
-              <View className="bg-gray-50 p-2 mr-4">
-                <Ionicons name="lock-closed-outline" size={18} color="#64748B" />
-              </View>
-              <Text className="font-bold text-xs text-gray-700">Canviar Contrasenya</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={16} color="#CBD5E1" />
-          </TouchableOpacity>
+          {/* User ID Card */}
+          <View className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 flex-row items-center">
+             <View className="w-20 h-20 rounded-full bg-slate-900 items-center justify-center mr-6 border-4 border-gray-50 shadow-sm">
+                <Text className="text-2xl font-black text-white">{getUserInitials()}</Text>
+             </View>
+             <View className="flex-1">
+                <Text className="text-2xl font-extrabold text-slate-900 leading-tight mb-1" numberOfLines={1}>
+                  {user?.nom_complet || 'Carregant...'}
+                </Text>
+                <View className="bg-blue-50 self-start px-2 py-1 rounded-md border border-blue-100">
+                   <Text className="text-blue-700 text-[10px] font-bold uppercase tracking-wide">
+                     {user?.role === 'PROFESSOR' ? 'Professorat' : 'Administrador'}
+                   </Text>
+                </View>
+             </View>
+          </View>
 
-          <TouchableOpacity className="p-6 flex-row justify-between items-center border-b border-gray-100">
-            <View className="flex-row items-center">
-              <View className="bg-gray-50 p-2 mr-4">
-                <Ionicons name="help-circle-outline" size={18} color="#64748B" />
-              </View>
-              <Text className="font-bold text-xs text-gray-700">Centre d'Ajuda</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={16} color="#CBD5E1" />
-          </TouchableOpacity>
+          {/* Settings Group */}
+          <Text className="text-slate-900 text-lg font-bold mb-4">Configuració</Text>
+          
+          <View className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-8 shadow-sm">
+             
+             {/* Notificacions */}
+             <View className="p-4 flex-row justify-between items-center border-b border-gray-50">
+               <View className="flex-row items-center">
+                 <View className="w-10 h-10 rounded-xl bg-gray-50 items-center justify-center mr-4">
+                   <Ionicons name="notifications" size={20} color="#64748B" />
+                 </View>
+                 <Text className="font-bold text-sm text-slate-700">Notificacions Push</Text>
+               </View>
+               <Switch 
+                 value={notifications}
+                 onValueChange={setNotifications}
+                 trackColor={{ false: '#E2E8F0', true: '#3B82F6' }}
+                 thumbColor="white"
+               />
+             </View>
+             
+             {/* Change Password */}
+             <TouchableOpacity className="p-4 flex-row justify-between items-center border-b border-gray-50">
+               <View className="flex-row items-center">
+                 <View className="w-10 h-10 rounded-xl bg-gray-50 items-center justify-center mr-4">
+                   <Ionicons name="lock-closed" size={20} color="#64748B" />
+                 </View>
+                 <Text className="font-bold text-sm text-slate-700">Seguretat i Contrasenya</Text>
+               </View>
+               <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
+             </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleLogout} className="p-6 flex-row justify-between items-center">
-            <View className="flex-row items-center">
-              <View className="bg-red-50 p-2 mr-4">
-                <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-              </View>
-              <Text className="font-bold text-xs text-red-500">Tancar Sessió</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={16} color="#FEE2E2" />
-          </TouchableOpacity>
+             {/* Help Center */}
+             <TouchableOpacity className="p-4 flex-row justify-between items-center">
+               <View className="flex-row items-center">
+                 <View className="w-10 h-10 rounded-xl bg-gray-50 items-center justify-center mr-4">
+                   <Ionicons name="help-buoy" size={20} color="#64748B" />
+                 </View>
+                 <Text className="font-bold text-sm text-slate-700">Suport i Ajuda</Text>
+               </View>
+               <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
+             </TouchableOpacity>
+
+          </View>
+
+          {/* Logout Button */}
+           <TouchableOpacity 
+             onPress={handleLogout} 
+             className="bg-red-50 rounded-2xl p-4 border border-red-100 flex-row items-center justify-center mb-10"
+           >
+             <Ionicons name="log-out" size={20} color="#EF4444" className="mr-2" />
+             <Text className="text-red-600 font-bold text-sm uppercase tracking-wider ml-2">Tancar Sessió</Text>
+           </TouchableOpacity>
+
+           {/* Version Footer */}
+           <View className="items-center pb-8">
+              <Text className="text-xs text-gray-400 font-bold uppercase tracking-widest">Iter App v1.0.0</Text>
+           </View>
         </View>
-
-        <View className="mt-12 items-center">
-          <Text className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Iter App v1.0.0</Text>
-          <Text className="text-[9px] text-gray-300 font-bold mt-2 uppercase">© 2026 Consorci d'Educació de Barcelona</Text>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
