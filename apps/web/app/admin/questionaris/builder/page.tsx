@@ -62,7 +62,7 @@ export default function QuestionnaireBuilderPage() {
             title="Constructor de Qüestionaris"
             subtitle="Crea formularis dinàmics per a centres, docents o alumnat."
         >
-            <div className="max-w-4xl mx-auto pb-20">
+            <div className="w-full pb-20">
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Configuració Bàsica */}
                     <div className="bg-white p-10 border shadow-sm space-y-8">

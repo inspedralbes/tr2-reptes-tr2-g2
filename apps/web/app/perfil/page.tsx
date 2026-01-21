@@ -20,7 +20,7 @@ export default function ProfilePage() {
       title="El meu Perfil"
       subtitle="Gestiona la teva informació personal i preferències de l'acadèmia."
     >
-      <div className="max-w-4xl mx-auto">
+      <div className="w-full">
         <div className="bg-white shadow-sm border border-gray-100 overflow-hidden">
           {/* Header/Cover */}
           <div className="h-32 bg-gradient-to-r from-blue-600 to-blue-800"></div>

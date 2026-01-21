@@ -57,27 +57,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
 
   return (
     <div className="sticky top-0 z-50">
-      {/* Top Bar - Auxiliary links and user info */}
-      <div className="bg-[#EAEFF2] border-b text-[#00426B] text-[10px] font-bold uppercase tracking-wider py-1.5 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex gap-4">
-            <span className="hover:underline cursor-pointer">Idioma</span>
-            <span className="hover:underline cursor-pointer">Notícies</span>
-            <span className="hover:underline cursor-pointer">Contacte</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span>{user.nom_complet} | {user.rol.nom_rol} {user.centre?.nom ? `• ${user.centre.nom}` : ''}</span>
-            <button
-              onClick={logout}
-              className="hover:text-red-600 transition-colors"
-            >
-              Cerrar Sesión
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Bar - Logo and Primary Nav */}
+      {/* Main Bar - Logo, Primary Nav and User Info */}
       <nav className="bg-[#00426B] border-b border-[#00426B] shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-14">
@@ -117,14 +97,16 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Cerca..."
-                  className="bg-white/10 border border-white/20 text-white text-[10px] px-2 py-1 focus:outline-none focus:bg-white/20 transition-all placeholder:text-white/40"
-                />
-              </div>
+            <div className="flex items-center gap-6">
+              <span className="text-white/80 text-[10px] font-bold uppercase tracking-widest hidden md:block">
+                {user.nom_complet} {user.centre?.nom ? `• ${user.centre.nom}` : ''}
+              </span>
+              <button
+                onClick={logout}
+                className="bg-white/10 hover:bg-white/20 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 border border-white/20 transition-all"
+              >
+                Cerrar Sesión
+              </button>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
 import { THEME, PHASES } from '@iter/shared';
+import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
 
 export default function AssignacionsPage() {
@@ -40,21 +41,11 @@ export default function AssignacionsPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen p-8" style={{ backgroundColor: THEME.colors.background }}>
-      <div className="max-w-6xl mx-auto">
-        <button
-          onClick={() => router.push('/centro')}
-          className="mb-6 text-sm flex items-center gap-2 hover:underline"
-          style={{ color: THEME.colors.primary }}
-        >
-          ← Volver al panel
-        </button>
-
-        <header className="mb-10">
-          <h2 className="text-3xl font-bold">Talleres Asignados</h2>
-          <p className="text-gray-600">Aquí puedes consultar el estado de tus talleres y el centro referente.</p>
-        </header>
-
+    <DashboardLayout
+      title="Talleres Asignados"
+      subtitle="Aquí puedes consultar el estado de tus talleres y el centro referente."
+    >
+      <div className="w-full">
         {assignacions.length === 0 ? (
           <div className="bg-blue-50 border border-blue-200 p-8 rounded-xl text-center">
             <p className="text-blue-700">Aún no se han comunicado las asignaciones oficiales (previsto para el 20 de octubre).</p>
@@ -109,8 +100,8 @@ export default function AssignacionsPage() {
                     onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push(`/centro/assignacions/${a.id_assignacio}/profesores`)}
                     disabled={!isPhaseActive(PHASES.PLANIFICACION)}
                     className={`py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${isPhaseActive(PHASES.PLANIFICACION)
-                        ? 'border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white'
-                        : 'border-gray-200 text-gray-300 cursor-not-allowed'
+                      ? 'border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white'
+                      : 'border-gray-200 text-gray-300 cursor-not-allowed'
                       }`}
                   >
                     Designar Professors
@@ -119,8 +110,8 @@ export default function AssignacionsPage() {
                     onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push(`/centro/assignacions/${a.id_assignacio}/alumnos`)}
                     disabled={!isPhaseActive(PHASES.PLANIFICACION)}
                     className={`py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${isPhaseActive(PHASES.PLANIFICACION)
-                        ? 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
-                        : 'border-gray-200 text-gray-300 cursor-not-allowed'
+                      ? 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
+                      : 'border-gray-200 text-gray-300 cursor-not-allowed'
                       }`}
                   >
                     Registro Nominal
@@ -130,8 +121,8 @@ export default function AssignacionsPage() {
                   <button
                     onClick={() => (isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) ? router.push(`/centro/assignacions/${a.id_assignacio}/evaluacions`) : alert('Documentació encara no disponible')}
                     className={`w-full py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${(isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE))
-                        ? 'border-accent text-accent hover:bg-accent hover:text-white'
-                        : 'border-gray-100 text-gray-300'
+                      ? 'border-accent text-accent hover:bg-accent hover:text-white'
+                      : 'border-gray-100 text-gray-300'
                       }`}
                   >
                     {(isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) ? 'Avaluar Alumnes' : 'Consultar Documentació'}
@@ -177,6 +168,6 @@ export default function AssignacionsPage() {
           </section>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

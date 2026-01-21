@@ -38,7 +38,7 @@ export default function AdminReportsPage() {
             title="Dashboard d'Avaluació"
             subtitle="Analitza la qualitat i l'impacte del Programa Enginy."
         >
-            <div className="max-w-6xl mx-auto pb-20 space-y-12">
+            <div className="w-full pb-20 space-y-12">
 
                 {/* Métriques Generals */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

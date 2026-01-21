@@ -177,7 +177,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
             title={`Avaluació d'Alumne`}
             subtitle={`${inscripcio.alumne?.nom} ${inscripcio.alumne?.cognoms}`}
         >
-            <div className="max-w-4xl mx-auto pb-20">
+            <div className="w-full pb-20">
                 <button
                     onClick={() => router.push(`/centro/assignacions/${id}/evaluacions`)}
                     className="mb-8 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black transition-colors flex items-center gap-2"
@@ -237,8 +237,8 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                                                         type="button"
                                                         onClick={() => handleRatingChange(c.id_competencia, v)}
                                                         className={`w-10 h-10 border-2 font-black transition-all ${form.competencies.find(comp => comp.id_competencia === c.id_competencia)?.puntuacio === v
-                                                                ? 'bg-blue-900 border-blue-900 text-white shadow-md scale-110'
-                                                                : 'bg-white border-gray-200 text-gray-300 hover:border-blue-200'
+                                                            ? 'bg-blue-900 border-blue-900 text-white shadow-md scale-110'
+                                                            : 'bg-white border-gray-200 text-gray-300 hover:border-blue-200'
                                                             }`}
                                                     >
                                                         {v}
@@ -268,8 +268,8 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                                                         type="button"
                                                         onClick={() => handleRatingChange(c.id_competencia, v)}
                                                         className={`w-10 h-10 border-2 font-black transition-all ${form.competencies.find(comp => comp.id_competencia === c.id_competencia)?.puntuacio === v
-                                                                ? 'bg-blue-900 border-blue-900 text-white shadow-md scale-110'
-                                                                : 'bg-white border-gray-200 text-gray-300 hover:border-blue-200'
+                                                            ? 'bg-blue-900 border-blue-900 text-white shadow-md scale-110'
+                                                            : 'bg-white border-gray-200 text-gray-300 hover:border-blue-200'
                                                             }`}
                                                     >
                                                         {v}

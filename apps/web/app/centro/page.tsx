@@ -61,15 +61,10 @@ export default function CentroDashboard() {
     );
   }
 
-  const headerActions = (
-    <ResourcesWidget />
-  );
-
   return (
     <DashboardLayout
       title={`Panell de Centre: ${user.centre?.nom || 'Educatiu'}`}
       subtitle="Procés de gestió de tallers d'Iter."
-      actions={headerActions}
     >
       {/* Timeline Secció Institucional */}
       <section className="bg-white border border-gray-200 p-12 mb-12 relative overflow-hidden">
@@ -103,8 +98,8 @@ export default function CentroDashboard() {
                 <div key={fase.id_fase} className="relative flex flex-col items-center text-center group/phase flex-1">
                   <div
                     className={`w-14 h-14 flex items-center justify-center mb-6 z-10 border-4 transition-all duration-500 scale-100 ${fase.activa
-                        ? 'border-[#0775AB] bg-[#00426B] text-white shadow-xl scale-110'
-                        : 'border-[#EAEFF2] bg-white text-gray-300 group-hover/phase:border-[#0775AB] group-hover/phase:text-[#0775AB]'
+                      ? 'border-[#0775AB] bg-[#00426B] text-white shadow-xl scale-110'
+                      : 'border-[#EAEFF2] bg-white text-gray-300 group-hover/phase:border-[#0775AB] group-hover/phase:text-[#0775AB]'
                       }`}
                   >
                     <span className="text-lg font-black italic tracking-tighter">
@@ -119,11 +114,6 @@ export default function CentroDashboard() {
                     }`}>
                     {new Date(fase.data_inici).toLocaleDateString('ca-ES', { day: 'numeric', month: 'short' })}
                   </div>
-                  {fase.activa && (
-                    <div className="mt-4">
-                      <span className="px-3 py-1 bg-[#0775AB] text-white text-[9px] font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-500/20">Activa</span>
-                    </div>
-                  )}
                 </div>
               ))
             )}
@@ -132,12 +122,12 @@ export default function CentroDashboard() {
       </section>
 
       {/* Accesos Directos - Targetes Estil edubcn */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      < div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" >
         <div
           onClick={() => isPhaseActive(PHASES.SOLICITUD) && router.push('/centro/peticions')}
           className={`group p-10 border transition-all duration-500 relative overflow-hidden ${isPhaseActive(PHASES.SOLICITUD)
-              ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
-              : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
+            ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
+            : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
         >
           <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${isPhaseActive(PHASES.SOLICITUD) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
@@ -154,8 +144,8 @@ export default function CentroDashboard() {
         <div
           onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push('/centro/alumnos')}
           className={`group p-10 border transition-all duration-500 relative overflow-hidden ${isPhaseActive(PHASES.PLANIFICACION)
-              ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
-              : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
+            ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
+            : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
         >
           <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${isPhaseActive(PHASES.PLANIFICACION) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
@@ -172,8 +162,8 @@ export default function CentroDashboard() {
         <div
           onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push('/centro/profesores')}
           className={`group p-10 border transition-all duration-500 relative overflow-hidden ${isPhaseActive(PHASES.PLANIFICACION)
-              ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
-              : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
+            ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
+            : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
         >
           <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${isPhaseActive(PHASES.PLANIFICACION) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
@@ -189,8 +179,8 @@ export default function CentroDashboard() {
         <div
           onClick={() => (isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) && router.push('/centro/assignacions')}
           className={`group p-10 border transition-all duration-500 relative overflow-hidden ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE))
-              ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
-              : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
+            ? 'bg-white border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-2xl'
+            : 'bg-[#F2F2F3] border-gray-300 opacity-60 cursor-not-allowed'
             }`}
         >
           <div className={`w-16 h-16 flex items-center justify-center mb-8 border transition-all duration-300 ${(isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) ? 'bg-[#EAEFF2] text-[#00426B] border-[#EAEFF2] group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-200 text-gray-400 border-gray-200'
@@ -202,7 +192,7 @@ export default function CentroDashboard() {
           <h3 className="text-xl font-black text-[#00426B] mb-3 uppercase tracking-tight">Assignacions</h3>
           <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">Consulta la planificació i estat dels tallers adjudicats.</p>
         </div>
-      </div>
-    </DashboardLayout>
+      </div >
+    </DashboardLayout >
   );
 }

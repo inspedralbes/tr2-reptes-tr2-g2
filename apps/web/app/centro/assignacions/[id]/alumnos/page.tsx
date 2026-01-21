@@ -27,12 +27,12 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
     const fetchData = async () => {
       try {
         const api = getApi();
-        
+
         // Fetch phases first for gating
         const resFases = await api.get("/fases");
         const phasesData = resFases.data.data;
         const isPlanificacio = phasesData.find((f: any) => f.nom === PHASES.PLANIFICACION)?.activa;
-        
+
         if (!isPlanificacio) {
           alert('El període de registre nominal no està actiu.');
           router.push('/centro/assignacions');
@@ -42,7 +42,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
         // Fetch assignment with inscriptions
         const resAssig = await api.get(`/assignacions/centre/${currentUser.id_centre}`);
         const found = resAssig.data.find((a: any) => a.id_assignacio === parseInt(id));
-        
+
         if (!found) {
           alert('Assignació no trobada o no autoritzada.');
           router.push('/centro/assignacions');
@@ -54,7 +54,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
         if (found.inscripcions) {
           setSelectedIds(found.inscripcions.map((i: any) => i.id_alumne));
         }
-        
+
         // Fetch all students from center
         const resAlumnes = await api.get(`/alumnes/centre/${currentUser.id_centre}`);
         setAlumnes(resAlumnes.data || []);
@@ -72,14 +72,14 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
     setSelectedIds(prev => {
       const isSelected = prev.includes(idAlumne);
       const plazasMax = assignacio?.peticio?.alumnes_aprox || 0;
-      
+
       if (!isSelected && prev.length >= plazasMax) {
         alert(`Has arribat al límit de ${plazasMax} places sol·licitades.`);
         return prev;
       }
-      
-      return isSelected 
-        ? prev.filter(i => i !== idAlumne) 
+
+      return isSelected
+        ? prev.filter(i => i !== idAlumne)
         : [...prev, idAlumne];
     });
   };
@@ -90,7 +90,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
       const api = getApi();
       // 1. Save inscriptions (Nominal Register)
       await api.post(`/assignacions/${id}/inscripcions`, { ids_alumnes: selectedIds });
-      
+
       // 2. Update Checklist Item etc.
       alert('Registre Nominal desat amb èxit.');
       router.push('/centro/assignacions');
@@ -133,11 +133,11 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
   const isFull = selectedIds.length === plazasAsignadas;
 
   return (
-    <DashboardLayout 
-      title={`Registre Nominal: ${assignacio.taller?.titol}`} 
+    <DashboardLayout
+      title={`Registre Nominal: ${assignacio.taller?.titol}`}
       subtitle={`En aquesta fase has de designar els ${plazasAsignadas} alumnes que participaran.`}
     >
-      <div className="max-w-4xl mx-auto pb-20">
+      <div className="w-full pb-20">
         <div className="mb-6 flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-800">Assignació d'Alumnes</h2>
           <div className="flex gap-2">
@@ -148,7 +148,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
               Importar Excel
               <input type="file" className="hidden" accept=".xlsx,.xls" onChange={handleExcelUpload} disabled={loading} />
             </label>
-            <button 
+            <button
               onClick={() => router.push('/centro/alumnos')}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg flex items-center gap-2"
             >
@@ -190,7 +190,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
             {alumnes.length === 0 ? (
               <div className="p-20 text-center">
                 <p className="text-sm text-gray-400 italic">No s'han trobat alumnes registrats al centre.</p>
-                <button 
+                <button
                   onClick={() => router.push('/centro/alumnos')}
                   className="mt-4 text-xs font-bold text-blue-600 hover:underline"
                 >
@@ -201,19 +201,17 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
               alumnes.map(alum => {
                 const isSelected = selectedIds.includes(alum.id_alumne);
                 return (
-                  <div 
+                  <div
                     key={alum.id_alumne}
                     onClick={() => toggleAlumne(alum.id_alumne)}
-                    className={`px-8 py-5 flex justify-between items-center cursor-pointer transition-all ${
-                      isSelected 
-                        ? 'bg-blue-50/50' 
+                    className={`px-8 py-5 flex justify-between items-center cursor-pointer transition-all ${isSelected
+                        ? 'bg-blue-50/50'
                         : 'hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-6">
-                      <div className={`w-12 h-12 flex items-center justify-center font-black italic text-sm transition-all ${
-                        isSelected ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-300'
-                      }`}>
+                      <div className={`w-12 h-12 flex items-center justify-center font-black italic text-sm transition-all ${isSelected ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-300'
+                        }`}>
                         {alum.nom.charAt(0)}{alum.cognoms.charAt(0)}
                       </div>
                       <div>
@@ -225,10 +223,9 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
                         </p>
                       </div>
                     </div>
-                    <div className={`w-6 h-6 border-2 flex items-center justify-center transition-all ${
-                      isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-200'
-                    }`}>
-                      {isSelected && <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>}
+                    <div className={`w-6 h-6 border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-200'
+                      }`}>
+                      {isSelected && <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" /></svg>}
                     </div>
                   </div>
                 );
@@ -237,19 +234,18 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
           </div>
 
           <div className="p-8 bg-gray-50 border-t flex flex-col sm:flex-row gap-4">
-            <button 
+            <button
               onClick={handleSave}
               disabled={loading || selectedIds.length === 0}
-              className={`flex-1 py-4 font-black uppercase text-xs tracking-[0.2em] shadow-lg transition-all flex items-center justify-center gap-3 ${
-                loading || selectedIds.length === 0
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
-                : 'bg-blue-900 text-white hover:bg-black active:scale-95'
-              }`}
+              className={`flex-1 py-4 font-black uppercase text-xs tracking-[0.2em] shadow-lg transition-all flex items-center justify-center gap-3 ${loading || selectedIds.length === 0
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                  : 'bg-blue-900 text-white hover:bg-black active:scale-95'
+                }`}
             >
               {loading ? 'Processant...' : 'Confirmar Registre Nominal'}
-              {!loading && <svg className="w-4 h-4" fill="white" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>}
+              {!loading && <svg className="w-4 h-4" fill="white" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" /></svg>}
             </button>
-            <button 
+            <button
               onClick={() => router.back()}
               className="px-10 bg-white text-gray-400 py-4 font-black uppercase text-xs tracking-widest border border-gray-200 hover:bg-gray-100 transition-all"
             >
@@ -257,7 +253,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
             </button>
           </div>
         </div>
-        
+
         <div className="mt-8 p-6 bg-blue-50/50 border-l-4 border-blue-900 text-blue-900 text-xs font-bold flex gap-4 items-start">
           <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           <div>

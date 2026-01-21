@@ -58,7 +58,7 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
             title={`Avaluació de Competències: ${assignacio.taller?.titol}`}
             subtitle="Qualifica el desempreny de l'alumnat participant en el taller."
         >
-            <div className="max-w-4xl mx-auto pb-20">
+            <div className="w-full pb-20">
                 <button
                     onClick={() => router.push('/centro/assignacions')}
                     className="mb-8 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black transition-colors flex items-center gap-2"

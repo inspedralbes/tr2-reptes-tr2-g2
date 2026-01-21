@@ -38,7 +38,7 @@ export default function AdminQuestionnairesPage() {
             title="Gestió de Qüestionaris"
             subtitle="Administra els models de formularis dinàmics i visualitza les respostes."
         >
-            <div className="max-w-5xl mx-auto pb-20">
+            <div className="w-full pb-20">
                 <div className="flex justify-between items-center mb-10">
                     <h2 className="text-xl font-black uppercase tracking-tighter text-gray-800">Models Disponibles</h2>
                     <button
@@ -62,7 +62,7 @@ export default function AdminQuestionnairesPage() {
                                 <div>
                                     <div className="flex justify-between items-start mb-4">
                                         <span className={`px-3 py-1 text-[8px] font-black uppercase tracking-widest ${m.destinatari === 'ALUMNE' ? 'bg-blue-100 text-blue-700' :
-                                                m.destinatari === 'DOCENT' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
+                                            m.destinatari === 'DOCENT' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
                                             }`}>
                                             {m.destinatari}
                                         </span>

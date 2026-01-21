@@ -21,9 +21,9 @@ export default function CalendarPage() {
           api.get("/calendar"),
           api.get("/fases")
         ]);
-        
+
         const phasesData = phasesRes.data.data;
-        
+
         // Transform phases into calendar events
         const phaseEvents = phasesData.map((f: any) => ({
           id: `fase-${f.id_fase}`,
@@ -51,11 +51,11 @@ export default function CalendarPage() {
   if (authLoading) return null;
 
   return (
-    <DashboardLayout 
-      title="Calendari Iter" 
+    <DashboardLayout
+      title="Calendari Iter"
       subtitle="Visualitza totes les fites, tallers i terminis en un sol lloc."
     >
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="w-full space-y-6">
 
 
         {loading ? (
@@ -66,12 +66,12 @@ export default function CalendarPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-3">
-              <Calendar 
-                events={events} 
-                onEventClick={(e: CalendarEvent) => setSelectedEvent(e)} 
+              <Calendar
+                events={events}
+                onEventClick={(e: CalendarEvent) => setSelectedEvent(e)}
               />
             </div>
-            
+
             <div className="space-y-6">
               <div className="bg-white p-8 border border-gray-200">
                 <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-8">Llegenda</h3>
@@ -104,7 +104,7 @@ export default function CalendarPage() {
                   {selectedEvent.description && (
                     <p className="text-sm text-gray-500 leading-relaxed mb-6 italic">"{selectedEvent.description}"</p>
                   )}
-                  <button 
+                  <button
                     onClick={() => setSelectedEvent(null)}
                     className="w-full py-3 bg-gray-50 text-gray-400 font-bold border border-gray-200 text-xs uppercase tracking-widest hover:bg-gray-100 transition-colors"
                   >
