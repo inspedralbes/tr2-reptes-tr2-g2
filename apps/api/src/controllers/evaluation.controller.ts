@@ -67,16 +67,31 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
         // 2. Update Competence (if detected)
         let competenceEvaluation = null;
         if (result.competenceUpdate && inscripcio) {
-            // Find 'Transversal' competence or specific one. 
-            // We'll pick the first transversal one for demo purposes.
+            // Find 'Transversal' competence or specific one.
             const competencia = await prisma.competencia.findFirst({
                 where: { tipus: 'Transversal' }
             });
 
             if (competencia) {
+                // Ensure AvaluacioDocent exists
+                let docentEval = await prisma.avaluacioDocent.findUnique({
+                    where: { id_inscripcio: inscripcio.id_inscripcio }
+                });
+
+                if (!docentEval) {
+                    docentEval = await prisma.avaluacioDocent.create({
+                        data: {
+                            id_inscripcio: inscripcio.id_inscripcio,
+                            percentatge_asistencia: 100, // Default initialization
+                            numero_retards: 0,
+                            observacions: 'Inicializado por Asistente de Voz'
+                        }
+                    });
+                }
+
                 competenceEvaluation = await prisma.avaluacioCompetencial.create({
                     data: {
-                        id_inscripcio: inscripcio.id_inscripcio,
+                        id_avaluacio_docent: docentEval.id_avaluacio_docent,
                         id_competencia: competencia.id_competencia,
                         puntuacio: result.competenceUpdate.score
                     }
