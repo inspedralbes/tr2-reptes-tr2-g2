@@ -43,7 +43,7 @@ app.use(cors({
 app.use(express.json());
 
 // Rutas API
-app.use('/', routes);
+app.use('/api', routes);
 
 // Error Handler (Debe ir después de las rutas)
 app.use(errorHandler);

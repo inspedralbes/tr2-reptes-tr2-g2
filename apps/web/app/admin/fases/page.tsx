@@ -131,7 +131,7 @@ export default function PhaseManagementPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4 bg-gray-50/50 border border-gray-100">
                       <div>
-                        <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                           Data obertura
                         </label>
@@ -143,7 +143,7 @@ export default function PhaseManagementPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                           Data tancament
                         </label>

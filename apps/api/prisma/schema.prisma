@@ -99,6 +99,7 @@ model Usuari {
   assignacio_professors AssignacioProfessor[]
   logs                  LogAuditoria[]
   notificacions         Notificacio[]
+  professor             Professor?
 
   @@map("usuaris")
 }
@@ -109,11 +110,13 @@ model Professor {
   contacte     String?
   id_centre    Int
   centre       Centre  @relation(fields: [id_centre], references: [id_centre])
+  id_usuari    Int?    @unique
+  usuari       Usuari? @relation(fields: [id_usuari], references: [id_usuari], onDelete: Cascade)
 
-  peticiones1 Peticio[]    @relation("Profesor1")
-  peticiones2 Peticio[]    @relation("Profesor2")
-  assig1      Assignacio[] @relation("AssigProf1")
-  assig2      Assignacio[] @relation("AssigProf2")
+  peticions1 Peticio[]    @relation("Profesor1")
+  peticions2 Peticio[]    @relation("Profesor2")
+  assig1     Assignacio[] @relation("AssigProf1")
+  assig2     Assignacio[] @relation("AssigProf2")
 
   @@map("professors")
 }
@@ -457,10 +460,10 @@ model LogAuditoria {
 }
 
 // ==========================================
-// 7. CONFIGURACIÓ DINÀMICA
+// 8. CONFIGURACIÓ DINÀMICA
 // ==========================================
 
-model fase {
+model Fase {
   id_fase    Int              @id @default(autoincrement())
   nom        String           @unique
   descripcio String?
@@ -468,15 +471,15 @@ model fase {
   data_fi    DateTime
   activa     Boolean          @default(false)
   ordre      Int              @default(0)
-  events     calendariEvent[]
+  events     CalendariEvent[]
 
   @@map("fases")
 }
 
-model calendariEvent {
+model CalendariEvent {
   id_event   Int      @id @default(autoincrement())
   id_fase    Int
-  fase       fase     @relation(fields: [id_fase], references: [id_fase])
+  fase       Fase     @relation(fields: [id_fase], references: [id_fase])
   titol      String
   descripcio String?
   data       DateTime

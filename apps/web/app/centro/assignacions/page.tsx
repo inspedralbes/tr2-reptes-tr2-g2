@@ -168,16 +168,7 @@ export default function AssignacionsPage() {
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex flex-col sm:flex-row justify-end items-center gap-2">
-                        <button
-                          onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push(`/centro/assignacions/${a.id_assignacio}/profesores`)}
-                          disabled={!isPhaseActive(PHASES.PLANIFICACION)}
-                          className={`px-3 py-2 text-[9px] font-black uppercase tracking-widest border transition-all whitespace-nowrap ${isPhaseActive(PHASES.PLANIFICACION)
-                            ? 'border-[#00426B] text-[#00426B] hover:bg-[#00426B] hover:text-white'
-                            : 'border-gray-200 text-gray-300 cursor-not-allowed'
-                            }`}
-                        >
-                          Designar Professors
-                        </button>
+
                         <button
                           onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push(`/centro/assignacions/${a.id_assignacio}/alumnos`)}
                           disabled={!isPhaseActive(PHASES.PLANIFICACION)}

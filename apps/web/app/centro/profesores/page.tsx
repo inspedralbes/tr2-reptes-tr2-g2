@@ -13,7 +13,8 @@ export default function ProfesoresCRUD() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProf, setEditingProf] = useState<Professor | null>(null);
-  const [formData, setFormData] = useState({ nom: '', contacte: '' });
+  const [formData, setFormData] = useState({ nom: '', contacte: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -64,7 +65,7 @@ export default function ProfesoresCRUD() {
       }
       setIsModalOpen(false);
       setEditingProf(null);
-      setFormData({ nom: '', contacte: '' });
+      setFormData({ nom: '', contacte: '', password: '' });
       loadProfessors();
     } catch (err) {
       console.error(err);
@@ -73,7 +74,7 @@ export default function ProfesoresCRUD() {
 
   const handleEdit = (prof: Professor) => {
     setEditingProf(prof);
-    setFormData({ nom: prof.nom, contacte: prof.contacte });
+    setFormData({ nom: prof.nom, contacte: prof.contacte, password: '' });
     setIsModalOpen(true);
   };
 
@@ -85,7 +86,7 @@ export default function ProfesoresCRUD() {
   };
   const headerActions = (
     <button 
-      onClick={() => { setEditingProf(null); setFormData({ nom: '', contacte: '' }); setIsModalOpen(true); }}
+      onClick={() => { setEditingProf(null); setFormData({ nom: '', contacte: '', password: '' }); setIsModalOpen(true); }}
       className="bg-[#00426B] text-white px-6 py-3 font-black uppercase text-[10px] tracking-widest hover:bg-[#0775AB] transition-all flex items-center gap-2 shadow-lg"
     >
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
@@ -232,13 +233,41 @@ export default function ProfesoresCRUD() {
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Dades de contacte (Email o telèfon)</label>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Dades de contacte (Email principal)</label>
                 <input 
-                  type="text" value={formData.contacte} 
+                  type="email" value={formData.contacte} 
                   onChange={e => setFormData({...formData, contacte: e.target.value})}
-                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" required
+                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" 
+                  placeholder="ejemplo@centro.cat"
+                  required
                 />
               </div>
+
+              {!editingProf && (
+                <div>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 flex justify-between">
+                    Contrasenya (Accés App)
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-[#0775AB] hover:underline"
+                    >
+                      {showPassword ? 'Amagar' : 'Veure'}
+                    </button>
+                  </label>
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    value={formData.password} 
+                    onChange={e => setFormData({...formData, password: e.target.value})}
+                    placeholder="Contrasenya per a l'App mòbil"
+                    className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" 
+                    required={!editingProf}
+                  />
+                  <p className="mt-2 text-[9px] text-gray-400 font-bold uppercase leading-tight">
+                    Aquesta serà la contrasenya que el professor usarà per entrar a l'App.
+                  </p>
+                </div>
+              )}
 
               <div className="flex gap-4 pt-6">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 font-black text-[10px] uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">Cancel·lar</button>

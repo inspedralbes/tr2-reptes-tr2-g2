@@ -211,59 +211,58 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
 
 // POST: Realizar Registro Nominal (Inscribir alumnos en una asignación)
 export const createInscripcions = async (req: Request, res: Response) => {
-  const idAssignacio = req.params.idAssignacio as string;
+  const idAssignacio = parseInt(req.params.idAssignacio as string);
   const { ids_alumnes } = req.body; // Array de IDs de alumnos
 
   try {
-    const assignacio = await prisma.assignacio.findUnique({
-      where: { id_assignacio: parseInt(idAssignacio) }
-    });
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Verificar existencia de la asignación
+      const assignacio = await tx.assignacio.findUnique({
+        where: { id_assignacio: idAssignacio }
+      });
 
-    if (!assignacio) {
-      return res.status(404).json({ error: 'Asignación no encontrada.' });
-    }
+      if (!assignacio) {
+        throw new Error('Asignación no encontrada.');
+      }
 
-    // 1. Crear las inscripciones
-    const inscripcions = await Promise.all(
-      ids_alumnes.map((idAlumne: number) =>
-        prisma.inscripcio.upsert({
-          where: {
-            // Necesitaríamos una clave única para inscripciones si quisiéramos upsert real,
-            // pero como no hay, usaremos create o simplemente borraremos las anteriores
-            id_inscripcio: -1 // Truco para forzar el fallo si no existe y crear
-          },
-          update: {},
-          create: {
-            id_assignacio: parseInt(idAssignacio),
-            id_alumne: idAlumne
-          }
-        }).catch(() =>
-          // Si falla (porque el ID -1 no existe), creamos normalmente
-          prisma.inscripcio.create({
+      // 2. Eliminar inscripciones previas para esta asignación
+      await tx.inscripcio.deleteMany({
+        where: { id_assignacio: idAssignacio }
+      });
+
+      // 3. Crear las nuevas inscripciones
+      const newInscripcions = await Promise.all(
+        ids_alumnes.map((idAlumne: number) =>
+          tx.inscripcio.create({
             data: {
-              id_assignacio: parseInt(idAssignacio),
+              id_assignacio: idAssignacio,
               id_alumne: idAlumne
             }
           })
         )
-      )
-    );
+      );
 
-    // 2. Marcar el ítem del checklist como completado
-    await prisma.checklistAssignacio.updateMany({
-      where: {
-        id_assignacio: parseInt(idAssignacio as string),
-        pas_nom: { contains: 'Registro Nominal' }
-      },
-      data: {
-        completat: true,
-        data_completat: new Date()
-      }
+      // 4. Marcar el ítem del checklist como completado
+      await tx.checklistAssignacio.updateMany({
+        where: {
+          id_assignacio: idAssignacio,
+          pas_nom: { contains: 'Registro Nominal' }
+        },
+        data: {
+          completat: true,
+          data_completat: new Date()
+        }
+      });
+
+      return newInscripcions;
     });
 
-    res.json({ message: 'Registro nominal completado', count: inscripcions.length });
-  } catch (error) {
+    res.json({ message: 'Registro nominal completado', count: result.length });
+  } catch (error: any) {
     console.error("Error al realizar registro nominal:", error);
+    if (error.message === 'Asignación no encontrada.') {
+      return res.status(404).json({ error: error.message });
+    }
     res.status(500).json({ error: 'Error al realizar el registro nominal.' });
   }
 };

@@ -1,5 +1,6 @@
 import prisma from '../lib/prisma';
 import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
 
 export const getProfessors = async (req: Request, res: Response) => {
   const { centreId, role } = (req as any).user || {};
@@ -17,7 +18,14 @@ export const getProfessors = async (req: Request, res: Response) => {
 
     const professors = await prisma.professor.findMany({
       where,
-      include: { centre: true }
+      include: { 
+        centre: true,
+        usuari: {
+          select: {
+            email: true
+          }
+        }
+      }
     });
     res.json(professors);
   } catch (error) {
@@ -27,17 +35,58 @@ export const getProfessors = async (req: Request, res: Response) => {
 
 export const createProfessor = async (req: Request, res: Response) => {
   const { centreId } = (req as any).user;
+  const { nom, contacte, password } = req.body;
+  
   try {
-    const professor = await prisma.professor.create({
-      data: {
-        ...req.body,
-        id_centre: centreId ? parseInt(centreId) : req.body.id_centre
-      }
+    const finalCentreId = centreId ? parseInt(centreId) : req.body.id_centre;
+
+    if (!finalCentreId) {
+      return res.status(400).json({ error: 'ID de centre requerit.' });
+    }
+
+    // Usamos una transacción para asegurar que se creen ambos o ninguno
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Buscar el rol de profesor
+      const rolProfe = await tx.rol.findFirst({
+        where: { nom_rol: 'PROFESSOR' }
+      });
+
+      if (!rolProfe) throw new Error('Rol PROFESSOR no trobat.');
+
+      // 2. Crear el usuario
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash(password || 'Iter@1234', salt);
+
+      const usuari = await tx.usuari.create({
+        data: {
+          nom_complet: nom,
+          email: contacte, // Usamos el contacto como email principal
+          password_hash: passwordHash,
+          id_rol: rolProfe.id_rol,
+          id_centre: finalCentreId
+        }
+      });
+
+      // 3. Crear el profesor vinculado
+      const professor = await tx.professor.create({
+        data: {
+          nom,
+          contacte,
+          id_centre: finalCentreId,
+          id_usuari: usuari.id_usuari
+        }
+      });
+
+      return professor;
     });
-    res.json(professor);
-  } catch (error) {
+
+    res.json(result);
+  } catch (error: any) {
     console.error(error);
-    res.status(500).json({ error: 'Error al crear profesor' });
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'Aquest email ja està en ús.' });
+    }
+    res.status(500).json({ error: 'Error al crear professor i usuari.' });
   }
 };
 

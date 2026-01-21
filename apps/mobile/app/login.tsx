@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
-import { THEME } from '@iter/shared';
+import { THEME, ROLES } from '@iter/shared';
 import { login } from '../services/api';
 
 export default function LoginScreen() {
@@ -12,6 +12,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [roleError, setRoleError] = useState<string | null>(null);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -25,14 +26,13 @@ export default function LoginScreen() {
       const { token, user } = response.data;
 
       // Restricció de rol: Només els PROFESSORS poden entrar a l'app mòbil
-      if (user.rol?.nom_rol !== 'PROFESSOR') {
+      if (user.rol?.nom_rol !== ROLES.PROFESOR) {
         setLoading(false);
-        Alert.alert(
-          'Accés Denegat', 
-          'Aquesta aplicació mòbil és d\'ús exclusiu per a professors. Els administradors i coordinadors han d\'utilitzar la plataforma web.'
-        );
+        setRoleError('Aquesta aplicació és d\'ús exclusiu per a professors. Els administradors i coordinadors han d\'utilitzar la plataforma web.');
         return;
       }
+
+      setRoleError(null);
 
       // Save token and user info
       if (Platform.OS === 'web') {
@@ -43,7 +43,7 @@ export default function LoginScreen() {
         await SecureStore.setItemAsync('user', JSON.stringify(user));
       }
 
-      router.replace('/(professor)');
+      router.replace('/(professor)' as any);
     } catch (error: any) {
       console.error('Login error:', error);
       const message = error.response?.data?.error || 'Error en iniciar sessió. Revisa les teves credencials.';
@@ -108,6 +108,25 @@ export default function LoginScreen() {
               </View>
             </View>
           </View>
+
+          {roleError && (
+            <View className="my-6 p-5 bg-[#F26178]/10 border-l-4 border-[#F26178]">
+              <View className="flex-row items-center mb-2">
+                <Ionicons name="warning-outline" size={18} color="#F26178" />
+                <Text className="ml-2 font-black text-[10px] text-[#F26178] uppercase tracking-widest">Accés Restringit</Text>
+              </View>
+              <Text className="text-xs font-bold text-gray-600 leading-relaxed mb-4">
+                {roleError}
+              </Text>
+              <TouchableOpacity 
+                onPress={() => Linking.openURL('https://iter.consorci.cat')}
+                className="flex-row items-center border-b border-[#F26178] self-start pb-0.5"
+              >
+                <Text className="text-[#F26178] font-black text-[10px] uppercase tracking-widest">Anar a la Plataforma Web</Text>
+                <Ionicons name="arrow-forward" size={12} color="#F26178" className="ml-2" />
+              </TouchableOpacity>
+            </View>
+          )}
 
           <View className="mt-12">
             <TouchableOpacity 
