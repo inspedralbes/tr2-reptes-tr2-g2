@@ -7,26 +7,20 @@ interface MobileNavbarProps {
   title?: string;
 }
 
-const MobileNavbar: React.FC<MobileNavbarProps> = ({ title = 'Programa Iter' }) => {
+const MobileNavbar: React.FC<MobileNavbarProps> = ({ title = 'Iter' }) => {
   return (
     <SafeAreaView style={{ backgroundColor: THEME.colors.primary }}>
-      <View className="flex-row justify-between items-center h-16 px-4 border-b" style={{ borderColor: THEME.colors.primary }}>
-        <View className="flex-row items-center space-x-4">
-          {/* Logo */}
-          <View className="w-8 h-8 bg-white flex items-center justify-center mr-3">
-            <Text style={{ color: THEME.colors.primary }} className="font-black text-xs">E</Text>
+      <View className="flex-row justify-between items-center h-16 px-6 border-b-2 border-primary">
+        <View className="flex-row items-center">
+          {/* Logo - Linear Style */}
+          <View className="w-8 h-8 bg-white flex items-center justify-center mr-4 border-2 border-gray-900 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.2)]">
+            <Text style={{ color: THEME.colors.primary }} className="font-black text-sm">I</Text>
           </View>
-          <Text className="text-xl font-bold text-white tracking-tight">{title}</Text>
+          <View>
+            <Text className="text-xl font-black text-white uppercase tracking-tighter">{title}</Text>
+            <View className="w-12 h-1 bg-secondary mt-0.5" />
+          </View>
         </View>
-
-        <TouchableOpacity 
-          className="bg-white/10 px-3 py-2 border border-white/20 backdrop-blur-sm active:scale-95"
-          activeOpacity={0.7}
-        >
-          <Text className="text-white text-[10px] font-black uppercase tracking-widest">
-            SALIR
-          </Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

@@ -2,7 +2,8 @@
 
 # --- CONFIGURACIÓN ---
 # Directorio donde está tu proyecto en el servidor
-PROJECT_DIR="/ruta/a/tu/proyecto/tr2-reptes-tr2-g2"
+# Si se ejecuta desde el mismo directorio, podemos usar $(pwd)
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Colores para logs bonitos
 GREEN='\033[0;32m'
@@ -26,7 +27,7 @@ chmod +x deploy.sh
 # 4. Reconstrucción inteligente (Docker Prod)
 echo -e "${YELLOW}🐳 Construyendo imágenes de Producción (Multi-stage)...${NC}"
 # Usamos --build para forzar que coja los cambios de código
-docker-compose -f docker-compose.prod.yml up --build -d --remove-orphans
+docker compose -f docker-compose.prod.yml up --build -d --remove-orphans
 
 # 5. Verificación de salud
 if [ $? -eq 0 ]; then

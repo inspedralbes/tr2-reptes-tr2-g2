@@ -79,11 +79,18 @@ docker compose down -v && docker compose up --build
 
 ### 🔑 Credencials de Prova (Seed)
 
-El sistema pobla automàticament la base de dades amb les següents credencials:
+El sistema pobla automàticament la base de dades amb les següents credencials per a proves:
 
-* **Admin Global:** `admin@iter.com` / `admin123`
-* **Professor (Brossa):** `profe.brossa@example.com` / `password123`
-* **Professor (Milà):** `profe.mila@example.com` / `password123`
+* **Administrador:** `admin@admin.com` / `Admin@1234`
+* **Coordinador:** `centros@centros.com` / `Centro@1234`
+* **Professors (Mòbil):** Tots usen la contrasenya **`Profe@1234`**
+
+| Professor/a | Email | Institut (Centre) |
+| :--- | :--- | :--- |
+| **Marta Gil** | `marta@test.com` | Institut Pau Claris |
+| **Sergi Roca** | `sergi@test.com` | Institut Fort Pius |
+| **Clara Bosch** | `clara@test.com` | Institut Montserrat |
+| **Professor Ejemplo** | `profe@profe.com` | Institut Milà i Fontanals |
 
 ## 🐳 Arquitectura Docker Seqüencial
 
@@ -99,7 +106,7 @@ Per evitar conflictes de lectura/escriptura de fitxers, hem implementat un flux 
 * [x] Arrencada Seqüencial Premium.
 * [x] Optimització amb **tsx** i **Turbopack**.
 * [ ] **Motor d'Assignació (AI Constraint Satisfaction):** Algorisme d'optimització per garantir l'heterogeneïtat de grups i respectar límits complexos de places per centre.
-* [ ] **Assistent d'Avaluació per Veu (NLP):** Sistema *Speech-to-Text* que omple automàticament rúbriques i observacions analitzant el dictat del professor.
+* [x] **Assistent d'Avaluació per Veu (NLP):** Sistema *Speech-to-Text* que omple automàticament rúbriques i observacions analitzant el dictat del professor.
 * [ ] **Predicció de Risc d'Abandonament:** Sistema *Early Warning* que alerta als tutors de possibles abandonaments basant-se en patrons d'assistència i baixada de rendiment.
 * [ ] **Validació Documental (Computer Vision):** Verificació automàtica de signatures i estructura de documents (ex: Acords Pedagògics) al pujar-los.
 

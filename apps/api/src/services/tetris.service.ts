@@ -41,7 +41,7 @@ export async function runTetris() {
   });
 
   stats.totalPetitions = petitions.length;
-  stats.totalStudents = petitions.reduce((acc, p) => acc + (p.alumnes_aprox || 0), 0);
+  stats.totalStudents = petitions.reduce((acc: number, p: any) => acc + (p.alumnes_aprox || 0), 0);
 
   // Group by Taller
   const tallerGroups: Record<number, typeof petitions> = {};
@@ -61,7 +61,7 @@ export async function runTetris() {
 
     // Diversity bookkeeping for Modalidad C (if applicable)
     // Though the petitions themselves already restricted to 4, we need to ensure the TOTAL for the taller is correct.
-    
+
     for (const petition of tallerPetitions) {
       const neededPlazas = petition.alumnes_aprox || 0;
 
