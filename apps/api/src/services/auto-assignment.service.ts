@@ -40,7 +40,7 @@ export class AutoAssignmentService {
         const petitionMap = new Map<number, typeof petitions[0]>(); // Map StudentId -> Peticio (to track back)
         const studentPeticioMap = new Map<number, number>();
 
-        petitions.forEach((p: any) => {
+        petitions.forEach((p) => {
             if (!studentsByTaller.has(p.id_taller)) {
                 studentsByTaller.set(p.id_taller, []);
             }
@@ -48,14 +48,12 @@ export class AutoAssignmentService {
 
             // If petition has specific students linked
             if (p.alumnes.length > 0) {
-                p.alumnes.forEach((a: any) => {
+                p.alumnes.forEach((a) => {
                     list.push({ id: a.id_alumne, centerId: p.id_centre });
                     studentPeticioMap.set(a.id_alumne, p.id_peticio);
                 });
             } else {
-                // Validation: Modalitat C usually requires nominal registration beforehand? 
-                // If no students, we can't assign. Skip.
-                console.warn(`Peticio ${p.id_peticio} has no students linked.`);
+                // Validation: Modalitat C usually requires nominal registration beforehand.
             }
         });
 

@@ -56,6 +56,8 @@ export const getPeticions = async (req: Request, res: Response) => {
 export const createPeticio = async (req: Request, res: Response) => {
   const {
     id_taller,
+  const {
+    id_taller,
     alumnes_aprox,
     comentaris,
     prof1_id,
@@ -98,6 +100,8 @@ export const createPeticio = async (req: Request, res: Response) => {
     if (totalAlumnesC + alumnes_aprox > 12) {
       return res.status(400).json({
         error: `Límite excedido. El instituto ya tiene ${totalAlumnesC} alumnos en proyectos de Modalidad C. El máximo total permitido es 12.`
+      return res.status(400).json({
+        error: `Límite excedido. El instituto ya tiene ${totalAlumnesC} alumnos en proyectos de Modalidad C. El máximo total permitido es 12.`
       });
     }
   }
@@ -135,6 +139,7 @@ export const createPeticio = async (req: Request, res: Response) => {
     try {
       const { db } = await connectToDatabase();
 
+
       // 1. Crear Checklist Dinámica (Arrays y Objetos imbricados)
       await db.collection('request_checklists').insertOne({
         id_peticio: nuevaPeticio.id_peticio,
@@ -165,7 +170,7 @@ export const createPeticio = async (req: Request, res: Response) => {
         }
       });
 
-      console.log(`✅ MongoDB: Checklist y Log creados para la petición ${nuevaPeticio.id_peticio}`);
+
     } catch (mongoError) {
       console.warn('⚠️ MongoDB: No se pudo registrar el checklist/log:', mongoError);
     }
@@ -182,6 +187,7 @@ export const updatePeticioStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { estat } = req.body;
 
+
   try {
     const updated = await prisma.peticio.update({
       where: { id_peticio: parseInt(id as string) },
@@ -196,6 +202,7 @@ export const updatePeticioStatus = async (req: Request, res: Response) => {
       tipus: 'PETICIO',
       importancia: updated.estat === 'Aprovada' ? 'INFO' : 'WARNING'
     });
+
 
     res.json(updated);
   } catch (error) {

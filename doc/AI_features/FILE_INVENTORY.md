@@ -13,11 +13,6 @@ Este documento lista todos los archivos y carpetas que han sido creados o modifi
 *   `apps/api/src/controllers/evaluation.controller.ts` (Idea 2)
 *   `apps/api/src/routes/evaluation.routes.ts` (Idea 2)
 
-### Scripts de Prueba (Verificación)
-*   `apps/api/scripts/test-idea-1-solver.ts`
-*   `apps/api/scripts/test-idea-2-voice.ts`
-*   `apps/api/scripts/test-idea-3-risk.ts`
-*   `apps/api/scripts/test-idea-4-vision.ts`
 
 ### Documentación
 *   `doc/AI_features/README.md`

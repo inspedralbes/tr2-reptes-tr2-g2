@@ -56,10 +56,7 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
                 });
             } else {
                 assistencia = await prisma.assistencia.create({
-                    data: {
-                        ...dataToSave,
-                        estat: dataToSave.estat // Ensure valid enum
-                    } as any // TS Enum casting might be needed
+                    data: dataToSave
                 });
             }
         }
