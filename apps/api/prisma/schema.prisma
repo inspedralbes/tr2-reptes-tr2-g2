@@ -23,7 +23,7 @@ model Sector {
 model Taller {
   id_taller      Int          @id @default(autoincrement())
   titol          String
-  descripcio     String
+  descripcio     String       @default("")
   durada_h       Int
   places_maximes Int          @default(25)
   modalitat      Modalitat

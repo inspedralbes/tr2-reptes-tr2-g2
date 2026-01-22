@@ -72,12 +72,12 @@ export class AutoAssignmentService {
 
             // 1. Calculate occupied capacity from existing assignments
             const existingAssignments = await prisma.assignacio.findMany({
-              where: { id_taller: tallerId },
-              include: { peticio: true }
+                where: { id_taller: tallerId },
+                include: { peticio: true }
             });
 
             const occupiedPlazas = existingAssignments.reduce((sum, a) => {
-              return sum + (a.peticio?.alumnes_aprox || 0);
+                return sum + (a.peticio?.alumnes_aprox || 0);
             }, 0);
 
             const remainingCapacity = taller.places_maximes - occupiedPlazas;
@@ -86,25 +86,32 @@ export class AutoAssignmentService {
             const totalStudents = students.length;
 
             if (remainingCapacity <= 0) {
-              console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Cannot assign ${totalStudents} students.`);
-              continue;
+                console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Cannot assign ${totalStudents} students.`);
+                continue;
             }
 
             // Calculate needed groups based on remaining capacity
             const GROUP_CAPACITY = 16;
-            const groupsNeeded = Math.min(
-                Math.ceil(totalStudents / GROUP_CAPACITY),
-                Math.floor(remainingCapacity / GROUP_CAPACITY) || 1 // At least 1 if there is some capacity
-            );
 
-            // Create Slots
+            // Create Slots until we cover all students OR run out of capacity
+            // We ensure we don't create "phantom" capacity that exceeds the workshop limit
             const slots: WorkshopSlot[] = [];
-            for (let i = 1; i <= groupsNeeded; i++) {
+            let currentRemaining = remainingCapacity;
+            let groupId = 1;
+
+            while (currentRemaining > 0) {
+                // If we already have enough capacity for all students, stop creating new groups
+                const currentTotalCapacity = slots.reduce((acc, s) => acc + s.capacity, 0);
+                if (currentTotalCapacity >= totalStudents) break;
+
+                const slotCap = Math.min(GROUP_CAPACITY, currentRemaining);
                 slots.push({
                     workshopId: tallerId,
-                    groupId: i,
-                    capacity: GROUP_CAPACITY
+                    groupId: groupId++,
+                    capacity: slotCap
                 });
+
+                currentRemaining -= slotCap;
             }
 
             // Run Solver
