@@ -12,6 +12,11 @@ export default function ProfessorTabsLayout() {
         <Icon sf="square.grid.2x2.fill" />
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="avisos" options={{ title: 'Avisos' }}>
+        <Label>Avisos</Label>
+        <Icon sf="bell.fill" />
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name="talleres" options={{ title: 'Agenda' }}>
         <Label>Agenda</Label>
         <Icon sf="calendar" />

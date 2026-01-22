@@ -21,18 +21,17 @@ model Sector {
 }
 
 model Taller {
-  id_taller        Int          @id @default(autoincrement())
-  titol            String
-  descripcio_curta String
-  durada_h         Int
-  places_maximes   Int          @default(25)
-  modalitat        Modalitat
-  icona            String       @default("🧩")
-  id_sector        Int
-  sector           Sector       @relation(fields: [id_sector], references: [id_sector])
-  peticions        Peticio[]
-  assignacions     Assignacio[]
-  ambit            String?
+  id_taller      Int          @id @default(autoincrement())
+  titol          String
+  descripcio     String
+  durada_h       Int
+  places_maximes Int          @default(25)
+  modalitat      Modalitat
+  icona          String       @default("🧩")
+  id_sector      Int
+  sector         Sector       @relation(fields: [id_sector], references: [id_sector])
+  peticions      Peticio[]
+  assignacions   Assignacio[]
 
   @@map("tallers")
 }
@@ -48,13 +47,12 @@ enum Modalitat {
 // ==========================================
 
 model Centre {
-  id_centre          Int     @id @default(autoincrement())
-  codi_centre        String  @unique
-  nom                String
-  adreca             String?
-  telefon_contacte   String?
-  email_contacte     String?
-  asistencia_reunion Boolean @default(false)
+  id_centre        Int     @id @default(autoincrement())
+  codi_centre      String  @unique
+  nom              String
+  adreca           String?
+  telefon_contacte String?
+  email_contacte   String?
 
   usuaris       Usuari[]
   peticions     Peticio[]
@@ -142,8 +140,7 @@ model Peticio {
   prof2_id Int?
   prof2    Professor? @relation("Profesor2", fields: [prof2_id], references: [id_professor])
 
-  ids_alumnes Int[]
-  alumnes     Alumne[] @relation("AlumnesPeticio")
+  alumnes Alumne[] @relation("AlumnesPeticio")
 
   assignacions Assignacio[]
 
@@ -342,7 +339,7 @@ model AutoconsultaAlumne {
 }
 
 enum ImpacteVocacional {
-  SI          @map("Sí, m’ha aclarat les idees")
+  SI          @map("Sí, m’ha aclarit les idees")
   NO          @map("No, ja ho tenia clar o no és per a mi")
   CONSIDERANT @map("Ho estic considerant ara mateix")
 }
@@ -405,17 +402,15 @@ enum EstatEnviament {
 }
 
 model RespostesQuestionari {
-  id_resposta  Int                  @id @default(autoincrement())
-  id_enviament Int
-  enviament    EnviamentQuestionari @relation(fields: [id_enviament], references: [id_enviament])
-  id_pregunta  Int
-  pregunta     Pregunta             @relation(fields: [id_pregunta], references: [id_pregunta])
-  valor        String               @db.Text
-  es_anonim    Boolean              @default(false)
-
-  // Camps redundants per facilitat de consulta si no hi ha Enviament (vells)
-  id_assignacio Int?
-  assignacio    Assignacio? @relation(fields: [id_assignacio], references: [id_assignacio])
+  id_resposta             Int                  @id @default(autoincrement())
+  id_enviament            Int
+  enviament               EnviamentQuestionari @relation(fields: [id_enviament], references: [id_enviament])
+  id_pregunta             Int
+  pregunta                Pregunta             @relation(fields: [id_pregunta], references: [id_pregunta])
+  valor                   String               @db.Text
+  es_anonim               Boolean              @default(false)
+  assignacio              Assignacio?          @relation(fields: [assignacioId_assignacio], references: [id_assignacio])
+  assignacioId_assignacio Int?
 
   @@map("respostes_questionari")
 }
@@ -446,14 +441,12 @@ model Notificacio {
 // ==========================================
 
 model LogAuditoria {
-  id_log              Int      @id @default(autoincrement())
-  id_usuari           Int?
-  usuari              Usuari?  @relation(fields: [id_usuari], references: [id_usuari])
-  accio               String
-  taula_afectada      String?
-  id_registre_afectat Int?
-  detalls             Json?
-  data_hora           DateTime @default(now())
+  id_log    Int      @id @default(autoincrement())
+  id_usuari Int?
+  usuari    Usuari?  @relation(fields: [id_usuari], references: [id_usuari])
+  accio     String
+  detalls   Json?
+  data_hora DateTime @default(now())
 
   @@index([data_hora])
   @@map("logs_auditoria")

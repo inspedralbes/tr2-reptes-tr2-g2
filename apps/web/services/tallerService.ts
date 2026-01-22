@@ -37,7 +37,7 @@ const tallerService = {
         trimestre: "1r",
         icona: t.icona || "🧩",
         detalls_tecnics: {
-          descripcio: t.descripcio_curta || t.descripcio || "",
+          descripcio: t.descripcio || "",
           durada_hores: t.durada_h || 0,
           places_maximes: t.places_maximes || 0,
           ubicacio_defecte: "Ca n'Olivella",
@@ -78,7 +78,7 @@ const tallerService = {
         modalitat: t.modalitat,
         trimestre: "1r",
         detalls_tecnics: {
-          descripcio: t.descripcio_curta || t.descripcio || "",
+          descripcio: t.descripcio || "",
           durada_hores: t.durada_h || 0,
           places_maximes: t.places_maximes || 0,
           ubicacio_defecte: "Ca n'Olivella",
@@ -122,7 +122,7 @@ const tallerService = {
         trimestre: "1r",
         icona: t.icona || "🧩",
         detalls_tecnics: {
-          descripcio: t.descripcio_curta || t.descripcio || "",
+          descripcio: t.descripcio || "",
           durada_hores: t.durada_h || 0,
           places_maximes: t.places_maximes || 0,
           ubicacio_defecte: "Ca n'Olivella",

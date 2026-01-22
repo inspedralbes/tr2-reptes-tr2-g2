@@ -28,13 +28,23 @@ export default function CalendarPage() {
 
         const phasesData = phasesRes.data.data;
 
+        const getPhaseColor = (nom: string) => {
+          const n = nom.toLowerCase();
+          if (n.includes("solicitud") || n.includes("sol·licitud")) return "bg-consorci-darkBlue text-white";
+          if (n.includes("planificació") || n.includes("planificación")) return "bg-consorci-actionBlue text-white";
+          if (n.includes("execució") || n.includes("ejecución")) return "bg-consorci-pinkRed text-white";
+          if (n.includes("cierre") || n.includes("tancament") || n.includes("evaluación") || n.includes("avaluació")) return "bg-consorci-beige text-[#00426B]";
+          return "bg-consorci-darkBlue text-white";
+        };
+
         const phaseEvents = phasesData.map((f: any) => ({
           id: `fase-${f.id_fase}`,
           title: `Fase: ${f.nom}`,
           date: f.data_inici,
           endDate: f.data_fi,
           type: 'milestone',
-          description: f.descripcio
+          description: f.descripcio,
+          colorClass: getPhaseColor(f.nom)
         }));
 
         setEvents([...eventsRes.data, ...phaseEvents]);
@@ -104,25 +114,33 @@ export default function CalendarPage() {
               
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-4 h-4 bg-[#00426B]"></div>
-                  <div>
-                    <span className="block text-xs font-black text-gray-800 uppercase tracking-tight">Fita del Programa</span>
-                    <span className="text-[10px] text-gray-400 font-medium">Fases i moments clau del curs.</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-4 h-4 bg-[#F26178]"></div>
-                  <div>
-                    <span className="block text-xs font-black text-gray-800 uppercase tracking-tight">Termini Límit</span>
-                    <span className="text-[10px] text-gray-400 font-medium">Dates de tancament i lliuraments.</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
                   <div className="w-4 h-4 bg-[#4197CB]"></div>
                   <div>
                     <span className="block text-xs font-black text-gray-800 uppercase tracking-tight">Activitat Docent</span>
                     <span className="text-[10px] text-gray-400 font-medium">Tallers i sessions presencials.</span>
                   </div>
+                </div>
+
+                <div className="pt-4 border-t border-gray-50">
+                   <span className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">Fases del Programa</span>
+                   <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-[#00426B]"></div>
+                        <span className="text-[10px] font-bold text-gray-500 uppercase">Solicitud e Inscripción</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-[#0775AB]"></div>
+                        <span className="text-[10px] font-bold text-gray-500 uppercase">Planificación y Asignación</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-[#F26178]"></div>
+                        <span className="text-[10px] font-bold text-gray-500 uppercase">Ejecución y Seguimiento</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-[#E0C5AC]"></div>
+                        <span className="text-[10px] font-bold text-gray-500 uppercase">Cierre y Evaluación</span>
+                      </div>
+                   </div>
                 </div>
               </div>
 

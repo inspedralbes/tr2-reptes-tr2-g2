@@ -61,7 +61,13 @@ async function seedUsers(roles: any, passDefault: string) {
 
   // 2. Centro Joan Brossa
   const centroBrossa = await prisma.centre.create({
-    data: { codi_centre: '08014231', nom: 'Institut Joan Brossa', email_contacte: 'a8014231@xtec.cat' }
+    data: { 
+      codi_centre: '08014231', 
+      nom: 'Institut Joan Brossa', 
+      email_contacte: 'a8014231@xtec.cat',
+      adreca: 'Carrer de la Mare de Déu del Port, 397',
+      telefon_contacte: '934 32 30 54'
+    }
   });
   await prisma.usuari.create({
     data: {
@@ -75,7 +81,13 @@ async function seedUsers(roles: any, passDefault: string) {
 
   // 3. Centro Pau Claris
   const centroPauClaris = await prisma.centre.create({
-    data: { codi_centre: '08013147', nom: 'Institut Pau Claris', email_contacte: 'a8013147@xtec.cat' }
+    data: { 
+      codi_centre: '08013147', 
+      nom: 'Institut Pau Claris', 
+      email_contacte: 'a8013147@xtec.cat',
+      adreca: 'Passeig de Lluís Companys, 18',
+      telefon_contacte: '932 68 02 11'
+    }
   });
   await prisma.usuari.create({
     data: {
@@ -87,7 +99,7 @@ async function seedUsers(roles: any, passDefault: string) {
     }
   });
 
-  // 4. Profesores
+  // ... (rest of the professors and students logic)
   const profesBrossa = [];
   const profesClaris = [];
 
@@ -123,7 +135,6 @@ async function seedUsers(roles: any, passDefault: string) {
     profesClaris.push(pc);
   }
 
-  // 5. Alumnos
   for (let i = 1; i <= 10; i++) {
     await prisma.alumne.create({
       data: { nom: `Alumne Brossa ${i}`, cognoms: 'Simulació', idalu: `B${100+i}`, curs: '4t ESO', id_centre_procedencia: centroBrossa.id_centre }
@@ -158,7 +169,7 @@ async function seedTallers(sectors: any) {
         durada_h: 3,
         places_maximes: t.cap,
         icona: t.icona,
-        descripcio_curta: `Exploració pràctica de ${t.titol}.`
+        descripcio: `Exploració pràctica de ${t.titol}.`
       }
     });
     creadosTallers.push(nuevo);

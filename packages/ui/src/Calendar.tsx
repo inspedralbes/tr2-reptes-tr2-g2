@@ -11,6 +11,7 @@ export interface CalendarEvent {
   type: 'milestone' | 'deadline' | 'assignment' | 'session';
   description?: string;
   metadata?: any;
+  colorClass?: string;
 }
 
 interface CalendarProps {
@@ -198,7 +199,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
                       <button
                         key={event.id}
                         onClick={() => onEventClick?.(event)}
-                        className={`absolute h-full pointer-events-auto flex items-center px-4 transition-colors hover:bg-opacity-90 active:opacity-80 group/event ${getEventStyles(event.type, event.title)}`}
+                        className={`absolute h-full pointer-events-auto flex items-center px-4 transition-colors hover:bg-opacity-90 active:opacity-80 group/event ${event.colorClass || getEventStyles(event.type, event.title)}`}
                         style={{
                           left: `${(event.start * 100) / 7}%`,
                           width: `${(event.span * 100) / 7}%`,

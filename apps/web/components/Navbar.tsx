@@ -75,7 +75,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
 
   const navLinks = [
     { label: 'Inicio', path: getInicioPath(), show: true },
-    { label: 'Avisos', path: '/centro/avisos', show: isCoordinator || isAdmin, isAvisos: true },
+    { label: 'Avisos', path: '/centro/avisos', show: true, isAvisos: true },
     { label: 'Calendari', path: '/calendar', show: true },
     { label: 'Perfil', path: '/perfil', show: true },
   ];

@@ -106,8 +106,8 @@ export default function AvisosPage() {
 
   return (
     <DashboardLayout
-      title="Avisos i Notificacions"
-      subtitle="Estigues al dia dels canvis de fase, resolucions de sol·licituds i comunicacions oficials."
+      title={user?.rol.nom_rol === 'ADMIN' ? "Control d'Avisos del Sistema" : "Avisos i Notificacions"}
+      subtitle={user?.rol.nom_rol === 'ADMIN' ? "Gestió de les comunicacions globals i d'alerta per a tots els usuaris." : "Estigues al dia dels canvis de fase, resolucions de sol·licituds i comunicacions oficials."}
     >
       <div className="w-full pb-12">
         {loading ? (

@@ -4,17 +4,21 @@ import { connectToDatabase } from '../lib/mongodb';
 
 // GET: Ver notificaciones (Filtradas por centro o usuario)
 export const getNotificacions = async (req: Request, res: Response) => {
-  const { centreId, userId } = (req as any).user || {};
+  const { centreId, userId, role } = (req as any).user || {};
 
   try {
-    const where: any = { OR: [] };
-    if (userId) where.OR.push({ id_usuari: userId });
-    if (centreId) where.OR.push({ id_centre: centreId });
-
-    // Si no hay filtros, no devolvemos nada o devolvemos error 400
-    if (where.OR.length === 0) {
-      return res.json([]);
-    }
+    const where: any = {
+      OR: [
+        // 1. Notificaciones globales (sin usuario ni centro específico)
+        { id_usuari: null, id_centre: null },
+        
+        // 2. Notificaciones para mi usuario específico
+        ...(userId ? [{ id_usuari: userId }] : []),
+        
+        // 3. Notificaciones para mi centro
+        ...(centreId ? [{ id_centre: centreId }] : [])
+      ]
+    };
 
     const notificacions = await prisma.notificacio.findMany({
       where,

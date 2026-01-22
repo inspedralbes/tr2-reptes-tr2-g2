@@ -54,7 +54,7 @@ export const createTaller = async (req: Request, res: Response) => {
     const nuevoTaller = await prisma.taller.create({
       data: {
         titol,
-        descripcio_curta: descripcio || "",
+        descripcio: descripcio || "",
         durada_h: typeof durada_h === 'string' ? parseInt(durada_h) : (durada_h || 0),
         places_maximes: typeof places_maximes === 'string' ? parseInt(places_maximes) : (places_maximes || 25),
         modalitat: modalitat || 'A',
@@ -76,7 +76,7 @@ export const updateTaller = async (req: Request, res: Response) => {
   try {
     const updateData: any = {};
     if (titol !== undefined) updateData.titol = titol;
-    if (descripcio !== undefined) updateData.descripcio_curta = descripcio;
+    if (descripcio !== undefined) updateData.descripcio = descripcio;
     if (durada_h !== undefined) updateData.durada_h = typeof durada_h === 'string' ? parseInt(durada_h) : durada_h;
     if (places_maximes !== undefined) updateData.places_maximes = typeof places_maximes === 'string' ? parseInt(places_maximes) : places_maximes;
     if (modalitat !== undefined) updateData.modalitat = modalitat;

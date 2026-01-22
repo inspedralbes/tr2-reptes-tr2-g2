@@ -41,7 +41,7 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
   } : {};
 
   // Ejecutamos consultas en paralelo para mejorar rendimiento
-  const [dbEvents, assignments, petitions] = await Promise.all([
+  const [dbEvents, assignments] = await Promise.all([
     // 1. Milestones
     prisma.calendariEvent.findMany({
       where: dateFilter,
@@ -68,18 +68,6 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
           include: { taller: true, centre: true } 
         })
       : Promise.resolve([]),
-
-    // 3. Petitions (Solo Admin y Coordinador)
-    (user.role === ROLES.ADMIN || user.role === ROLES.COORDINADOR)
-      ? prisma.peticio.findMany({
-          where: {
-            ...(user.role === ROLES.COORDINADOR ? { id_centre: user.centreId } : {}),
-            ...(user.role === ROLES.ADMIN ? { estat: 'Pendent' } : {}),
-            data_peticio: start && end ? { gte: new Date(start as string), lte: new Date(end as string) } : undefined
-          },
-          include: { taller: true, centre: true }
-        })
-      : Promise.resolve([])
   ]);
 
   const events: any[] = [];
@@ -112,17 +100,6 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
         }
       });
     }
-  });
-
-  // Mapeo de Petitions
-  petitions.forEach((p: any) => {
-    events.push({
-      id: `peticio-${p.id_peticio}`,
-      title: user.role === ROLES.ADMIN ? `Pendent: ${p.taller.titol} (${p.centre.nom})` : `Sol·licitud: ${p.taller.titol}`,
-      date: p.data_peticio.toISOString(),
-      type: 'deadline',
-      description: user.role === ROLES.ADMIN ? 'Sol·licitud de taller pendent de validació.' : `Estat: ${p.estat}`
-    });
   });
 
   res.json(events);
