@@ -70,7 +70,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
       case 'assignment': 
         return 'bg-consorci-lightBlue text-white';
       case 'session': 
-        return 'bg-consorci-darkBlue text-white';
+        return 'bg-consorci-yellow text-white';
       default: 
         return 'bg-gray-500 text-white';
     }

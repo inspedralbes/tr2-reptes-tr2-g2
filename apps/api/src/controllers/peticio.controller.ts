@@ -130,7 +130,6 @@ export const createPeticio = async (req: Request, res: Response) => {
         modalitat,
         prof1_id: prof1_id ? parseInt(prof1_id) : null,
         prof2_id: prof2_id ? parseInt(prof2_id) : null,
-        ids_alumnes: [], // Ya no se guardan identidades en Fase 1
       },
       include: {
         taller: true

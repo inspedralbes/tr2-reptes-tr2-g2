@@ -319,7 +319,16 @@ export const generateAutomaticAssignments = async (req: Request, res: Response) 
 
 // Phase 3: Sessions & Attendance
 export const getSessions = async (req: Request, res: Response) => {
-  res.json({ message: 'Stub: getSessions implemented' });
+  const { idAssignacio } = req.params;
+  try {
+    const sessions = await prisma.sessio.findMany({
+      where: { id_assignacio: parseInt(idAssignacio as string) },
+      orderBy: { data_sessio: 'asc' }
+    });
+    res.json(sessions);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtenir sessions' });
+  }
 };
 
 export const getSessionAttendance = async (req: Request, res: Response) => {

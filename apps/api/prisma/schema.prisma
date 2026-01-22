@@ -179,9 +179,21 @@ model Assignacio {
   enviaments   EnviamentQuestionari[]
   enquestes    Enquesta[]
   certificats  Certificat[]
+  sessions     Sessio[]
 
   @@index([data_inici, data_fi])
   @@map("assignacions")
+}
+
+model Sessio {
+  id_sessio     Int        @id @default(autoincrement())
+  id_assignacio Int
+  assignacio    Assignacio @relation(fields: [id_assignacio], references: [id_assignacio], onDelete: Cascade)
+  data_sessio   DateTime
+  hora_inici    String?
+  hora_fi       String?
+
+  @@map("sessions")
 }
 
 enum EstatAssignacio {

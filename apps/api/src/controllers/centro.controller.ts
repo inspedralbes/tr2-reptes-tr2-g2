@@ -44,17 +44,6 @@ export const createCentre = async (req: Request, res: Response) => {
   res.json(newCentre);
 };
 
-// PATCH: Marcar asistencia a la reunión
-export const updateCentreAttendance = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { asistencia_reunion } = req.body;
-  const updated = await prisma.centre.update({
-    where: { id_centre: parseInt(id as string) },
-    data: { asistencia_reunion }
-  });
-  res.json(updated);
-};
-
 // PATCH: Actualizar centro
 export const updateCentre = async (req: Request, res: Response) => {
   const { id } = req.params;

@@ -7,7 +7,6 @@ export const createCentreSchema = z.object({
     adreca: z.string().optional(),
     telefon_contacte: z.string().optional(),
     email_contacte: z.string().email('Email invàlid').optional().or(z.literal('')),
-    asistencia_reunion: z.boolean().optional(),
   }),
 });
 

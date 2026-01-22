@@ -20,6 +20,7 @@ const config: Config = {
           lightGray: "#CFD2D3",
           pinkRed: "#F26178",
           beige: "#E0C5AC",
+          yellow: "#F9C311",
           bgGray: "#F2F2F3",
           secondaryBg: "#EAEFF2",
         },

@@ -13,6 +13,7 @@ module.exports = {
         'light-gray': '#CFD2D3', // Pantone 427 C / Cool Grey 1 U
         'pink-red': '#F26178',   // Pantone 709 C / 709 U
         beige: '#E0C5AC',        // Pantone 4685 C / 4685 U
+        yellow: '#F9C311',
       },
       fontFamily: {
         sans: ['Arial', 'sans-serif'], // Para documentos editables

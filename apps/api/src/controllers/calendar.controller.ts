@@ -48,11 +48,17 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
       include: { fase: true }
     }),
     
-    // 2. Assignments (basado en rol)
+    // 2. Assignments (basado en rol) + Sessions
     user.role === ROLES.ADMIN 
-      ? prisma.assignacio.findMany({ where: assignmentDateFilter, include: { taller: true, centre: true } })
+      ? prisma.assignacio.findMany({ 
+          where: assignmentDateFilter, 
+          include: { taller: true, centre: true, sessions: true } 
+        })
       : user.role === ROLES.COORDINADOR
-      ? prisma.assignacio.findMany({ where: { ...assignmentDateFilter, id_centre: user.centreId }, include: { taller: true } })
+      ? prisma.assignacio.findMany({ 
+          where: { ...assignmentDateFilter, id_centre: user.centreId }, 
+          include: { taller: true, sessions: true } 
+        })
       : user.role === ROLES.PROFESOR
       ? prisma.assignacio.findMany({ 
           where: { 
@@ -65,7 +71,7 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
               ] : [])
             ]
           }, 
-          include: { taller: true, centre: true } 
+          include: { taller: true, centre: true, sessions: true } 
         })
       : Promise.resolve([]),
   ]);
@@ -84,20 +90,38 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
     });
   });
 
-  // Mapeo de Assignments
+  // Mapeo de Assignments y sus Sessions
   assignments.forEach((a: any) => {
-    if (a.data_inici) {
+    // La barra de rango del taller (Azul claro)
+    if (a.data_inici && a.data_fi) {
       events.push({
         id: `assign-${a.id_assignacio}`,
-        title: user.role === ROLES.COORDINADOR ? `Taller: ${a.titol}` : `${a.taller.titol}`,
+        title: user.role === ROLES.COORDINADOR ? `Taller: ${a.taller.titol}` : `${a.taller.titol}`,
         date: a.data_inici.toISOString(),
+        endDate: a.data_fi.toISOString(),
         type: 'assignment',
         metadata: { 
           id_assignacio: a.id_assignacio,
           centre: a.centre?.nom,
-          adreca: a.centre?.adreca,
-          hora: '09:00 - 13:00' // Hardcoded for now as it's the standard
+          adreca: a.centre?.adreca
         }
+      });
+    }
+
+    // Las sesiones individuales (Amarillo)
+    if (a.sessions) {
+      a.sessions.forEach((s: any) => {
+        events.push({
+          id: `session-${s.id_sessio}`,
+          title: `SESSIÓ: ${a.taller.titol}`,
+          date: s.data_sessio.toISOString(),
+          type: 'session',
+          metadata: {
+            id_assignacio: a.id_assignacio,
+            hora: `${s.hora_inici || '09:00'} - ${s.hora_fi || '13:00'}`,
+            centre: a.centre?.nom || 'Centre del Professor'
+          }
+        });
       });
     }
   });
