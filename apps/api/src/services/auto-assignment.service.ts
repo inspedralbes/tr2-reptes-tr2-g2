@@ -4,6 +4,7 @@ import { AssignmentSolver, Student, WorkshopSlot, AssignmentResult } from './ass
 export class AutoAssignmentService {
     private solver: AssignmentSolver;
     private readonly GROUP_CAPACITY = 16;
+    private readonly GLOBAL_CENTER_LIMIT = 12; // Max 12 students globally in Mod C
 
     constructor() {
         this.solver = new AssignmentSolver();
@@ -66,14 +67,14 @@ export class AutoAssignmentService {
         // 3. Process each Taller
         const results = [];
 
+        // 3. Process each Taller and collect candidates
+        const allAssignments: AssignmentResult[] = [];
+        const centerPlazaCount = new Map<number, number>();
+
         for (const [tallerId, students] of studentsByTaller.entries()) {
-            // Fetch Taller capacity/info
             const taller = await prisma.taller.findUnique({ where: { id_taller: tallerId } });
             if (!taller) continue;
 
-            // 1. Calculate occupied capacity from existing assignments
-            // We sum the actual number of nominal inscriptions if they exist, 
-            // otherwise we fall back to approx students
             const existingAssignments = await prisma.assignacio.findMany({
               where: { id_taller: tallerId },
               include: { 
@@ -83,45 +84,44 @@ export class AutoAssignmentService {
             });
 
             const occupiedPlazas = existingAssignments.reduce((sum: number, a: any) => {
-              const nominalCount = a.inscripcions.length;
-              return sum + (nominalCount > 0 ? nominalCount : (a.peticio?.alumnes_aprox || 0));
+              return sum + a.inscripcions.length;
             }, 0);
 
             const remainingCapacity = taller.places_maximes - occupiedPlazas;
-            console.log(`📊 AutoAssignment: Taller ID ${tallerId} (${taller.titol}): Plazas Totales: ${taller.places_maximes}, Ocupadas: ${occupiedPlazas}, Disponibles: ${remainingCapacity}`);
-
-            const totalStudents = students.length;
-
-            if (remainingCapacity <= 0) {
-              console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Cannot assign ${totalStudents} students.`);
-              continue;
-            }
-
-            // Calculate needed groups based on remaining capacity
             const groupsNeeded = Math.min(
-                Math.ceil(totalStudents / this.GROUP_CAPACITY),
-                Math.floor(remainingCapacity / this.GROUP_CAPACITY) || 1 // At least 1 if there is some capacity
+                Math.ceil(students.length / this.GROUP_CAPACITY),
+                Math.floor(remainingCapacity / this.GROUP_CAPACITY) || 1
             );
 
-            // Create Slots
             const slots: WorkshopSlot[] = [];
             for (let i = 1; i <= groupsNeeded; i++) {
-                slots.push({
-                    workshopId: tallerId,
-                    groupId: i,
-                    capacity: this.GROUP_CAPACITY
-                });
+                slots.push({ workshopId: tallerId, groupId: i, capacity: this.GROUP_CAPACITY });
             }
 
-            // Run Solver
-            const assignments = this.solver.solve(students, slots);
+            // Run Solver for this workshop
+            const tallerAssignments = this.solver.solve(students, slots);
+            
+            // Filter assignments based on global center limit
+            for (const assig of tallerAssignments) {
+                const student = students.find(s => s.id === assig.studentId);
+                if (!student) continue;
 
-            // Save assignments
-            await this.saveAssignments(assignments, studentPeticioMap);
-            results.push(...assignments);
+                const currentCount = centerPlazaCount.get(student.centerId) || 0;
+                if (currentCount < this.GLOBAL_CENTER_LIMIT) {
+                    allAssignments.push(assig);
+                    centerPlazaCount.set(student.centerId, currentCount + 1);
+                } else {
+                    console.log(`⚠️ AutoAssignment: Global limit reached for Center ${student.centerId}. Skipping student ${student.id} in Workshop ${tallerId}.`);
+                }
+            }
         }
 
-        return { assigned: results.length, details: results };
+        // 4. Save all collected assignments
+        if (allAssignments.length > 0) {
+            await this.saveAssignments(allAssignments, studentPeticioMap);
+        }
+
+        return { assigned: allAssignments.length, details: allAssignments };
     }
 
     private async saveAssignments(assignments: AssignmentResult[], studentPeticioMap: Map<number, number>) {
@@ -168,7 +168,15 @@ export class AutoAssignmentService {
                     id_peticio: group.peticioId,
                     id_centre: peticio.id_centre,
                     id_taller: group.workshopId,
-                    estat: 'En_curs'
+                    estat: 'PROVISIONAL',
+                    // Initialize checklist for Phase 2
+                    checklist: {
+                      create: [
+                        { pas_nom: 'Designar Profesores Referentes', completat: false },
+                        { pas_nom: 'Subir Registro Nominal (Excel)', completat: true }, // Already done by auto-assignment
+                        { pas_nom: 'Acuerdo Pedagógico (Modalidad C)', completat: false }
+                      ]
+                    }
                 }
             });
 

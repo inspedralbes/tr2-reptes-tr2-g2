@@ -197,9 +197,16 @@ model Sessio {
 }
 
 enum EstatAssignacio {
-  En_curs     @map("En curs")
+  PROVISIONAL
+  PUBLISHED
+  DATA_ENTRY_PENDING
+  DATA_SUBMITTED
+  VALIDATED
+  READY_TO_START
+  VACANT
+  En_curs            @map("En curs")
   Finalitzada
-  Cancellada  @map("Cancel·lada")
+  Cancellada         @map("Cancel·lada")
 }
 
 model AssignacioProfessor {
@@ -251,6 +258,12 @@ model Inscripcio {
   assignacio    Assignacio @relation(fields: [id_assignacio], references: [id_assignacio])
   id_alumne     Int
   alumne        Alumne     @relation(fields: [id_alumne], references: [id_alumne])
+
+  // Compliance (Solo Mod C)
+  acord_pedagogic        Boolean @default(false)
+  autoritzacio_mobilitat Boolean @default(false)
+  drets_imatge           Boolean @default(false)
+  registre_ceb_confirmat Boolean @default(false)
 
   assistencia      Assistencia[]
   avaluacio_docent AvaluacioDocent?
