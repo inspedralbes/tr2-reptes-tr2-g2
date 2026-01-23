@@ -38,7 +38,7 @@ export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => 
 };
 
 export const isCoordinator = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (req.user?.role !== 'COORDINADOR') {
+  if (req.user?.role !== 'COORDINADOR' && req.user?.role !== 'ADMIN') {
     return res.status(403).json({ error: 'Acceso denegado: Se requiere rol de Coordinador' });
   }
   next();
