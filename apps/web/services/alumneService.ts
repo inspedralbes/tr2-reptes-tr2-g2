@@ -7,6 +7,7 @@ export interface Alumne {
   idalu: string;
   curs: string;
   id_centre_procedencia?: number;
+  url_foto?: string | null;
 }
 
 const alumneService = {

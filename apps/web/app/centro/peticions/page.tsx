@@ -374,8 +374,9 @@ export default function PeticionsPage() {
                           value={prof2_id}
                           onChange={(e) => setProf2Id(e.target.value)}
                           className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700"
+                          required
                         >
-                          <option value="">Segon Referent (Opcional)</option>
+                          <option value="">Segon Referent</option>
                           {professors.map(p => (
                             <option key={p.id_professor} value={p.id_professor}>{p.nom}</option>
                           ))}
@@ -403,13 +404,12 @@ export default function PeticionsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Motiu de la Sol·licitud</label>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Motiu de la Sol·licitud (Opcional)</label>
                       <textarea
                         value={comentaris}
                         onChange={(e) => setComentaris(e.target.value)}
                         placeholder="Breu explicació del perfil de l'alumnat..."
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700 min-h-[80px] resize-none"
-                        required
                       />
                     </div>
                   </div>

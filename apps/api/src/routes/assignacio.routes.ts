@@ -27,6 +27,7 @@ router.post('/:idAssignacio/enrollment/excel', authenticateToken, upload.single(
 router.patch('/checklist/designate-profs/:idAssignacio', authenticateToken, assignacioController.designateProfessors);
 router.post('/upload/validate', authenticateToken, upload.single('file'), assignacioController.validateDocumentUpload);
 router.post('/:idAssignacio/compliance', authenticateToken, assignacioController.updateComplianceDocuments);
+router.post('/:idAssignacio/student-document', authenticateToken, upload.single('file'), assignacioController.uploadStudentDocument);
 router.post('/:idAssignacio/confirm-registration', authenticateToken, assignacioController.confirmLegalRegistration);
 
 // Phase 2: Teaching Staff

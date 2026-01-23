@@ -18,6 +18,7 @@ import notificacioRoutes from './notificacio.routes';
 import evaluationRoutes from './evaluation.routes'; // Rutas de IA (Voz)
 import avaluacioRoutes from './avaluacio.routes';
 import questionariRoutes from './questionari.routes';
+import uploadRoutes from './upload.routes';
 
 // --- Definir las rutas base ---
 

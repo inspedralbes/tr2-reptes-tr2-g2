@@ -89,6 +89,7 @@ model Usuari {
   nom_complet   String
   email         String  @unique
   password_hash String
+  url_foto      String?
   id_rol        Int
   rol           Rol     @relation(fields: [id_rol], references: [id_rol])
   id_centre     Int?
@@ -135,10 +136,10 @@ model Peticio {
   estat         EstatPeticio @default(Pendent)
   modalitat     Modalitat?
 
-  prof1_id Int?
-  prof1    Professor? @relation("Profesor1", fields: [prof1_id], references: [id_professor])
-  prof2_id Int?
-  prof2    Professor? @relation("Profesor2", fields: [prof2_id], references: [id_professor])
+  prof1_id Int
+  prof1    Professor @relation("Profesor1", fields: [prof1_id], references: [id_professor])
+  prof2_id Int
+  prof2    Professor @relation("Profesor2", fields: [prof2_id], references: [id_professor])
 
   alumnes Alumne[] @relation("AlumnesPeticio")
 
@@ -242,6 +243,7 @@ model Alumne {
   nom                   String
   cognoms               String
   curs                  String?
+  url_foto              String?
   id_centre_procedencia Int?
   centre_procedencia    Centre? @relation("CentreProcedencia", fields: [id_centre_procedencia], references: [id_centre])
 
@@ -264,6 +266,11 @@ model Inscripcio {
   autoritzacio_mobilitat Boolean @default(false)
   drets_imatge           Boolean @default(false)
   registre_ceb_confirmat Boolean @default(false)
+
+  // Document URLs
+  url_acord_pedagogic        String?
+  url_autoritzacio_mobilitat String?
+  url_drets_imatge           String?
 
   assistencia      Assistencia[]
   avaluacio_docent AvaluacioDocent?

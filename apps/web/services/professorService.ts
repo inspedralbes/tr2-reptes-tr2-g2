@@ -5,6 +5,12 @@ export interface Professor {
   nom: string;
   contacte: string;
   id_centre?: number;
+  usuari?: {
+    id_usuari: number;
+    email: string;
+    nom_complet?: string;
+    url_foto?: string | null;
+  };
 }
 
 const professorService = {

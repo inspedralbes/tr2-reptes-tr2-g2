@@ -22,7 +22,9 @@ export const getProfessors = async (req: Request, res: Response) => {
         centre: true,
         usuari: {
           select: {
-            email: true
+            id_usuari: true,
+            email: true,
+            url_foto: true
           }
         }
       }
@@ -168,8 +170,10 @@ export const getProfessorsByCentre = async (req: Request, res: Response) => {
       include: {
         usuari: {
           select: {
+            id_usuari: true,
             email: true,
-            nom_complet: true
+            nom_complet: true,
+            url_foto: true
           }
         }
       }

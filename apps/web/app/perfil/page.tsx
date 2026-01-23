@@ -3,6 +3,7 @@
 import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import { THEME } from '@iter/shared';
+import Avatar from '@/components/Avatar';
 
 export default function ProfilePage() {
   const { user, loading } = useAuth();
@@ -28,11 +29,15 @@ export default function ProfilePage() {
           <div className="px-8 pb-10 relative">
             {/* Avatar */}
             <div className="absolute -top-12 left-8">
-              <div className="w-24 h-24 bg-white shadow-xl flex items-center justify-center border-4 border-white">
-                <span className="text-4xl font-black text-[#00426B]">
-                  {user.nom_complet.charAt(0)}
-                </span>
-              </div>
+              <Avatar 
+                url={user.url_foto} 
+                name={user.nom_complet} 
+                id={user.id_usuari} 
+                type="usuari" 
+                size="xl"
+                className="ring-4 ring-white shadow-xl"
+                isCoordinator={user.rol.nom_rol === 'COORDINADOR'}
+              />
             </div>
 
             <div className="pt-16">

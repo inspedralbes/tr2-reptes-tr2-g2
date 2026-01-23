@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { THEME } from '@iter/shared';
 import notificacioService, { Notificacio } from '@/services/notificacioService';
 import { useEffect, useState, useRef } from 'react';
+import Avatar from './Avatar';
 
 interface NavbarProps {
   title?: string;

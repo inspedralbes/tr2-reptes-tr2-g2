@@ -470,6 +470,100 @@ export const updateComplianceDocuments = async (req: Request, res: Response) => 
   }
 };
 
+// POST: Pujar document de l'alumne
+import fs from 'fs';
+import path from 'path';
+
+const sanitizeFileName = (str: string) => {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Treure accents
+    .replace(/[^a-z0-9]/g, "_")    // Només lletres i números
+    .replace(/_+/g, "_")           // Treure guions baixos consecutius
+    .replace(/(^_|_$)/g, "");      // Treure guions baixos a l'inici o final
+};
+
+export const uploadStudentDocument = async (req: Request, res: Response) => {
+  const { idAssignacio } = req.params;
+  const { idInscripcio, documentType } = req.body;
+  
+  if (!req.file) {
+    return res.status(400).json({ error: 'No s\'ha pujat cap fitxer.' });
+  }
+
+  try {
+    const inscripcio = await prisma.inscripcio.findUnique({
+      where: { id_inscripcio: parseInt(idInscripcio) },
+      include: {
+        alumne: true,
+        assignacio: {
+          include: {
+            taller: true
+          }
+        }
+      }
+    });
+
+    if (!inscripcio || !inscripcio.alumne || !inscripcio.assignacio?.taller) {
+      return res.status(404).json({ error: 'Inscripció o dades associades no trobades.' });
+    }
+
+    const { alumne, assignacio } = inscripcio;
+    const taller = assignacio.taller;
+
+    const fileExt = path.extname(req.file.originalname);
+    
+    // Generar nom descriptiu
+    const nomAlumne = sanitizeFileName(`${alumne.nom}_${alumne.cognoms}`);
+    const cursAlumne = sanitizeFileName(alumne.curs || 'sense_curs');
+    const titolTaller = sanitizeFileName(taller.titol);
+    
+    const fileName = `${nomAlumne}_${cursAlumne}_${titolTaller}_${documentType}_${Date.now()}${fileExt}`;
+    const docDir = path.join('uploads', 'documents');
+    const filePath = path.join(docDir, fileName);
+
+    // Ensure documents dir exists
+    if (!fs.existsSync(docDir)) {
+      fs.mkdirSync(docDir, { recursive: true });
+    }
+
+    fs.writeFileSync(filePath, req.file.buffer);
+
+    const url = `/uploads/documents/${fileName}`;
+    const fieldMap: Record<string, string> = {
+      'acord_pedagogic': 'url_acord_pedagogic',
+      'autoritzacio_mobilitat': 'url_autoritzacio_mobilitat',
+      'drets_imatge': 'url_drets_imatge'
+    };
+
+    const updateField = fieldMap[documentType];
+    const boolFieldMap: Record<string, string> = {
+      'acord_pedagogic': 'acord_pedagogic',
+      'autoritzacio_mobilitat': 'autoritzacio_mobilitat',
+      'drets_imatge': 'drets_imatge'
+    };
+    const boolField = boolFieldMap[documentType];
+
+    if (!updateField) {
+      return res.status(400).json({ error: 'Tipus de document no vàlid.' });
+    }
+
+    const updated = await prisma.inscripcio.update({
+      where: { id_inscripcio: parseInt(idInscripcio) },
+      data: {
+        [updateField]: url,
+        [boolField]: true // També marquem el boolean com a completat
+      }
+    });
+
+    res.json(updated);
+  } catch (error) {
+    console.error("Error al pujar document:", error);
+    res.status(500).json({ error: 'Error al processar la pujada del document.' });
+  }
+};
+
 export const getSessions = async (req: Request, res: Response) => {
   const idAssignacio = req.params.idAssignacio as string;
   try {
