@@ -70,8 +70,8 @@ export const createPeticio = async (req: Request, res: Response) => {
   } = req.body;
   const { centreId } = (req as any).user;
 
-  if (!id_taller || !centreId) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios (id_taller, centreId)' });
+  if (!id_taller || !centreId || !prof1_id || !prof2_id) {
+    return res.status(400).json({ error: 'Faltan campos obligatorios (id_taller, centreId, prof1_id, prof2_id)' });
   }
 
   // --- VERIFICACIÓN DE FASE ---
@@ -128,8 +128,8 @@ export const createPeticio = async (req: Request, res: Response) => {
         comentaris,
         estat: 'Pendent',
         modalitat,
-        prof1_id: prof1_id ? parseInt(prof1_id) : null,
-        prof2_id: prof2_id ? parseInt(prof2_id) : null,
+        prof1_id: parseInt(prof1_id),
+        prof2_id: parseInt(prof2_id),
       },
       include: {
         taller: true
@@ -259,8 +259,8 @@ export const updatePeticio = async (req: Request, res: Response) => {
       data: {
         alumnes_aprox: alumnes_aprox ? parseInt(alumnes_aprox) : undefined,
         comentaris,
-        prof1_id: prof1_id ? parseInt(prof1_id) : null,
-        prof2_id: prof2_id ? parseInt(prof2_id) : null,
+        prof1_id: parseInt(prof1_id),
+        prof2_id: parseInt(prof2_id),
       },
       include: {
         taller: true

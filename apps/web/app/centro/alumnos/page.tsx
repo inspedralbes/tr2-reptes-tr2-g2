@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
+import getApi from '@/services/api';
 import alumneService, { Alumne } from '@/services/alumneService';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import Avatar from '@/components/Avatar';
 
 export default function AlumnesCRUD() {
   const { user, loading: authLoading } = useAuth();
@@ -201,11 +203,13 @@ export default function AlumnesCRUD() {
                   <tr key={a.id_alumne} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-[#EAEFF2] flex items-center justify-center text-[#00426B] group-hover:bg-[#00426B] group-hover:text-white transition-colors">
-                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                        </div>
+                        <Avatar 
+                          url={a.url_foto} 
+                          name={`${a.nom} ${a.cognoms}`} 
+                          id={a.id_alumne} 
+                          type="alumne" 
+                          size="md"
+                        />
                         <div>
                           <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{a.nom} {a.cognoms}</div>
                         </div>
@@ -287,6 +291,43 @@ export default function AlumnesCRUD() {
               {editingAlumne ? 'Editar Alumne' : 'Nou Alumne'}
             </h3>
             
+            {editingAlumne && (
+              <div className="mb-8 flex flex-col items-center gap-4 p-6 bg-gray-50 border border-gray-100">
+                <Avatar 
+                  url={editingAlumne.url_foto} 
+                  name={`${editingAlumne.nom} ${editingAlumne.cognoms}`} 
+                  id={editingAlumne.id_alumne} 
+                  type="alumne" 
+                  size="xl"
+                  className="shadow-xl ring-4 ring-white"
+                />
+                <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#00426B] hover:text-white transition-all shadow-sm">
+                  Canviar Foto
+                  <input 
+                    type="file" 
+                    className="hidden" 
+                    accept="image/*"
+                    onChange={async (e) => {
+                      if (e.target.files?.[0]) {
+                        const file = e.target.files[0];
+                        const formData = new FormData();
+                        formData.append('foto', file);
+                        try {
+                          const api = getApi();
+                          const res = await api.post(`/upload/perfil/alumne/${editingAlumne.id_alumne}`, formData);
+                          toast.success("Foto actualitzada.");
+                          loadAlumnes();
+                          setEditingAlumne({ ...editingAlumne, url_foto: res.data.url_foto });
+                        } catch (err) {
+                          toast.error("Error al pujar la foto.");
+                        }
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Nom de l'alumne</label>

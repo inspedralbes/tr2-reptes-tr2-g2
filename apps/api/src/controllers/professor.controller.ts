@@ -22,7 +22,9 @@ export const getProfessors = async (req: Request, res: Response) => {
         centre: true,
         usuari: {
           select: {
-            email: true
+            id_usuari: true,
+            email: true,
+            url_foto: true
           }
         }
       }
@@ -45,7 +47,7 @@ export const createProfessor = async (req: Request, res: Response) => {
     }
 
     // Usamos una transacción para asegurar que se creen ambos o ninguno
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // 1. Buscar el rol de profesor
       const rolProfe = await tx.rol.findFirst({
         where: { nom_rol: 'PROFESSOR' }
@@ -158,5 +160,36 @@ export const getProfessorAssignments = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error fetching professor assignments:", error);
     res.status(500).json({ error: 'Error al obtener las asignaciones del centro.' });
+  }
+};
+
+export const getProfessorsByCentre = async (req: Request, res: Response) => {
+  const { idCentre } = req.params;
+  const { centreId, role } = (req as any).user || {};
+
+  try {
+    // Scoping check
+    if (role !== 'ADMIN' && parseInt(idCentre as string) !== centreId) {
+      return res.status(403).json({ error: 'Accés denegat' });
+    }
+
+    const professors = await prisma.professor.findMany({
+      where: { id_centre: parseInt(idCentre as string) },
+      include: {
+        usuari: {
+          select: {
+            id_usuari: true,
+            email: true,
+            nom_complet: true,
+            url_foto: true
+          }
+        }
+      }
+    });
+
+    res.json(professors);
+  } catch (error) {
+    console.error("Error fetching professors by centre:", error);
+    res.status(500).json({ error: 'Error al obtenir els professors del centre.' });
   }
 };

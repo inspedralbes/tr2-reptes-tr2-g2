@@ -19,12 +19,17 @@ router.post('/incidencies', authenticateToken, assignacioController.createIncide
 router.post('/', authenticateToken, assignacioController.createAssignacioFromPeticio);
 router.post('/:idAssignacio/inscripcions', authenticateToken, assignacioController.createInscripcions);
 router.post('/auto-generate', authenticateToken, assignacioController.generateAutomaticAssignments);
+router.post('/publish', authenticateToken, assignacioController.publishAssignments);
+router.post('/:idAssignacio/validate', authenticateToken, assignacioController.validateCenterData);
 
 // Phase 2 Specifics
 router.post('/tetris', authenticateToken, tetrisController.triggerTetris);
 router.post('/:idAssignacio/enrollment/excel', authenticateToken, upload.single('file'), enrollmentController.enrollStudentsViaExcel);
 router.patch('/checklist/designate-profs/:idAssignacio', authenticateToken, assignacioController.designateProfessors);
 router.post('/upload/validate', authenticateToken, upload.single('file'), assignacioController.validateDocumentUpload);
+router.post('/:idAssignacio/compliance', authenticateToken, assignacioController.updateComplianceDocuments);
+router.post('/:idAssignacio/student-document', authenticateToken, upload.single('file'), assignacioController.uploadStudentDocument);
+router.post('/:idAssignacio/confirm-registration', authenticateToken, assignacioController.confirmLegalRegistration);
 
 // Phase 2: Teaching Staff
 router.post('/:idAssignacio/staff', authenticateToken, assignacioController.addTeachingStaff);

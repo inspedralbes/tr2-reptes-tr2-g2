@@ -275,13 +275,40 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
   }
 };
 
+// POST: Publicar Asignaciones (Admin Only)
+export const publishAssignments = async (req: Request, res: Response) => {
+  const { role } = (req as any).user;
+  if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
+
+  try {
+    const result = await prisma.assignacio.updateMany({
+      where: { estat: 'PROVISIONAL' },
+      data: { estat: 'PUBLISHED' }
+    });
+
+    // Notify centers (simplified logic)
+    await prisma.notificacio.create({
+      data: {
+        titol: 'Assignacions Publicades',
+        missatge: 'Ja podeu consultar les assignacions i començar a introduir les dades.',
+        tipus: 'FASE',
+        importancia: 'URGENT'
+      }
+    });
+
+    res.json({ message: `${result.count} assignacions publicades correctament.` });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al publicar assignacions.' });
+  }
+};
+
 // POST: Realizar Registro Nominal (Inscribir alumnos en una asignación)
 export const createInscripcions = async (req: Request, res: Response) => {
   const idAssignacio = parseInt(req.params.idAssignacio as string);
   const { ids_alumnes } = req.body; // Array de IDs de alumnos
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // 1. Verificar existencia de la asignación
       const assignacio = await tx.assignacio.findUnique({
         where: { id_assignacio: idAssignacio },
@@ -292,14 +319,19 @@ export const createInscripcions = async (req: Request, res: Response) => {
         throw new Error('Asignación no encontrada.');
       }
 
-      // 2. Sincronizar inscripciones (en lugar de borrar todo)
+      // 2. Validación de Cupo (Máx 4 alumnos en Mod C)
+      const taller = await tx.taller.findUnique({ where: { id_taller: assignacio.id_taller } });
+      if (taller?.modalitat === 'C' && ids_alumnes.length > 4) {
+        throw new Error('Límit superat: En Modalitat C només es permeten un màxim de 4 alumnes per centre.');
+      }
+
+      // 3. Sincronizar inscripciones
       const currentIds = assignacio.inscripcions.map((i: any) => i.id_alumne);
       const newIds = ids_alumnes.map((id: any) => parseInt(id));
 
       const toAdd = newIds.filter((id: number) => !currentIds.includes(id));
       const toRemove = currentIds.filter((id: number) => !newIds.includes(id));
 
-      // Eliminar desaparecidos
       if (toRemove.length > 0) {
         await tx.inscripcio.deleteMany({
           where: {
@@ -309,7 +341,6 @@ export const createInscripcions = async (req: Request, res: Response) => {
         });
       }
 
-      // Añadir nuevos
       for (const idAlumne of toAdd) {
         await tx.inscripcio.create({
           data: {
@@ -319,7 +350,9 @@ export const createInscripcions = async (req: Request, res: Response) => {
         });
       }
 
-      // 3. Marcar el ítem del checklist como completado
+      // 4. Actualizar estado si ya tiene profes y alumnos
+      // Logic: If documented and teachers ok, state => DATA_SUBMITTED?
+      // For now, update checklist
       await tx.checklistAssignacio.updateMany({
         where: {
           id_assignacio: idAssignacio,
@@ -337,10 +370,7 @@ export const createInscripcions = async (req: Request, res: Response) => {
     res.json({ message: 'Registro nominal sincronizado correctamente', details: result });
   } catch (error: any) {
     console.error("Error al realizar registro nominal:", error);
-    if (error.message === 'Asignación no encontrada.') {
-      return res.status(404).json({ error: error.message });
-    }
-    res.status(500).json({ error: 'Error al realizar el registro nominal.' });
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -350,11 +380,17 @@ export const designateProfessors = async (req: Request, res: Response) => {
   const { prof1_id, prof2_id } = req.body;
 
   try {
+    // 1. Validar que los profesores sean diferentes
+    if (prof1_id === prof2_id) {
+      return res.status(400).json({ error: 'Has de designar dos professors diferents.' });
+    }
+
     const updated = await prisma.assignacio.update({
       where: { id_assignacio: parseInt(idAssignacio as string) },
       data: {
         prof1_id,
-        prof2_id
+        prof2_id,
+        estat: 'DATA_ENTRY_PENDING' // Transition state once they start filling data
       }
     });
 
@@ -365,8 +401,8 @@ export const designateProfessors = async (req: Request, res: Response) => {
         pas_nom: { contains: 'Profesores Referentes' }
       },
       data: {
-        completat: true,
-        data_completat: new Date()
+        completat: !!(prof1_id && prof2_id),
+        data_completat: (prof1_id && prof2_id) ? new Date() : null
       }
     });
 
@@ -374,6 +410,30 @@ export const designateProfessors = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error al designar profesores:", error);
     res.status(500).json({ error: 'Error al designar profesores.' });
+  }
+};
+
+// POST: Validar Datos del Centro (Admin)
+export const validateCenterData = async (req: Request, res: Response) => {
+  const idAssignacio = req.params.idAssignacio as string;
+  const { aprobado, feedback } = req.body;
+  const { role } = (req as any).user;
+
+  if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
+
+  try {
+    const newState = aprobado ? 'VALIDATED' : 'DATA_ENTRY_PENDING';
+    
+    await prisma.assignacio.update({
+      where: { id_assignacio: parseInt(idAssignacio) },
+      data: { 
+        estat: newState,
+      }
+    });
+
+    res.json({ message: `Assignació ${aprobado ? 'validada' : 'rebutjada'} correctament.` });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al validar dades.' });
   }
 };
 
@@ -394,12 +454,142 @@ export const generateAutomaticAssignments = async (req: Request, res: Response) 
   }
 };
 
-// Phase 3: Sessions & Attendance
-export const getSessions = async (req: Request, res: Response) => {
+// POST: Confirmar Registre CEB (Centro)
+export const confirmLegalRegistration = async (req: Request, res: Response) => {
+  const idAssignacio = req.params.idAssignacio as string;
+  try {
+    await prisma.inscripcio.updateMany({
+      where: { id_assignacio: parseInt(idAssignacio) },
+      data: { registre_ceb_confirmat: true }
+    });
+
+    res.json({ success: true, message: 'Registre CEB confirmat correctament.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al confirmar el registre.' });
+  }
+};
+// POST: Actualitzar Documents de Conformitat (Centro)
+export const updateComplianceDocuments = async (req: Request, res: Response) => {
+  const idAssignacio = req.params.idAssignacio as string;
+  const { idAlumne, acord_pedagogic, autoritzacio_mobilitat, drets_imatge } = req.body;
+
+  try {
+    const updated = await prisma.inscripcio.update({
+      where: {
+        id_inscripcio: parseInt(idAlumne) // Assuming we update per student or per assignment
+      },
+      data: {
+        acord_pedagogic,
+        autoritzacio_mobilitat,
+        drets_imatge
+      }
+    });
+
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al actualitzar documents.' });
+  }
+};
+
+// POST: Pujar document de l'alumne
+import fs from 'fs';
+import path from 'path';
+
+const sanitizeFileName = (str: string) => {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Treure accents
+    .replace(/[^a-z0-9]/g, "_")    // Només lletres i números
+    .replace(/_+/g, "_")           // Treure guions baixos consecutius
+    .replace(/(^_|_$)/g, "");      // Treure guions baixos a l'inici o final
+};
+
+export const uploadStudentDocument = async (req: Request, res: Response) => {
   const { idAssignacio } = req.params;
+  const { idInscripcio, documentType } = req.body;
+  
+  if (!req.file) {
+    return res.status(400).json({ error: 'No s\'ha pujat cap fitxer.' });
+  }
+
+  try {
+    const inscripcio = await prisma.inscripcio.findUnique({
+      where: { id_inscripcio: parseInt(idInscripcio) },
+      include: {
+        alumne: true,
+        assignacio: {
+          include: {
+            taller: true
+          }
+        }
+      }
+    });
+
+    if (!inscripcio || !inscripcio.alumne || !inscripcio.assignacio?.taller) {
+      return res.status(404).json({ error: 'Inscripció o dades associades no trobades.' });
+    }
+
+    const { alumne, assignacio } = inscripcio;
+    const taller = assignacio.taller;
+
+    const fileExt = path.extname(req.file.originalname);
+    
+    // Generar nom descriptiu
+    const nomAlumne = sanitizeFileName(`${alumne.nom}_${alumne.cognoms}`);
+    const cursAlumne = sanitizeFileName(alumne.curs || 'sense_curs');
+    const titolTaller = sanitizeFileName(taller.titol);
+    
+    const fileName = `${nomAlumne}_${cursAlumne}_${titolTaller}_${documentType}_${Date.now()}${fileExt}`;
+    const docDir = path.join('uploads', 'documents');
+    const filePath = path.join(docDir, fileName);
+
+    // Ensure documents dir exists
+    if (!fs.existsSync(docDir)) {
+      fs.mkdirSync(docDir, { recursive: true });
+    }
+
+    fs.writeFileSync(filePath, req.file.buffer);
+
+    const url = `/uploads/documents/${fileName}`;
+    const fieldMap: Record<string, string> = {
+      'acord_pedagogic': 'url_acord_pedagogic',
+      'autoritzacio_mobilitat': 'url_autoritzacio_mobilitat',
+      'drets_imatge': 'url_drets_imatge'
+    };
+
+    const updateField = fieldMap[documentType];
+    const boolFieldMap: Record<string, string> = {
+      'acord_pedagogic': 'acord_pedagogic',
+      'autoritzacio_mobilitat': 'autoritzacio_mobilitat',
+      'drets_imatge': 'drets_imatge'
+    };
+    const boolField = boolFieldMap[documentType];
+
+    if (!updateField) {
+      return res.status(400).json({ error: 'Tipus de document no vàlid.' });
+    }
+
+    const updated = await prisma.inscripcio.update({
+      where: { id_inscripcio: parseInt(idInscripcio) },
+      data: {
+        [updateField]: url,
+        [boolField]: true // També marquem el boolean com a completat
+      }
+    });
+
+    res.json(updated);
+  } catch (error) {
+    console.error("Error al pujar document:", error);
+    res.status(500).json({ error: 'Error al processar la pujada del document.' });
+  }
+};
+
+export const getSessions = async (req: Request, res: Response) => {
+  const idAssignacio = req.params.idAssignacio as string;
   try {
     const sessions = await prisma.sessio.findMany({
-      where: { id_assignacio: parseInt(idAssignacio as string) },
+      where: { id_assignacio: parseInt(idAssignacio) },
       orderBy: { data_sessio: 'asc' }
     });
     res.json(sessions);

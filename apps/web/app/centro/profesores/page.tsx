@@ -9,6 +9,8 @@ import professorService, { Professor } from '@/services/professorService';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import Avatar from '@/components/Avatar';
+import getApi from '@/services/api';
 
 export default function ProfesoresCRUD() {
   const { user, loading: authLoading } = useAuth();
@@ -179,11 +181,13 @@ export default function ProfesoresCRUD() {
                     <tr key={p.id_professor} className="hover:bg-gray-50 transition-colors group">
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-[#EAEFF2] flex items-center justify-center text-[#00426B] group-hover:bg-[#00426B] group-hover:text-white transition-colors">
-                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </div>
+                          <Avatar 
+                            url={p.usuari?.url_foto} 
+                            name={p.nom} 
+                            id={p.usuari?.id_usuari || p.id_professor} 
+                            type="usuari" 
+                            size="md"
+                          />
                           <div>
                             <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{p.nom}</div>
                           </div>
@@ -260,6 +264,49 @@ export default function ProfesoresCRUD() {
             <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tight mb-8">
               {editingProf ? 'Editar Professor' : 'Nou Professor'}
             </h3>
+
+            {editingProf && (
+              <div className="mb-8 flex flex-col items-center gap-4 p-6 bg-gray-50 border border-gray-100">
+                <Avatar 
+                  url={editingProf.usuari?.url_foto} 
+                  name={editingProf.nom} 
+                  id={editingProf.usuari?.id_usuari || editingProf.id_professor} 
+                  type="usuari" 
+                  size="xl"
+                  className="shadow-xl ring-4 ring-white"
+                />
+                <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#00426B] hover:text-white transition-all shadow-sm">
+                  Canviar Foto
+                  <input 
+                    type="file" 
+                    className="hidden" 
+                    accept="image/*"
+                    onChange={async (e) => {
+                      if (e.target.files?.[0] && editingProf.usuari?.id_usuari) {
+                        const file = e.target.files[0];
+                        const formData = new FormData();
+                        formData.append('foto', file);
+                        try {
+                          const api = getApi();
+                          const res = await api.post(`/upload/perfil/usuari/${editingProf.usuari.id_usuari}`, formData);
+                          toast.success("Foto actualitzada.");
+                          loadProfessors();
+                          // Update local state for immediate feedback
+                          setEditingProf({ 
+                            ...editingProf, 
+                            usuari: { ...editingProf.usuari, url_foto: res.data.url_foto } 
+                          });
+                        } catch (err) {
+                          toast.error("Error al pujar la foto.");
+                        }
+                      } else if (!editingProf.usuari?.id_usuari) {
+                        toast.error("No se puede subir foto a un profesor sin usuario vinculado.");
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            )}
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>

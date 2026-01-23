@@ -4,6 +4,7 @@ import { AssignmentSolver, Student, WorkshopSlot, AssignmentResult } from './ass
 export class AutoAssignmentService {
     private solver: AssignmentSolver;
     private readonly GROUP_CAPACITY = 16;
+    private readonly GLOBAL_CENTER_LIMIT = 12; // Max 12 students globally in Mod C
 
     constructor() {
         this.solver = new AssignmentSolver();
@@ -66,14 +67,14 @@ export class AutoAssignmentService {
         // 3. Process each Taller
         const results = [];
 
+        // 3. Process each Taller and collect candidates
+        const allAssignments: AssignmentResult[] = [];
+        const centerPlazaCount = new Map<number, number>();
+
         for (const [tallerId, students] of studentsByTaller.entries()) {
-            // Fetch Taller capacity/info
             const taller = await prisma.taller.findUnique({ where: { id_taller: tallerId } });
             if (!taller) continue;
 
-            // 1. Calculate occupied capacity from existing assignments
-            // We sum the actual number of nominal inscriptions if they exist, 
-            // otherwise we fall back to approx students
             const existingAssignments = await prisma.assignacio.findMany({
                 where: { id_taller: tallerId },
                 include: {
@@ -126,7 +127,7 @@ export class AutoAssignmentService {
             results.push(...assignments);
         }
 
-        return { assigned: results.length, details: results };
+        return { assigned: allAssignments.length, details: allAssignments };
     }
 
     private async saveAssignments(assignments: AssignmentResult[], studentPeticioMap: Map<number, number>) {
@@ -173,7 +174,15 @@ export class AutoAssignmentService {
                     id_peticio: group.peticioId,
                     id_centre: peticio.id_centre,
                     id_taller: group.workshopId,
-                    estat: 'En_curs'
+                    estat: 'PROVISIONAL',
+                    // Initialize checklist for Phase 2
+                    checklist: {
+                      create: [
+                        { pas_nom: 'Designar Profesores Referentes', completat: false },
+                        { pas_nom: 'Subir Registro Nominal (Excel)', completat: true }, // Already done by auto-assignment
+                        { pas_nom: 'Acuerdo Pedagógico (Modalidad C)', completat: false }
+                      ]
+                    }
                 }
             });
 

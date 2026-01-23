@@ -16,7 +16,7 @@ export default function AssignacionsPage() {
   const [fases, setFases] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("En_curs");
+  const [statusFilter, setStatusFilter] = useState("Tots els estats");
   
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -75,35 +75,35 @@ export default function AssignacionsPage() {
 
   return (
     <DashboardLayout
-      title="Talleres Asignados"
-      subtitle="Aquí puedes consultar el estado de tus talleres y el centro referente."
+      title="Talleres Assignats"
+      subtitle="Consulta i gestiona la planificació dels teus tallers."
     >
       <div className="w-full">
         {/* Panell de Filtres */}
-        <div className="bg-white border border-gray-200 p-8 mb-8">
+        <div className="bg-white border-2 border-gray-100 p-8 mb-10 shadow-sm relative overflow-hidden">
           <div className="flex flex-col md:flex-row justify-between items-end gap-6">
             <div className="flex-1 w-full space-y-4">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00426B] mb-2 flex items-center gap-2">
-                <span className="w-4 h-[2px] bg-[#0775AB]"></span>
-                Panell de Filtres
+              <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#00426B] mb-4 flex items-center gap-3">
+                <div className="w-8 h-1 bg-[#0775AB]"></div>
+                Cerca i Filtres
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="relative group">
                   <input 
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Cerca per taller o centre..."
-                    className="w-full pl-10 pr-4 py-3 bg-[#F8FAFC] border-none text-[11px] font-bold uppercase tracking-wider text-[#00426B] focus:ring-2 focus:ring-[#0775AB] transition-all outline-none"
+                    placeholder="CERCA PER TALLER O CENTRE..."
+                    className="w-full pl-10 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#4197CB] text-[11px] font-bold uppercase tracking-widest text-[#00426B] transition-all outline-none"
                   />
-                  <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-3 h-4 w-4 text-[#00426B]/40 group-focus-within:text-[#0775AB] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-4 h-4 w-4 text-[#00426B]/40 group-focus-within:text-[#4197CB] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none text-[11px] font-bold uppercase tracking-wider text-[#00426B] focus:ring-2 focus:ring-[#0775AB] transition-all outline-none appearance-none"
+                  className="w-full px-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#4197CB] text-[11px] font-bold uppercase tracking-widest text-[#00426B] transition-all outline-none appearance-none"
                 >
                   <option value="Tots els estats">Tots els estats</option>
                   <option value="En_curs">En curs / Acceptats</option>
@@ -113,7 +113,7 @@ export default function AssignacionsPage() {
             </div>
             <button 
               onClick={() => { setSearchQuery(""); setStatusFilter("Tots els estats"); }}
-              className="px-8 py-3 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-all border border-[#CFD2D3]"
+              className="px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#00426B] hover:bg-[#EAEFF2] transition-all border-2 border-[#00426B]"
             >
               Netejar
             </button>
@@ -123,87 +123,40 @@ export default function AssignacionsPage() {
         {loading ? (
           <Loading />
         ) : (
-          <div className="bg-white border border-gray-200 overflow-hidden">
+          <div className="bg-white border-2 border-gray-100 shadow-sm overflow-hidden">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#F8FAFC] border-b border-gray-200">
-                  <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-400 tracking-widest">Taller Assignat</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-400 tracking-widest">Centre Referent</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-400 tracking-widest">Calendari</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-400 tracking-widest">Estat / Progrés</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-400 tracking-widest text-right">Accions</th>
+                <tr className="bg-gray-50 border-b-2 border-gray-100">
+                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Taller Assignat</th>
+                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Referent</th>
+                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Més Info</th>
+                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] text-right">Accions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredAssignacions.map(a => (
-                  <tr key={a.id_assignacio} className="hover:bg-gray-50 transition-colors group">
-                    <td className="px-6 py-5">
+                  <tr key={a.id_assignacio} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
+                    <td className="px-10 py-10">
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[#4197CB] mb-1">Taller Iter</span>
-                        <span className="text-sm font-black text-[#00426B] uppercase tracking-tight">{a.taller?.titol}</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-[#4197CB] mb-2">IDENTIFICADOR TALLER</span>
+                        <span className="text-base font-extrabold text-[#00426B] uppercase tracking-tight leading-tight">{a.taller?.titol}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2">
-                        <svg className="h-4 w-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m4 0h1m-5 10h5m-5 4h5" />
-                        </svg>
-                        <span className="text-xs font-bold text-gray-600">{a.centre?.nom || 'Pendent'}</span>
+                    <td className="px-10 py-10">
+                      <span className="text-[11px] font-bold text-[#00426B] uppercase">{a.centre?.nom || 'No assignat'}</span>
+                    </td>
+                    <td className="px-10 py-10">
+                      <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                        Inici: {a.data_inici ? new Date(a.data_inici).toLocaleDateString() : '—'}
                       </div>
                     </td>
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          Inici: {a.data_inici ? new Date(a.data_inici).toLocaleDateString() : 'Pendiente'}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col gap-3">
-                        <span className={`w-fit px-3 py-1 text-[9px] font-black uppercase tracking-widest border ${
-                          a.estat === 'En_curs' ? 'border-orange-200 bg-orange-50 text-orange-600' : 'border-green-200 bg-green-50 text-green-600'
-                        }`}>
-                          {a.estat === 'En_curs' ? 'En curs' : a.estat}
-                        </span>
-                        
-                        {/* Checklist Mini Visualitzador - Always show 3 squares for visual consistency */}
-                        <div className="flex items-center gap-2">
-                          {[0, 1, 2].map((idx) => {
-                            const item = a.checklist?.[idx];
-                            return (
-                              <div 
-                                key={idx} 
-                                title={item?.pas_nom || 'Pendent'}
-                                className={`w-3 h-3 border-2 ${item?.completat ? 'bg-green-500 border-green-600' : 'bg-gray-100 border-gray-300'}`}
-                              />
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col sm:flex-row justify-end items-center gap-2">
-
-                        <button
-                          onClick={() => isPhaseActive(PHASES.PLANIFICACION) && router.push(`/centro/assignacions/${a.id_assignacio}/alumnos`)}
-                          disabled={!isPhaseActive(PHASES.PLANIFICACION)}
-                          className={`px-3 py-2 text-[9px] font-black uppercase tracking-widest border transition-all whitespace-nowrap ${isPhaseActive(PHASES.PLANIFICACION)
-                            ? 'border-[#0775AB] text-[#0775AB] hover:bg-[#0775AB] hover:text-white'
-                            : 'border-gray-200 text-gray-300 cursor-not-allowed'
-                            }`}
-                        >
-                          Registre Nominal
-                        </button>
-                         <button
-                          onClick={() => router.push(`/centro/assignacions/${a.id_assignacio}`)}
-                          className={`px-3 py-2 text-[9px] font-black uppercase tracking-widest border transition-all whitespace-nowrap border-black text-black hover:bg-black hover:text-white`}
-                        >
-                          Gestionar Taller
-                        </button>
-                      </div>
+                    <td className="px-10 py-10 text-right">
+                      <button
+                        onClick={() => router.push(`/centro/assignacions/${a.id_assignacio}`)}
+                        className="btn-primary py-2 px-6 text-[10px]"
+                      >
+                        Gestionar
+                      </button>
                     </td>
                   </tr>
                 ))}

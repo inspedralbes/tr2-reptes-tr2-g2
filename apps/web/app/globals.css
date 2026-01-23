@@ -30,21 +30,46 @@ h3,
 h4,
 h5,
 h6 {
-  font-weight: 900;
+  font-weight: 800;
   color: var(--consorci-dark-blue);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+/* Institutional Design System */
+* {
+  border-radius: 0 !important;
+  box-shadow: none !important; /* Remove all shadows for a serious look */
 }
 
 .btn-primary {
-  @apply bg-[#00426B] hover:bg-[#0775AB] text-white font-black uppercase text-[10px] tracking-widest py-3 px-6 transition-all active:scale-95;
+  @apply bg-[#00426B] hover:bg-black text-white font-bold uppercase text-[11px] tracking-[0.2em] py-4 px-10 transition-colors;
 }
 
 .btn-secondary {
-  @apply bg-white border border-[#EAEFF2] hover:bg-[#EAEFF2] text-[#00426B] font-black uppercase text-[10px] tracking-widest py-3 px-6 transition-all active:scale-95;
+  @apply bg-white border-2 border-[#00426B] hover:bg-[#F2F2F3] text-[#00426B] font-bold uppercase text-[11px] tracking-[0.2em] py-4 px-10 transition-colors;
 }
 
-.card-premium {
-  @apply bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#0775AB] transition-all duration-300;
+.card-institutional {
+  @apply bg-white border-2 border-gray-200 p-8 transition-colors hover:border-[#4197CB];
+}
+
+.header-label {
+  @apply text-[11px] font-black uppercase tracking-[0.3em] text-[#00426B] mb-8 flex items-center gap-4;
+}
+
+.header-label::before {
+  content: '';
+  @apply w-12 h-1.5 bg-[#0775AB];
+}
+
+/* Sidebar Specifics */
+.sidebar-card-dark {
+  @apply bg-[#00426B] p-10 text-white;
+}
+
+.sidebar-card-light {
+  @apply bg-white border-2 border-gray-100 p-10;
 }
 
 @layer utilities {
