@@ -25,7 +25,9 @@ export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
-      }
+      },
+      connectTimeoutMS: 5000, // 5 segundos para conectar
+      serverSelectionTimeoutMS: 5000 // 5 segundos para seleccionar servidor
     });
 
     await client.connect();

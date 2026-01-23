@@ -18,7 +18,7 @@ export default function AdminStatsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  
+
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -30,7 +30,7 @@ export default function AdminStatsPage() {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const router = useRouter();
@@ -109,8 +109,8 @@ export default function AdminStatsPage() {
   }
 
   return (
-    <DashboardLayout 
-      title="Gestió de Dades" 
+    <DashboardLayout
+      title="Gestió de Dades"
       subtitle="Analítica professional i administració de registres d'activitat"
     >
       <div className="space-y-8">
@@ -119,7 +119,7 @@ export default function AdminStatsPage() {
           <div className="text-[10px] font-black text-[#00426B] uppercase tracking-widest">
             PANEL D'ADMINISTRACIÓ AVANÇAT
           </div>
-          <button 
+          <button
             onClick={handleCleanup}
             className="bg-white text-red-600 px-4 py-2 rounded-none text-[10px] font-black uppercase tracking-widest hover:bg-red-50 transition-all border border-red-200"
           >
@@ -194,14 +194,14 @@ export default function AdminStatsPage() {
               <h3 className="text-xs font-black text-[#00426B] uppercase tracking-widest">Gestió de Checklists (MongoDB)</h3>
             </div>
             <div className="flex gap-0">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Cercar per títol o estat..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="bg-white border border-gray-200 px-4 py-2 rounded-none text-xs focus:outline-none focus:border-[#00426B] border-r-0 w-64"
               />
-              <button 
+              <button
                 onClick={handleSearch}
                 className="bg-[#00426B] text-white px-6 py-2 rounded-none text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB]"
               >
@@ -227,7 +227,7 @@ export default function AdminStatsPage() {
                       ))}
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={() => handleAddStep(result.id_peticio)}
                     className="bg-white border border-gray-200 text-[10px] font-black uppercase px-4 py-2 hover:bg-gray-100 transition-all text-[#00426B] whitespace-nowrap"
                   >
@@ -280,7 +280,7 @@ export default function AdminStatsPage() {
                     </td>
                   </tr>
                 )) : (
-                  <tr>
+                  <tr key="no-activity">
                     <td colSpan={3} className="px-6 py-20 text-center">
                       <p className="text-gray-300 text-xs font-bold uppercase tracking-widest">No hi ha activitat registrada</p>
                     </td>
@@ -291,7 +291,7 @@ export default function AdminStatsPage() {
           </div>
         </div>
       </div>
-      <ConfirmDialog 
+      <ConfirmDialog
         isOpen={confirmConfig.isOpen}
         title={confirmConfig.title}
         message={confirmConfig.message}
