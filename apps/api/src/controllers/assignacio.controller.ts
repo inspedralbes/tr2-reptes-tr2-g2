@@ -81,6 +81,27 @@ export const getAssignacionsByCentre = async (req: Request, res: Response) => {
   }
 };
 
+// GET: Obtener alumnos inscritos en una asignación
+export const getStudents = async (req: Request, res: Response) => {
+  const { idAssignacio } = req.params;
+  const { userId, role } = (req as any).user;
+
+  try {
+    const inscripcions = await prisma.inscripcio.findMany({
+      where: { id_assignacio: parseInt(idAssignacio as string) },
+      include: {
+        alumne: true
+      }
+    });
+
+    // Flatten structure to return just students with relevant info
+    const students = inscripcions.map(i => i.alumne);
+    res.json(students);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener alumnos' });
+  }
+};
+
 // GET: Checklist de una asignación
 export const getChecklist = async (req: Request, res: Response) => {
   const { idAssignacio } = req.params;

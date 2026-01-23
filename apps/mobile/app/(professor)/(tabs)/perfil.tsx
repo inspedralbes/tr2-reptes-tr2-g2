@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { THEME } from '@iter/shared';
+import { THEME, ROLES } from '@iter/shared';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -83,32 +83,34 @@ export default function PerfilScreen() {
         <View className="px-6"> 
           
           {/* User ID Card */}
-          <View className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 flex-row items-center">
-             <View className="w-20 h-20 rounded-full bg-slate-900 items-center justify-center mr-6 border-4 border-gray-50 shadow-sm">
-                <Text className="text-2xl font-black text-white">{getUserInitials()}</Text>
+          <View className="bg-gray-50 rounded-2xl p-4 shadow-sm border border-gray-200 flex-row">
+             <View className="w-20 items-center justify-center border-r border-gray-200 mr-5 pr-5">
+                <View className="w-16 h-16 rounded-full bg-slate-900 items-center justify-center border-4 border-white shadow-sm">
+                   <Text className="text-xl font-black text-white">{getUserInitials()}</Text>
+                </View>
              </View>
-             <View className="flex-1">
-                <Text className="text-2xl font-extrabold text-slate-900 leading-tight mb-1" numberOfLines={1}>
+             <View className="flex-1 justify-center">
+                <Text className="text-xl font-extrabold text-slate-900 leading-tight mb-1.5" numberOfLines={1}>
                   {user?.nom_complet || 'Carregant...'}
                 </Text>
-                <View className="bg-blue-50 self-start px-2 py-1 rounded-md border border-blue-100">
+                <View className="bg-blue-50 self-start px-2.5 py-1 rounded-md border border-blue-100">
                    <Text className="text-blue-700 text-[10px] font-bold uppercase tracking-wide">
-                     {user?.role === 'PROFESSOR' ? 'Professorat' : 'Administrador'}
+                     {user?.rol?.nom_rol === ROLES.PROFESOR ? 'Professorat' : 'Administrador'}
                    </Text>
                 </View>
              </View>
           </View>
 
           {/* Settings Group */}
-          <Text className="text-slate-900 text-lg font-bold mb-4">Configuració</Text>
+          <Text className="text-slate-900 text-lg font-bold mb-4 mt-8">Configuració</Text>
           
-          <View className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-8 shadow-sm">
+          <View className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden mb-8 shadow-sm">
              
              {/* Notificacions */}
-             <View className="p-4 flex-row justify-between items-center border-b border-gray-50">
+             <View className="p-4 flex-row justify-between items-center border-b border-gray-200">
                <View className="flex-row items-center">
-                 <View className="w-10 h-10 rounded-xl bg-gray-50 items-center justify-center mr-4">
-                   <Ionicons name="notifications" size={20} color="#64748B" />
+                 <View className="w-10 h-10 rounded-xl bg-white items-center justify-center mr-4 border border-gray-100 shadow-sm">
+                   <Ionicons name="notifications" size={18} color="#64748B" />
                  </View>
                  <Text className="font-bold text-sm text-slate-700">Notificacions Push</Text>
                </View>
@@ -121,10 +123,10 @@ export default function PerfilScreen() {
              </View>
              
              {/* Change Password */}
-             <TouchableOpacity className="p-4 flex-row justify-between items-center border-b border-gray-50">
+             <TouchableOpacity className="p-4 flex-row justify-between items-center border-b border-gray-200">
                <View className="flex-row items-center">
-                 <View className="w-10 h-10 rounded-xl bg-gray-50 items-center justify-center mr-4">
-                   <Ionicons name="lock-closed" size={20} color="#64748B" />
+                 <View className="w-10 h-10 rounded-xl bg-white items-center justify-center mr-4 border border-gray-100 shadow-sm">
+                   <Ionicons name="lock-closed" size={18} color="#64748B" />
                  </View>
                  <Text className="font-bold text-sm text-slate-700">Seguretat i Contrasenya</Text>
                </View>
@@ -134,8 +136,8 @@ export default function PerfilScreen() {
              {/* Help Center */}
              <TouchableOpacity className="p-4 flex-row justify-between items-center">
                <View className="flex-row items-center">
-                 <View className="w-10 h-10 rounded-xl bg-gray-50 items-center justify-center mr-4">
-                   <Ionicons name="help-buoy" size={20} color="#64748B" />
+                 <View className="w-10 h-10 rounded-xl bg-white items-center justify-center mr-4 border border-gray-100 shadow-sm">
+                   <Ionicons name="help-buoy" size={18} color="#64748B" />
                  </View>
                  <Text className="font-bold text-sm text-slate-700">Suport i Ajuda</Text>
                </View>

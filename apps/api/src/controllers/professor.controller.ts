@@ -120,19 +120,27 @@ export const getProfessorAssignments = async (req: Request, res: Response) => {
   const { userId, centreId } = (req as any).user;
 
   try {
+    // Verify user belongs to center or is admin (optional safety check)
     if (!centreId) {
       return res.json([]);
     }
 
     const assignments = await prisma.assignacio.findMany({
       where: {
-        id_centre: parseInt(centreId)
+        OR: [
+           { professors: { some: { id_usuari: parseInt(userId) } } },
+           { prof1: { id_usuari: parseInt(userId) } },
+           { prof2: { id_usuari: parseInt(userId) } }
+        ]
       },
       include: {
         taller: true,
         centre: true,
         prof1: true,
         prof2: true,
+        sessions: {
+            orderBy: { data_sessio: 'asc' }
+        },
         professors: {
           include: {
             usuari: {

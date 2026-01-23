@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { THEME, PHASES } from '@iter/shared';
-import api, { getMyAssignments, getFases } from '../../../services/api';
+import api, { getMyAssignments, getFases, getNotificacions } from '../../../services/api';
 
 import { CalendarEvent } from '../../../components/EventDetailModal';
 import WorkshopDetailModal from '../../../components/WorkshopDetailModal';
@@ -70,12 +70,41 @@ export default function DashboardScreen() {
   const getNextSession = () => {
     if (assignments.length === 0) return null;
     const now = new Date();
-    const sorted = [...assignments].sort((a, b) => 
-      new Date(a.data_inici || 0).getTime() - new Date(b.data_inici || 0).getTime()
-    );
     
-    // Find next upcoming or today, else last one
-    return sorted.find(a => new Date(a.data_inici).getTime() >= now.getTime() - 86400000) || sorted[0];
+    // Flatten sessions from all assignments
+    const allSessions: any[] = [];
+    assignments.forEach(assign => {
+        if (assign.sessions && assign.sessions.length > 0) {
+            assign.sessions.forEach((sess: any) => {
+                allSessions.push({
+                    id_assignacio: assign.id_assignacio,
+                    taller: assign.taller,
+                    centre: assign.centre,
+                    data_inici: sess.data_sessio, 
+                    hora_inici: sess.hora_inici,
+                    hora_fi: sess.hora_fi,
+                    isSession: true
+                });
+            });
+        } else {
+             // Fallback for assignments without sessions loaded
+             allSessions.push({
+                id_assignacio: assign.id_assignacio,
+                taller: assign.taller,
+                centre: assign.centre,
+                data_inici: assign.data_inici,
+                hora_inici: null,
+                isSession: false
+             });
+        }
+    });
+
+    // Sort sessions by date
+    allSessions.sort((a, b) => new Date(a.data_inici).getTime() - new Date(b.data_inici).getTime());
+
+    // Find next upcoming session (today or future)
+    // We look back ~20h to ensuring 'today's' sessions are shown even if technically started a few hours ago
+    return allSessions.find(s => new Date(s.data_inici).getTime() >= now.getTime() - 72000000) || allSessions[allSessions.length - 1];
   };
 
   const nextWorkshop = getNextSession();
@@ -100,108 +129,116 @@ export default function DashboardScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-white">
+      <View className="flex-1 justify-center items-center bg-[#F9FAFB]">
         <ActivityIndicator size="large" color={THEME.colors.primary} />
       </View>
     );
   }
+
+
 
   return (
 
     <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#F9FAFB]">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         
-        {/* Professional Header */}
+        {/* Professional Header - Matches Agenda Aesthetic */}
         <View className="px-6 pb-6 pt-4 bg-white border-b border-gray-100 mb-6">
-          <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
-            {new Date().toLocaleDateString('ca-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
-          </Text>
-          <Text className="text-3xl font-extrabold text-slate-900 leading-tight">
+          <View className="flex-row items-baseline">
+            <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest mr-2">
+              {new Date().toLocaleDateString('ca-ES', { weekday: 'long' })}
+            </Text>
+            <Text className="text-gray-300 text-xs font-bold uppercase tracking-widest">
+              {new Date().toLocaleDateString('ca-ES', { day: 'numeric', month: 'long' })}
+            </Text>
+          </View>
+          <Text className="text-3xl font-extrabold text-slate-900 leading-tight mt-1">
             Hola, {userName}
           </Text>
         </View>
 
         <View className="px-6">
           
-          {/* Section: Next Session */}
+          {/* Section: Project Status - Apple Style - KEPT */}
+          <View className="w-full bg-gray-100 rounded-2xl p-4 flex-row items-center justify-between mb-8">
+             <View>
+                 <Text className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Fase Actual</Text>
+                 <Text className="text-xl font-bold text-slate-900 tracking-tight">
+                    {fases.find(f => f.activa)?.nom || 'Càrrega de dades'}
+                 </Text>
+             </View>
+             <View className="flex-row items-center bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+                <View className="w-2 h-2 rounded-full bg-green-500 mr-2" />
+                <Text className="text-xs font-semibold text-gray-600">Actiu</Text>
+             </View>
+          </View>
+
+          {/* Section: Next Session - Hero Card Style */}
           <Text className="text-slate-900 text-lg font-bold mb-4">Propera Sessió</Text>
 
-          {/* Hero Card */}
           {nextWorkshop ? (
              <TouchableOpacity 
                onPress={() => handleWorkshopClick(nextWorkshop)}
                activeOpacity={0.9}
-               className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 relative overflow-hidden mb-8"
+               className="w-full bg-slate-900 rounded-3xl p-6 shadow-lg shadow-slate-200 relative overflow-hidden mb-8"
              >
-                {/* Accent Bar */}
-                <View className="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-500" />
+                {/* Decorative circle */}
+                <View className="absolute -right-6 -top-6 w-32 h-32 bg-slate-800 rounded-full opacity-50" />
                 
-                <View className="ml-3">
+                <View>
                     {/* Top Row: Time & Status */}
-                    <View className="flex-row justify-between items-center mb-3">
-                        <View className="flex-row items-center bg-gray-50 px-2 py-1 rounded-md">
-                           <Ionicons name="time" size={14} color="#64748B" />
-                           <Text className="text-gray-600 text-xs font-bold ml-1.5">
-                              {new Date(nextWorkshop.data_inici).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <View className="flex-row justify-between items-center mb-4">
+                        <View className="flex-row items-center bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+                           <Ionicons name="time" size={14} color="#94A3B8" />
+                           <Text className="text-gray-200 text-xs font-bold ml-2">
+                              {nextWorkshop.hora_inici 
+                                ? `${nextWorkshop.hora_inici}${nextWorkshop.hora_fi ? ' - ' + nextWorkshop.hora_fi : ''}`
+                                : new Date(nextWorkshop.data_inici).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                              }
                            </Text>
                         </View>
                         {isPhaseActive(PHASES.EJECUCION) && (
-                            <View className="bg-green-100 px-2.5 py-1 rounded-full">
-                                <Text className="text-green-700 text-[10px] font-extrabold uppercase tracking-wide">En Curs</Text>
+                            <View className="bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-500/30">
+                                <Text className="text-emerald-400 text-[10px] font-black uppercase tracking-wide">En Curs</Text>
                             </View>
                         )}
                     </View>
 
                     {/* Title */}
-                    <Text className="text-xl font-black text-slate-900 mb-1 leading-tight" numberOfLines={2}>
+                    <Text className="text-2xl font-black text-white mb-2 leading-tight" numberOfLines={2}>
                         {nextWorkshop.taller.titol}
                     </Text>
 
                     {/* Location */}
-                    <View className="flex-row items-center mb-5">
+                    <View className="flex-row items-center mb-6">
                         <Ionicons name="location" size={16} color="#94A3B8" />
-                        <Text className="text-slate-500 text-sm font-medium ml-1.5" numberOfLines={1}>
+                        <Text className="text-slate-400 text-sm font-medium ml-1.5" numberOfLines={1}>
                             {nextWorkshop.centre.nom}
                         </Text>
                     </View>
 
                     {/* Action Footer */}
-                    <View className="flex-row justify-between items-center pt-4 border-t border-gray-50">
-                        <Text className="text-slate-400 text-xs font-bold uppercase tracking-wider">
+                    <View className="flex-row justify-between items-center pt-4 border-t border-slate-800">
+                        <Text className="text-slate-400 text-xs font-bold uppercase tracking-widest">
                            {isPhaseActive(PHASES.EJECUCION) ? 'Gestionar Sessió' : 'Veure Detalls'}
                         </Text>
-                        <View className="w-8 h-8 rounded-full bg-slate-900 items-center justify-center">
-                            <Ionicons name="arrow-forward" size={16} color="white" />
+                        <View className="w-10 h-10 rounded-full bg-white/10 items-center justify-center">
+                            <Ionicons name="arrow-forward" size={18} color="white" />
                         </View>
                     </View>
                 </View>
              </TouchableOpacity>
           ) : (
-            <View className="bg-white rounded-2xl p-8 border-dashed border-2 border-gray-200 items-center justify-center mb-8">
-               <View className="w-12 h-12 bg-gray-50 rounded-full items-center justify-center mb-3">
-                  <Ionicons name="calendar" size={24} color="#CBD5E1" />
-               </View>
-               <Text className="text-gray-400 font-medium text-center">No tens tallers propers.</Text>
+            <View className="w-full items-center justify-center py-10 rounded-2xl border-2 border-dashed border-gray-300 mb-8">
+               <Text className="text-gray-400 font-medium text-sm">No tens tallers propers</Text>
             </View>
           )}
 
-          {/* Section: Project Status */}
-          <Text className="text-slate-900 text-lg font-bold mb-4">Estat Actual</Text>
-          
-          <View className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex-row items-center mb-8">
-             <View className="w-12 h-12 rounded-xl bg-orange-50 items-center justify-center mr-4 border border-orange-100">
-                <Ionicons name="flag" size={24} color="#F97316" />
-             </View>
-             <View className="flex-1">
-                 <Text className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Fase del Projecte</Text>
-                 <Text className="text-lg font-bold text-slate-900">
-                    {fases.find(f => f.activa)?.nom || 'Càrrega de dades'}
-                 </Text>
-             </View>
-             <View className="bg-gray-50 w-8 h-8 rounded-full items-center justify-center">
-                 <Ionicons name="chevron-forward" size={16} color="#CBD5E1" />
-             </View>
-          </View>
+
+
+
+
+          <View className="h-6" /> 
 
         </View>
       </ScrollView>
@@ -213,3 +250,9 @@ export default function DashboardScreen() {
     </View>
   );
 }
+
+// Helper to check for active sessions today
+const hasActiveSession = (assignments: any[]) => {
+   const today = new Date().toLocaleDateString();
+   return assignments.some(a => new Date(a.data_inici).toLocaleDateString() === today);
+};

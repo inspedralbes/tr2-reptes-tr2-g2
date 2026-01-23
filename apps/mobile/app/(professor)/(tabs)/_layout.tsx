@@ -17,8 +17,8 @@ export default function ProfessorTabsLayout() {
         <Icon sf="bell.fill" />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="talleres" options={{ title: 'Agenda' }}>
-        <Label>Agenda</Label>
+      <NativeTabs.Trigger name="talleres" options={{ title: 'Calendari' }}>
+        <Label>Calendari</Label>
         <Icon sf="calendar" />
       </NativeTabs.Trigger>
 

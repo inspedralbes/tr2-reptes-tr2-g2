@@ -81,6 +81,7 @@ export const login = (data: any) => api.post('auth/login', data);
 
 export const getMyAssignments = () => api.get('professors/me/assignments');
 export const getChecklist = (id: string) => api.get(`assignacions/${id}/checklist`);
+export const getStudents = (id: string) => api.get(`assignacions/${id}/students`);
 export const getAttendance = (idAssignacio: string) => api.get(`assistencia/assignacio/${idAssignacio}`);
 export const postAttendance = (data: any) => api.post('assistencia', data);
 export const postIncidencia = (data: any) => api.post('assignacions/incidencies', data);

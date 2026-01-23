@@ -92,8 +92,8 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
 
   // Mapeo de Assignments y sus Sessions
   assignments.forEach((a: any) => {
-    // La barra de rango del taller (Azul claro)
-    if (a.data_inici && a.data_fi) {
+    // La barra de rango del taller (Azul claro) - Ocultar para profesores para reducir ruido
+    if (a.data_inici && a.data_fi && user.role !== ROLES.PROFESOR) {
       events.push({
         id: `assign-${a.id_assignacio}`,
         title: user.role === ROLES.COORDINADOR ? `Taller: ${a.taller.titol}` : `${a.taller.titol}`,
