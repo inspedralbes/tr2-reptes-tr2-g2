@@ -3,6 +3,49 @@ import { Request, Response } from 'express';
 import { AssignmentChecklistSchema, ROLES } from '@iter/shared';
 import { isPhaseActive, PHASES } from '../lib/phaseUtils';
 
+// GET: Una asignación por ID (Detalle completo)
+export const getAssignacioById = async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const { centreId, role } = (req as any).user;
+
+  try {
+    const assignacio = await prisma.assignacio.findUnique({
+      where: { id_assignacio: parseInt(id) },
+      include: {
+        taller: true,
+        centre: true,
+        checklist: true,
+        prof1: true,
+        prof2: true,
+        sessions: true,
+        professors: {
+          include: {
+            usuari: true
+          }
+        },
+        inscripcions: {
+          include: {
+            alumne: true
+          }
+        }
+      }
+    });
+
+    if (!assignacio) {
+      return res.status(404).json({ error: 'Assignació no trobada' });
+    }
+
+    // Security Scoping
+    if (role !== 'ADMIN' && assignacio.id_centre !== centreId) {
+      return res.status(403).json({ error: 'Accés denegat' });
+    }
+
+    res.json(assignacio);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtenir el detall de l\'assignació' });
+  }
+};
+
 // GET: Listar asignaciones de un centro
 export const getAssignacionsByCentre = async (req: Request, res: Response) => {
   const { idCentre } = req.params;
@@ -18,16 +61,16 @@ export const getAssignacionsByCentre = async (req: Request, res: Response) => {
       where: { id_centre: parseInt(idCentre as string) },
       include: {
         taller: true,
+        centre: true,
         checklist: true,
+        sessions: {
+          orderBy: { data_sessio: 'asc' },
+          take: 1
+        },
         inscripcions: {
           include: {
             alumne: true,
             avaluacio_docent: true
-          }
-        },
-        peticio: {
-          include: {
-            centre: true
           }
         }
       }
@@ -192,11 +235,12 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
         prof1_id: peticio.prof1_id ?? undefined,
         prof2_id: peticio.prof2_id ?? undefined,
         // Inicializar checklist por defecto para Fase 2
+        // SIEMPRE 3 pasos para consistencia visual, pero Marcando como completado el que no aplique
         checklist: {
           create: [
             { pas_nom: 'Designar Profesores Referentes', completat: false },
             { pas_nom: 'Subir Registro Nominal (Excel)', completat: false },
-            { pas_nom: 'Gestionar Acuerdo Pedagógico (Modalidad C)', completat: peticio.modalitat !== 'C' }
+            { pas_nom: 'Acuerdo Pedagógico (Modalidad C)', completat: peticio.modalitat !== 'C' }
           ]
         }
       }
@@ -337,6 +381,44 @@ export const getSessionAttendance = async (req: Request, res: Response) => {
 
 export const registerAttendance = async (req: Request, res: Response) => {
   res.json({ message: 'Stub: registerAttendance implemented' });
+};
+
+// Phase 2: Teaching Staff Management
+export const addTeachingStaff = async (req: Request, res: Response) => {
+  const idAssignacio = req.params.idAssignacio as string;
+  const { idUsuari, esPrincipal } = req.body;
+
+  try {
+    const relation = await prisma.assignacioProfessor.create({
+      data: {
+        id_assignacio: parseInt(idAssignacio),
+        id_usuari: parseInt(idUsuari),
+        es_principal: esPrincipal || false
+      }
+    });
+    res.status(201).json(relation);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al afegir professor a l\'equip' });
+  }
+};
+
+export const removeTeachingStaff = async (req: Request, res: Response) => {
+  const idAssignacio = req.params.idAssignacio as string;
+  const idUsuari = req.params.idUsuari as string;
+
+  try {
+    await prisma.assignacioProfessor.delete({
+      where: {
+        id_assignacio_id_usuari: {
+          id_assignacio: parseInt(idAssignacio),
+          id_usuari: parseInt(idUsuari)
+        }
+      }
+    });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar professor de l\'equip' });
+  }
 };
 
 // Phase 4: Closing

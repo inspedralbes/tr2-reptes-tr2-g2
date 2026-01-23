@@ -16,7 +16,7 @@ export default function AssignacionsPage() {
   const [fases, setFases] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Tots els estats");
+  const [statusFilter, setStatusFilter] = useState("En_curs");
   
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -105,9 +105,9 @@ export default function AssignacionsPage() {
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="w-full px-4 py-3 bg-[#F8FAFC] border-none text-[11px] font-bold uppercase tracking-wider text-[#00426B] focus:ring-2 focus:ring-[#0775AB] transition-all outline-none appearance-none"
                 >
-                  <option>Tots els estats</option>
-                  <option>En curs</option>
-                  <option>Finalitzat</option>
+                  <option value="Tots els estats">Tots els estats</option>
+                  <option value="En_curs">En curs / Acceptats</option>
+                  <option value="Finalitzada">Finalitzats</option>
                 </select>
               </div>
             </div>
@@ -148,7 +148,7 @@ export default function AssignacionsPage() {
                         <svg className="h-4 w-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m4 0h1m-5 10h5m-5 4h5" />
                         </svg>
-                        <span className="text-xs font-bold text-gray-600">{a.peticio?.centre?.nom || 'Pendent'}</span>
+                        <span className="text-xs font-bold text-gray-600">{a.centre?.nom || 'Pendent'}</span>
                       </div>
                     </td>
                     <td className="px-6 py-5">
@@ -164,20 +164,23 @@ export default function AssignacionsPage() {
                     <td className="px-6 py-5">
                       <div className="flex flex-col gap-3">
                         <span className={`w-fit px-3 py-1 text-[9px] font-black uppercase tracking-widest border ${
-                          a.estat === 'En curs' ? 'border-orange-200 bg-orange-50 text-orange-600' : 'border-green-200 bg-green-50 text-green-600'
+                          a.estat === 'En_curs' ? 'border-orange-200 bg-orange-50 text-orange-600' : 'border-green-200 bg-green-50 text-green-600'
                         }`}>
-                          {a.estat}
+                          {a.estat === 'En_curs' ? 'En curs' : a.estat}
                         </span>
                         
-                        {/* Checklist Mini Visualitzador */}
-                        <div className="flex items-center gap-1">
-                          {a.checklist?.map((item: any) => (
-                            <div 
-                              key={item.id_checklist} 
-                              title={item.pas_nom}
-                              className={`w-2 h-2 border ${item.completat ? 'bg-green-500 border-green-500' : 'bg-gray-100 border-gray-200'}`}
-                            />
-                          ))}
+                        {/* Checklist Mini Visualitzador - Always show 3 squares for visual consistency */}
+                        <div className="flex items-center gap-2">
+                          {[0, 1, 2].map((idx) => {
+                            const item = a.checklist?.[idx];
+                            return (
+                              <div 
+                                key={idx} 
+                                title={item?.pas_nom || 'Pendent'}
+                                className={`w-3 h-3 border-2 ${item?.completat ? 'bg-green-500 border-green-600' : 'bg-gray-100 border-gray-300'}`}
+                              />
+                            );
+                          })}
                         </div>
                       </div>
                     </td>
@@ -195,13 +198,10 @@ export default function AssignacionsPage() {
                           Registre Nominal
                         </button>
                          <button
-                          onClick={() => (isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) ? router.push(`/centro/assignacions/${a.id_assignacio}/evaluacions`) : toast.info('La fase d\'avaluació encara no està activa')}
-                          className={`px-3 py-2 text-[9px] font-black uppercase tracking-widest border transition-all whitespace-nowrap ${(isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE))
-                            ? 'border-[#F26178] text-[#F26178] hover:bg-[#F26178] hover:text-white'
-                            : 'border-gray-100 text-gray-300'
-                            }`}
+                          onClick={() => router.push(`/centro/assignacions/${a.id_assignacio}`)}
+                          className={`px-3 py-2 text-[9px] font-black uppercase tracking-widest border transition-all whitespace-nowrap border-black text-black hover:bg-black hover:text-white`}
                         >
-                          {(isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)) ? 'Avaluar Alumnes' : 'Doc.'}
+                          Gestionar Taller
                         </button>
                       </div>
                     </td>

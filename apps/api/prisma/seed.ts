@@ -177,39 +177,6 @@ async function seedTallers(sectors: any) {
   return creadosTallers;
 }
 
-async function seedPeticions(centros: any, tallers: any, profes: any) {
-  console.log('📝 Generando peticiones de centros...');
-  
-  // Peticiones para Joan Brossa
-  for (let i = 0; i < 4; i++) {
-    await prisma.peticio.create({
-      data: {
-        id_centre: centros.centroBrossa.id_centre,
-        id_taller: tallers[i].id_taller,
-        alumnes_aprox: 10 + i,
-        estat: i === 0 ? 'Aprovada' : 'Pendent',
-        modalitat: tallers[i].modalitat,
-        prof1_id: profes.profesBrossa[i % profes.profesBrossa.length].id_professor,
-        comentaris: `Sol·licitud de prova ${i+1} per al centre Brossa.`
-      }
-    });
-  }
-
-  // Peticiones para Pau Claris
-  for (let i = 0; i < 4; i++) {
-    await prisma.peticio.create({
-      data: {
-        id_centre: centros.centroPauClaris.id_centre,
-        id_taller: tallers[tallers.length - 1 - i].id_taller,
-        alumnes_aprox: 8 + i,
-        estat: 'Pendent',
-        modalitat: tallers[tallers.length - 1 - i].modalitat,
-        prof1_id: profes.profesClaris[i % profes.profesClaris.length].id_professor,
-        comentaris: `Sol·licitud de prova ${i+1} per al centre Pau Claris.`
-      }
-    });
-  }
-}
 
 async function seedFases() {
   console.log('🗓️ Creando fases del programa...');
@@ -257,29 +224,6 @@ async function seedFases() {
   }
 }
 
-async function seedSessions(assignments: any[]) {
-  console.log('📅 Generando sesiones de talleres...');
-  const now = new Date();
-  
-  for (const a of assignments) {
-    if (a.data_inici) {
-      // Creamos 3 sesiones espaciadas una semana
-      for (let i = 0; i < 3; i++) {
-        const dataSessio = new Date(a.data_inici);
-        dataSessio.setDate(dataSessio.getDate() + (i * 7));
-        
-        await prisma.sessio.create({
-          data: {
-            id_assignacio: a.id_assignacio,
-            data_sessio: dataSessio,
-            hora_inici: '09:00',
-            hora_fi: '13:00'
-          }
-        });
-      }
-    }
-  }
-}
 
 async function main() {
   console.log('🌱 Iniciando Seed final para el programa Iter...');
@@ -294,37 +238,9 @@ async function main() {
   const centrosData = await seedUsers(infra.roles, passDefault);
   const tallers = await seedTallers(infra.sectors);
   
-  await seedPeticions(centrosData, tallers, centrosData);
   await seedFases();
 
-  // Necesitamos crear algunas asignaciones reales para ver sesiones
-  console.log('🔗 Generando asignaciones de prueba...');
-  const assignacions = [];
-  const brossaTaller1 = await prisma.assignacio.create({
-    data: {
-      id_centre: centrosData.centroBrossa.id_centre,
-      id_taller: tallers[0].id_taller,
-      data_inici: new Date(),
-      data_fi: new Date(new Date().setDate(new Date().getDate() + 30)),
-      estat: 'En_curs'
-    }
-  });
-  assignacions.push(brossaTaller1);
-
-  const pauTaller1 = await prisma.assignacio.create({
-    data: {
-      id_centre: centrosData.centroPauClaris.id_centre,
-      id_taller: tallers[1].id_taller,
-      data_inici: new Date(),
-      data_fi: new Date(new Date().setDate(new Date().getDate() + 30)),
-      estat: 'En_curs'
-    }
-  });
-  assignacions.push(pauTaller1);
-
-  await seedSessions(assignacions);
-
-  console.log('✅ Seed finalizado con éxito.');
+  console.log('✅ Seed finalizado con éxito (Sin datos transaccionales).');
 }
 
 main()
