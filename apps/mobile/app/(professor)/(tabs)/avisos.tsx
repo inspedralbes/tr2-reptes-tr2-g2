@@ -103,55 +103,64 @@ export default function AvisosScreen() {
             notificacions.map((notif) => (
               <View 
                 key={notif.id_notificacio}
-                className={`mb-4 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 relative overflow-hidden ${notif.llegida ? 'opacity-60' : ''}`}
+                className={`mb-3 bg-gray-50 rounded-2xl p-4 shadow-sm border border-gray-200 flex-row ${notif.llegida ? 'opacity-60' : ''}`}
               >
-                {!notif.llegida && (
-                  <View style={{ backgroundColor: getImportanceColor(notif.importancia) }} className="absolute left-0 top-0 bottom-0 w-1.5" />
-                )}
-                
-                <View className="flex-row justify-between items-start mb-2">
-                  <View className="flex-row items-center bg-gray-50 px-2 py-1 rounded-md">
-                     <Ionicons name={getTypeIcon(notif.tipus) as any} size={12} color="#64748B" />
-                     <Text className="text-gray-500 text-[10px] font-bold uppercase tracking-wider ml-1.5">{notif.tipus}</Text>
-                  </View>
-                  <Text className="text-gray-400 text-[10px] font-medium">
-                    {new Date(notif.data_creacio).toLocaleDateString('ca-ES', { day: 'numeric', month: 'short' })}
+                {/* Date Side - Calendar Style */}
+                <View className="w-14 items-center justify-center border-r border-gray-200 mr-4 pr-4">
+                  <Text className="text-gray-400 text-[10px] font-bold uppercase mb-1">
+                    {new Date(notif.data_creacio).toLocaleDateString('ca-ES', { month: 'short' }).slice(0, 3)}
+                  </Text>
+                  <Text className="text-slate-900 text-xl font-bold">
+                    {new Date(notif.data_creacio).getDate()}
                   </Text>
                 </View>
 
-                <Text className={`text-lg font-black text-slate-900 mb-1 leading-tight ${notif.llegida ? 'text-slate-500' : ''}`}>
-                  {notif.titol}
-                </Text>
-                <Text className="text-slate-600 text-sm leading-relaxed mb-4">
-                  {notif.missatge}
-                </Text>
+                {/* Content */}
+                <View className="flex-1 justify-center">
+                  
+                  {/* Top Row: Type & Status */}
+                  <View className="flex-row justify-between items-center mb-1">
+                    <Text className={`text-[10px] font-bold uppercase tracking-wider ${notif.llegida ? 'text-gray-400' : 'text-blue-600'}`}>
+                       {notif.tipus}
+                    </Text>
+                    
+                    {!notif.llegida && (
+                      <View className="w-2 h-2 rounded-full bg-blue-500" />
+                    )}
+                  </View>
 
-                <View className="flex-row justify-end space-x-3 pt-4 border-t border-gray-50">
-                   {!notif.llegida && (
+                  <Text className="text-slate-900 font-bold text-base leading-tight mb-1" numberOfLines={1}>
+                    {notif.titol}
+                  </Text>
+                  
+                  <Text className="text-gray-500 text-xs leading-relaxed line-clamp-2 mb-3" numberOfLines={2}>
+                    {notif.missatge}
+                  </Text>
+
+                  {/* Minimal Actions */}
+                  <View className="flex-row justify-end items-center pt-3 border-t border-gray-200 border-dashed">
+                     {!notif.llegida && (
+                       <TouchableOpacity 
+                          onPress={() => markRead(notif.id_notificacio)}
+                          className="mr-4"
+                          hitSlop={10}
+                       >
+                          <Text className="text-blue-600 font-bold text-[10px] uppercase">Llegit</Text>
+                       </TouchableOpacity>
+                     )}
                      <TouchableOpacity 
-                        onPress={() => markRead(notif.id_notificacio)}
-                        className="bg-slate-900 px-4 py-2 rounded-lg flex-row items-center"
+                        onPress={() => deleteNotif(notif.id_notificacio)}
+                        hitSlop={10}
                      >
-                        <Ionicons name="checkmark" size={14} color="white" />
-                        <Text className="text-white font-bold text-[10px] uppercase ml-1.5">Llegit</Text>
+                        <Text className="text-gray-400 font-bold text-[10px] uppercase hover:text-red-500">Eliminar</Text>
                      </TouchableOpacity>
-                   )}
-                   <TouchableOpacity 
-                      onPress={() => deleteNotif(notif.id_notificacio)}
-                      className="bg-gray-50 px-4 py-2 rounded-lg flex-row items-center border border-gray-100"
-                   >
-                      <Ionicons name="trash-outline" size={14} color="#EF4444" />
-                      <Text className="text-red-500 font-bold text-[10px] uppercase ml-1.5">Eliminar</Text>
-                   </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             ))
           ) : (
-            <View className="items-center py-24 bg-white rounded-3xl border border-gray-100 shadow-sm">
-               <View className="w-16 h-16 bg-gray-50 rounded-full items-center justify-center mb-4">
-                  <Ionicons name="mail-open-outline" size={32} color="#CBD5E1" />
-               </View>
-               <Text className="text-gray-400 font-bold uppercase tracking-widest text-center px-8">No hi ha avisos nous en aquest moment</Text>
+            <View className="items-center justify-center py-10 rounded-2xl border-2 border-dashed border-gray-300">
+               <Text className="text-gray-400 font-medium text-sm">No tens nous avisos</Text>
             </View>
           )}
         </View>

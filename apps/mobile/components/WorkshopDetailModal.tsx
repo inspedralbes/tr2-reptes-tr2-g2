@@ -124,9 +124,9 @@ const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onCl
                          onClose();
                          router.push(`/(professor)/sesion/${event.metadata.id_assignacio}`);
                        }}
-                       className="w-full bg-blue-600 h-14 rounded-2xl items-center justify-center shadow-lg shadow-blue-200"
+                       className="w-full bg-slate-900 h-14 rounded-2xl items-center justify-center shadow-lg shadow-slate-200"
                     >
-                        <Text className="text-white text-lg font-bold tracking-wide uppercase">Començar Sessió</Text>
+                        <Text className="text-white text-lg font-bold tracking-wide uppercase">Gestionar Sessió / Assistència</Text>
                     </TouchableOpacity>
                </View>
            )}

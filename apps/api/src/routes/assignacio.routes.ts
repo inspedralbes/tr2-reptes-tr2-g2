@@ -12,6 +12,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.get('/:id', authenticateToken, assignacioController.getAssignacioById);
 router.get('/centre/:idCentre', authenticateToken, assignacioController.getAssignacionsByCentre);
 router.get('/:idAssignacio/checklist', authenticateToken, assignacioController.getChecklist);
+router.get('/:idAssignacio/students', authenticateToken, assignacioController.getStudents);
 router.patch('/checklist/:idItem', authenticateToken, assignacioController.updateChecklistItem);
 router.get('/incidencies/centre/:idCentre', authenticateToken, assignacioController.getIncidenciesByCentre);
 router.post('/incidencies', authenticateToken, assignacioController.createIncidencia);
