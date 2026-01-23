@@ -12,6 +12,11 @@ export interface PopularStat {
   alumnes_totals: number;
 }
 
+export interface OccupancyStat {
+  zona: string;
+  percentatge_ocupacio: number;
+}
+
 export interface ActivityLog {
   _id: string;
   tipus_accio: string;
@@ -55,6 +60,11 @@ const statsService = {
   cleanupLogs: async (): Promise<{ success: boolean; deletedCount: number; message: string }> => {
     const api = getApi();
     const response = await api.delete<{ success: boolean; deletedCount: number; message: string }>("/stats/logs/cleanup");
+    return response.data;
+  },
+  getOccupancyByZone: async (): Promise<OccupancyStat[]> => {
+    const api = getApi();
+    const response = await api.get<OccupancyStat[]>("/stats/occupancy-by-zone");
     return response.data;
   }
 };

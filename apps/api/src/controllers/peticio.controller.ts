@@ -15,7 +15,7 @@ export const getPeticions = async (req: Request, res: Response) => {
 
   try {
     const where: any = {};
-    
+
     // Scoping: Admin sees all, others only their center
     if (role !== 'ADMIN') {
       if (!centreId) {
@@ -144,8 +144,9 @@ export const createPeticio = async (req: Request, res: Response) => {
       await db.collection('request_checklists').insertOne({
         id_peticio: nuevaPeticio.id_peticio,
         id_centre: nuevaPeticio.id_centre,
+        id_taller: nuevaPeticio.id_taller,
         workshop_title: nuevaPeticio.taller.titol,
-        status: 'initializing',
+        status: 'pendent',
         passos: [
           { pas: 'Revisió de coordinació', completat: false, data: new Date() },
           { pas: 'Assignació de material', completat: false, data: new Date() },
@@ -163,6 +164,7 @@ export const createPeticio = async (req: Request, res: Response) => {
         tipus_accio: 'CREATE_PETICIO',
         centre_id: nuevaPeticio.id_centre,
         taller_id: nuevaPeticio.id_taller,
+        workshop_title: nuevaPeticio.taller.titol,
         timestamp: new Date(),
         detalls: {
           modalitat: nuevaPeticio.modalitat,
@@ -202,8 +204,27 @@ export const updatePeticioStatus = async (req: Request, res: Response) => {
       importancia: updated.estat === 'Aprovada' ? 'INFO' : 'WARNING'
     });
 
+    // --- INTEGRACIÓN MONGODB ---
+    try {
+      const { db } = await connectToDatabase();
+      await db.collection('request_checklists').updateOne(
+        { id_peticio: updated.id_peticio },
+        { $set: { status: updated.estat.toLowerCase() } }
+      );
+      await db.collection('activity_logs').insertOne({
+        tipus_accio: updated.estat === 'Aprovada' ? 'APPROVE_PETICIO' : 'REJECT_PETICIO',
+        centre_id: updated.id_centre,
+        taller_id: updated.id_taller,
+        timestamp: new Date(),
+        detalls: { estat_anterior: 'Pendent', estat_nou: updated.estat }
+      });
+    } catch (mongoError) {
+      console.warn('⚠️ MongoDB Sync Error:', mongoError);
+    }
+
     res.json(updated);
   } catch (error) {
+    console.error("Error en updatePeticioStatus:", error);
     res.status(500).json({ error: 'Error al actualizar estado' });
   }
 };

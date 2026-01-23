@@ -19,15 +19,25 @@ export const getStatsByStatus = async (req: Request, res: Response) => {
         }
       },
       {
-        $sort: { total: -1 }
-      },
-      {
         $project: {
-          estat: "$_id",
+          estat: {
+            $switch: {
+              branches: [
+                { case: { $eq: [{ $toLower: "$_id" }, "initializing"] }, then: "pendent" },
+                { case: { $eq: [{ $toLower: "$_id" }, "pendent"] }, then: "pendent" },
+                { case: { $eq: [{ $toLower: "$_id" }, "aprovada"] }, then: "aprovada" },
+                { case: { $eq: [{ $toLower: "$_id" }, "rebutjada"] }, then: "rebutjada" }
+              ],
+              default: { $toLower: "$_id" }
+            }
+          },
           total: 1,
           last_update: 1,
           _id: 0
         }
+      },
+      {
+        $sort: { total: -1 }
       }
     ]).toArray();
 
@@ -51,7 +61,7 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
       },
       {
         $group: {
-          _id: "$taller_id",
+          _id: { $ifNull: ["$workshop_title", { $concat: ["Taller ", { $toString: "$taller_id" }] }] },
           total_solicitudes: { $sum: 1 },
           alumnes_totals: { $sum: "$detalls.alumnes_aprox" }
         }
