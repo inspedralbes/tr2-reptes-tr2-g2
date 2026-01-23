@@ -243,7 +243,7 @@ export default function AdminStatsPage() {
                   <div className="space-y-2 mb-6 flex-1">
                     {result.passos.map((p: any, idx: number) => (
                       <div key={idx} className="flex items-center gap-2">
-                        <div className={`w-3 h-3 border ${p.completat ? 'bg-[#00426B] border-[#00426B]' : 'bg-white border-gray-200'}`}></div>
+                        <div className={`w-3 h-3 border rounded-full ${p.completat ? 'bg-[#00426B] border-[#00426B]' : 'bg-white border-gray-200'}`}></div>
                         <span className={`text-[10px] font-bold ${p.completat ? 'text-[#00426B]' : 'text-gray-400 italic font-medium line-through'}`}>
                           {p.pas}
                         </span>

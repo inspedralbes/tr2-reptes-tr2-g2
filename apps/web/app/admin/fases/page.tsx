@@ -86,7 +86,7 @@ export default function PhaseManagementPage() {
             <div>
               <h3 className="font-black text-[#00426B] uppercase text-[10px] tracking-widest mb-1">Panell de Control Temporal</h3>
               <p className="text-sm text-gray-600 font-medium leading-relaxed">
-                Cada fase habilita funcionalitats específiques per als coordinadors de centre. 
+                Cada fase habilita funcionalitats específiques per als coordinadors de centre.
                 Pots activar una fase per forçar la transició de l'aplicació i provar els flujos de treball.
               </p>
             </div>
@@ -100,11 +100,10 @@ export default function PhaseManagementPage() {
             {fases.sort((a, b) => a.ordre - b.ordre).map((fase) => (
               <div
                 key={fase.id_fase}
-                className={`border bg-white ${
-                  fase.activa 
-                  ? 'border-l-8 border-[#00426B] border-t-gray-200 border-r-gray-200 border-b-gray-200' 
-                  : 'border-l-8 border-gray-200 border-t-gray-100 border-r-gray-100 border-b-gray-100 opacity-70'
-                }`}
+                className={`border bg-white ${fase.activa
+                    ? 'border-l-8 border-[#00426B] border-t-gray-200 border-r-gray-200 border-b-gray-200'
+                    : 'border-l-8 border-gray-200 border-t-gray-100 border-r-gray-100 border-b-gray-100 opacity-70'
+                  }`}
               >
                 <div className="p-8 flex flex-col md:flex-row justify-between gap-8">
                   <div className="flex-1">
@@ -125,7 +124,7 @@ export default function PhaseManagementPage() {
                         )}
                       </div>
                     </div>
-                    
+
                     <p className="text-xs text-gray-500 font-medium mb-8 max-w-2xl leading-relaxed">
                       {fase.descripcio}
                     </p>
@@ -162,19 +161,18 @@ export default function PhaseManagementPage() {
                     <button
                       onClick={() => togglePhase(fase.id_fase, fase.activa)}
                       disabled={updating === fase.id_fase}
-                      className={`w-full py-5 font-black text-[10px] uppercase tracking-widest transition-all ${
-                        fase.activa
-                        ? 'bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed'
-                        : 'bg-[#00426B] text-white hover:bg-[#0775AB] hover:shadow-lg active:translate-y-0.5'
-                      }`}
+                      className={`w-full py-5 font-black text-[10px] uppercase tracking-widest transition-all ${fase.activa
+                          ? 'bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed'
+                          : 'bg-[#00426B] text-white hover:bg-[#0775AB] hover:shadow-lg active:translate-y-0.5'
+                        }`}
                     >
-                      {updating === fase.id_fase 
+                      {updating === fase.id_fase
                         ? (
                           <div className="flex items-center justify-center gap-2">
-                            <div className="w-3 h-3 border-2 border-white/20 border-t-white animate-spin"></div>
+                            <div className="w-3 h-3 border-2 border-white/20 border-t-white animate-spin rounded-full"></div>
                             Processant
                           </div>
-                        ) 
+                        )
                         : (fase.activa ? 'Fase Activada' : 'Activar aquesta Fase')
                       }
                     </button>

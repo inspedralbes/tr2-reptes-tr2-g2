@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { connectToDatabase } from '../lib/mongodb';
+import prisma from '../lib/prisma';
+import { RiskAnalysisService } from '../services/risk-analysis.service';
 
 /**
  * GET /stats/peticions-by-status
@@ -70,7 +72,10 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
         $sort: { total_solicitudes: -1 }
       },
       {
-        $limit: 5
+        $limit: 10
+      },
+      {
+        $sort: { _id: 1 } // Sort alphabetically by name for stability
       }
     ]).toArray();
 
@@ -277,9 +282,6 @@ export const getOccupancyByZone = async (req: Request, res: Response) => {
 };
 
 // POST: Ejecutar análisis de riesgo de abandono
-import { RiskAnalysisService } from '../services/risk-analysis.service';
-import prisma from '../lib/prisma'; // Import prisma for this function
-
 export const runRiskAnalysis = async (req: Request, res: Response) => {
   try {
     const { studentId } = req.body;

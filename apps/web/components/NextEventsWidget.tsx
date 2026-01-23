@@ -35,10 +35,10 @@ const NextEventsWidget: React.FC = () => {
   if (loading) return (
     <div className="animate-pulse flex space-x-4 p-4 bg-white border border-gray-100 h-40">
       <div className="flex-1 space-y-4 py-1">
-        <div className="h-4 bg-gray-200 w-3/4"></div>
+        <div className="h-4 bg-gray-200 w-3/4 rounded-full"></div>
         <div className="space-y-2">
-          <div className="h-4 bg-gray-200"></div>
-          <div className="h-4 bg-gray-200 w-5/6"></div>
+          <div className="h-4 bg-gray-200 rounded-full"></div>
+          <div className="h-4 bg-gray-200 w-5/6 rounded-full"></div>
         </div>
       </div>
     </div>
@@ -47,14 +47,14 @@ const NextEventsWidget: React.FC = () => {
   return (
     <div className="bg-white border border-gray-300 p-6 flex flex-col h-full relative overflow-hidden group">
       <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-         <svg className="h-20 w-20" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-         </svg>
+        <svg className="h-20 w-20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
       </div>
 
       <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-6 flex items-center justify-between">
         Properes Fites
-        <button 
+        <button
           onClick={() => router.push('/calendar')}
           className="text-consorci-darkBlue hover:text-consorci-lightBlue lowercase font-bold tracking-normal"
         >
