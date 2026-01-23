@@ -198,11 +198,10 @@ const CreateWorkshopModal = ({
                   <button
                     key={key}
                     onClick={() => setIcona(key)}
-                    className={`w-12 h-12 flex items-center justify-center transition-all border ${
-                      icona === key 
-                        ? 'bg-[#00426B] border-[#00426B] scale-105 shadow-md text-white' 
+                    className={`w-12 h-12 flex items-center justify-center transition-all border ${icona === key
+                        ? 'bg-[#00426B] border-[#00426B] scale-105 shadow-md text-white'
                         : 'bg-white border-gray-200 text-[#00426B] hover:border-[#0775AB] hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                       {path}
@@ -386,7 +385,7 @@ const CreateWorkshopModal = ({
             {loading ? (
               <span className="flex items-center">
                 <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white rounded-full"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"

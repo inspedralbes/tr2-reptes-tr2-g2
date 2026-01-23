@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { connectToDatabase } from '../lib/mongodb';
+import prisma from '../lib/prisma';
+import { RiskAnalysisService } from '../services/risk-analysis.service';
 
 /**
  * GET /stats/peticions-by-status
@@ -19,15 +21,25 @@ export const getStatsByStatus = async (req: Request, res: Response) => {
         }
       },
       {
-        $sort: { total: -1 }
-      },
-      {
         $project: {
-          estat: "$_id",
+          estat: {
+            $switch: {
+              branches: [
+                { case: { $eq: [{ $toLower: "$_id" }, "initializing"] }, then: "pendent" },
+                { case: { $eq: [{ $toLower: "$_id" }, "pendent"] }, then: "pendent" },
+                { case: { $eq: [{ $toLower: "$_id" }, "aprovada"] }, then: "aprovada" },
+                { case: { $eq: [{ $toLower: "$_id" }, "rebutjada"] }, then: "rebutjada" }
+              ],
+              default: { $toLower: "$_id" }
+            }
+          },
           total: 1,
           last_update: 1,
           _id: 0
         }
+      },
+      {
+        $sort: { total: -1 }
       }
     ]).toArray();
 
@@ -51,7 +63,7 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
       },
       {
         $group: {
-          _id: "$taller_id",
+          _id: { $ifNull: ["$workshop_title", { $concat: ["Taller ", { $toString: "$taller_id" }] }] },
           total_solicitudes: { $sum: 1 },
           alumnes_totals: { $sum: "$detalls.alumnes_aprox" }
         }
@@ -60,7 +72,10 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
         $sort: { total_solicitudes: -1 }
       },
       {
-        $limit: 5
+        $limit: 10
+      },
+      {
+        $sort: { _id: 1 } // Sort alphabetically by name for stability
       }
     ]).toArray();
 
@@ -267,9 +282,6 @@ export const getOccupancyByZone = async (req: Request, res: Response) => {
 };
 
 // POST: Ejecutar análisis de riesgo de abandono
-import { RiskAnalysisService } from '../services/risk-analysis.service';
-import prisma from '../lib/prisma'; // Import prisma for this function
-
 export const runRiskAnalysis = async (req: Request, res: Response) => {
   try {
     const { studentId } = req.body;
