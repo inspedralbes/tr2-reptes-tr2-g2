@@ -3,6 +3,7 @@ import { AssignmentSolver, Student, WorkshopSlot, AssignmentResult } from './ass
 
 export class AutoAssignmentService {
     private solver: AssignmentSolver;
+    private readonly GROUP_CAPACITY = 16;
 
     constructor() {
         this.solver = new AssignmentSolver();
@@ -45,15 +46,15 @@ export class AutoAssignmentService {
         const petitionMap = new Map<number, typeof petitions[0]>(); // Map StudentId -> Peticio (to track back)
         const studentPeticioMap = new Map<number, number>();
 
-        petitions.forEach((p) => {
+        petitions.forEach((p: any) => {
             if (!studentsByTaller.has(p.id_taller)) {
                 studentsByTaller.set(p.id_taller, []);
             }
             const list = studentsByTaller.get(p.id_taller)!;
 
             // If petition has specific students linked
-            if ((p as any).alumnes && (p as any).alumnes.length > 0) {
-                (p as any).alumnes.forEach((a: any) => {
+            if (p.alumnes && p.alumnes.length > 0) {
+                p.alumnes.forEach((a: any) => {
                     list.push({ id: a.id_alumne, centerId: p.id_centre });
                     studentPeticioMap.set(a.id_alumne, p.id_peticio);
                 });
@@ -71,13 +72,19 @@ export class AutoAssignmentService {
             if (!taller) continue;
 
             // 1. Calculate occupied capacity from existing assignments
+            // We sum the actual number of nominal inscriptions if they exist, 
+            // otherwise we fall back to approx students
             const existingAssignments = await prisma.assignacio.findMany({
               where: { id_taller: tallerId },
-              include: { peticio: true }
+              include: { 
+                peticio: true,
+                inscripcions: true 
+              }
             });
 
-            const occupiedPlazas = existingAssignments.reduce((sum, a) => {
-              return sum + (a.peticio?.alumnes_aprox || 0);
+            const occupiedPlazas = existingAssignments.reduce((sum: number, a: any) => {
+              const nominalCount = a.inscripcions.length;
+              return sum + (nominalCount > 0 ? nominalCount : (a.peticio?.alumnes_aprox || 0));
             }, 0);
 
             const remainingCapacity = taller.places_maximes - occupiedPlazas;
@@ -91,10 +98,9 @@ export class AutoAssignmentService {
             }
 
             // Calculate needed groups based on remaining capacity
-            const GROUP_CAPACITY = 16;
             const groupsNeeded = Math.min(
-                Math.ceil(totalStudents / GROUP_CAPACITY),
-                Math.floor(remainingCapacity / GROUP_CAPACITY) || 1 // At least 1 if there is some capacity
+                Math.ceil(totalStudents / this.GROUP_CAPACITY),
+                Math.floor(remainingCapacity / this.GROUP_CAPACITY) || 1 // At least 1 if there is some capacity
             );
 
             // Create Slots
@@ -103,7 +109,7 @@ export class AutoAssignmentService {
                 slots.push({
                     workshopId: tallerId,
                     groupId: i,
-                    capacity: GROUP_CAPACITY
+                    capacity: this.GROUP_CAPACITY
                 });
             }
 

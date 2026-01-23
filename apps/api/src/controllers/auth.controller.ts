@@ -3,6 +3,7 @@ import prisma from '../lib/prisma';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
+import logger from '../lib/logger';
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -27,8 +28,14 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    const secret = process.env.JWT_SECRET || 'secreto_super_seguro';
-
+    const secret = process.env.JWT_SECRET;
+    
+    if (!secret) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('JWT_SECRET no está configurada en producción.');
+      }
+      logger.warn('⚠️ JWT_SECRET no configurada. Usando fallback inseguro para desarrollo.');
+    }
 
     const token = jwt.sign(
       {
@@ -36,7 +43,7 @@ export const login = async (req: Request, res: Response) => {
         role: usuari.rol.nom_rol,
         centreId: usuari.id_centre
       },
-      secret,
+      secret || 'secreto_super_seguro_dev',
       { expiresIn: '8h' }
     );
 

@@ -153,7 +153,8 @@ export const createIncidencia = async (req: Request, res: Response) => {
     });
     res.status(201).json(nuevaIncidencia);
   } catch (error) {
-    res.status(500).json({ error: 'Error al ejecutar análisis de riesgo' });
+    console.error("Error al crear incidencia:", error);
+    res.status(500).json({ error: 'Error al crear la incidencia y ejecutar análisis de riesgo' });
   }
 };
 
@@ -262,31 +263,42 @@ export const createInscripcions = async (req: Request, res: Response) => {
     const result = await prisma.$transaction(async (tx) => {
       // 1. Verificar existencia de la asignación
       const assignacio = await tx.assignacio.findUnique({
-        where: { id_assignacio: idAssignacio }
+        where: { id_assignacio: idAssignacio },
+        include: { inscripcions: true }
       });
 
       if (!assignacio) {
         throw new Error('Asignación no encontrada.');
       }
 
-      // 2. Eliminar inscripciones previas para esta asignación
-      await tx.inscripcio.deleteMany({
-        where: { id_assignacio: idAssignacio }
-      });
+      // 2. Sincronizar inscripciones (en lugar de borrar todo)
+      const currentIds = assignacio.inscripcions.map((i: any) => i.id_alumne);
+      const newIds = ids_alumnes.map((id: any) => parseInt(id));
 
-      // 3. Crear las nuevas inscripciones
-      const newInscripcions = await Promise.all(
-        ids_alumnes.map((idAlumne: number) =>
-          tx.inscripcio.create({
-            data: {
-              id_assignacio: idAssignacio,
-              id_alumne: idAlumne
-            }
-          })
-        )
-      );
+      const toAdd = newIds.filter((id: number) => !currentIds.includes(id));
+      const toRemove = currentIds.filter((id: number) => !newIds.includes(id));
 
-      // 4. Marcar el ítem del checklist como completado
+      // Eliminar desaparecidos
+      if (toRemove.length > 0) {
+        await tx.inscripcio.deleteMany({
+          where: {
+            id_assignacio: idAssignacio,
+            id_alumne: { in: toRemove }
+          }
+        });
+      }
+
+      // Añadir nuevos
+      for (const idAlumne of toAdd) {
+        await tx.inscripcio.create({
+          data: {
+            id_assignacio: idAssignacio,
+            id_alumne: idAlumne
+          }
+        });
+      }
+
+      // 3. Marcar el ítem del checklist como completado
       await tx.checklistAssignacio.updateMany({
         where: {
           id_assignacio: idAssignacio,
@@ -298,10 +310,10 @@ export const createInscripcions = async (req: Request, res: Response) => {
         }
       });
 
-      return newInscripcions;
+      return { added: toAdd.length, removed: toRemove.length, total: newIds.length };
     });
 
-    res.json({ message: 'Registro nominal completado', count: result.length });
+    res.json({ message: 'Registro nominal sincronizado correctamente', details: result });
   } catch (error: any) {
     console.error("Error al realizar registro nominal:", error);
     if (error.message === 'Asignación no encontrada.') {
@@ -376,11 +388,11 @@ export const getSessions = async (req: Request, res: Response) => {
 };
 
 export const getSessionAttendance = async (req: Request, res: Response) => {
-  res.json({ message: 'Stub: getSessionAttendance implemented' });
+  res.status(501).json({ error: 'Funcionalitat no implementada: getSessionAttendance' });
 };
 
 export const registerAttendance = async (req: Request, res: Response) => {
-  res.json({ message: 'Stub: registerAttendance implemented' });
+  res.status(501).json({ error: 'Funcionalitat no implementada: registerAttendance' });
 };
 
 // Phase 2: Teaching Staff Management
@@ -423,5 +435,5 @@ export const removeTeachingStaff = async (req: Request, res: Response) => {
 
 // Phase 4: Closing
 export const closeAssignacio = async (req: Request, res: Response) => {
-  res.json({ message: 'Stub: closeAssignacio implemented' });
+  res.status(501).json({ error: 'Funcionalitat no implementada: closeAssignacio' });
 };

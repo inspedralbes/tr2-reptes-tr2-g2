@@ -7,6 +7,7 @@ import cors from 'cors';
 import routes from './routes';
 import logger from './lib/logger';
 import { errorHandler } from './middlewares/errorHandler';
+import prisma from './lib/prisma';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -32,7 +33,13 @@ if (process.env.CORS_ORIGIN) {
 
 app.use(cors({
   origin: function (origin, callback) {
-    return callback(null, true);
+    // permitir peticiones sin origen (como apps móviles o curl) si es necesario, 
+    // pero para web restringir a la lista
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'ngrok-skip-browser-warning'],
@@ -50,8 +57,13 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 8002;
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   logger.info(`🚀 Servidor listo en puerto: ${PORT}`);
   logger.info(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-  logger.info(`🗄️  DATABASE STATUS: Connected to PostgreSQL (Live Update)`);
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    logger.info(`🗄️  DATABASE STATUS: Connected to PostgreSQL`);
+  } catch (e) {
+    logger.error(`🗄️  DATABASE STATUS: Connection failed`);
+  }
 });
