@@ -76,49 +76,55 @@ export class AutoAssignmentService {
             if (!taller) continue;
 
             const existingAssignments = await prisma.assignacio.findMany({
-              where: { id_taller: tallerId },
-              include: { 
-                peticio: true,
-                inscripcions: true 
-              }
+                where: { id_taller: tallerId },
+                include: {
+                    peticio: true,
+                    inscripcions: true
+                }
             });
 
             const occupiedPlazas = existingAssignments.reduce((sum: number, a: any) => {
-              return sum + a.inscripcions.length;
+                const nominalCount = a.inscripcions.length;
+                return sum + (nominalCount > 0 ? nominalCount : (a.peticio?.alumnes_aprox || 0));
             }, 0);
 
             const remainingCapacity = taller.places_maximes - occupiedPlazas;
-            const groupsNeeded = Math.min(
-                Math.ceil(students.length / this.GROUP_CAPACITY),
-                Math.floor(remainingCapacity / this.GROUP_CAPACITY) || 1
-            );
+            console.log(`📊 AutoAssignment: Taller ID ${tallerId} (${taller.titol}): Plazas Totales: ${taller.places_maximes}, Ocupadas: ${occupiedPlazas}, Disponibles: ${remainingCapacity}`);
 
+            const totalStudents = students.length;
+
+            if (remainingCapacity <= 0) {
+                console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Cannot assign ${totalStudents} students.`);
+                continue;
+            }
+
+            // Create Slots until we cover all students OR run out of capacity
+            // We ensure we don't create "phantom" capacity that exceeds the workshop limit
             const slots: WorkshopSlot[] = [];
-            for (let i = 1; i <= groupsNeeded; i++) {
-                slots.push({ workshopId: tallerId, groupId: i, capacity: this.GROUP_CAPACITY });
+            let currentRemaining = remainingCapacity;
+            let groupId = 1;
+
+            while (currentRemaining > 0) {
+                // If we already have enough capacity for all students, stop creating new groups
+                const currentTotalCapacity = slots.reduce((acc, s) => acc + s.capacity, 0);
+                if (currentTotalCapacity >= totalStudents) break;
+
+                const slotCap = Math.min(this.GROUP_CAPACITY, currentRemaining);
+                slots.push({
+                    workshopId: tallerId,
+                    groupId: groupId++,
+                    capacity: slotCap
+                });
+
+                currentRemaining -= slotCap;
             }
 
-            // Run Solver for this workshop
-            const tallerAssignments = this.solver.solve(students, slots);
-            
-            // Filter assignments based on global center limit
-            for (const assig of tallerAssignments) {
-                const student = students.find(s => s.id === assig.studentId);
-                if (!student) continue;
+            // Run Solver
+            const assignments = this.solver.solve(students, slots);
 
-                const currentCount = centerPlazaCount.get(student.centerId) || 0;
-                if (currentCount < this.GLOBAL_CENTER_LIMIT) {
-                    allAssignments.push(assig);
-                    centerPlazaCount.set(student.centerId, currentCount + 1);
-                } else {
-                    console.log(`⚠️ AutoAssignment: Global limit reached for Center ${student.centerId}. Skipping student ${student.id} in Workshop ${tallerId}.`);
-                }
-            }
-        }
-
-        // 4. Save all collected assignments
-        if (allAssignments.length > 0) {
-            await this.saveAssignments(allAssignments, studentPeticioMap);
+            // Save assignments
+            await this.saveAssignments(assignments, studentPeticioMap);
+            results.push(...assignments);
         }
 
         return { assigned: allAssignments.length, details: allAssignments };
