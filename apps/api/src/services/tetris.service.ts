@@ -1,5 +1,6 @@
 import prisma from '../lib/prisma';
 import { EstatPeticio } from '@prisma/client';
+import { createNotificacioInterna } from '../controllers/notificacio.controller';
 
 export interface TetrisStats {
   totalPetitions: number;
@@ -49,12 +50,6 @@ export async function runTetris() {
     console.log(`🚀 TetrisService: Starting assignment for ${petitions.length} petitions...`);
   }
 
-  if (petitions.length === 0) {
-    console.log('ℹ️ TetrisService: No approved petitions found waiting for assignment.');
-  } else {
-    console.log(`🚀 TetrisService: Starting assignment for ${petitions.length} petitions...`);
-  }
-
   // Group by Taller
   const tallerGroups: Record<number, typeof petitions> = {};
   for (const p of petitions) {
@@ -69,7 +64,7 @@ export async function runTetris() {
   for (const tallerId in tallerGroups) {
     const tallerPetitions = tallerGroups[tallerId];
     const taller = (tallerPetitions[0] as any).taller;
-    
+
     // 1. Calculate strictly occupied capacity from existing assignments
     const existingAssignments = await prisma.assignacio.findMany({
       where: { id_taller: parseInt(tallerId) },
@@ -120,6 +115,15 @@ export async function runTetris() {
               ]
             }
           }
+        });
+
+        // 3. Send Notification
+        await createNotificacioInterna({
+          id_centre: petition.id_centre,
+          titol: 'Sol·licitud Assignada Automàticament',
+          missatge: `La teva sol·licitud per al taller "${taller.titol}" ha estat acceptada i assignada via procés automàtic.`,
+          tipus: 'PETICIO',
+          importancia: 'INFO'
         });
 
         createdAssignments.push(assignacio);

@@ -28,6 +28,16 @@ export class AssignmentSolver {
    * algo: Randomized Greedy with Swap Optimization
    */
   public solve(students: Student[], slots: WorkshopSlot[]): AssignmentResult[] {
+    // 0. Check total capacity vs total students
+    const totalCapacity = slots.reduce((sum, s) => sum + s.capacity, 0);
+    let studentsToAssign = students;
+
+    // If we have more students than capacity, we need to select fairly (Round Robin per Center)
+    if (studentsToAssign.length > totalCapacity) {
+      console.log(`⚠️ AssignmentSolver: Students (${students.length}) > Capacity (${totalCapacity}). Applying Fair Selection (Round Robin).`);
+      studentsToAssign = this.selectStudentsFairly(students, totalCapacity);
+    }
+
     // 1. Prepare slots with tracking
     const slotsState = slots.map(s => ({
       ...s,
@@ -36,14 +46,14 @@ export class AssignmentSolver {
     }));
 
     // 2. Shuffle students for randomness
-    const shuffledStudents = [...students].sort(() => Math.random() - 0.5);
+    // Even after fair selection, we shuffle to ensure detailed assignment to slots is random
+    const shuffledStudents = [...studentsToAssign].sort(() => Math.random() - 0.5);
     const unassigned: Student[] = [];
 
     // 3. Initial Greedy Assignment
     for (const student of shuffledStudents) {
       // Find best valid slot
       let bestSlotIndex = -1;
-      let minScore = Infinity; // We want to minimize "concentration"
 
       // Sort slots by current usage (try to fill evenly or respecting diversity?)
       // Let's try to fit into any valid slot first
@@ -101,5 +111,52 @@ export class AssignmentSolver {
     });
 
     return results;
+  }
+
+  /**
+   * Selects students in a Round-Robin fashion from each center to ensure equity.
+   * If institute A has 4 students and B has 4 students, and we need 4 total,
+   * it picks: A1, B1, A2, B2.
+   */
+  private selectStudentsFairly(allStudents: Student[], limit: number): Student[] {
+    // Group by Center
+    const studentsByCenter = new Map<number, Student[]>();
+    allStudents.forEach(s => {
+      if (!studentsByCenter.has(s.centerId)) {
+        studentsByCenter.set(s.centerId, []);
+      }
+      studentsByCenter.get(s.centerId)!.push(s);
+    });
+
+    // Shuffle each center's list to ensure randomness within the center
+    studentsByCenter.forEach((list) => {
+      list.sort(() => Math.random() - 0.5);
+    });
+
+    const centers = Array.from(studentsByCenter.keys());
+    const selected: Student[] = [];
+    let nothingSelectedInRound = false;
+
+    // Round Robin Selection
+    while (selected.length < limit && !nothingSelectedInRound) {
+      nothingSelectedInRound = true;
+
+      // Shuffle centers order each round to avoid bias towards first center in list? 
+      // Or keep strict rotation? Strict rotation A, B, C, A, B, C is fairer for predictable counts.
+      // But let's shuffle centers once at start? No, keeping consistent order is standard RR.
+
+      for (const centerId of centers) {
+        if (selected.length >= limit) break;
+
+        const list = studentsByCenter.get(centerId)!;
+        if (list.length > 0) {
+          const student = list.pop()!; // Take one
+          selected.push(student);
+          nothingSelectedInRound = false;
+        }
+      }
+    }
+
+    return selected;
   }
 }

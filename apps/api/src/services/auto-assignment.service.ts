@@ -75,16 +75,16 @@ export class AutoAssignmentService {
             // We sum the actual number of nominal inscriptions if they exist, 
             // otherwise we fall back to approx students
             const existingAssignments = await prisma.assignacio.findMany({
-              where: { id_taller: tallerId },
-              include: { 
-                peticio: true,
-                inscripcions: true 
-              }
+                where: { id_taller: tallerId },
+                include: {
+                    peticio: true,
+                    inscripcions: true
+                }
             });
 
             const occupiedPlazas = existingAssignments.reduce((sum: number, a: any) => {
-              const nominalCount = a.inscripcions.length;
-              return sum + (nominalCount > 0 ? nominalCount : (a.peticio?.alumnes_aprox || 0));
+                const nominalCount = a.inscripcions.length;
+                return sum + (nominalCount > 0 ? nominalCount : (a.peticio?.alumnes_aprox || 0));
             }, 0);
 
             const remainingCapacity = taller.places_maximes - occupiedPlazas;
@@ -93,24 +93,29 @@ export class AutoAssignmentService {
             const totalStudents = students.length;
 
             if (remainingCapacity <= 0) {
-              console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Cannot assign ${totalStudents} students.`);
-              continue;
+                console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Cannot assign ${totalStudents} students.`);
+                continue;
             }
 
-            // Calculate needed groups based on remaining capacity
-            const groupsNeeded = Math.min(
-                Math.ceil(totalStudents / this.GROUP_CAPACITY),
-                Math.floor(remainingCapacity / this.GROUP_CAPACITY) || 1 // At least 1 if there is some capacity
-            );
-
-            // Create Slots
+            // Create Slots until we cover all students OR run out of capacity
+            // We ensure we don't create "phantom" capacity that exceeds the workshop limit
             const slots: WorkshopSlot[] = [];
-            for (let i = 1; i <= groupsNeeded; i++) {
+            let currentRemaining = remainingCapacity;
+            let groupId = 1;
+
+            while (currentRemaining > 0) {
+                // If we already have enough capacity for all students, stop creating new groups
+                const currentTotalCapacity = slots.reduce((acc, s) => acc + s.capacity, 0);
+                if (currentTotalCapacity >= totalStudents) break;
+
+                const slotCap = Math.min(this.GROUP_CAPACITY, currentRemaining);
                 slots.push({
                     workshopId: tallerId,
-                    groupId: i,
-                    capacity: this.GROUP_CAPACITY
+                    groupId: groupId++,
+                    capacity: slotCap
                 });
+
+                currentRemaining -= slotCap;
             }
 
             // Run Solver
