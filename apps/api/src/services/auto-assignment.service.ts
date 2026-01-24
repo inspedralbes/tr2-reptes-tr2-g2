@@ -75,16 +75,16 @@ export class AutoAssignmentService {
             // We sum the actual number of nominal inscriptions if they exist, 
             // otherwise we fall back to approx students
             const existingAssignments = await prisma.assignacio.findMany({
-              where: { id_taller: tallerId },
-              include: { 
-                peticio: true,
-                inscripcions: true 
-              }
+                where: { id_taller: tallerId },
+                include: {
+                    peticio: true,
+                    inscripcions: true
+                }
             });
 
             const occupiedPlazas = existingAssignments.reduce((sum: number, a: any) => {
-              const nominalCount = a.inscripcions.length;
-              return sum + (nominalCount > 0 ? nominalCount : (a.peticio?.alumnes_aprox || 0));
+                const nominalCount = a.inscripcions.length;
+                return sum + (nominalCount > 0 ? nominalCount : (a.peticio?.alumnes_aprox || 0));
             }, 0);
 
             const remainingCapacity = taller.places_maximes - occupiedPlazas;
@@ -93,8 +93,8 @@ export class AutoAssignmentService {
             const totalStudents = students.length;
 
             if (remainingCapacity <= 0) {
-              console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Cannot assign ${totalStudents} students.`);
-              continue;
+                console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Cannot assign ${totalStudents} students.`);
+                continue;
             }
 
             // Calculate needed groups based on remaining capacity
@@ -161,6 +161,18 @@ export class AutoAssignmentService {
                     where: { id_peticio: peticio.id_peticio },
                     data: { estat: 'Aprovada' }
                 });
+
+                // --- MODIFICACIÓ: Sincronitza amb MongoDB per als gràfics ---
+                try {
+                    const { connectToDatabase } = require('../lib/mongodb');
+                    const { db: mongoDb } = await connectToDatabase();
+                    await mongoDb.collection('request_checklists').updateOne(
+                        { id_peticio: peticio.id_peticio },
+                        { $set: { status: 'aprovada' } }
+                    );
+                } catch (mongoError) {
+                    console.warn(`⚠️ AutoAssignmentService: Error sincronitzant Mongo per petició ${peticio.id_peticio}:`, mongoError);
+                }
             }
 
             const assignacio = await prisma.assignacio.create({
