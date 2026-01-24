@@ -174,7 +174,7 @@ export class AutoAssignmentService {
                     id_peticio: group.peticioId,
                     id_centre: peticio.id_centre,
                     id_taller: group.workshopId,
-                    estat: 'PROVISIONAL',
+                    estat: 'PUBLISHED',
                     // Initialize checklist for Phase 2
                     checklist: {
                       create: [

@@ -22,6 +22,7 @@ router.post('/:idAssignacio/inscripcions', authenticateToken, assignacioControll
 router.post('/auto-generate', authenticateToken, assignacioController.generateAutomaticAssignments);
 router.post('/publish', authenticateToken, assignacioController.publishAssignments);
 router.post('/:idAssignacio/validate', authenticateToken, assignacioController.validateCenterData);
+router.patch('/inscripcions/:idInscripcio/validate', authenticateToken, assignacioController.validateInscripcioDocument);
 router.post('/:idAssignacio/document-notification', authenticateToken, assignacioController.sendDocumentNotification);
 
 // Phase 2 Specifics

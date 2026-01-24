@@ -96,6 +96,20 @@ const assignacioService = {
       console.error("Error en assignacioService.sendDocumentNotification:", error);
       throw error;
     }
+  },
+
+  /**
+   * Valida un documento específico de una inscripción.
+   */
+  validateDocument: async (idInscripcio: number, field: string, valid: boolean): Promise<any> => {
+    const api = getApi();
+    try {
+      const response = await api.patch(`/assignacions/inscripcions/${idInscripcio}/validate`, { field, valid });
+      return response.data;
+    } catch (error) {
+      console.error("Error en assignacioService.validateDocument:", error);
+      throw error;
+    }
   }
 };
 

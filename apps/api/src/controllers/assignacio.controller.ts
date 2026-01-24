@@ -294,7 +294,7 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
         id_peticio: peticio.id_peticio,
         id_centre: peticio.id_centre,
         id_taller: peticio.id_taller,
-        estat: 'En_curs',
+        estat: 'PUBLISHED',
         prof1_id: peticio.prof1_id ?? undefined,
         prof2_id: peticio.prof2_id ?? undefined,
         // Inicializar checklist por defecto para Fase 2
@@ -426,14 +426,20 @@ export const designateProfessors = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Has de designar dos professors diferents.' });
     }
 
+    const oldAssignacio = await prisma.assignacio.findUnique({ where: { id_assignacio: parseInt(idAssignacio as string) } });
+    
     const updated = await prisma.assignacio.update({
       where: { id_assignacio: parseInt(idAssignacio as string) },
       data: {
         prof1_id,
         prof2_id,
-        estat: 'DATA_ENTRY_PENDING' // Transition state once they start filling data
+        estat: 'DATA_ENTRY' // Transition state once they start filling data
       }
     });
+
+    if (oldAssignacio) {
+        await logStatusChange(parseInt(idAssignacio as string), oldAssignacio.estat, 'DATA_ENTRY');
+    }
 
     // Actualizar checklist
     await prisma.checklistAssignacio.updateMany({
@@ -463,7 +469,8 @@ export const validateCenterData = async (req: Request, res: Response) => {
   if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
 
   try {
-    const newState = aprobado ? 'VALIDATED' : 'DATA_ENTRY_PENDING';
+    const oldAssignacio = await prisma.assignacio.findUnique({ where: { id_assignacio: parseInt(idAssignacio) } });
+    const newState = aprobado ? 'VALIDATED' : 'DATA_ENTRY';
     
     await prisma.assignacio.update({
       where: { id_assignacio: parseInt(idAssignacio) },
@@ -471,6 +478,10 @@ export const validateCenterData = async (req: Request, res: Response) => {
         estat: newState,
       }
     });
+
+    if (oldAssignacio) {
+        await logStatusChange(parseInt(idAssignacio), oldAssignacio.estat, newState);
+    }
 
     res.json({ message: `Assignació ${aprobado ? 'validada' : 'rebutjada'} correctament.` });
   } catch (error) {
@@ -593,10 +604,25 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
         }
     }
 
-    // 4. Actualizar estado de la asignación a 'En_curs'
+    const oldAssignacio = await prisma.assignacio.findUnique({ where: { id_assignacio: parseInt(idAssignacio) } });
+
+    // 4. Actualizar estado de la asignación a 'IN_PROGRESS'
     await prisma.assignacio.update({
         where: { id_assignacio: parseInt(idAssignacio) },
-        data: { estat: 'En_curs' }
+        data: { estat: 'IN_PROGRESS' }
+    });
+
+    if (oldAssignacio) {
+        await logStatusChange(parseInt(idAssignacio), oldAssignacio.estat, 'IN_PROGRESS');
+    }
+
+    // 5. Enviar notificació al centre confirmant l'inici del taller
+    await createNotificacioInterna({
+        id_centre: assignacio.id_centre,
+        titol: 'Registre Confirmat: Taller en Marxa',
+        missatge: `El registre per al taller "${assignacio.taller.titol}" s'ha completat correctament. El taller ja està actiu i les sessions s'han generat al vostre calendari.`,
+        tipus: 'FASE',
+        importancia: 'INFO'
     });
 
     res.json({ success: true, message: 'Registre confirmat i sessions generades.' });
@@ -605,6 +631,53 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al confirmar el registre.' });
   }
 };
+
+/**
+ * PATCH: Validar un documento específico de una inscripción
+ */
+export const validateInscripcioDocument = async (req: Request, res: Response) => {
+    const { idInscripcio } = req.params;
+    const { field, valid } = req.body; // field: 'validat_acord_pedagogic', etc.
+    const { role } = (req as any).user;
+
+    if (role !== ROLES.ADMIN) {
+        return res.status(403).json({ error: 'Només els administradors poden validar documents.' });
+    }
+
+    const permittedFields = ['validat_acord_pedagogic', 'validat_autoritzacio_mobilitat', 'validat_drets_imatge'];
+    if (!permittedFields.includes(field)) {
+        return res.status(400).json({ error: 'Camp de validació no vàlid.' });
+    }
+
+    try {
+        const updated = await prisma.inscripcio.update({
+            where: { id_inscripcio: parseInt(idInscripcio as string) },
+            data: { [field]: !!valid }
+        });
+        res.json(updated);
+    } catch (error) {
+        console.error("Error validant document:", error);
+        res.status(500).json({ error: 'Error al validar el document.' });
+    }
+};
+
+/**
+ * HELPER: Log status changes as requested by user
+ */
+async function logStatusChange(idAssignacio: number, oldState: string, newState: string) {
+    if (oldState === newState) return;
+    try {
+        const a = await prisma.assignacio.findUnique({
+            where: { id_assignacio: idAssignacio },
+            include: { centre: true, taller: true }
+        });
+        if (a) {
+            console.log(`[STATUS CHANGE] Center: ${a.centre.nom} - Workshop: ${a.taller.titol} - From: ${oldState} - To: ${newState}`);
+        }
+    } catch (e) {
+        console.error("Error logging status change:", e);
+    }
+}
 // POST: Actualitzar Documents de Conformitat (Centro)
 export const updateComplianceDocuments = async (req: Request, res: Response) => {
   const idAssignacio = req.params.idAssignacio as string;

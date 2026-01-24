@@ -106,8 +106,8 @@ export default function AssignacionsPage() {
                   className="w-full px-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#4197CB] text-[11px] font-bold uppercase tracking-widest text-[#00426B] transition-all outline-none appearance-none"
                 >
                   <option value="Tots els estats">Tots els estats</option>
-                  <option value="En_curs">En curs / Acceptats</option>
-                  <option value="Finalitzada">Finalitzats</option>
+                  <option value="IN_PROGRESS">En curs / Acceptats</option>
+                  <option value="COMPLETED">Finalitzats</option>
                 </select>
               </div>
             </div>

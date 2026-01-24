@@ -167,7 +167,7 @@ model Assignacio {
   taller        Taller          @relation(fields: [id_taller], references: [id_taller])
   data_inici    DateTime?       @db.Date
   data_fi       DateTime?       @db.Date
-  estat         EstatAssignacio @default(En_curs)
+  estat         EstatAssignacio @default(PUBLISHED)
   grup          Int             @default(1)
 
   prof1_id Int?
@@ -213,14 +213,14 @@ model SessioProfessor {
 enum EstatAssignacio {
   PROVISIONAL
   PUBLISHED
-  DATA_ENTRY_PENDING
+  DATA_ENTRY
   DATA_SUBMITTED
   VALIDATED
   READY_TO_START
   VACANT
-  En_curs            @map("En curs")
-  Finalitzada
-  Cancellada         @map("Cancel·lada")
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }
 
 model AssignacioProfessor {
@@ -279,6 +279,11 @@ model Inscripcio {
   autoritzacio_mobilitat Boolean @default(false)
   drets_imatge           Boolean @default(false)
   registre_ceb_confirmat Boolean @default(false)
+
+  // Validation Flags (Admin)
+  validat_acord_pedagogic        Boolean @default(false)
+  validat_autoritzacio_mobilitat Boolean @default(false)
+  validat_drets_imatge           Boolean @default(false)
 
   // Document URLs
   url_acord_pedagogic        String?

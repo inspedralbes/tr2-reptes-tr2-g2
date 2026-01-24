@@ -322,7 +322,7 @@ async function seedAssignments(centros: any, tallers: any[]) {
         data: {
             id_centre: centros.centroBrossa.id_centre,
             id_taller: tallerRobot.id_taller,
-            estat: 'En_curs',
+            estat: 'PUBLISHED',
         }
     });
 
@@ -365,7 +365,7 @@ async function seedAssignments(centros: any, tallers: any[]) {
         data: {
             id_centre: centros.centroPauClaris.id_centre,
             id_taller: tallerCinema.id_taller,
-            estat: 'En_curs',
+            estat: 'PUBLISHED',
         }
     });
 

@@ -319,7 +319,7 @@ export const getPhase2MonitoringStats = async (req: Request, res: Response) => {
   try {
     const assignacions = await prisma.assignacio.findMany({
       where: {
-        estat: { in: ['PUBLISHED', 'DATA_ENTRY_PENDING', 'DATA_SUBMITTED', 'VALIDATED'] }
+        estat: { in: ['PUBLISHED', 'DATA_ENTRY', 'DATA_SUBMITTED', 'VALIDATED'] }
       },
       include: {
         centre: true,

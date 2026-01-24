@@ -9,6 +9,7 @@ interface DocumentUploadProps {
   idInscripcio: number;
   documentType: 'acord_pedagogic' | 'autoritzacio_mobilitat' | 'drets_imatge';
   initialUrl?: string | null;
+  isValidated?: boolean;
   label: string;
   onUploadSuccess: (newUrl: string) => void;
 }
@@ -18,6 +19,7 @@ export default function DocumentUpload({
   idInscripcio,
   documentType,
   initialUrl,
+  isValidated,
   label,
   onUploadSuccess
 }: DocumentUploadProps) {
@@ -66,18 +68,25 @@ export default function DocumentUpload({
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-4 p-3 border border-gray-100 bg-gray-50/50 group hover:bg-white hover:border-consorci-lightBlue transition-all">
         <div className="flex flex-col">
-          <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest">{label}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest">{label}</span>
+            {isValidated && (
+                <span className="bg-green-100 text-green-600 p-0.5 rounded-full" title="Validat per l'Administrador">
+                    <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor font-black"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
+                </span>
+            )}
+          </div>
           {currentUrl ? (
             <a 
               href={`${process.env.NEXT_PUBLIC_API_URL}${currentUrl}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-[10px] font-bold text-consorci-darkBlue hover:text-consorci-lightBlue flex items-center gap-1 mt-1"
+              className={`text-[10px] font-bold flex items-center gap-1 mt-1 ${isValidated ? 'text-green-600' : 'text-consorci-darkBlue hover:text-consorci-lightBlue'}`}
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
-              VEURE DOCUMENT
+              {isValidated ? 'DOCUMENT VALIDAT' : 'VEURE DOCUMENT'}
             </a>
           ) : (
             <span className="text-[10px] font-bold text-red-400 mt-1 uppercase">PENDENT</span>

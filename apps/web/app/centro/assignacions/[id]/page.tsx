@@ -104,16 +104,22 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
 
   const getStatusLabel = (estat: string) => {
     const maps: Record<string, string> = {
-      'DATA_ENTRY_PENDING': 'PENDENT DE GESTIÓ',
+      'DATA_ENTRY': 'PENDENT DE GESTIÓ',
       'PROVISIONAL': 'PROVISIONAL',
       'VALIDATED': 'CONFIRMAT',
-      'EN_CURS': 'EN EXECUCIÓ',
-      'FINALITZADA': 'FINALITZAT'
+      'IN_PROGRESS': 'EN EXECUCIÓ',
+      'COMPLETED': 'FINALITZAT'
     };
     return maps[estat] || estat.replace('_', ' ');
   };
 
-  if (loading || !assignacio) return <Loading fullScreen message="Carregant detalls..." />;
+  if (loading || !assignacio) return <Loading fullScreen message="Carregant detalls del taller..." />;
+
+  const allDocumentsValidated = assignacio.inscripcions?.length > 0 && assignacio.inscripcions.every((ins: any) => 
+    ins.validat_acord_pedagogic && 
+    ins.validat_autoritzacio_mobilitat && 
+    ins.validat_drets_imatge
+  );
 
   const filteredAlumnes = allAlumnes.filter(a => {
     const matchesSearch = a.nom.toLowerCase().includes(searchAlumne.toLowerCase()) || 
@@ -213,6 +219,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                       idInscripcio={ins.id_inscripcio}
                       documentType="acord_pedagogic"
                       initialUrl={ins.url_acord_pedagogic}
+                      isValidated={ins.validat_acord_pedagogic}
                       label="Acord Pedagògic"
                       onUploadSuccess={() => {}}
                     />
@@ -221,6 +228,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                       idInscripcio={ins.id_inscripcio}
                       documentType="autoritzacio_mobilitat"
                       initialUrl={ins.url_autoritzacio_mobilitat}
+                      isValidated={ins.validat_autoritzacio_mobilitat}
                       label="Aut. Mobilitat"
                       onUploadSuccess={() => {}}
                     />
@@ -229,6 +237,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                       idInscripcio={ins.id_inscripcio}
                       documentType="drets_imatge"
                       initialUrl={ins.url_drets_imatge}
+                      isValidated={ins.validat_drets_imatge}
                       label="Drets d'Imatge"
                       onUploadSuccess={() => {}}
                     />
@@ -266,17 +275,27 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
         </section>
         
         {/* ACTION: FINALITZAR REGISTRE */}
-        {assignacio.estat !== 'En_curs' && assignacio.estat !== 'FINALITZADA' && (
-            <div className="bg-blue-50 border border-blue-100 p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+        {assignacio.estat !== 'IN_PROGRESS' && assignacio.estat !== 'COMPLETED' && (
+            <div className={`p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm border ${
+                allDocumentsValidated ? 'bg-green-50 border-green-100 animate-pulse' : 'bg-blue-50 border-blue-100'
+            }`}>
                 <div>
-                    <h4 className="text-lg font-black text-[#00426B] uppercase">Confirmar Documentació</h4>
+                    <h4 className={`text-lg font-black uppercase ${allDocumentsValidated ? 'text-green-700' : 'text-[#00426B]'}`}>
+                        {allDocumentsValidated ? '✓ Tot a punt per començar' : 'Confirmar Documentació'}
+                    </h4>
                     <p className="text-xs text-gray-600 mt-1 max-w-xl">
-                        Un cop hagis pujat tota la documentació requerida dels alumnes, fes clic aquí per finalitzar el registre. 
-                        Això confirmarà les inscripcions i <span className="font-bold">generarà automàticament les sessions del taller</span> al calendari.
+                        {allDocumentsValidated 
+                            ? "Tota la documentació ha estat validada. Ja pots confirmar el registre final per activar el taller i generar el calendari." 
+                            : "Un cop hagis pujat tota la documentació requerida i hagi estat validada per l'administració, podreu confirmar el registre final."
+                        }
                     </p>
                 </div>
                 <button 
                     onClick={async () => {
+                        if (!allDocumentsValidated) {
+                            toast.error("Alguns documents encara no han estat validats per l'Administració.");
+                            return;
+                        }
                         if(!confirm("Estàs segur que vols confirmar el registre i generar les sessions?")) return;
                         try {
                             const api = getApi();
@@ -288,7 +307,11 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                             toast.error("Error al confirmar.");
                         }
                     }}
-                    className="bg-[#00426B] text-white px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-green-600 transition-all shadow-xl whitespace-nowrap"
+                    className={`px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] transition-all shadow-xl whitespace-nowrap ${
+                        allDocumentsValidated 
+                            ? 'bg-green-600 text-white hover:bg-green-700' 
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                 >
                     Confirmar i Generar Sessions
                 </button>

@@ -105,7 +105,7 @@ export async function runTetris() {
             id_taller: petition.id_taller,
             prof1_id: petition.prof1_id,
             prof2_id: petition.prof2_id,
-            estat: 'En_curs',
+            estat: 'PUBLISHED',
             checklist: {
               create: [
                 { pas_nom: 'Designar Profesores Referentes', completat: petition.prof1_id !== null && petition.prof2_id !== null },

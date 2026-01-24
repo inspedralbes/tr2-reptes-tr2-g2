@@ -28,7 +28,6 @@ export default function CentrosScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedAsistencia, setSelectedAsistencia] = useState("Toti els estats");
   const [isModalVisible, setModalVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -48,6 +47,7 @@ export default function CentrosScreen() {
   });
 
   const fetchCentros = useCallback(async () => {
+    setLoading(true);
     try {
       const lista = await centroService.getAll();
       setCentros(lista);
@@ -55,13 +55,14 @@ export default function CentrosScreen() {
     } catch (err) {
       setError("No se pudieron cargar los centros.");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     if (user && user.rol.nom_rol === 'ADMIN') {
-      setLoading(true);
-      fetchCentros().finally(() => setLoading(false));
+      fetchCentros();
     }
   }, [fetchCentros, user]);
 
@@ -70,18 +71,10 @@ export default function CentrosScreen() {
       const matchesSearch = !searchQuery || 
         centro.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
         centro.codi_centre.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesAsistencia = selectedAsistencia === "Toti els estats" || 
-        (selectedAsistencia === "Confirmada" && centro.asistencia_reunion) ||
-        (selectedAsistencia === "Pendent" && !centro.asistencia_reunion);
 
-      return matchesSearch && matchesAsistencia;
+      return matchesSearch;
     });
-  }, [centros, searchQuery, selectedAsistencia]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedAsistencia]);
+  }, [centros, searchQuery]);
 
   const totalPages = Math.ceil(filteredCentros.length / itemsPerPage);
   const paginatedCentros = filteredCentros.slice(
@@ -161,7 +154,10 @@ export default function CentrosScreen() {
               type="text"
               placeholder="Ej: Institut Pedralbes, 08012345..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
               className="w-full pl-11 pr-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] placeholder:text-gray-300 transition-all"
             />
             <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -170,26 +166,12 @@ export default function CentrosScreen() {
           </div>
         </div>
 
-        {/* Filtre Assistència */}
-        <div className="lg:w-72">
-          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Filtre d'assistència</label>
-          <select 
-            value={selectedAsistencia}
-            onChange={(e) => setSelectedAsistencia(e.target.value)}
-            className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] appearance-none"
-          >
-            <option value="Toti els estats">Toti els estats</option>
-            <option value="Confirmada">Assistència Confirmada</option>
-            <option value="Pendent">Pendent d'Assistència</option>
-          </select>
-        </div>
-
         {/* Acció: Netejar */}
         <div className="flex items-end">
           <button 
             onClick={() => {
               setSearchQuery("");
-              setSelectedAsistencia("Toti els estats");
+              setCurrentPage(1);
             }}
             className="w-full lg:w-auto px-6 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
           >
@@ -197,6 +179,21 @@ export default function CentrosScreen() {
           </button>
         </div>
       </div>
+
+      {error && (
+        <div className="mb-8 bg-red-50 border-l-4 border-red-500 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Taula de Centres */}
       {loading ? (
@@ -207,9 +204,10 @@ export default function CentrosScreen() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-[#F8FAFC] border-b border-gray-200">
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Informació del Centre</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Dades de Contacte</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Assistència</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Centre</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Adreça</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Email</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Telèfon</th>
                   <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">Accions</th>
                 </tr>
               </thead>
@@ -225,28 +223,18 @@ export default function CentrosScreen() {
                         </div>
                         <div>
                           <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{centro.nom}</div>
-                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">CODI: {centro.codi_centre} • {centro.adreca || "Sense adreça"}</div>
+                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">CODI: {centro.codi_centre}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-[11px] text-gray-500 font-medium">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-gray-300 select-none">Email:</span>
-                          <span className="text-[#00426B] font-bold">{centro.email_contacte || "N/A"}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-gray-300 select-none">Tel:</span>
-                          <span className="text-[#00426B] font-bold">{centro.telefon_contacte || "N/A"}</span>
-                        </div>
-                      </div>
+                    <td className="px-6 py-5 text-[11px] font-bold text-[#00426B]">
+                      {centro.adreca || "Sense adreça"}
                     </td>
-                    <td className="px-6 py-5">
-                      <div className={`inline-flex items-center px-2 py-0.5 text-[10px] font-black uppercase tracking-widest border ${centro.asistencia_reunion 
-                        ? 'bg-green-50 text-green-700 border-green-100' 
-                        : 'bg-red-50 text-red-600 border-red-100'}`}>
-                        {centro.asistencia_reunion ? 'Confirmada' : 'Pendent'}
-                      </div>
+                    <td className="px-6 py-5 text-[11px] font-bold text-[#00426B]">
+                      {centro.email_contacte || "N/A"}
+                    </td>
+                    <td className="px-6 py-5 text-[11px] font-bold text-[#00426B]">
+                      {centro.telefon_contacte || "N/A"}
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex justify-end items-center gap-2">

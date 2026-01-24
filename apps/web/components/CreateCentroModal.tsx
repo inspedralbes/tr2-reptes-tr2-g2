@@ -21,7 +21,6 @@ const CreateCentroModal = ({
   const [adreca, setAdreca] = useState("");
   const [telefonContacte, setTelefonContacte] = useState("");
   const [emailContacte, setEmailContacte] = useState("");
-  const [asistenciaReunion, setAsistenciaReunion] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -34,7 +33,6 @@ const CreateCentroModal = ({
         setAdreca(initialData.adreca || "");
         setTelefonContacte(initialData.telefon_contacte || "");
         setEmailContacte(initialData.email_contacte || "");
-        setAsistenciaReunion(initialData.asistencia_reunion);
       } else {
         // Reset form
         setCodiCentre("");
@@ -42,7 +40,6 @@ const CreateCentroModal = ({
         setAdreca("");
         setTelefonContacte("");
         setEmailContacte("");
-        setAsistenciaReunion(false);
       }
       setError(null);
     }
@@ -62,7 +59,6 @@ const CreateCentroModal = ({
       adreca,
       telefon_contacte: telefonContacte,
       email_contacte: emailContacte,
-      asistencia_reunion: asistenciaReunion,
     };
 
     try {
@@ -203,19 +199,6 @@ const CreateCentroModal = ({
                 value={emailContacte}
                 onChange={(e) => setEmailContacte(e.target.value)}
               />
-            </div>
-
-            <div className="md:col-span-2 flex items-center">
-              <input
-                id="asistencia"
-                type="checkbox"
-                className="h-4 w-4 text-consorci-darkBlue focus:ring-consorci-darkBlue border-gray-300"
-                checked={asistenciaReunion}
-                onChange={(e) => setAsistenciaReunion(e.target.checked)}
-              />
-              <label htmlFor="asistencia" className="ml-2 block text-sm text-gray-700">
-                Asistencia a la reunión confirmada
-              </label>
             </div>
           </div>
         </div>
