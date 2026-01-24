@@ -1,4 +1,20 @@
 /** @type {import('tailwindcss').Config} */
+
+// Simulating import from shared/theme to avoid build issues in JS config
+const THEME = {
+  colors: {
+    primary: '#00426B',
+    secondary: '#4197CB',
+    tertiary: '#0775AB',
+    accent: '#F26178',
+    beige: '#E0C5AC',
+    yellow: '#F9C311',
+    gray: '#CFD2D3',
+    bgGray: '#F2F2F3',
+    secondaryBg: '#EAEFF2',
+  }
+};
+
 module.exports = {
   content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
@@ -6,18 +22,18 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#00426B', // Pantone 7694 C / 541 U
+          DEFAULT: THEME.colors.primary, 
         },
         // Colores Complementarios
-        'light-blue': '#4197CB', // Pantone 7688 C / 7688 U
-        'light-gray': '#CFD2D3', // Pantone 427 C / Cool Grey 1 U
-        'pink-red': '#F26178',   // Pantone 709 C / 709 U
-        beige: '#E0C5AC',        // Pantone 4685 C / 4685 U
-        yellow: '#F9C311',
+        'light-blue': THEME.colors.secondary,
+        'light-gray': THEME.colors.gray,
+        'pink-red': THEME.colors.accent,
+        beige: THEME.colors.beige,
+        yellow: THEME.colors.yellow,
       },
       fontFamily: {
-        sans: ['Arial', 'sans-serif'], // Para documentos editables
-        corporate: ['Helvetica Neue', 'sans-serif'], // Para uso corporativo
+        sans: ['Inter', 'sans-serif'], 
+        corporate: ['Inter', 'sans-serif'], 
       },
       fontSize: {
         'xs': '14px',

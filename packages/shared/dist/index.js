@@ -1,7 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CentreAttendanceSchema = exports.AssignmentChecklistSchema = exports.PeticioSchema = exports.esEmailValido = exports.FASES_TIMELINE = exports.PHASES = exports.CALENDARI = exports.THEME = exports.ESTADOS_PETICION = exports.ROLES = void 0;
+exports.CentreAttendanceSchema = exports.AssignmentChecklistSchema = exports.PeticioSchema = exports.esEmailValido = exports.FASES_TIMELINE = exports.PHASES = exports.CALENDARI = exports.ESTADOS_PETICION = exports.ROLES = exports.THEME = void 0;
 const zod_1 = require("zod");
+const theme_1 = require("./theme");
+Object.defineProperty(exports, "THEME", { enumerable: true, get: function () { return theme_1.THEME; } });
 // Definimos los roles exactos que espera la Base de Datos
 exports.ROLES = {
     ADMIN: 'ADMIN',
@@ -13,26 +15,6 @@ exports.ESTADOS_PETICION = {
     PENDIENTE: 'Pendent',
     ACEPTADA: 'Aprovada',
     RECHAZADA: 'Rebutjada'
-};
-// Branding CEB
-exports.THEME = {
-    colors: {
-        primary: '#00426B', // Blau fosc (Principal)
-        secondary: '#4197CB', // Blau clar
-        background: '#F9FAFB', // Gris molt clar
-        surface: '#FFFFFF',
-        text: {
-            primary: '#111827',
-            secondary: '#4B5563',
-            muted: '#9CA3AF'
-        },
-        accent: '#F26178', // Rosa/Vermell
-        neutral: '#CFD2D3', // Gris
-        beige: '#E0C5AC'
-    },
-    fonts: {
-        primary: 'Helvetica Neue, Arial, sans-serif'
-    }
 };
 // Calendario Programa Iter (Curso 25-26 aprox)
 exports.CALENDARI = {

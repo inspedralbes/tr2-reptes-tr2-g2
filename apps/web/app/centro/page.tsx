@@ -114,20 +114,28 @@ export default function CentroDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
           {[
             { 
-              title: "Solicitar Tallers", 
-              text: "Solicita els tallers que vols amb les plaçes necessàries.", 
-              icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
-              path: "/centro/peticions",
-              active: isPhaseActive(PHASES.SOLICITUD),
-              phase: "Fase 1"
-            },
-            { 
               title: "Gestió Alumnat", 
               text: "Afegeix els alumnes del teu centre", 
               icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
               path: "/centro/alumnos",
               active: isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD),
               phase: "General"
+            },
+            { 
+              title: "Gestió Professors", 
+              text: "Afegeix els professors del teu centre", 
+              icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
+              path: "/centro/profesores",
+              active: true,
+              phase: "General"
+            },
+            { 
+              title: "Solicitar Tallers", 
+              text: "Solicita els tallers que vols amb les plaçes necessàries.", 
+              icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+              path: "/centro/peticions",
+              active: isPhaseActive(PHASES.SOLICITUD),
+              phase: "Fase 1"
             },
             { 
               title: "Assignacions", 
@@ -139,19 +147,11 @@ export default function CentroDashboard() {
             },
             { 
               title: "Gestió Sessions", 
-              text: "Afegeix els teus profesors als tallers assignats", 
+              text: "Afegeix els teus professors als tallers assignats", 
               icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
               path: "/centro/sessions",
               active: isPhaseActive(PHASES.EJECUCION),
               phase: "Fase 3"
-            },
-            { 
-              title: "Professors", 
-              text: "Afegeix els professors del teu centre", 
-              icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
-              path: "/centro/profesores",
-              active: true,
-              phase: "General"
             },
           ].map((item, idx) => (
             <div
@@ -179,7 +179,7 @@ export default function CentroDashboard() {
                 </div>
               </div>
               
-              <h3 className={`text-xl font-black mb-3 uppercase tracking-tight ${
+              <h3 className={`text-xl font-medium mb-3 uppercase tracking-tight ${
                 item.active ? 'text-[#00426B]' : 'text-gray-400'
               }`}>
                 {item.title}

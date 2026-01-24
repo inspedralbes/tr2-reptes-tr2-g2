@@ -60,7 +60,7 @@ const tallerService = {
         durada_h: tallerData.detalls_tecnics?.durada_hores,
         places_maximes: tallerData.detalls_tecnics?.places_maximes,
         modalitat: tallerData.modalitat,
-        icona: tallerData.icona || "🧩",
+        icona: tallerData.icona,
         id_sector: tallerData.id_sector || 1,
         dies_execucio: tallerData.dies_execucio,
       };
@@ -74,6 +74,7 @@ const tallerService = {
         sector: t.sector?.nom || "General",
         id_sector: t.id_sector,
         modalitat: t.modalitat,
+        icona: t.icona || "🧩",
         trimestre: "1r",
         detalls_tecnics: {
           descripcio: t.descripcio || "",

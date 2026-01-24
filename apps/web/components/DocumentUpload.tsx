@@ -69,12 +69,7 @@ export default function DocumentUpload({
       <div className="flex items-center justify-between gap-4 p-3 border border-gray-100 bg-gray-50/50 group hover:bg-white hover:border-consorci-lightBlue transition-all">
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest">{label}</span>
-            {isValidated && (
-                <span className="bg-green-100 text-green-600 p-0.5 rounded-full" title="Validat per l'Administrador">
-                    <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor font-black"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
-                </span>
-            )}
+            <span className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">{label}</span>
           </div>
           {currentUrl ? (
             <a 
@@ -93,8 +88,8 @@ export default function DocumentUpload({
           )}
         </div>
 
-        <label className={`shrink-0 cursor-pointer px-4 py-2 text-[9px] font-black uppercase tracking-widest transition-all ${
-          uploading ? 'bg-gray-100 text-gray-300' : 'bg-[#00426B] text-white hover:bg-[#0775AB]'
+        <label className={`shrink-0 cursor-pointer px-4 py-2 text-[9px] font-bold uppercase tracking-widest transition-all border ${
+          uploading ? 'bg-gray-50 border-gray-100 text-gray-300' : 'border-[#00426B] text-[#00426B] hover:bg-blue-50'
         }`}>
           {uploading ? 'PUJANT...' : currentUrl ? 'CANVIAR' : 'ADJUNTAR'}
           <input 

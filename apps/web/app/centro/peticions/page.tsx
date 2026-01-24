@@ -8,6 +8,7 @@ import tallerService, { Taller } from '@/services/tallerService';
 import peticioService, { Peticio } from '@/services/peticioService';
 import professorService, { Professor } from '@/services/professorService';
 import Loading from '@/components/Loading';
+import WorkshopIcon from '@/components/WorkshopIcon';
 
 export default function PeticionsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -257,7 +258,7 @@ export default function PeticionsPage() {
                               }`}>
                               {taller.modalitat}
                             </div>
-                            <span className="text-xl" title="Icona del taller">{taller.icona || '🧩'}</span>
+                            <WorkshopIcon iconName={taller.icona} className="w-6 h-6 text-[#00426B]" />
                           </div>
                         </td>
                         <td className="px-6 py-4">

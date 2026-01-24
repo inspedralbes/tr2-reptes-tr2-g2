@@ -7,22 +7,14 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
     const { user } = req as any;
     const { start, end } = req.query;
 
-    // Buscar el profesor asociado al usuario (si es rol profesor)
+    // 1. Obtener el profesor asociado al usuario (si es rol profesor) de forma directa por ID
     let professorId: number | null = null;
     if (user.role === ROLES.PROFESOR) {
-      // 1. Obtener el usuario completo para ver su nombre
-      const fullUser = await prisma.usuari.findUnique({
+      const professor = await prisma.professor.findUnique({
         where: { id_usuari: user.userId }
       });
-
-      if (fullUser) {
-        // 2. Buscar el profesor por nombre
-        const professor = await prisma.professor.findFirst({
-          where: { nom: fullUser.nom_complet } 
-        });
-        if (professor) {
-          professorId = professor.id_professor;
-        }
+      if (professor) {
+        professorId = professor.id_professor;
       }
     }
 

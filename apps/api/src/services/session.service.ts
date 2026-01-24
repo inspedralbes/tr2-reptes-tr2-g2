@@ -116,13 +116,13 @@ export class SessionService {
     static async syncSessionsForAssignment(idAssignacio: number) {
         const assignacio = await prisma.assignacio.findUnique({
             where: { id_assignacio: idAssignacio },
-            include: { teller: true }
+            include: { taller: true }
         });
 
         if (!assignacio || !assignacio.data_inici) return;
 
-        const schedule = assignacio.teller.dies_execucio;
-        const sessionDates = this.generateDatesFromSchedule(assignacio.data_inici, schedule);
+        const schedule = assignacio.taller.dies_execucio;
+        const sessionDates = this.generateDatesFromSchedule(assignacio.data_inici, schedule as any);
 
         // Delete future sessions that might be outdated
         // Actually, better to just create if they don't exist or update dates

@@ -16,7 +16,7 @@ export const updateWorkshopMetadata = async (req: Request, res: Response) => {
 
         // Usamos $set. El esquema es flexible, por lo que aceptamos cualquier campo
         const result = await db.collection('workshop_metadata').updateOne(
-            { taller_id: parseInt(id) },
+            { taller_id: parseInt(id as string) },
             {
                 $set: {
                     ...metadata,
@@ -45,7 +45,7 @@ export const bookWorkshopPlace = async (req: Request, res: Response) => {
         // Verificamos y decrementamos atómicamente si hay plazas
         const result = await db.collection('workshop_metadata').findOneAndUpdate(
             {
-                taller_id: parseInt(id),
+                taller_id: parseInt(id as string),
                 places_disponibles: { $gt: 0 }
             },
             { $inc: { places_disponibles: -1 } },

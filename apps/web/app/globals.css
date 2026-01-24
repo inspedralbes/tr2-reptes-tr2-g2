@@ -30,7 +30,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-weight: 800;
+  font-weight: 700;
   color: var(--consorci-dark-blue);
   letter-spacing: -0.01em;
   text-transform: uppercase;
@@ -55,7 +55,7 @@ h6 {
 }
 
 .header-label {
-  @apply text-[11px] font-black uppercase tracking-[0.3em] text-[#00426B] mb-8 flex items-center gap-4;
+  @apply text-[11px] font-bold uppercase tracking-[0.3em] text-[#00426B] mb-8 flex items-center gap-4;
 }
 
 .header-label::before {

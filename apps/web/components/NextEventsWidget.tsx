@@ -52,7 +52,7 @@ const NextEventsWidget: React.FC = () => {
         </svg>
       </div>
 
-      <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-6 flex items-center justify-between">
+      <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-6 flex items-center justify-between">
         Properes Fites
         <button
           onClick={() => router.push('/calendar')}
@@ -67,10 +67,10 @@ const NextEventsWidget: React.FC = () => {
           {events.map((event) => (
             <div key={event.id} className="flex items-center gap-4 group/item cursor-default">
               <div className="flex flex-col items-center justify-center w-12 h-12 bg-gray-50 border border-gray-100 group-hover/item:border-consorci-lightBlue group-hover/item:bg-blue-50 transition-colors">
-                <span className="text-[10px] font-black uppercase text-gray-400 group-hover/item:text-consorci-lightBlue leading-none mb-1">
+                <span className="text-[10px] font-bold uppercase text-gray-400 group-hover/item:text-consorci-lightBlue leading-none mb-1">
                   {new Date(event.date).toLocaleDateString('ca-ES', { month: 'short' }).replace('.', '')}
                 </span>
-                <span className="text-sm font-black text-gray-900 group-hover/item:text-consorci-darkBlue leading-none">
+                <span className="text-sm font-bold text-gray-900 group-hover/item:text-consorci-darkBlue leading-none">
                   {new Date(event.date).getDate()}
                 </span>
               </div>

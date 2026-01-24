@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { THEME } from './theme.ts';
+
+export { THEME };
 
 // Definimos los roles exactos que espera la Base de Datos
 export const ROLES = {
@@ -17,27 +20,6 @@ export const ESTADOS_PETICION = {
 } as const;
 
 export type EstadoPeticion = typeof ESTADOS_PETICION[keyof typeof ESTADOS_PETICION];
-
-// Branding CEB
-export const THEME = {
-  colors: {
-    primary: '#00426B', // Blau fosc (Principal)
-    secondary: '#4197CB', // Blau clar
-    background: '#F9FAFB', // Gris molt clar
-    surface: '#FFFFFF',
-    text: {
-      primary: '#111827',
-      secondary: '#4B5563',
-      muted: '#9CA3AF'
-    },
-    accent: '#F26178', // Rosa/Vermell
-    neutral: '#CFD2D3', // Gris
-    beige: '#E0C5AC'
-  },
-  fonts: {
-    primary: 'Helvetica Neue, Arial, sans-serif'
-  }
-} as const;
 
 // Calendario Programa Iter (Curso 25-26 aprox)
 export const CALENDARI = {

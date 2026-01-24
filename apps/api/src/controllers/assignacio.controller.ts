@@ -573,34 +573,57 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
 
     if (existingSessions === 0) {
         const schedule = assignacio.taller.dies_execucio as any[]; 
-        const sessionsToCreate = [];
-        const now = new Date();
         
-        // Generar para 4 semanas (ejemplo)
-        for (let w = 0; w < 4; w++) {
-            if (!Array.isArray(schedule)) continue;
+        // 3.1 Obtener fechas de la Fase 3
+        const { phase: phase3 } = await isPhaseActive(PHASES.EJECUCION);
+        
+        if (phase3 && Array.isArray(schedule) && schedule.length > 0) {
+            const startDate = new Date(Math.max(new Date().getTime(), phase3.data_inici.getTime()));
+            const endDate = phase3.data_fi;
+            
+            // Buscar los usuarios asociados a los profesores referentes para auto-asignarlos
+            const referentProfessors = await prisma.professor.findMany({
+                where: { id_professor: { in: [assignacio.prof1_id, assignacio.prof2_id].filter(Boolean) as number[] } },
+                select: { id_usuari: true }
+            });
+            const referentUserIds = referentProfessors.map(p => p.id_usuari).filter(Boolean) as number[];
 
-            for (const slot of schedule) {
-                const d = new Date(now);
-                d.setDate(d.getDate() + (w * 7));
-                
-                // Calcular fecha correcta para dayOfWeek
-                const currentDay = d.getDay(); 
-                let daysUntil = (slot.dayOfWeek + 7 - currentDay) % 7;
-                if (daysUntil === 0 && w === 0) daysUntil = 0; // Hoy
-                d.setDate(d.getDate() + daysUntil);
+            // Iterar por semanas desde startDate hasta endDate
+            let currentPointer = new Date(startDate);
+            while (currentPointer <= endDate) {
+                for (const slot of schedule) {
+                    const sessionDate = new Date(currentPointer);
+                    
+                    // Calcular el día de la semana deseado para esta sesión
+                    const currentDay = sessionDate.getDay(); 
+                    let daysUntil = (slot.dayOfWeek + 7 - currentDay) % 7;
+                    sessionDate.setDate(sessionDate.getDate() + daysUntil);
 
-                sessionsToCreate.push({
-                    id_assignacio: assignacio.id_assignacio,
-                    data_sessio: d,
-                    hora_inici: slot.startTime,
-                    hora_fi: slot.endTime
-                });
+                    // Verificar que seguimos dentro del rango de la fase
+                    if (sessionDate >= startDate && sessionDate <= endDate) {
+                        // Crear la sesión
+                        const createdSession = await prisma.sessio.create({
+                            data: {
+                                id_assignacio: assignacio.id_assignacio,
+                                data_sessio: sessionDate,
+                                hora_inici: slot.startTime,
+                                hora_fi: slot.endTime,
+                                staff: {
+                                    create: referentUserIds.map(idUsuari => ({
+                                        id_usuari: idUsuari
+                                    }))
+                                }
+                            }
+                        });
+                    }
+                }
+                // Avanzar a la siguiente semana
+                currentPointer.setDate(currentPointer.getDate() + 7);
+                // Asegurarse de que el puntero no se quede atascado si el incremento cruza meses de forma extraña (raro en JS Date pero preventivo)
+                if (currentPointer > endDate && currentPointer.getTime() - endDate.getTime() < 86400000 * 7) {
+                    // Ya nos pasamos, el bucle terminará
+                }
             }
-        }
-        
-        if (sessionsToCreate.length > 0) {
-            await prisma.sessio.createMany({ data: sessionsToCreate });
         }
     }
 

@@ -120,7 +120,7 @@ export default function AdminDashboardPage() {
                   {section.icon}
                 </div>
               </div>
-              <h3 className="text-xl font-black text-[#00426B] mb-3 uppercase tracking-tight">{section.title}</h3>
+              <h3 className="text-xl font-medium text-[#00426B] mb-3 uppercase tracking-tight">{section.title}</h3>
               <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">{section.description}</p>
 
               <div className="mt-8 flex items-center">

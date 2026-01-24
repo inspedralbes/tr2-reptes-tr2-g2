@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { THEME } from './theme';
+export { THEME };
 export declare const ROLES: {
     readonly ADMIN: "ADMIN";
     readonly COORDINADOR: "COORDINADOR";
@@ -11,25 +13,6 @@ export declare const ESTADOS_PETICION: {
     readonly RECHAZADA: "Rebutjada";
 };
 export type EstadoPeticion = typeof ESTADOS_PETICION[keyof typeof ESTADOS_PETICION];
-export declare const THEME: {
-    readonly colors: {
-        readonly primary: "#00426B";
-        readonly secondary: "#4197CB";
-        readonly background: "#F9FAFB";
-        readonly surface: "#FFFFFF";
-        readonly text: {
-            readonly primary: "#111827";
-            readonly secondary: "#4B5563";
-            readonly muted: "#9CA3AF";
-        };
-        readonly accent: "#F26178";
-        readonly neutral: "#CFD2D3";
-        readonly beige: "#E0C5AC";
-    };
-    readonly fonts: {
-        readonly primary: "Helvetica Neue, Arial, sans-serif";
-    };
-};
 export declare const CALENDARI: {
     readonly REUNION_PRESENTACION: "2025-09-30";
     readonly LIMITE_DEMANDA: "2025-10-10";

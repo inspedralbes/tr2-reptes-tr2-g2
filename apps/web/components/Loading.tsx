@@ -39,7 +39,7 @@ const Loading: React.FC<LoadingProps> = ({ fullScreen = false, message = 'Carreg
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-[#0775AB] rounded-full shadow-lg animate-pulse" style={{ animationDuration: '2s' }}></div>
       </div>
 
-      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#00426B]/80 drop-shadow-sm">
+      <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#00426B]/80 drop-shadow-sm">
         {message}
       </p>
     </div>

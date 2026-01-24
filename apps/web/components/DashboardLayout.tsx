@@ -28,7 +28,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           <header className="w-full mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 py-2 container-responsive">
             <div className="">
               {title && (
-                <h2 className="text-3xl font-extrabold text-[#00426B] tracking-tight uppercase">
+                <h2 className="text-3xl font-bold text-[#00426B] tracking-tight uppercase">
                   {title}
                 </h2>
               )}

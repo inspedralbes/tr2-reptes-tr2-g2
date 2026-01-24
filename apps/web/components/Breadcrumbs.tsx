@@ -30,7 +30,7 @@ const Breadcrumbs: React.FC = () => {
 
   return (
     <div className="mb-10 w-full">
-      <nav className="flex items-center space-x-2 text-[11px] font-black uppercase tracking-widest" aria-label="Breadcrumb">
+      <nav className="flex items-center space-x-2 text-[11px] font-bold uppercase tracking-widest" aria-label="Breadcrumb">
         {pathSegments.map((segment, index) => {
           const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
           const isLast = index === pathSegments.length - 1;

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import tallerService, { Taller } from "../services/tallerService";
 import sectorService, { Sector } from "../services/sectorService";
+import WorkshopIcon, { SVG_ICONS } from "./WorkshopIcon";
 
 type CreateWorkshopModalProps = {
   visible: boolean;
@@ -45,17 +46,6 @@ const CreateWorkshopModal = ({
 
   const daysMap: Record<number, string> = {
       1: 'Dilluns', 2: 'Dimarts', 3: 'Dimecres', 4: 'Dijous', 5: 'Divendres'
-  };
-
-  const SVG_ICONS = {
-    PUZZLE: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />,
-    ROBOT: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />,
-    CODE: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />,
-    PAINT: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />,
-    FILM: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />,
-    TOOLS: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />,
-    LEAF: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />,
-    GEAR: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z" />
   };
 
   useEffect(() => {
@@ -181,7 +171,7 @@ const CreateWorkshopModal = ({
             {/* Esquerra: Dades */}
             <div className="md:w-7/12 p-8 overflow-y-auto border-r border-gray-100">
                 <section className="mb-8">
-                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-100 pb-2">Informació General</h3>
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-100 pb-2">Informació General</h3>
                     
                     <div className="space-y-5">
                         <div className="group">
@@ -239,7 +229,7 @@ const CreateWorkshopModal = ({
                 </section>
 
                 <section>
-                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-100 pb-2">Detalls Tècnics</h3>
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-100 pb-2">Detalls Tècnics</h3>
                     <div className="grid grid-cols-3 gap-5">
                          <div>
                             <label className="block text-[11px] font-bold text-[#00426B] uppercase mb-1.5">Durada (h)</label>
@@ -263,17 +253,15 @@ const CreateWorkshopModal = ({
                              <label className="block text-[11px] font-bold text-[#00426B] uppercase mb-1.5">Icona</label>
                              <div className="relative group">
                                 <button className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-200 text-sm font-medium">
-                                    <span className="flex items-center gap-2">
-                                        <svg className="w-4 h-4 text-[#00426B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            {SVG_ICONS[icona as keyof typeof SVG_ICONS]}
-                                        </svg>
-                                        {icona}
+                                    <span className="flex items-center gap-2 text-[#00426B]">
+                                        <WorkshopIcon iconName={icona} className="w-5 h-5" />
+                                        <span className="text-[10px] font-bold uppercase tracking-widest">{icona}</span>
                                     </span>
                                 </button>
                                 <div className="absolute top-full left-0 w-full bg-white border shadow-lg hidden group-hover:grid grid-cols-4 gap-1 p-2 z-20">
-                                    {Object.entries(SVG_ICONS).map(([key, path]) => (
-                                        <button key={key} onClick={() => setIcona(key)} className="p-2 hover:bg-blue-50 flex justify-center text-[#00426B]">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">{path}</svg>
+                                    {Object.keys(SVG_ICONS).map((key) => (
+                                        <button key={key} onClick={() => setIcona(key)} className="p-2 hover:bg-blue-50 flex justify-center text-[#00426B] transition-colors">
+                                            <WorkshopIcon iconName={key} className="w-5 h-5" />
                                         </button>
                                     ))}
                                 </div>
@@ -286,7 +274,7 @@ const CreateWorkshopModal = ({
             {/* Dreta: Horaris */}
             <div className="md:w-5/12 bg-[#F8FAFC] p-8 overflow-y-auto">
                 <section>
-                    <h3 className="text-xs font-black text-[#00426B] uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <h3 className="text-xs font-bold text-[#00426B] uppercase tracking-widest mb-4 flex items-center gap-2">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         Horari Setmanal
                     </h3>
@@ -318,7 +306,7 @@ const CreateWorkshopModal = ({
                             </div>
                             <button 
                                 onClick={addScheduleSlot}
-                                className="w-full py-2 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-colors mt-2"
+                                className="w-full py-2 bg-[#00426B] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#0775AB] transition-colors mt-2"
                             >
                                 + Afegir Dia
                             </button>
@@ -330,7 +318,7 @@ const CreateWorkshopModal = ({
                         {schedule.map((slot, idx) => (
                             <div key={idx} className="flex justify-between items-center bg-white border border-gray-200 p-3 shadow-sm hover:border-[#4197CB] transition-colors group">
                                 <div className="flex flex-col">
-                                    <span className="text-xs font-black text-[#00426B] uppercase">{daysMap[slot.dayOfWeek]}</span>
+                                    <span className="text-xs font-bold text-[#00426B] uppercase">{daysMap[slot.dayOfWeek]}</span>
                                     <span className="text-[10px] font-medium text-gray-500">{slot.startTime} - {slot.endTime}</span>
                                 </div>
                                 <button onClick={() => removeScheduleSlot(idx)} className="text-gray-300 hover:text-red-500 transition-colors p-1">
@@ -363,7 +351,7 @@ const CreateWorkshopModal = ({
                  <button 
                     onClick={handleSubmit} 
                     disabled={loading}
-                    className="px-8 py-2.5 bg-[#00426B] text-white text-xs font-black uppercase tracking-widest hover:bg-[#0775AB] shadow-lg disabled:opacity-50 disabled:shadow-none transition-all"
+                    className="px-8 py-2.5 bg-[#00426B] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#0775AB] shadow-lg disabled:opacity-50 disabled:shadow-none transition-all"
                  >
                      {loading ? 'Guardant...' : 'Guardar Taller'}
                  </button>

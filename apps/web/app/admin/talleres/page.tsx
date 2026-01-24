@@ -1,12 +1,8 @@
 "use client";
-
-export const dynamic = 'force-dynamic';
-
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { THEME } from "@iter/shared";
-import WorkshopDetail from "../../../components/WorkshopDetail";
 import tallerService, { Taller } from "../../../services/tallerService";
 import DashboardLayout from "../../../components/DashboardLayout";
 import CreateWorkshopModal from "../../../components/CreateWorkshopModal";
@@ -35,7 +31,6 @@ export default function TallerScreen() {
     }
   }, [user, authLoading, router]);
 
-  const [selectedWorkshop, setSelectedWorkshop] = useState<Taller | null>(null);
   const [editingWorkshop, setEditingWorkshop] = useState<Taller | null>(null);
   const [talleres, setTalleres] = useState<Taller[]>([]);
   const [loading, setLoading] = useState(true);
@@ -122,7 +117,6 @@ export default function TallerScreen() {
 
   const handleEdit = (taller: Taller) => {
     setEditingWorkshop(taller);
-    setSelectedWorkshop(null);
     setCreateModalVisible(true);
   };
 
@@ -136,7 +130,6 @@ export default function TallerScreen() {
         try {
           await tallerService.delete(id);
           setTalleres((prev) => prev.filter((t) => t._id !== id));
-          setSelectedWorkshop(null);
           toast.success("Taller eliminat correctament.");
         } catch (err) {
           toast.error("Error al eliminar el taller.");
@@ -176,7 +169,7 @@ export default function TallerScreen() {
       <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8">
         {/* Cercador de Text */}
         <div className="flex-1">
-          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Cerca per títol</label>
+          <label className="block text-[10px] font-bold text-[#00426B] uppercase tracking-[0.2em] mb-3">Cerca per títol</label>
           <div className="relative">
             <input 
               type="text"
@@ -193,7 +186,7 @@ export default function TallerScreen() {
 
         {/* Filtre Sector */}
         <div className="lg:w-64">
-          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Filtra per sector</label>
+          <label className="block text-[10px] font-bold text-[#00426B] uppercase tracking-[0.2em] mb-3">Filtra per sector</label>
           <select 
             value={selectedSector}
             onChange={(e) => setSelectedSector(e.target.value)}
@@ -207,7 +200,7 @@ export default function TallerScreen() {
 
         {/* Filtre Modalitat */}
         <div className="lg:w-64">
-          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Filtrar per modalitat</label>
+          <label className="block text-[10px] font-bold text-[#00426B] uppercase tracking-[0.2em] mb-3">Filtrar per modalitat</label>
           <select 
             value={selectedModalitat}
             onChange={(e) => setSelectedModalitat(e.target.value)}
@@ -227,7 +220,7 @@ export default function TallerScreen() {
               setSelectedSector("Tots els sectors");
               setSelectedModalitat("Totes les modalitats");
             }}
-            className="w-full lg:w-auto px-6 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
+            className="w-full lg:w-auto px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
           >
             Netejar
           </button>
@@ -243,10 +236,10 @@ export default function TallerScreen() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-[#F8FAFC] border-b border-gray-200">
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Informació del Taller</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Detalls Tècnics</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Capacitat</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">Accions</th>
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#00426B]">Informació del Taller</th>
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#00426B]">Classificació</th>
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#00426B]">Detalls i Capacitat</th>
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#00426B] text-right">Accions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -260,16 +253,21 @@ export default function TallerScreen() {
                           </svg>
                         </div>
                         <div>
-                          <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{taller.titol}</div>
-                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">ID: {taller._id} • {taller.modalitat}</div>
+                          <div className="text-sm font-bold text-[#00426B] uppercase tracking-tight">{taller.titol}</div>
+                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">ID: {taller._id}</div>
                         </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 text-[11px] font-medium text-gray-600">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-bold text-[#0775AB] uppercase">{taller.sector}</span>
+                        <span className="text-gray-400">Modalitat {taller.modalitat}</span>
                       </div>
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-wide">
-                          <span className="w-1 h-1 bg-[#4197CB]"></span>
-                          {taller.detalls_tecnics?.durada_hores} Hores Lectives
+                          {taller.detalls_tecnics?.durada_hores}h • {taller.detalls_tecnics?.places_maximes} Places
                         </div>
                         <div className="text-[10px] text-gray-400 font-medium line-clamp-1 max-w-[200px]">
                           {taller.detalls_tecnics?.descripcio}
@@ -277,31 +275,16 @@ export default function TallerScreen() {
                       </div>
                     </td>
                     <td className="px-6 py-5">
-                      <div className="flex items-center gap-2">
-                        <div className="px-2 py-0.5 bg-green-50 text-green-700 text-[10px] font-black uppercase tracking-widest border border-green-100">
-                          {taller.detalls_tecnics?.places_maximes} PLACES
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
                       <div className="flex justify-end items-center gap-2">
                         <button 
-                          onClick={() => setSelectedWorkshop(taller)}
-                          className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors"
-                        >
-                          Detalles
-                        </button>
-                        <button 
                           onClick={() => handleEdit(taller)}
-                          className="p-1.5 text-gray-400 hover:text-[#0775AB] hover:bg-[#EAEFF2] transition-all"
+                          className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors"
                         >
-                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
+                          Editar
                         </button>
                         <button 
                           onClick={() => handleDelete(taller._id)}
-                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all"
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all"
                         >
                           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -318,26 +301,26 @@ export default function TallerScreen() {
           {/* Paginació */}
           {totalPages > 1 && (
             <div className="mt-0 flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#F8FAFC] border-t border-gray-200 p-6">
-              <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
+              <div className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">
                 Mostrant <span className="text-[#00426B]">{paginatedTalleres.length}</span> de <span className="text-[#00426B]">{filteredTalleres.length}</span> tallers
               </div>
               <div className="flex items-center gap-2">
                 <button 
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === 1 
+                  className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${currentPage === 1 
                     ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
                     : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
                 >
                   Anterior
                 </button>
-                <div className="px-4 py-2 bg-white border border-gray-200 text-[10px] font-black text-[#00426B] tracking-[0.2em]">
+                <div className="px-4 py-2 bg-white border border-gray-200 text-[10px] font-bold text-[#00426B] tracking-[0.2em]">
                   Pàgina {currentPage} de {totalPages}
                 </div>
                 <button 
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === totalPages 
+                  className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${currentPage === totalPages 
                     ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
                     : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
                 >
@@ -354,18 +337,10 @@ export default function TallerScreen() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <p className="text-[#00426B] font-black uppercase text-xs tracking-widest">No s'han trobat tallers</p>
+          <p className="text-[#00426B] font-bold uppercase text-xs tracking-widest">No s'han trobat tallers</p>
           <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">Prova amb altres termes de cerca.</p>
         </div>
       )}
-
-      <WorkshopDetail
-        visible={!!selectedWorkshop}
-        onClose={() => setSelectedWorkshop(null)}
-        selectedWorkshop={selectedWorkshop}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
 
       <CreateWorkshopModal
         visible={isCreateModalVisible}

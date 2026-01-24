@@ -104,7 +104,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
                 <Link
                   key={link.path}
                   href={link.path}
-                  className={`h-full flex items-center px-4 text-[11px] font-black uppercase tracking-widest transition-all border-b-2 ${
+                  className={`h-full flex items-center px-4 text-[11px] font-bold uppercase tracking-widest transition-all border-b-2 ${
                     pathname === link.path 
                       ? 'border-[#00426B] text-[#00426B]' 
                       : 'border-transparent text-[#00426B]/40 hover:text-[#00426B] hover:bg-[#F2F4F7]'
@@ -114,7 +114,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
                     {link.label}
                     {link.isAvisos && unreadCount > 0 && (
                       <span className="absolute -top-3 -right-4 flex h-4 w-4">
-                        <span className="relative inline-flex h-4 w-4 bg-[#F26178] text-[8px] font-black items-center justify-center text-white">
+                        <span className="relative inline-flex h-4 w-4 bg-[#F26178] text-[8px] font-bold items-center justify-center text-white">
                           {unreadCount > 9 ? '9+' : unreadCount}
                         </span>
                       </span>
@@ -127,7 +127,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
             {/* User Info & Logout */}
             <div className="flex items-center border-l border-[#CFD2D3] pl-8 h-8 my-auto gap-6">
               <div className="flex flex-col items-end">
-                <span className="text-[#00426B] text-[10px] font-black uppercase tracking-widest">
+                <span className="text-[#00426B] text-[10px] font-bold uppercase tracking-widest">
                   {user.nom_complet}
                 </span>
                 <span className="text-[#4197CB] text-[8px] font-bold uppercase tracking-widest">
@@ -136,7 +136,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
               </div>
               <button
                 onClick={logout}
-                className="bg-[#00426B] hover:bg-[#0775AB] text-white text-[10px] font-black uppercase tracking-widest px-5 py-2 transition-all"
+                className="bg-[#00426B] hover:bg-[#0775AB] text-white text-[10px] font-bold uppercase tracking-widest px-5 py-2 transition-all"
               >
                 Sortir
               </button>

@@ -122,7 +122,7 @@ export default function DocumentVerificationPage() {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider">Centre / Taller</th>
-                <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider">Estat</th>
+                <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider">Dates</th>
                 <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider">Documentació Alumnat</th>
               </tr>
             </thead>
@@ -140,14 +140,15 @@ export default function DocumentVerificationPage() {
                       <div className="font-bold text-gray-800 text-sm">{assig.centre?.nom}</div>
                       <div className="text-[10px] font-bold text-[#4197CB] uppercase tracking-tight">{assig.taller?.titol}</div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`text-[10px] font-black border px-2 py-1 uppercase tracking-widest ${
-                        assig.estat === 'VALIDATED' ? 'border-green-200 bg-green-50 text-green-600' :
-                        assig.estat === 'DATA_SUBMITTED' ? 'border-blue-200 bg-blue-50 text-blue-600' :
-                        'border-gray-200 bg-gray-50 text-gray-400'
-                      }`}>
-                        {assig.estat.replace(/_/g, ' ')}
-                      </span>
+                    <td className="px-6 py-4 text-xs font-bold text-gray-600">
+                      {assig.data_inici && assig.data_fi ? (
+                        <div className="flex flex-col">
+                          <span>Inici: {new Date(assig.data_inici).toLocaleDateString()}</span>
+                          <span>Fi: {new Date(assig.data_fi).toLocaleDateString()}</span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 italic">Dates no definides</span>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <div className="space-y-2">
@@ -170,8 +171,10 @@ export default function DocumentVerificationPage() {
                                             href={`${process.env.NEXT_PUBLIC_API_URL}${doc.url}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className={`text-[9px] font-bold px-2 py-1 uppercase transition-colors flex items-center gap-1 ${
-                                                doc.valid ? 'bg-green-600 text-white' : 'bg-[#00426B] text-white hover:bg-[#4197CB]'
+                                            className={`text-[9px] font-bold px-3 py-1.5 uppercase transition-all flex items-center gap-1.5 border ${
+                                                doc.valid 
+                                                  ? 'border-green-200 text-green-600 hover:bg-green-50' 
+                                                  : 'border-[#4197CB]/30 text-[#00426B] hover:bg-blue-50'
                                             }`}
                                             title={`Veure ${doc.name}`}
                                           >
@@ -181,23 +184,23 @@ export default function DocumentVerificationPage() {
                                             </svg>
                                             {doc.name}
                                           </a>
-                                          {!doc.valid ? (
+                                            {!doc.valid ? (
+                                                <button 
+                                                  onClick={() => handleValidateDocument(ins.id_inscripcio, doc.validField, true)}
+                                                  className="bg-green-50 text-green-600 px-3 py-1.5 text-[9px] font-black uppercase hover:bg-green-100 transition-all border border-green-200 border-l-0"
+                                                  title="Acceptar document"
+                                                >
+                                                    Acceptar
+                                                </button>
+                                            ) : (
                                               <button 
-                                                onClick={() => handleValidateDocument(ins.id_inscripcio, doc.validField, true)}
-                                                className="bg-green-100 text-green-700 px-2 py-1 text-[9px] font-black uppercase hover:bg-green-200 transition-colors border-l border-white"
-                                                title="Acceptar document"
-                                              >
-                                                  Acceptar
-                                              </button>
-                                          ) : (
-                                            <button 
-                                                onClick={() => handleValidateDocument(ins.id_inscripcio, doc.validField, false)}
-                                                className="bg-red-50 text-red-400 px-2 py-1 text-[9px] font-black uppercase hover:bg-red-100 transition-colors border-l border-white"
-                                                title="Revocar validació"
-                                              >
-                                                  ✕
-                                              </button>
-                                          )}
+                                                  onClick={() => handleValidateDocument(ins.id_inscripcio, doc.validField, false)}
+                                                  className="bg-red-50 text-red-500 px-3 py-1.5 text-[9px] font-black uppercase hover:bg-red-100 transition-all border border-red-200 border-l-0"
+                                                  title="Revocar validació"
+                                                >
+                                                    ✕
+                                                </button>
+                                            )}
                                         </div>
                                       ) : (
                                         <span className="text-[9px] font-bold text-gray-300 border border-gray-100 px-2 py-1 uppercase" title={`${doc.name} pendent`}>

@@ -48,7 +48,7 @@ export const getTallerById = async (req: Request, res: Response) => {
 
 // POST: Crear Taller
 export const createTaller = async (req: Request, res: Response) => {
-  const { titol, descripcio, durada_h, places_maximes, modalitat, id_sector, dies_execucio } = req.body;
+  const { titol, descripcio, durada_h, places_maximes, modalitat, id_sector, dies_execucio, icona } = req.body;
 
   try {
     const nuevoTaller = await prisma.taller.create({
@@ -58,6 +58,7 @@ export const createTaller = async (req: Request, res: Response) => {
         durada_h: typeof durada_h === 'string' ? parseInt(durada_h) : (durada_h || 0),
         places_maximes: typeof places_maximes === 'string' ? parseInt(places_maximes) : (places_maximes || 25),
         modalitat: modalitat || 'A',
+        icona: icona || "🧩",
         id_sector: id_sector ? (typeof id_sector === 'string' ? parseInt(id_sector) : id_sector) : 1,
         dies_execucio: dies_execucio || []
       },
@@ -72,7 +73,7 @@ export const createTaller = async (req: Request, res: Response) => {
 // PUT: Actualizar
 export const updateTaller = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { titol, descripcio, durada_h, places_maximes, modalitat, id_sector, dies_execucio } = req.body;
+  const { titol, descripcio, durada_h, places_maximes, modalitat, id_sector, dies_execucio, icona } = req.body;
 
   try {
     const updateData: any = {};
@@ -81,6 +82,7 @@ export const updateTaller = async (req: Request, res: Response) => {
     if (durada_h !== undefined) updateData.durada_h = typeof durada_h === 'string' ? parseInt(durada_h) : durada_h;
     if (places_maximes !== undefined) updateData.places_maximes = typeof places_maximes === 'string' ? parseInt(places_maximes) : places_maximes;
     if (modalitat !== undefined) updateData.modalitat = modalitat;
+    if (icona !== undefined) updateData.icona = icona;
     if (id_sector !== undefined) updateData.id_sector = typeof id_sector === 'string' ? parseInt(id_sector) : id_sector;
     if (dies_execucio !== undefined) updateData.dies_execucio = dies_execucio;
 

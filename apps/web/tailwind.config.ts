@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { THEME } from "@iter/shared";
 
 const config: Config = {
   content: [
@@ -14,16 +15,19 @@ const config: Config = {
         foreground: "var(--foreground)",
         action: "var(--action)",
         consorci: {
-          darkBlue: "#00426B",
-          lightBlue: "#4197CB",
-          actionBlue: "#0775AB",
-          lightGray: "#CFD2D3",
-          pinkRed: "#F26178",
-          beige: "#E0C5AC",
-          yellow: "#F9C311",
-          bgGray: "#F2F2F3",
-          secondaryBg: "#EAEFF2",
+          darkBlue: THEME.colors.primary,
+          lightBlue: THEME.colors.secondary,
+          actionBlue: THEME.colors.tertiary,
+          lightGray: THEME.colors.gray,
+          pinkRed: THEME.colors.accent,
+          beige: THEME.colors.beige,
+          yellow: THEME.colors.yellow,
+          bgGray: THEME.colors.bgGray,
+          secondaryBg: THEME.colors.secondaryBg,
         },
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)", "sans-serif"],
       },
     },
   },

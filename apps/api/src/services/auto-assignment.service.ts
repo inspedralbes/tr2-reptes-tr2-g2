@@ -1,22 +1,23 @@
 import prisma from '../lib/prisma';
-import { AssignmentSolver, Student, WorkshopSlot, AssignmentResult } from './assignment.solver';
+
+interface PendingCenter {
+    centerId: number;
+    students: number[];
+    peticioId: number;
+    timestamp: Date;
+    assignedCount: number;
+}
 
 export class AutoAssignmentService {
-    private solver: AssignmentSolver;
-    private readonly GROUP_CAPACITY = 16;
-    private readonly GLOBAL_CENTER_LIMIT = 12; // Max 12 students globally in Mod C
-
-    constructor() {
-        this.solver = new AssignmentSolver();
-    }
+    
+    constructor() {}
 
     /**
-     * Generates assignments for all pending Petitions (Modalitat C preferably)
-     * for a specific set of Talleres (or all).
+     * Generates assignments using a Fair Distribution algorithm.
+     * Rule: If demand > supply, split evenly among centers. Remainder goes by priority.
      */
     async generateAssignments() {
-        // 1. Fetch Approved Petitions that are not yet assigned (or overwrite?)
-        // We filter by Modalitat C as per requirement, but logic applies generally if needed
+        // 1. Fetch Approved/Pending Petitions for Modalitat C that are not yet fully assigned
         const petitions = await prisma.peticio.findMany({
             where: {
                 estat: { in: ['Aprovada', 'Pendent'] },
@@ -41,194 +42,187 @@ export class AutoAssignmentService {
 
         console.log(`🚀 AutoAssignmentService: Processing ${petitions.length} petitions of Modalitat C...`);
 
-        // 2. Group Students by Taller
-        // Map TallerId -> Students[]
-        const studentsByTaller = new Map<number, Student[]>();
-        const petitionMap = new Map<number, typeof petitions[0]>(); // Map StudentId -> Peticio (to track back)
-        const studentPeticioMap = new Map<number, number>();
-
-        petitions.forEach((p: any) => {
-            if (!studentsByTaller.has(p.id_taller)) {
-                studentsByTaller.set(p.id_taller, []);
+        // 2. Group Petitions by Taller
+        const workshopMap = new Map<number, typeof petitions>();
+        petitions.forEach(p => {
+            if (!workshopMap.has(p.id_taller)) {
+                workshopMap.set(p.id_taller, []);
             }
-            const list = studentsByTaller.get(p.id_taller)!;
-
-            // If petition has specific students linked
-            if (p.alumnes && p.alumnes.length > 0) {
-                p.alumnes.forEach((a: any) => {
-                    list.push({ id: a.id_alumne, centerId: p.id_centre });
-                    studentPeticioMap.set(a.id_alumne, p.id_peticio);
-                });
-            } else {
-                console.warn(`⚠️ AutoAssignmentService: Petition ${p.id_peticio} (Centre ID ${p.id_centre}) has 0 linked students. Skipping nominal assignment for this petition.`);
-            }
+            workshopMap.get(p.id_taller)?.push(p);
         });
 
-        // 3. Process each Taller
         const results = [];
 
-        // 3. Process each Taller and collect candidates
-        const allAssignments: AssignmentResult[] = [];
-        const centerPlazaCount = new Map<number, number>();
-
-        for (const [tallerId, students] of studentsByTaller.entries()) {
+        // 3. Process each Workshop
+        for (const [tallerId, workshopPetitions] of workshopMap.entries()) {
             const taller = await prisma.taller.findUnique({ where: { id_taller: tallerId } });
             if (!taller) continue;
 
+            // Calculate Capacity
             const existingAssignments = await prisma.assignacio.findMany({
                 where: { id_taller: tallerId },
-                include: {
-                    peticio: true,
-                    inscripcions: true
-                }
+                include: { inscripcions: true }
             });
 
-            const occupiedPlazas = existingAssignments.reduce((sum: number, a: any) => {
-                const nominalCount = a.inscripcions.length;
-                return sum + (nominalCount > 0 ? nominalCount : (a.peticio?.alumnes_aprox || 0));
-            }, 0);
-
+            const occupiedPlazas = existingAssignments.reduce((sum, a) => sum + a.inscripcions.length, 0);
             const remainingCapacity = taller.places_maximes - occupiedPlazas;
-            console.log(`📊 AutoAssignment: Taller ID ${tallerId} (${taller.titol}): Plazas Totales: ${taller.places_maximes}, Ocupadas: ${occupiedPlazas}, Disponibles: ${remainingCapacity}`);
 
-            const totalStudents = students.length;
+            console.log(`📊 AutoAssignment: Taller ID ${tallerId} (${taller.titol}): Capacity: ${taller.places_maximes}, Occupied: ${occupiedPlazas}, Remaining: ${remainingCapacity}`);
 
             if (remainingCapacity <= 0) {
-                console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Cannot assign ${totalStudents} students.`);
+                console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Skipping.`);
                 continue;
             }
 
-            // Create Slots until we cover all students OR run out of capacity
-            // We ensure we don't create "phantom" capacity that exceeds the workshop limit
-            const slots: WorkshopSlot[] = [];
-            let currentRemaining = remainingCapacity;
-            let groupId = 1;
+            // Group by Center
+            const centersData: PendingCenter[] = [];
+            
+            // Map to aggregate students if a center has multiple petitions for same workshop (rare but possible)
+            // or just treat each petition as a distinct entry? 
+            // The requirement implies "Fairness between Centers", so we should aggregate by Center.
+            const centerMap = new Map<number, PendingCenter>();
 
-            while (currentRemaining > 0) {
-                // If we already have enough capacity for all students, stop creating new groups
-                const currentTotalCapacity = slots.reduce((acc, s) => acc + s.capacity, 0);
-                if (currentTotalCapacity >= totalStudents) break;
+            workshopPetitions.forEach(p => {
+                if (!p.alumnes || p.alumnes.length === 0) return;
 
-                const slotCap = Math.min(this.GROUP_CAPACITY, currentRemaining);
-                slots.push({
-                    workshopId: tallerId,
-                    groupId: groupId++,
-                    capacity: slotCap
+                if (!centerMap.has(p.id_centre)) {
+                    centerMap.set(p.id_centre, {
+                        centerId: p.id_centre,
+                        students: [],
+                        peticioId: p.id_peticio, // Track the main petition ID (or latest)
+                        timestamp: p.data_peticio,
+                        assignedCount: 0
+                    });
+                }
+                const entry = centerMap.get(p.id_centre)!;
+                // Add students
+                p.alumnes.forEach(a => entry.students.push(a.id_alumne));
+                // Keep the earliest timestamp for priority
+                if (p.data_peticio < entry.timestamp) {
+                    entry.timestamp = p.data_peticio;
+                }
+            });
+
+            const centers = Array.from(centerMap.values());
+            const totalDemand = centers.reduce((sum, c) => sum + c.students.length, 0);
+
+            // DISTRIBUTION LOGIC
+            let allocated = 0;
+
+            if (totalDemand <= remainingCapacity) {
+                // Happy Path: Give everyone everything
+                centers.forEach(c => c.assignedCount = c.students.length);
+                allocated = totalDemand;
+            } else {
+                // Scarcity Logic: Fair Share
+                const numCenters = centers.length;
+                const baseShare = Math.floor(remainingCapacity / numCenters);
+                
+                // 1. Base Allocation
+                let leftoverSpots = remainingCapacity;
+                
+                centers.forEach(c => {
+                    const allocation = Math.min(c.students.length, baseShare);
+                    c.assignedCount = allocation;
+                    leftoverSpots -= allocation;
                 });
 
-                currentRemaining -= slotCap;
+                // 2. Distribute Leftovers by Priority (Earliest Timestamp)
+                // Sort centers by timestamp
+                centers.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
+                let i = 0;
+                while (leftoverSpots > 0) {
+                    const center = centers[i % numCenters]; // Round robin if we loop? 
+                    // Actually, requirement says "por orden de llegada". 
+                    // So we iterate prioritized list. If a center still needs spots, give 1.
+                    // But usually "order de llegada" implies the first one gets as much as possible?
+                    // "si son impares, por orden de llegada" implies the REMAINDER is distributed by order.
+                    
+                    if (center.assignedCount < center.students.length) {
+                        center.assignedCount++;
+                        leftoverSpots--;
+                    }
+                    
+                    // Move to next center? Or fill this one? 
+                    // "Assign the remainder by order of arrival" usually means distributing the odd lots.
+                    // Example: 5 spots, 2 centers. Share = 2. Remainder = 1.
+                    // Center A (Early) gets +1 -> Total 3. Center B gets 2.
+                    // So we iterate once through the sorted list.
+                    i++;
+                    if (i >= numCenters * 2 && leftoverSpots > 0) break; // Breaker preventing infinite loop if logic fails
+                }
             }
 
-            // Run Solver
-            const assignments = this.solver.solve(students, slots);
-
-            // Save assignments
-            await this.saveAssignments(assignments, studentPeticioMap);
-            results.push(...assignments);
+            // SAVE TO DB
+            for (const center of centers) {
+                if (center.assignedCount > 0) {
+                    await this.persistAssignment(center, tallerId);
+                    results.push(center);
+                }
+            }
         }
 
-        return { assigned: allAssignments.length, details: allAssignments };
+        return { processed: results.length };
     }
 
-    private async saveAssignments(assignments: AssignmentResult[], studentPeticioMap: Map<number, number>) {
-        // We need to group assignments by (Peticio, Group) to create Assignacio records
-        // Map: Key="${peticioId}-${groupId}" -> Value={ studentIds[] }
+    private async persistAssignment(center: PendingCenter, tallerId: number) {
+        // Take the first N students
+        const studentsToAssign = center.students.slice(0, center.assignedCount);
 
-        const grouping = new Map<string, { peticioId: number, groupId: number, workshopId: number, students: number[] }>();
-
-        assignments.forEach(a => {
-            const peticioId = studentPeticioMap.get(a.studentId);
-            if (!peticioId) return;
-
-            const key = `${peticioId}-${a.groupId}`;
-            if (!grouping.has(key)) {
-                grouping.set(key, {
-                    peticioId,
-                    groupId: a.groupId,
-                    workshopId: a.workshopId,
-                    students: []
-                });
-            }
-            grouping.get(key)!.students.push(a.studentId);
+        // Update Petition Status
+        await prisma.peticio.update({
+            where: { id_peticio: center.peticioId },
+            data: { estat: 'Aprovada' }
         });
 
-        // Process DB writes
-        for (const group of grouping.values()) {
-            // 1. Create Assignacio
-            // Find center ID from peticio? We need to fetch it or cheat.
-            // We know peticioId exists.
-            const peticio = await prisma.peticio.findUnique({ where: { id_peticio: group.peticioId } });
-            if (!peticio) continue;
-
-            // 1. Auto-approve if it was Pendent
-            if (peticio.estat === 'Pendent') {
-                console.log(`✅ AutoAssignmentService: Auto-approving petition ${peticio.id_peticio} for center ID ${peticio.id_centre}`);
-                await prisma.peticio.update({
-                    where: { id_peticio: peticio.id_peticio },
-                    data: { estat: 'Aprovada' }
-                });
-            }
-
-            const assignacio = await prisma.assignacio.create({
-                data: {
-                    id_peticio: group.peticioId,
-                    id_centre: peticio.id_centre,
-                    id_taller: group.workshopId,
-                    estat: 'PUBLISHED',
-                    // Initialize checklist for Phase 2
-                    checklist: {
-                      create: [
+        // Create Assignacio
+        const assignacio = await prisma.assignacio.create({
+            data: {
+                id_peticio: center.peticioId,
+                id_centre: center.centerId,
+                id_taller: tallerId,
+                estat: 'PUBLISHED',
+                checklist: {
+                    create: [
                         { pas_nom: 'Designar Profesores Referentes', completat: false },
-                        { pas_nom: 'Subir Registro Nominal (Excel)', completat: true }, // Already done by auto-assignment
+                        { pas_nom: 'Subir Registro Nominal (Excel)', completat: true },
                         { pas_nom: 'Acuerdo Pedagógico (Modalidad C)', completat: false }
-                      ]
-                    }
-                }
-            });
-
-            // 1.5 Generate Sessions based on Taller Schedule
-            const taller = await prisma.taller.findUnique({ where: { id_taller: group.workshopId } });
-            if (taller && taller.dies_execucio) {
-                const schedule = taller.dies_execucio as any[]; // { dayOfWeek: number, startTime: string, endTime: string }[]
-                
-                if (Array.isArray(schedule) && schedule.length > 0) {
-                     const sessionsData = schedule.map(slot => {
-                        // Calculate next occurrence of this dayOfWeek
-                        // dayOfWeek: 1=Mon ... 5=Fri
-                        // We start looking from tomorrow to be safe
-                        const d = new Date();
-                        d.setDate(d.getDate() + 1);
-                        
-                        // Find next date matches slot.dayOfWeek
-                        // slot.dayOfWeek is 1-5. JS getDay() is 0(Sun)-6(Sat). 
-                        // So Mon(1) is JS(1). 
-                        while (d.getDay() !== slot.dayOfWeek) {
-                            d.setDate(d.getDate() + 1);
-                        }
-
-                        return {
-                            id_assignacio: assignacio.id_assignacio,
-                            data_sessio: d,
-                            hora_inici: slot.startTime,
-                            hora_fi: slot.endTime
-                        };
-                     });
-
-                     await prisma.sessio.createMany({
-                        data: sessionsData
-                     });
-                     
-                     console.log(`📅 AutoAssignment: Generated ${sessionsData.length} sessions for Assignment ${assignacio.id_assignacio}`);
+                    ]
                 }
             }
+        });
 
-            // 2. Create Inscripcions
-            await prisma.inscripcio.createMany({
-                data: group.students.map(sid => ({
-                    id_assignacio: assignacio.id_assignacio,
-                    id_alumne: sid
-                }))
-            });
+        // Create Inscripcions
+        await prisma.inscripcio.createMany({
+            data: studentsToAssign.map(sid => ({
+                id_assignacio: assignacio.id_assignacio,
+                id_alumne: sid
+            }))
+        });
+
+        // Generate Sessions (Copy from original)
+        const taller = await prisma.taller.findUnique({ where: { id_taller: tallerId } });
+        if (taller && taller.dies_execucio) {
+            const schedule = taller.dies_execucio as any[];
+            if (Array.isArray(schedule) && schedule.length > 0) {
+                const sessionsData = schedule.map(slot => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + 1);
+                    while (d.getDay() !== slot.dayOfWeek) {
+                        d.setDate(d.getDate() + 1);
+                    }
+                    return {
+                        id_assignacio: assignacio.id_assignacio,
+                        data_sessio: d,
+                        hora_inici: slot.startTime,
+                        hora_fi: slot.endTime
+                    };
+                });
+                await prisma.sessio.createMany({ data: sessionsData });
+            }
         }
+
+        console.log(`✅ AutoAssignment: Assigned ${center.assignedCount} students to Center ${center.centerId} for Workshop ${tallerId}`);
     }
 }
