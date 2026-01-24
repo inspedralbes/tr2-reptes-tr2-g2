@@ -52,6 +52,9 @@ router.use('/stats', statsRoutes);
 router.use('/evaluacions', avaluacioRoutes);
 router.use('/questionaris', questionariRoutes);
 
+// Rutas de Carga de Archivos
+router.use('/upload', uploadRoutes);
+
 // Health Check (Para ver si la API respira)
 router.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });

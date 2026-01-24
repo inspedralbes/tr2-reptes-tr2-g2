@@ -6,6 +6,9 @@ import { Toaster } from 'sonner';
 export const metadata: Metadata = {
   title: 'Iter Web',
   description: 'Aplicación web de Iter',
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export default function RootLayout({

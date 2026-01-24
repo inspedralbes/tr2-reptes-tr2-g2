@@ -242,38 +242,38 @@ export default function AlumnesCRUD() {
               <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">Prova amb altres termes de cerca.</p>
             </div>
           )}
-        </div>
-      )}
 
-      {/* Paginació */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white border border-gray-200 p-6">
-          <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
-            Mostrant <span className="text-[#00426B]">{paginatedAlumnes.length}</span> de <span className="text-[#00426B]">{filteredAlumnes.length}</span> alumnes
-          </div>
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === 1 
-                ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-                : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
-            >
-              Anterior
-            </button>
-            <div className="px-4 py-2 bg-[#F8FAFC] border border-gray-200 text-[10px] font-black text-[#00426B] tracking-[0.2em]">
-              Pàgina {currentPage} de {totalPages}
+          {/* Paginació */}
+          {totalPages > 1 && (
+            <div className="mt-0 flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#F8FAFC] border-t border-gray-200 p-6">
+              <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                Mostrant <span className="text-[#00426B]">{paginatedAlumnes.length}</span> de <span className="text-[#00426B]">{filteredAlumnes.length}</span> alumnes
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === 1 
+                    ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
+                    : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
+                >
+                  Anterior
+                </button>
+                <div className="px-4 py-2 bg-white border border-gray-200 text-[10px] font-black text-[#00426B] tracking-[0.2em]">
+                  Pàgina {currentPage} de {totalPages}
+                </div>
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === totalPages 
+                    ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
+                    : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
+                >
+                  Següent
+                </button>
+              </div>
             </div>
-            <button 
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-              className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === totalPages 
-                ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-                : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
-            >
-              Següent
-            </button>
-          </div>
+          )}
         </div>
       )}
 
@@ -314,7 +314,9 @@ export default function AlumnesCRUD() {
                         formData.append('foto', file);
                         try {
                           const api = getApi();
-                          const res = await api.post(`/upload/perfil/alumne/${editingAlumne.id_alumne}`, formData);
+                          const res = await api.post(`/upload/perfil/alumne/${editingAlumne.id_alumne}`, formData, {
+                            headers: { 'Content-Type': 'multipart/form-data' }
+                          });
                           toast.success("Foto actualitzada.");
                           loadAlumnes();
                           setEditingAlumne({ ...editingAlumne, url_foto: res.data.url_foto });

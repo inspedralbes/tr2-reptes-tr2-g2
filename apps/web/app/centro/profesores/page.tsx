@@ -80,10 +80,10 @@ export default function ProfesoresCRUD() {
     try {
       if (editingProf) {
         await professorService.update(editingProf.id_professor, formData);
-        toast.success("Professor actualitzat correctly.");
+        toast.success("Professor actualitzat correctament.");
       } else {
         await professorService.create(formData);
-        toast.success("Professor creat correctly.");
+        toast.success("Professor creat correctament.");
       }
       setIsModalOpen(false);
       setEditingProf(null);
@@ -187,6 +187,7 @@ export default function ProfesoresCRUD() {
                             id={p.usuari?.id_usuari || p.id_professor} 
                             type="usuari" 
                             size="md"
+                            email={p.usuari?.email}
                           />
                           <div>
                             <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{p.nom}</div>
@@ -288,7 +289,9 @@ export default function ProfesoresCRUD() {
                         formData.append('foto', file);
                         try {
                           const api = getApi();
-                          const res = await api.post(`/upload/perfil/usuari/${editingProf.usuari.id_usuari}`, formData);
+                          const res = await api.post(`/upload/perfil/usuari/${editingProf.usuari.id_usuari}`, formData, {
+                            headers: { 'Content-Type': 'multipart/form-data' }
+                          });
                           toast.success("Foto actualitzada.");
                           loadProfessors();
                           // Update local state for immediate feedback

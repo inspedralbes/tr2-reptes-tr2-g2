@@ -134,12 +134,29 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
     <DashboardLayout 
       title={`GESTIÓ TALLER: ${assignacio.taller?.titol}`} 
       subtitle={
-        <div className="flex items-center gap-3 mt-4">
-          <div className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border-2 border-gray-100 bg-white text-consorci-darkBlue">
-            ESTAT: {getStatusLabel(assignacio.estat)}
+        <div className="flex flex-col gap-4 mt-6">
+          <div className="flex items-center gap-3">
+            <div className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border-2 border-gray-100 bg-white text-[#00426B]">
+              {getStatusLabel(assignacio.estat)}
+            </div>
+            <div className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest bg-[#00426B] text-white">
+              MODALITAT {assignacio.taller?.modalitat}
+            </div>
           </div>
-          <div className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest bg-consorci-darkBlue text-white">
-            MODALITAT {assignacio.taller?.modalitat}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6 p-6 bg-[#F8FAFC] border border-gray-200">
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Equip Docent Referent</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-[#00426B] uppercase">{assignacio.prof1?.nom}</span>
+                <span className="text-gray-300">•</span>
+                <span className="text-xs font-black text-[#00426B] uppercase">{assignacio.prof2?.nom}</span>
+              </div>
+            </div>
+            <div className="h-8 w-[1px] bg-gray-200 hidden sm:block"></div>
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Centre Educatiu</span>
+              <span className="text-xs font-black text-[#00426B] uppercase">{assignacio.centre?.nom}</span>
+            </div>
           </div>
         </div>
       }
@@ -147,16 +164,16 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
       <div className="pb-20">
         {/* SECCIÓ: ALUMNAT PARTICIPANT */}
         <section className="bg-white border border-gray-200 shadow-sm overflow-hidden">
-          <div className="p-10 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-[#F8FAFC]/50">
+          <div className="p-10 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gradient-to-r from-[#F8FAFC] to-white">
             <div>
-              <h3 className="text-xl font-black text-consorci-darkBlue uppercase tracking-tighter">Alumnat Participant</h3>
+              <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tighter">Alumnat Participant</h3>
               <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">
                 {assignacio.inscripcions?.length || 0} de {assignacio?.peticio?.alumnes_aprox || assignacio?.taller?.places_maximes || 20} places ocupades.
               </p>
             </div>
             <button 
               onClick={() => setViewMode('selection')}
-              className="bg-consorci-darkBlue text-white px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all flex items-center gap-3 shadow-xl"
+              className="bg-[#00426B] text-white px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#0775AB] transition-all flex items-center gap-3 shadow-xl"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
               Afegir Alumne
@@ -175,13 +192,13 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                       id={ins.alumne.id_alumne} 
                       type="alumne" 
                       size="lg"
-                      className="shadow-lg"
+                      className="shadow-md"
                     />
                     <div>
-                      <p className="text-base font-black text-consorci-darkBlue uppercase tracking-tight leading-none">
+                      <p className="text-base font-black text-[#00426B] uppercase tracking-tight leading-none">
                         {ins.alumne.nom} {ins.alumne.cognoms}
                       </p>
-                      <p className="text-[10px] font-bold text-consorci-lightBlue uppercase tracking-widest mt-2 bg-blue-50 px-2 py-0.5 inline-block">
+                      <p className="text-[10px] font-bold text-[#4197CB] uppercase tracking-widest mt-2 bg-blue-50 px-2 py-0.5 inline-block border border-blue-100">
                         {ins.alumne.curs} • {ins.alumne.idalu}
                       </p>
                     </div>
@@ -237,7 +254,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                 <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4">No hi ha alumnes assignats encara</p>
                 <button 
                   onClick={() => setViewMode('selection')}
-                  className="text-consorci-lightBlue font-black text-[10px] uppercase tracking-widest hover:text-consorci-darkBlue transition-colors"
+                  className="text-[#4197CB] font-black text-[10px] uppercase tracking-widest hover:text-[#00426B] transition-colors"
                 >
                   Fes clic aquí per començar el registre nominal
                 </button>
@@ -252,7 +269,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           {/* Backdrop blurred */}
           <div 
-            className="absolute inset-0 bg-[#00426B]/40 backdrop-blur-md"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setViewMode('workshop')}
           ></div>
           

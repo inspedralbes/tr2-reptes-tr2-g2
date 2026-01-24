@@ -37,6 +37,7 @@ export default function ProfilePage() {
                 size="xl"
                 className="ring-4 ring-white shadow-xl"
                 isCoordinator={user.rol.nom_rol === 'COORDINADOR'}
+                email={user.email}
               />
             </div>
 

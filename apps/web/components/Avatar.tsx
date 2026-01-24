@@ -8,9 +8,10 @@ interface AvatarProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   isCoordinator?: boolean;
+  email?: string | null;
 }
 
-export default function Avatar({ url, name, id, type, size = 'md', className = '', isCoordinator }: AvatarProps) {
+export default function Avatar({ url, name, id, type, size = 'md', className = '', isCoordinator, email }: AvatarProps) {
   const sizeClasses = {
     xs: 'w-6 h-6 text-[8px]',
     sm: 'w-8 h-8 text-[10px]',
@@ -21,27 +22,21 @@ export default function Avatar({ url, name, id, type, size = 'md', className = '
 
   const currentSize = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
   
-  // Realist fallbacks
-  // For 'alumne' we use a curated student-like photo from Unsplash/Pravatar
-  // For 'usuari' we use Pravatar
-  // For 'coordinator' we show a building/school icon
-  const avatarId = typeof id === 'number' ? id : parseInt(id.toString().slice(-3)) || 1;
-  const fallbackUrl = type === 'alumne' 
-    ? `https://i.pravatar.cc/150?u=student${avatarId}`
-    : `https://i.pravatar.cc/150?u=teacher${avatarId}`;
-
   const fullUrl = url ? `${process.env.NEXT_PUBLIC_API_URL}${url}` : null;
+  const isAdmin = email === 'admin@admin.com';
+
+  // We should NOT show a photo if it's the admin or if we don't have a URL
+  const showPhoto = fullUrl && !isAdmin;
 
   return (
-    <div className={`relative shrink-0 overflow-hidden bg-consorci-darkBlue text-white flex items-center justify-center font-black shadow-inner ${currentSize} ${className}`}>
-      {fullUrl ? (
+    <div className={`relative shrink-0 overflow-hidden bg-[#EAEFF2] text-[#00426B] flex items-center justify-center font-black shadow-inner ${currentSize} ${className}`}>
+      {showPhoto ? (
         <img 
-          src={fullUrl} 
+          src={fullUrl!} 
           alt={name} 
           className="w-full h-full object-cover"
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = 'none';
-            (e.target as HTMLImageElement).parentElement?.classList.add('flex-col');
           }}
         />
       ) : isCoordinator ? (
@@ -51,11 +46,11 @@ export default function Avatar({ url, name, id, type, size = 'md', className = '
           </svg>
         </div>
       ) : (
-        <img 
-          src={fallbackUrl} 
-          alt={name} 
-          className="w-full h-full object-cover"
-        />
+        <div className="flex flex-col items-center justify-center w-full h-full bg-[#EAEFF2] text-[#00426B]">
+          <svg className="w-1/2 h-1/2" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+          </svg>
+        </div>
       )}
     </div>
   );

@@ -44,6 +44,8 @@ export default function TallerScreen() {
   const [selectedSector, setSelectedSector] = useState("Tots els sectors");
   const [selectedModalitat, setSelectedModalitat] = useState("Totes les modalitats");
   const [isCreateModalVisible, setCreateModalVisible] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -85,6 +87,16 @@ export default function TallerScreen() {
       return matchesSearch && matchesSector && matchesModalitat;
     });
   }, [talleres, searchQuery, selectedSector, selectedModalitat]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedSector, selectedModalitat]);
+
+  const totalPages = Math.ceil(filteredTalleres.length / itemsPerPage);
+  const paginatedTalleres = filteredTalleres.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const uniqueSectors = useMemo(() => {
     const sectors = Array.from(new Set(talleres.map(t => t.sector))).filter(Boolean);
@@ -238,7 +250,7 @@ export default function TallerScreen() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredTalleres.map((taller) => (
+                {paginatedTalleres.map((taller) => (
                   <tr key={taller._id} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
@@ -302,6 +314,38 @@ export default function TallerScreen() {
               </tbody>
             </table>
           </div>
+
+          {/* Paginació */}
+          {totalPages > 1 && (
+            <div className="mt-0 flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#F8FAFC] border-t border-gray-200 p-6">
+              <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                Mostrant <span className="text-[#00426B]">{paginatedTalleres.length}</span> de <span className="text-[#00426B]">{filteredTalleres.length}</span> tallers
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === 1 
+                    ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
+                    : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
+                >
+                  Anterior
+                </button>
+                <div className="px-4 py-2 bg-white border border-gray-200 text-[10px] font-black text-[#00426B] tracking-[0.2em]">
+                  Pàgina {currentPage} de {totalPages}
+                </div>
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === totalPages 
+                    ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
+                    : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
+                >
+                  Següent
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="text-center py-32 bg-white border border-dashed border-gray-200">

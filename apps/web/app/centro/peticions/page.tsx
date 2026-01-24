@@ -123,6 +123,18 @@ export default function PeticionsPage() {
       return;
     }
 
+    if (!prof1_id || !prof2_id) {
+      setError('Has de seleccionar dos professors referents.');
+      setSubmitting(false);
+      return;
+    }
+
+    if (prof1_id === prof2_id) {
+      setError('Els dos professors referents han de ser diferents.');
+      setSubmitting(false);
+      return;
+    }
+
     try {
       if (editingPeticioId) {
         // Update
@@ -365,7 +377,7 @@ export default function PeticionsPage() {
                           className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700"
                           required
                         >
-                          <option value="">Referent Principal</option>
+                          <option value="">Selecciona el Referent Principal *</option>
                           {professors.map(p => (
                             <option key={p.id_professor} value={p.id_professor}>{p.nom}</option>
                           ))}
@@ -376,7 +388,7 @@ export default function PeticionsPage() {
                           className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700"
                           required
                         >
-                          <option value="">Segon Referent</option>
+                          <option value="">Selecciona el Segon Referent *</option>
                           {professors.map(p => (
                             <option key={p.id_professor} value={p.id_professor}>{p.nom}</option>
                           ))}

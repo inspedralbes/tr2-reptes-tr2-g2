@@ -14,6 +14,8 @@ services:
         required: false
     networks:
       - iter-network-prod
+    volumes:
+      - iter-uploads:/app/uploads
 
   api:
     build:
@@ -28,14 +30,17 @@ services:
         required: true
       - path: ./apps/api/.env
         required: false
-    # Afegeix extra_hosts per permetre la connexió a la base de dades local del host.
-    # Al teu arxiu .env a apps/api, configura la DATABASE_URL així:
-    # DATABASE_URL="postgresql://USER:PASSWORD@host.docker.internal:5432/DATABASE"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
       - iter-network-prod
+    volumes:
+      - iter-uploads:/app/uploads
 
 networks:
   iter-network-prod:
     driver: bridge
+
+volumes:
+  iter-uploads:
+    driver: local
