@@ -166,19 +166,19 @@ export default function TallerScreen() {
       actions={headerActions}
     >
       {/* Panell de Filtres */}
-      <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8">
+      <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-background-surface border border-border-subtle p-8">
         {/* Cercador de Text */}
         <div className="flex-1">
-          <label className="block text-[10px] font-bold text-[#00426B] uppercase tracking-[0.2em] mb-3">Cerca per títol</label>
+          <label className="block text-[10px] font-bold text-text-primary uppercase tracking-[0.2em] mb-3">Cerca per títol</label>
           <div className="relative">
             <input 
               type="text"
               placeholder="Ex: Fusta, Robòtica..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] placeholder:text-gray-300 transition-all"
+              className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-actionBlue focus:ring-0 text-sm font-bold text-text-primary placeholder:text-text-muted transition-all"
             />
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
@@ -186,11 +186,11 @@ export default function TallerScreen() {
 
         {/* Filtre Sector */}
         <div className="lg:w-64">
-          <label className="block text-[10px] font-bold text-[#00426B] uppercase tracking-[0.2em] mb-3">Filtra per sector</label>
+          <label className="block text-[10px] font-bold text-text-primary uppercase tracking-[0.2em] mb-3">Filtra per sector</label>
           <select 
             value={selectedSector}
             onChange={(e) => setSelectedSector(e.target.value)}
-            className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] appearance-none"
+            className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-actionBlue focus:ring-0 text-sm font-bold text-text-primary appearance-none"
           >
             {uniqueSectors.map(s => (
               <option key={s} value={s}>{s}</option>
@@ -200,11 +200,11 @@ export default function TallerScreen() {
 
         {/* Filtre Modalitat */}
         <div className="lg:w-64">
-          <label className="block text-[10px] font-bold text-[#00426B] uppercase tracking-[0.2em] mb-3">Filtrar per modalitat</label>
+          <label className="block text-[10px] font-bold text-text-primary uppercase tracking-[0.2em] mb-3">Filtrar per modalitat</label>
           <select 
             value={selectedModalitat}
             onChange={(e) => setSelectedModalitat(e.target.value)}
-            className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] appearance-none"
+            className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-actionBlue focus:ring-0 text-sm font-bold text-text-primary appearance-none"
           >
             {uniqueModalitats.map(m => (
               <option key={m} value={m}>{m}</option>
@@ -220,7 +220,7 @@ export default function TallerScreen() {
               setSelectedSector("Tots els sectors");
               setSelectedModalitat("Totes les modalitats");
             }}
-            className="w-full lg:w-auto px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
+            className="w-full lg:w-auto px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-text-muted hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
           >
             Netejar
           </button>
@@ -231,45 +231,45 @@ export default function TallerScreen() {
       {loading ? (
         <Loading message="Carregant catàleg..." />
       ) : filteredTalleres.length > 0 ? (
-        <div className="bg-white border border-gray-200 overflow-hidden">
+        <div className="bg-background-surface border border-border-subtle overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#F8FAFC] border-b border-gray-200">
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#00426B]">Informació del Taller</th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#00426B]">Classificació</th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#00426B]">Detalls i Capacitat</th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#00426B] text-right">Accions</th>
+                <tr className="bg-background-subtle border-b border-border-subtle">
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary">Informació del Taller</th>
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary">Classificació</th>
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary">Detalls i Capacitat</th>
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary text-right">Accions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border-subtle">
                 {paginatedTalleres.map((taller) => (
-                  <tr key={taller._id} className="hover:bg-gray-50 transition-colors group">
+                  <tr key={taller._id} className="hover:bg-background-subtle transition-colors group">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-[#EAEFF2] flex items-center justify-center text-[#00426B] group-hover:bg-[#00426B] group-hover:text-white transition-colors">
+                        <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {SVG_ICONS[taller.icona || "PUZZLE"] || SVG_ICONS.PUZZLE}
                           </svg>
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-[#00426B] uppercase tracking-tight">{taller.titol}</div>
-                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">ID: {taller._id}</div>
+                          <div className="text-sm font-bold text-text-primary uppercase tracking-tight">{taller.titol}</div>
+                          <div className="text-[10px] font-bold text-text-muted uppercase tracking-tighter mt-0.5">ID: {taller._id}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-[11px] font-medium text-gray-600">
+                    <td className="px-6 py-5 text-[11px] font-medium text-text-secondary">
                       <div className="flex flex-col gap-1">
-                        <span className="font-bold text-[#0775AB] uppercase">{taller.sector}</span>
-                        <span className="text-gray-400">Modalitat {taller.modalitat}</span>
+                        <span className="font-bold text-consorci-actionBlue uppercase">{taller.sector}</span>
+                        <span className="text-text-muted">Modalitat {taller.modalitat}</span>
                       </div>
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-wide">
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-text-muted uppercase tracking-wide">
                           {taller.detalls_tecnics?.durada_hores}h • {taller.detalls_tecnics?.places_maximes} Places
                         </div>
-                        <div className="text-[10px] text-gray-400 font-medium line-clamp-1 max-w-[200px]">
+                        <div className="text-[10px] text-text-muted font-medium line-clamp-1 max-w-[200px]">
                           {taller.detalls_tecnics?.descripcio}
                         </div>
                       </div>
@@ -278,13 +278,13 @@ export default function TallerScreen() {
                       <div className="flex justify-end items-center gap-2">
                         <button 
                           onClick={() => handleEdit(taller)}
-                          className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors"
+                          className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-consorci-darkBlue hover:bg-background-subtle transition-colors"
                         >
                           Editar
                         </button>
                         <button 
                           onClick={() => handleDelete(taller._id)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all"
+                          className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 transition-all"
                         >
                           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -300,29 +300,29 @@ export default function TallerScreen() {
 
           {/* Paginació */}
           {totalPages > 1 && (
-            <div className="mt-0 flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#F8FAFC] border-t border-gray-200 p-6">
-              <div className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">
-                Mostrant <span className="text-[#00426B]">{paginatedTalleres.length}</span> de <span className="text-[#00426B]">{filteredTalleres.length}</span> tallers
+            <div className="mt-0 flex flex-col sm:flex-row justify-between items-center gap-4 bg-background-subtle border-t border-border-subtle p-6">
+              <div className="text-[10px] font-bold uppercase text-text-muted tracking-widest">
+                Mostrant <span className="text-text-primary">{paginatedTalleres.length}</span> de <span className="text-text-primary">{filteredTalleres.length}</span> tallers
               </div>
               <div className="flex items-center gap-2">
                 <button 
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
                   className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${currentPage === 1 
-                    ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-                    : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
+                    ? 'text-text-muted border-border-subtle cursor-not-allowed' 
+                    : 'text-consorci-darkBlue border-border-subtle hover:bg-background-subtle'}`}
                 >
                   Anterior
                 </button>
-                <div className="px-4 py-2 bg-white border border-gray-200 text-[10px] font-bold text-[#00426B] tracking-[0.2em]">
+                <div className="px-4 py-2 bg-background-surface border border-border-subtle text-[10px] font-bold text-consorci-darkBlue tracking-[0.2em]">
                   Pàgina {currentPage} de {totalPages}
                 </div>
                 <button 
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
                   className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${currentPage === totalPages 
-                    ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-                    : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
+                    ? 'text-text-muted border-border-subtle cursor-not-allowed' 
+                    : 'text-consorci-darkBlue border-border-subtle hover:bg-background-subtle'}`}
                 >
                   Següent
                 </button>
@@ -331,14 +331,14 @@ export default function TallerScreen() {
           )}
         </div>
       ) : (
-        <div className="text-center py-32 bg-white border border-dashed border-gray-200">
-          <div className="w-16 h-16 bg-gray-50 flex items-center justify-center mx-auto mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="text-center py-32 bg-background-surface border border-dashed border-border-subtle">
+          <div className="w-16 h-16 bg-background-subtle flex items-center justify-center mx-auto mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <p className="text-[#00426B] font-bold uppercase text-xs tracking-widest">No s'han trobat tallers</p>
-          <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">Prova amb altres termes de cerca.</p>
+          <p className="text-text-primary font-bold uppercase text-xs tracking-widest">No s'han trobat tallers</p>
+          <p className="text-text-muted text-[10px] uppercase font-bold mt-1 tracking-widest">Prova amb altres termes de cerca.</p>
         </div>
       )}
 

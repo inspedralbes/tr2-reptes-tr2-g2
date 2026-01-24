@@ -9,8 +9,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true
+    "noEmit": false
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]
