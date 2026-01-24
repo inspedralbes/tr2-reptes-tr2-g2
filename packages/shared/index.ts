@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { THEME } from './theme.ts';
+import { THEME } from './theme';
 
 export { THEME };
 
