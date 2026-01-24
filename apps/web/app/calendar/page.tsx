@@ -114,10 +114,18 @@ export default function CalendarPage() {
               
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-4 h-4 bg-[#4197CB]"></div>
+                  <div className="w-4 h-4 bg-consorci-lightBlue"></div>
                   <div>
-                    <span className="block text-xs font-black text-gray-800 uppercase tracking-tight">Activitat Docent</span>
-                    <span className="text-[10px] text-gray-400 font-medium">Tallers i sessions presencials.</span>
+                    <span className="block text-xs font-black text-gray-800 uppercase tracking-tight">Assignació</span>
+                    <span className="text-[10px] text-gray-400 font-medium">Període total del taller al centre.</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <div className="w-4 h-4 bg-consorci-yellow"></div>
+                  <div>
+                    <span className="block text-xs font-black text-gray-800 uppercase tracking-tight">Sessió de Taller</span>
+                    <span className="text-[10px] text-gray-400 font-medium">Dia i hora concrets de l'activitat.</span>
                   </div>
                 </div>
 
@@ -181,6 +189,25 @@ export default function CalendarPage() {
                     {new Date(selectedEvent.date).toLocaleDateString('ca-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                   </span>
                 </div>
+                
+                {selectedEvent.metadata?.hora && (
+                  <div className="flex items-center gap-3 text-gray-600">
+                    <svg className="w-4 h-4 text-[#00426B]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-xs font-bold">{selectedEvent.metadata.hora}</span>
+                  </div>
+                )}
+
+                {selectedEvent.metadata?.centre && (
+                  <div className="flex items-center gap-3 text-gray-600">
+                    <svg className="w-4 h-4 text-[#00426B]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <span className="text-xs font-bold">{selectedEvent.metadata.centre}</span>
+                  </div>
+                )}
+
                 {selectedEvent.description && (
                   <div className="p-4 bg-gray-50 border-l-4 border-[#00426B]">
                     <p className="text-xs text-gray-600 font-medium leading-relaxed italic">
@@ -197,12 +224,25 @@ export default function CalendarPage() {
                 >
                   Tancar
                 </button>
-                <button 
-                  onClick={() => setSelectedEvent(null)}
-                  className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-colors"
-                >
-                  D'acord
-                </button>
+                {(selectedEvent.metadata?.id_assignacio) && (
+                  <button 
+                    onClick={() => {
+                      const baseUrl = user?.rol.nom_rol === 'ADMIN' ? '/admin/assignacions' : '/centro/assignacions';
+                      window.location.href = `${baseUrl}/${selectedEvent.metadata.id_assignacio}`;
+                    }}
+                    className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-colors"
+                  >
+                    Veure Detalls
+                  </button>
+                )}
+                {!selectedEvent.metadata?.id_assignacio && (
+                  <button 
+                    onClick={() => setSelectedEvent(null)}
+                    className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-colors"
+                  >
+                    D'acord
+                  </button>
+                )}
               </div>
             </div>
           </div>

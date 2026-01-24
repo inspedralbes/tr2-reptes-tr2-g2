@@ -186,6 +186,42 @@ export class AutoAssignmentService {
                 }
             });
 
+            // 1.5 Generate Sessions based on Taller Schedule
+            const taller = await prisma.taller.findUnique({ where: { id_taller: group.workshopId } });
+            if (taller && taller.dies_execucio) {
+                const schedule = taller.dies_execucio as any[]; // { dayOfWeek: number, startTime: string, endTime: string }[]
+                
+                if (Array.isArray(schedule) && schedule.length > 0) {
+                     const sessionsData = schedule.map(slot => {
+                        // Calculate next occurrence of this dayOfWeek
+                        // dayOfWeek: 1=Mon ... 5=Fri
+                        // We start looking from tomorrow to be safe
+                        const d = new Date();
+                        d.setDate(d.getDate() + 1);
+                        
+                        // Find next date matches slot.dayOfWeek
+                        // slot.dayOfWeek is 1-5. JS getDay() is 0(Sun)-6(Sat). 
+                        // So Mon(1) is JS(1). 
+                        while (d.getDay() !== slot.dayOfWeek) {
+                            d.setDate(d.getDate() + 1);
+                        }
+
+                        return {
+                            id_assignacio: assignacio.id_assignacio,
+                            data_sessio: d,
+                            hora_inici: slot.startTime,
+                            hora_fi: slot.endTime
+                        };
+                     });
+
+                     await prisma.sessio.createMany({
+                        data: sessionsData
+                     });
+                     
+                     console.log(`📅 AutoAssignment: Generated ${sessionsData.length} sessions for Assignment ${assignacio.id_assignacio}`);
+                }
+            }
+
             // 2. Create Inscripcions
             await prisma.inscripcio.createMany({
                 data: group.students.map(sid => ({

@@ -68,6 +68,34 @@ const assignacioService = {
       console.error("Error en assignacioService.runTetris:", error);
       throw error;
     }
+  },
+
+  /**
+   * Obtiene todas las asignaciones (Admin solo).
+   */
+  getAll: async (): Promise<Assignacio[]> => {
+    const api = getApi();
+    try {
+      const response = await api.get<Assignacio[]>("/assignacions");
+      return response.data;
+    } catch (error) {
+      console.error("Error en assignacioService.getAll:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Envía una notificación de error en un documento.
+   */
+  sendDocumentNotification: async (idAssignacio: number, documentName: string, comment: string, greeting: string): Promise<any> => {
+    const api = getApi();
+    try {
+      const response = await api.post(`/assignacions/${idAssignacio}/document-notification`, { documentName, comment, greeting });
+      return response.data;
+    } catch (error) {
+      console.error("Error en assignacioService.sendDocumentNotification:", error);
+      throw error;
+    }
   }
 };
 

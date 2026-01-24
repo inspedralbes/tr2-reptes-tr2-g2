@@ -100,6 +100,8 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
     }
   };
 
+
+
   const getStatusLabel = (estat: string) => {
     const maps: Record<string, string> = {
       'DATA_ENTRY_PENDING': 'PENDENT DE GESTIÓ',
@@ -163,7 +165,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
     >
       <div className="pb-20">
         {/* SECCIÓ: ALUMNAT PARTICIPANT */}
-        <section className="bg-white border border-gray-200 shadow-sm overflow-hidden">
+        <section className="bg-white border border-gray-200 shadow-sm overflow-hidden mb-8">
           <div className="p-10 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gradient-to-r from-[#F8FAFC] to-white">
             <div>
               <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tighter">Alumnat Participant</h3>
@@ -262,6 +264,37 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
             )}
           </div>
         </section>
+        
+        {/* ACTION: FINALITZAR REGISTRE */}
+        {assignacio.estat !== 'En_curs' && assignacio.estat !== 'FINALITZADA' && (
+            <div className="bg-blue-50 border border-blue-100 p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+                <div>
+                    <h4 className="text-lg font-black text-[#00426B] uppercase">Confirmar Documentació</h4>
+                    <p className="text-xs text-gray-600 mt-1 max-w-xl">
+                        Un cop hagis pujat tota la documentació requerida dels alumnes, fes clic aquí per finalitzar el registre. 
+                        Això confirmarà les inscripcions i <span className="font-bold">generarà automàticament les sessions del taller</span> al calendari.
+                    </p>
+                </div>
+                <button 
+                    onClick={async () => {
+                        if(!confirm("Estàs segur que vols confirmar el registre i generar les sessions?")) return;
+                        try {
+                            const api = getApi();
+                            await api.post(`/assignacions/${id}/confirm-registration`);
+                            toast.success("Registre confirmat! Sesion generades.");
+                            // Recargar
+                            window.location.reload();
+                        } catch(e) {
+                            toast.error("Error al confirmar.");
+                        }
+                    }}
+                    className="bg-[#00426B] text-white px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-green-600 transition-all shadow-xl whitespace-nowrap"
+                >
+                    Confirmar i Generar Sessions
+                </button>
+            </div>
+        )}
+
       </div>
 
       {/* MODAL: SELECCIÓ D'ALUMNAT */}

@@ -111,60 +111,94 @@ export default function CentroDashboard() {
       </section>
 
       {/* Accesos Directos - Targetes Estil edubcn */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 md:gap-8 w-full">
         {[
           { 
             title: "Solicitar Tallers", 
-            text: "Demana la participació del centre abans del 10 d'octubre.", 
+            text: "Solicita els tallers que vols amb les plaçes necessàries.", 
             icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
             path: "/centro/peticions",
             active: isPhaseActive(PHASES.SOLICITUD),
-            phaseLabel: "Fase Finalitzada"
+            phase: "Fase 1"
           },
           { 
             title: "Gestió Alumnat", 
-            text: "Inscriu els alumnes als tallers assignats de forma nominal.", 
+            text: "Afegeix els alumnes del teu centre", 
             icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
             path: "/centro/alumnos",
             active: isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.SOLICITUD),
-            phaseLabel: "Propera Fase"
-          },
-          { 
-            title: "Professors", 
-            text: "Gestiona l'equip docent referent del projecte.", 
-            icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
-            path: "/centro/profesores",
-            active: true
+            phase: "General"
           },
           { 
             title: "Assignacions", 
-            text: "Consulta la planificació i estat dels tallers adjudicats.", 
-            icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+            text: "Asigna els alumnes amb la documentació necessaria als talleres previament sol·licitats.", 
+            icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01",
             path: "/centro/assignacions",
-            active: isPhaseActive(PHASES.PLANIFICACION) || isPhaseActive(PHASES.EJECUCION) || isPhaseActive(PHASES.CIERRE)
-          }
+            active: isPhaseActive(PHASES.PLANIFICACION),
+            phase: "Fase 2"
+          },
+          { 
+            title: "Gestió Sessions", 
+            text: "Afegeix els teus profesors als tallers assignats", 
+            icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
+            path: "/centro/sessions",
+            active: isPhaseActive(PHASES.EJECUCION),
+            phase: "Fase 3"
+          },
+          { 
+            title: "Professors", 
+            text: "Afegeix els professors del teu centre", 
+            icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
+            path: "/centro/profesores",
+            active: true,
+            phase: "General"
+          },
         ].map((item, idx) => (
           <div
             key={idx}
             onClick={() => item.active && router.push(item.path)}
-            className={`group p-10 border-2 transition-all ${item.active
-              ? 'bg-white border-gray-100 cursor-pointer hover:border-[#4197CB]'
-              : 'bg-gray-50 border-gray-100 opacity-60 cursor-not-allowed'
-              }`}
+            className={`group bg-white p-8 md:p-10 border transition-all duration-300 relative overflow-hidden ${
+              item.active
+                ? 'border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-xl'
+                : 'border-gray-100 opacity-60 cursor-not-allowed'
+            }`}
           >
-            <div className={`w-16 h-16 flex items-center justify-center mb-8 border-2 ${item.active ? 'bg-gray-50 text-[#00426B] border-gray-50 group-hover:bg-[#00426B] group-hover:text-white' : 'bg-gray-100 text-gray-200 border-gray-100'
-              }`}>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-              </svg>
+            <div className={`absolute top-0 right-0 w-16 h-16 bg-[#F2F2F3] -mr-8 -mt-8 rotate-45 transition-colors duration-300 ${
+              item.active ? 'group-hover:bg-[#0775AB]' : ''
+            }`}></div>
+
+            <div className={`w-16 h-16 flex items-center justify-center mb-8 border border-gray-100 transition-all duration-300 ${
+              item.active 
+                ? 'bg-[#EAEFF2] text-[#00426B] group-hover:bg-[#00426B] group-hover:text-white' 
+                : 'bg-gray-100 text-gray-200'
+            }`}>
+              <div className={item.active ? 'group-hover:text-white' : ''}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
+                </svg>
+              </div>
             </div>
-            <h3 className="text-xl font-extrabold text-[#00426B] mb-4 uppercase tracking-tighter">{item.title}</h3>
-            <p className="text-[11px] text-gray-400 font-bold uppercase leading-relaxed tracking-wider">{item.text}</p>
-            {(!item.active && item.phaseLabel) && (
-              <span className={`text-[9px] font-black uppercase mt-8 block tracking-widest px-3 py-1 w-fit ${item.phaseLabel.includes('Final') ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-blue-50 text-[#0775AB] border border-blue-100'}`}>
-                {item.phaseLabel}
-              </span>
-            )}
+            
+            <h3 className={`text-xl font-black mb-3 uppercase tracking-tight ${
+              item.active ? 'text-[#00426B]' : 'text-gray-400'
+            }`}>
+              {item.title}
+            </h3>
+            
+            <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">
+              {item.text}
+            </p>
+
+            <div className="mt-8 flex items-center">
+              <div className={`flex items-center font-bold text-[10px] uppercase tracking-[0.2em] transition-transform ${
+                item.active ? 'text-[#0775AB] group-hover:translate-x-2' : 'text-gray-300'
+              }`}>
+                {item.active ? item.phase : "Mòdul tancat"}
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
           </div>
         ))}
       </div>

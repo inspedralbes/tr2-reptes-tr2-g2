@@ -9,6 +9,7 @@ import multer from 'multer';
 const upload = multer({ storage: multer.memoryStorage() });
 
 // /api/assignacions
+router.get('/', authenticateToken, assignacioController.getAssignacions);
 router.get('/:id', authenticateToken, assignacioController.getAssignacioById);
 router.get('/centre/:idCentre', authenticateToken, assignacioController.getAssignacionsByCentre);
 router.get('/:idAssignacio/checklist', authenticateToken, assignacioController.getChecklist);
@@ -21,6 +22,7 @@ router.post('/:idAssignacio/inscripcions', authenticateToken, assignacioControll
 router.post('/auto-generate', authenticateToken, assignacioController.generateAutomaticAssignments);
 router.post('/publish', authenticateToken, assignacioController.publishAssignments);
 router.post('/:idAssignacio/validate', authenticateToken, assignacioController.validateCenterData);
+router.post('/:idAssignacio/document-notification', authenticateToken, assignacioController.sendDocumentNotification);
 
 // Phase 2 Specifics
 router.post('/tetris', authenticateToken, tetrisController.triggerTetris);
@@ -39,6 +41,10 @@ router.delete('/:idAssignacio/staff/:idUsuari', authenticateToken, assignacioCon
 router.get('/:idAssignacio/sessions', authenticateToken, assignacioController.getSessions);
 router.get('/:idAssignacio/sessions/:sessionNum', authenticateToken, assignacioController.getSessionAttendance);
 router.post('/:idAssignacio/sessions/:sessionNum', authenticateToken, assignacioController.registerAttendance);
+
+// Phase 3: Dynamic Session Teaching Staff
+router.post('/sessions/:idSessio/staff', authenticateToken, assignacioController.addSessionProfessor);
+router.delete('/sessions/:idSessio/staff/:idUsuari', authenticateToken, assignacioController.removeSessionProfessor);
 
 // Phase 4: Closing
 router.post('/:idAssignacio/close', authenticateToken, assignacioController.closeAssignacio);

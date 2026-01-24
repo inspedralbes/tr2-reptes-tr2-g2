@@ -250,11 +250,14 @@ export default function PeticionsPage() {
                           }`}
                       >
                         <td className="px-6 py-4">
-                          <div className={`w-8 h-8 flex items-center justify-center font-bold text-xs ${taller.modalitat === 'A' ? 'bg-green-100 text-green-700' :
-                              taller.modalitat === 'B' ? 'bg-orange-100 text-orange-700' :
-                                'bg-purple-100 text-purple-700'
-                            }`}>
-                            {taller.modalitat}
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 flex items-center justify-center font-bold text-xs shrink-0 ${taller.modalitat === 'A' ? 'bg-green-100 text-green-700' :
+                                taller.modalitat === 'B' ? 'bg-orange-100 text-orange-700' :
+                                  'bg-purple-100 text-purple-700'
+                              }`}>
+                              {taller.modalitat}
+                            </div>
+                            <span className="text-xl" title="Icona del taller">{taller.icona || '🧩'}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">

@@ -150,13 +150,81 @@ async function seedUsers(roles: any, passDefault: string) {
 async function seedTallers(sectors: any) {
   console.log('📚 Generando catálogo de talleres...');
   const tallers = [
-    { titol: 'Robòtica i IoT', sector: sectors.sectorTecno.id_sector, modalitat: 'A', cap: 10, icona: 'ROBOT' },
-    { titol: 'Cinema Digital', sector: sectors.sectorCreacio.id_sector, modalitat: 'B', cap: 8, icona: 'FILM' },
-    { titol: 'Impressió 3D', sector: sectors.sectorIndus.id_sector, modalitat: 'A', cap: 7, icona: 'TOOLS' },
-    { titol: 'Desenvolupament Web', sector: sectors.sectorTecno.id_sector, modalitat: 'C', cap: 6, icona: 'CODE' },
-    { titol: 'Disseny Gràfic', sector: sectors.sectorCreacio.id_sector, modalitat: 'B', cap: 4, icona: 'PAINT' },
-    { titol: 'Realitat Virtual', sector: sectors.sectorTecno.id_sector, modalitat: 'A', cap: 8, icona: 'GEAR' }, 
-    { titol: 'Energies Renovables', sector: sectors.sectorIndus.id_sector, modalitat: 'B', cap: 10, icona: 'LEAF' }
+    { 
+      titol: 'Robòtica i IoT', 
+      sector: sectors.sectorTecno.id_sector, 
+      modalitat: 'A', 
+      cap: 10, 
+      icona: 'ROBOT',
+      schedule: [
+        { dayOfWeek: 1, startTime: "09:00", endTime: "11:00" }, // Dilluns
+        { dayOfWeek: 3, startTime: "09:00", endTime: "11:00" }  // Dimecres
+      ]
+    },
+    { 
+      titol: 'Cinema Digital', 
+      sector: sectors.sectorCreacio.id_sector, 
+      modalitat: 'B', 
+      cap: 8, 
+      icona: 'FILM',
+      schedule: [
+        { dayOfWeek: 2, startTime: "15:00", endTime: "18:00" }, // Dimarts
+        { dayOfWeek: 4, startTime: "15:00", endTime: "18:00" }  // Dijous
+      ]
+    },
+    { 
+      titol: 'Impressió 3D', 
+      sector: sectors.sectorIndus.id_sector, 
+      modalitat: 'A', 
+      cap: 7, 
+      icona: 'TOOLS',
+      schedule: [
+        { dayOfWeek: 5, startTime: "08:00", endTime: "12:00" }  // Divendres
+      ]
+    },
+    { 
+      titol: 'Desenvolupament Web', 
+      sector: sectors.sectorTecno.id_sector, 
+      modalitat: 'C', 
+      cap: 6, 
+      icona: 'CODE',
+      schedule: [
+         { dayOfWeek: 1, startTime: "10:00", endTime: "13:00" },
+         { dayOfWeek: 2, startTime: "10:00", endTime: "13:00" }
+      ]
+    },
+    { 
+      titol: 'Disseny Gràfic', 
+      sector: sectors.sectorCreacio.id_sector, 
+      modalitat: 'B', 
+      cap: 4, 
+      icona: 'PAINT',
+      schedule: [
+        { dayOfWeek: 3, startTime: "16:00", endTime: "19:00" }
+      ]
+    },
+    { 
+      titol: 'Realitat Virtual', 
+      sector: sectors.sectorTecno.id_sector, 
+      modalitat: 'A', 
+      cap: 8, 
+      icona: 'GEAR',
+      schedule: [
+        { dayOfWeek: 4, startTime: "09:00", endTime: "11:00" },
+        { dayOfWeek: 5, startTime: "09:00", endTime: "11:00" }
+      ]
+    }, 
+    { 
+      titol: 'Energies Renovables', 
+      sector: sectors.sectorIndus.id_sector, 
+      modalitat: 'B', 
+      cap: 10, 
+      icona: 'LEAF',
+      schedule: [
+        { dayOfWeek: 1, startTime: "12:00", endTime: "14:00" },
+        { dayOfWeek: 3, startTime: "12:00", endTime: "14:00" }
+      ]
+    }
   ];
 
   const creadosTallers = [];
@@ -169,7 +237,8 @@ async function seedTallers(sectors: any) {
         durada_h: 3,
         places_maximes: t.cap,
         icona: t.icona,
-        descripcio: `Exploració pràctica de ${t.titol}.`
+        descripcio: `Exploració pràctica de ${t.titol}.`,
+        dies_execucio: t.schedule
       }
     });
     creadosTallers.push(nuevo);
@@ -239,8 +308,88 @@ async function main() {
   const tallers = await seedTallers(infra.sectors);
   
   await seedFases();
+  await seedAssignments(centrosData, tallers);
 
-  console.log('✅ Seed finalizado con éxito (Sin datos transaccionales).');
+  console.log('✅ Seed finalizado con éxito (Con datos de prueba y sesiones).');
+}
+
+async function seedAssignments(centros: any, tallers: any[]) {
+    console.log('🧩 Generando asignaciones y sesiones de prueba...');
+    
+    // 1. Assignar Robotica (tallers[0]) a Brossa
+    const tallerRobot = tallers.find((t: any) => t.titol === 'Robòtica i IoT');
+    const assignacioBrossa = await prisma.assignacio.create({
+        data: {
+            id_centre: centros.centroBrossa.id_centre,
+            id_taller: tallerRobot.id_taller,
+            estat: 'En_curs',
+        }
+    });
+
+    // Generar sesiones para Robotica (Mon/Wed)
+    const scheduleRobot = tallerRobot.dies_execucio as any[]; 
+    const sessionsBrossa = [];
+    const now = new Date();
+    
+    // Generamos sesiones para las proximas 4 semanas
+    for (let w = 0; w < 4; w++) {
+        for (const slot of scheduleRobot) {
+            const d = new Date(now);
+            d.setDate(d.getDate() + (w * 7));
+            // Find next date matching dayOfWeek
+            // dayOfWeek: 1=Mon ... 5=Fri
+            const currentDay = d.getDay(); // 0-6
+            const diff = slot.dayOfWeek - currentDay;
+            // Si el dia ya pasó esta semana, saltamos a la siguiente? O al revés.
+            // Simplificamos: encontrar el próximo dia X desde 'd'
+            let daysUntil = (slot.dayOfWeek + 7 - currentDay) % 7;
+            if (daysUntil === 0 && w === 0) daysUntil = 0; // Hoy es el día
+            d.setDate(d.getDate() + daysUntil);
+
+            sessionsBrossa.push({
+                id_assignacio: assignacioBrossa.id_assignacio,
+                data_sessio: d,
+                hora_inici: slot.startTime,
+                hora_fi: slot.endTime
+            });
+        }
+    }
+    
+    await prisma.sessio.createMany({ data: sessionsBrossa });
+    console.log(`   -> Asignado ${tallerRobot.titol} a Brossa con ${sessionsBrossa.length} sesiones.`);
+
+
+    // 2. Assignar Cinema (tallers[1]) a Pau Claris
+    const tallerCinema = tallers.find((t: any) => t.titol === 'Cinema Digital');
+    const assignacioClaris = await prisma.assignacio.create({
+        data: {
+            id_centre: centros.centroPauClaris.id_centre,
+            id_taller: tallerCinema.id_taller,
+            estat: 'En_curs',
+        }
+    });
+
+    // Generar sesiones para Cinema (Tue/Thu)
+    const scheduleCinema = tallerCinema.dies_execucio as any[]; 
+    const sessionsClaris = [];
+    
+    for (let w = 0; w < 4; w++) {
+        for (const slot of scheduleCinema) {
+            const d = new Date(now);
+            d.setDate(d.getDate() + (w * 7));
+            let daysUntil = (slot.dayOfWeek + 7 - d.getDay()) % 7;
+            d.setDate(d.getDate() + daysUntil);
+
+            sessionsClaris.push({
+                id_assignacio: assignacioClaris.id_assignacio,
+                data_sessio: d,
+                hora_inici: slot.startTime,
+                hora_fi: slot.endTime
+            });
+        }
+    }
+    await prisma.sessio.createMany({ data: sessionsClaris });
+    console.log(`   -> Asignado ${tallerCinema.titol} a Pau Claris con ${sessionsClaris.length} sesiones.`);
 }
 
 main()

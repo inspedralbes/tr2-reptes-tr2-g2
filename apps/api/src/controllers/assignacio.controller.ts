@@ -2,6 +2,39 @@ import prisma from '../lib/prisma';
 import { Request, Response } from 'express';
 import { AssignmentChecklistSchema, ROLES } from '@iter/shared';
 import { isPhaseActive, PHASES } from '../lib/phaseUtils';
+import { createNotificacioInterna } from './notificacio.controller';
+
+// GET: Todas las asignaciones (Admin solo)
+export const getAssignacions = async (req: Request, res: Response) => {
+  const { role } = (req as any).user;
+
+  if (role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Accés denegat' });
+  }
+
+  try {
+    const assignacions = await prisma.assignacio.findMany({
+      include: {
+        taller: true,
+        centre: true,
+        checklist: true,
+        prof1: true,
+        prof2: true,
+        inscripcions: {
+          include: {
+            alumne: true
+          }
+        }
+      },
+      orderBy: {
+        id_assignacio: 'desc'
+      }
+    });
+    res.json(assignacions);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtenir les assignacions' });
+  }
+};
 
 // GET: Una asignación por ID (Detalle completo)
 export const getAssignacioById = async (req: Request, res: Response) => {
@@ -17,7 +50,15 @@ export const getAssignacioById = async (req: Request, res: Response) => {
         checklist: true,
         prof1: true,
         prof2: true,
-        sessions: true,
+        sessions: {
+          include: {
+            staff: {
+              include: {
+                usuari: true
+              }
+            }
+          }
+        },
         professors: {
           include: {
             usuari: true
@@ -95,7 +136,7 @@ export const getStudents = async (req: Request, res: Response) => {
     });
 
     // Flatten structure to return just students with relevant info
-    const students = inscripcions.map(i => i.alumne);
+    const students = inscripcions.map((i: any) => i.alumne);
     res.json(students);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener alumnos' });
@@ -437,6 +478,44 @@ export const validateCenterData = async (req: Request, res: Response) => {
   }
 };
 
+// POST: Enviar Notificación de Documento Incorrecto
+export const sendDocumentNotification = async (req: Request, res: Response) => {
+  const idAssignacio = req.params.idAssignacio as string;
+  const { documentName, comment, greeting } = req.body;
+  const { role } = (req as any).user;
+
+  if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
+
+  try {
+    const assignacio = await prisma.assignacio.findUnique({
+      where: { id_assignacio: parseInt(idAssignacio) },
+      include: { 
+        centre: true,
+        taller: true
+      }
+    });
+
+    if (!assignacio) {
+      return res.status(404).json({ error: 'Assignació no trobada' });
+    }
+
+    const missatge = `${greeting}, el document ${documentName} del taller ${assignacio.taller.titol} està malament. ${comment}`;
+
+    await createNotificacioInterna({
+      id_centre: assignacio.id_centre,
+      titol: 'Documentació Incorrecta',
+      missatge,
+      tipus: 'SISTEMA',
+      importancia: 'WARNING'
+    });
+
+    res.json({ success: true, message: 'Notificació enviada correctament.' });
+  } catch (error) {
+    console.error("Error al enviar notificación:", error);
+    res.status(500).json({ error: 'Error al enviar la notificació.' });
+  }
+};
+
 // POST: Generar Asignaciones Automáticas (AI)
 import { AutoAssignmentService } from '../services/auto-assignment.service';
 
@@ -455,16 +534,74 @@ export const generateAutomaticAssignments = async (req: Request, res: Response) 
 };
 
 // POST: Confirmar Registre CEB (Centro)
+// POST: Confirmar Registre CEB (Centro) y Generar Sesiones
 export const confirmLegalRegistration = async (req: Request, res: Response) => {
   const idAssignacio = req.params.idAssignacio as string;
   try {
+    // 1. Marcar inscripciones como confirmadas
     await prisma.inscripcio.updateMany({
       where: { id_assignacio: parseInt(idAssignacio) },
       data: { registre_ceb_confirmat: true }
     });
 
-    res.json({ success: true, message: 'Registre CEB confirmat correctament.' });
+    // 2. Obtener datos del taller para generar sesiones
+    const assignacio = await prisma.assignacio.findUnique({
+      where: { id_assignacio: parseInt(idAssignacio) },
+      include: { taller: true }
+    });
+
+    if (!assignacio || !assignacio.taller) {
+        return res.status(404).json({ error: 'Asignación no encontrada' });
+    }
+
+    // 3. Generar sesiones si no existen
+    // Comprobamos si ya hay sesiones para no duplicar si le dan dos veces
+    const existingSessions = await prisma.sessio.count({
+        where: { id_assignacio: parseInt(idAssignacio) }
+    });
+
+    if (existingSessions === 0) {
+        const schedule = assignacio.taller.dies_execucio as any[]; 
+        const sessionsToCreate = [];
+        const now = new Date();
+        
+        // Generar para 4 semanas (ejemplo)
+        for (let w = 0; w < 4; w++) {
+            if (!Array.isArray(schedule)) continue;
+
+            for (const slot of schedule) {
+                const d = new Date(now);
+                d.setDate(d.getDate() + (w * 7));
+                
+                // Calcular fecha correcta para dayOfWeek
+                const currentDay = d.getDay(); 
+                let daysUntil = (slot.dayOfWeek + 7 - currentDay) % 7;
+                if (daysUntil === 0 && w === 0) daysUntil = 0; // Hoy
+                d.setDate(d.getDate() + daysUntil);
+
+                sessionsToCreate.push({
+                    id_assignacio: assignacio.id_assignacio,
+                    data_sessio: d,
+                    hora_inici: slot.startTime,
+                    hora_fi: slot.endTime
+                });
+            }
+        }
+        
+        if (sessionsToCreate.length > 0) {
+            await prisma.sessio.createMany({ data: sessionsToCreate });
+        }
+    }
+
+    // 4. Actualizar estado de la asignación a 'En_curs'
+    await prisma.assignacio.update({
+        where: { id_assignacio: parseInt(idAssignacio) },
+        data: { estat: 'En_curs' }
+    });
+
+    res.json({ success: true, message: 'Registre confirmat i sessions generades.' });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Error al confirmar el registre.' });
   }
 };
@@ -641,6 +778,44 @@ export const removeTeachingStaff = async (req: Request, res: Response) => {
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: 'Error al eliminar professor de l\'equip' });
+  }
+};
+
+// Phase 3: Dynamic Session Teaching Staff
+export const addSessionProfessor = async (req: Request, res: Response) => {
+  const { idSessio } = req.params;
+  const { idUsuari } = req.body;
+
+  try {
+    const relation = await prisma.sessioProfessor.create({
+      data: {
+        id_sessio: parseInt(idSessio as string),
+        id_usuari: parseInt(idUsuari)
+      }
+    });
+    res.status(201).json(relation);
+  } catch (error) {
+    console.error("Error al afegir professor a la sessió:", error);
+    res.status(500).json({ error: 'Error al afegir professor a la sessió' });
+  }
+};
+
+export const removeSessionProfessor = async (req: Request, res: Response) => {
+  const { idSessio, idUsuari } = req.params;
+
+  try {
+    await prisma.sessioProfessor.delete({
+      where: {
+        id_sessio_id_usuari: {
+          id_sessio: parseInt(idSessio as string),
+          id_usuari: parseInt(idUsuari as string)
+        }
+      }
+    });
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error al eliminar professor de la sessió:", error);
+    res.status(500).json({ error: 'Error al eliminar professor de la sessió' });
   }
 };
 
