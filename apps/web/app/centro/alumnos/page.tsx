@@ -278,97 +278,106 @@ export default function AlumnesCRUD() {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-10 max-w-md w-full shadow-2xl relative border border-gray-100">
-            <button 
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-6 right-6 text-gray-300 hover:text-gray-600 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
+          <div className="bg-white shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-gray-100">
+            {/* Header */}
+            <div className="bg-gray-50 px-8 py-5 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
+              <div>
+                <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tight">
+                  {editingAlumne ? 'Editar Alumne' : 'Nou Alumne'}
+                </h3>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                  {editingAlumne ? 'Modifica les dades de l\'estudiant' : 'Introdueix les dades del nou alumne'}
+                </p>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-300 hover:text-[#00426B] transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
 
-            <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tight mb-8">
-              {editingAlumne ? 'Editar Alumne' : 'Nou Alumne'}
-            </h3>
-            
-            {editingAlumne && (
-              <div className="mb-8 flex flex-col items-center gap-4 p-6 bg-gray-50 border border-gray-100">
-                <Avatar 
-                  url={editingAlumne.url_foto} 
-                  name={`${editingAlumne.nom} ${editingAlumne.cognoms}`} 
-                  id={editingAlumne.id_alumne} 
-                  type="alumne" 
-                  size="xl"
-                  className="shadow-xl ring-4 ring-white"
-                />
-                <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#00426B] hover:text-white transition-all shadow-sm">
-                  Canviar Foto
-                  <input 
-                    type="file" 
-                    className="hidden" 
-                    accept="image/*"
-                    onChange={async (e) => {
-                      if (e.target.files?.[0]) {
-                        const file = e.target.files[0];
-                        const formData = new FormData();
-                        formData.append('foto', file);
-                        try {
-                          const api = getApi();
-                          const res = await api.post(`/upload/perfil/alumne/${editingAlumne.id_alumne}`, formData, {
-                            headers: { 'Content-Type': 'multipart/form-data' }
-                          });
-                          toast.success("Foto actualitzada.");
-                          loadAlumnes();
-                          setEditingAlumne({ ...editingAlumne, url_foto: res.data.url_foto });
-                        } catch (err) {
-                          toast.error("Error al pujar la foto.");
-                        }
-                      }
-                    }}
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+              {editingAlumne && (
+                <div className="p-8 bg-gray-50/50 border-b border-gray-50 flex flex-col items-center gap-4">
+                  <Avatar 
+                    url={editingAlumne.url_foto} 
+                    name={`${editingAlumne.nom} ${editingAlumne.cognoms}`} 
+                    id={editingAlumne.id_alumne} 
+                    type="alumne" 
+                    size="xl"
+                    className="shadow-xl ring-4 ring-white"
                   />
-                </label>
-              </div>
-            )}
+                  <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#00426B] hover:text-white transition-all shadow-sm active:scale-95">
+                    Canviar Foto
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={async (e) => {
+                        if (e.target.files?.[0]) {
+                          const file = e.target.files[0];
+                          const formData = new FormData();
+                          formData.append('foto', file);
+                          try {
+                            const api = getApi();
+                            const res = await api.post(`/upload/perfil/alumne/${editingAlumne.id_alumne}`, formData, {
+                              headers: { 'Content-Type': 'multipart/form-data' }
+                            });
+                            toast.success("Foto actualitzada.");
+                            loadAlumnes();
+                            setEditingAlumne({ ...editingAlumne, url_foto: res.data.url_foto });
+                          } catch (err) {
+                            toast.error("Error al pujar la foto.");
+                          }
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+              )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Nom de l'alumne</label>
-                <input 
-                  type="text" value={formData.nom} 
-                  onChange={e => setFormData({...formData, nom: e.target.value})}
-                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Cognoms</label>
-                <input 
-                  type="text" value={formData.cognoms} 
-                  onChange={e => setFormData({...formData, cognoms: e.target.value})}
-                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Codi IDALU</label>
-                <input 
-                  type="text" value={formData.idalu} 
-                  onChange={e => setFormData({...formData, idalu: e.target.value})}
-                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B] font-mono tracking-widest" required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Curs / Nivell (Ex: 4t ESO)</label>
-                <input 
-                  type="text" value={formData.curs} 
-                  onChange={e => setFormData({...formData, curs: e.target.value})}
-                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" required
-                />
-              </div>
+              <form onSubmit={handleSubmit} id="student-form" className="p-8 space-y-6">
+                <div>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Nom de l'alumne</label>
+                  <input 
+                    type="text" value={formData.nom} 
+                    onChange={e => setFormData({...formData, nom: e.target.value})}
+                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Cognoms</label>
+                  <input 
+                    type="text" value={formData.cognoms} 
+                    onChange={e => setFormData({...formData, cognoms: e.target.value})}
+                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Codi IDALU</label>
+                  <input 
+                    type="text" value={formData.idalu} 
+                    onChange={e => setFormData({...formData, idalu: e.target.value})}
+                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all font-mono tracking-widest" required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Curs / Nivell (Ex: 4t ESO)</label>
+                  <input 
+                    type="text" value={formData.curs} 
+                    onChange={e => setFormData({...formData, curs: e.target.value})}
+                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" required
+                  />
+                </div>
+              </form>
+            </div>
 
-              <div className="flex gap-4 pt-6">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 font-black text-[10px] uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">Cancel·lar</button>
-                <button type="submit" className="flex-1 py-3 bg-[#00426B] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#0775AB] transition-all shadow-lg">Guardar</button>
-              </div>
-            </form>
+            <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 flex gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">Cancel·lar</button>
+              <button type="submit" form="student-form" className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-all shadow-lg active:scale-95">Guardar Alumne</button>
+            </div>
           </div>
         </div>
       )}

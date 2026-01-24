@@ -19,7 +19,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   actions
 }) => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#F2F2F3]">
+    <div className="min-h-screen flex flex-col bg-background-page">
       <Navbar />
 
       <main className="flex-1 max-w-[1440px] mx-auto w-full py-8 md:py-16 flex flex-col items-start">
@@ -28,11 +28,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           <header className="w-full mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 py-2 container-responsive">
             <div className="">
               {title && (
-                <h2 className="text-3xl font-bold text-[#00426B] tracking-tight uppercase">
+                <h2 className="text-3xl font-bold text-text-primary tracking-tight uppercase">
                   {title}
                 </h2>
               )}
-              {subtitle && <div className="mt-2 text-[#4197CB] text-[11px] font-bold uppercase tracking-[0.1em]">{subtitle}</div>}
+              {subtitle && <div className="mt-2 text-consorci-lightBlue text-[11px] font-bold uppercase tracking-[0.1em]">{subtitle}</div>}
             </div>
 
             {actions && (
@@ -51,5 +51,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     </div>
   );
 };
+
 
 export default DashboardLayout;

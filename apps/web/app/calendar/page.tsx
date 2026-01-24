@@ -70,12 +70,12 @@ export default function CalendarPage() {
     >
       <div className="w-full relative">
         <div className="flex justify-between items-center mb-6">
-          <div className="text-[10px] font-black text-[#00426B] uppercase tracking-widest">
+          <div className="text-[10px] font-black text-text-primary uppercase tracking-widest">
             {activeFase ? `Fase Actual: ${activeFase.nom}` : "Sincronitzant fases..."}
           </div>
           <button 
             onClick={() => setIsLegendOpen(true)}
-            className="px-4 py-2 border border-[#00426B] text-[#00426B] text-[10px] font-black uppercase tracking-widest hover:bg-[#00426B] hover:text-white transition-all flex items-center gap-2"
+            className="px-4 py-2 border border-consorci-darkBlue text-consorci-darkBlue text-[10px] font-black uppercase tracking-widest hover:bg-consorci-darkBlue hover:text-white transition-all flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -87,7 +87,7 @@ export default function CalendarPage() {
         {loading ? (
           <Loading />
         ) : (
-          <div className="bg-white border border-gray-200">
+          <div className="bg-background-surface border border-border-subtle">
             <Calendar
               events={events}
               onEventClick={(e: CalendarEvent) => setSelectedEvent(e)}
@@ -97,18 +97,18 @@ export default function CalendarPage() {
 
         {/* Legend Overlay */}
         {isLegendOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00426B]/20 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="bg-white border border-[#00426B] w-full max-w-sm p-8 shadow-2xl relative">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-consorci-darkBlue/20 backdrop-blur-sm animate-in fade-in duration-300">
+            <div className="bg-background-surface border border-consorci-darkBlue w-full max-w-sm p-8 shadow-2xl relative">
               <button 
                 onClick={() => setIsLegendOpen(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-[#00426B] transition-colors"
+                className="absolute top-4 right-4 text-text-muted hover:text-consorci-darkBlue transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
               
-              <h3 className="text-sm font-black text-[#00426B] uppercase tracking-widest border-b border-gray-100 pb-4 mb-6">
+              <h3 className="text-sm font-black text-text-primary uppercase tracking-widest border-b border-border-subtle pb-4 mb-6">
                 Llegenda de Colors
               </h3>
               
@@ -116,37 +116,37 @@ export default function CalendarPage() {
                 <div className="flex items-center gap-4">
                   <div className="w-4 h-4 bg-consorci-lightBlue"></div>
                   <div>
-                    <span className="block text-xs font-black text-gray-800 uppercase tracking-tight">Assignació</span>
-                    <span className="text-[10px] text-gray-400 font-medium">Període total del taller al centre.</span>
+                    <span className="block text-xs font-black text-text-primary uppercase tracking-tight">Assignació</span>
+                    <span className="text-[10px] text-text-muted font-medium">Període total del taller al centre.</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <div className="w-4 h-4 bg-consorci-yellow"></div>
                   <div>
-                    <span className="block text-xs font-black text-gray-800 uppercase tracking-tight">Sessió de Taller</span>
-                    <span className="text-[10px] text-gray-400 font-medium">Dia i hora concrets de l'activitat.</span>
+                    <span className="block text-xs font-black text-text-primary uppercase tracking-tight">Sessió de Taller</span>
+                    <span className="text-[10px] text-text-muted font-medium">Dia i hora concrets de l'activitat.</span>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-gray-50">
-                   <span className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">Fases del Programa</span>
+                <div className="pt-4 border-t border-border-subtle">
+                   <span className="block text-[9px] font-black text-text-muted uppercase tracking-widest mb-4">Fases del Programa</span>
                    <div className="space-y-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 bg-[#00426B]"></div>
-                        <span className="text-[10px] font-bold text-gray-500 uppercase">Solicitud e Inscripción</span>
+                        <div className="w-3 h-3 bg-consorci-darkBlue"></div>
+                        <span className="text-[10px] font-bold text-text-secondary uppercase">Solicitud e Inscripción</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 bg-[#0775AB]"></div>
-                        <span className="text-[10px] font-bold text-gray-500 uppercase">Planificación y Asignación</span>
+                        <div className="w-3 h-3 bg-consorci-actionBlue"></div>
+                        <span className="text-[10px] font-bold text-text-secondary uppercase">Planificación y Asignación</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 bg-[#F26178]"></div>
-                        <span className="text-[10px] font-bold text-gray-500 uppercase">Ejecución y Seguimiento</span>
+                        <div className="w-3 h-3 bg-consorci-pinkRed"></div>
+                        <span className="text-[10px] font-bold text-text-secondary uppercase">Ejecución y Seguimiento</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 bg-[#E0C5AC]"></div>
-                        <span className="text-[10px] font-bold text-gray-500 uppercase">Cierre y Evaluación</span>
+                        <div className="w-3 h-3 bg-consorci-beige"></div>
+                        <span className="text-[10px] font-bold text-text-secondary uppercase">Cierre y Evaluación</span>
                       </div>
                    </div>
                 </div>
@@ -154,7 +154,7 @@ export default function CalendarPage() {
 
               <button 
                 onClick={() => setIsLegendOpen(false)}
-                className="w-full mt-8 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-colors"
+                className="w-full mt-8 py-3 bg-consorci-darkBlue text-white text-[10px] font-black uppercase tracking-widest hover:bg-consorci-actionBlue transition-colors"
               >
                 Entès
               </button>
@@ -164,11 +164,11 @@ export default function CalendarPage() {
 
         {/* Event Details Overlay */}
         {selectedEvent && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00426B]/20 backdrop-blur-sm animate-in fade-in zoom-in duration-300">
-            <div className="bg-white border border-[#00426B] w-full max-w-md p-8 shadow-2xl relative">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-consorci-darkBlue/20 backdrop-blur-sm animate-in fade-in zoom-in duration-300">
+            <div className="bg-background-surface border border-consorci-darkBlue w-full max-w-md p-8 shadow-2xl relative">
               <button 
                 onClick={() => setSelectedEvent(null)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-[#00426B] transition-colors"
+                className="absolute top-4 right-4 text-text-muted hover:text-consorci-darkBlue transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -176,13 +176,13 @@ export default function CalendarPage() {
               </button>
 
               <div className="mb-6">
-                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Detalls de l'esdeveniment</div>
-                <h3 className="text-xl font-black text-[#00426B] leading-tight uppercase tracking-tight">{selectedEvent.title}</h3>
+                <div className="text-[10px] font-black text-text-muted uppercase tracking-widest mb-1">Detalls de l'esdeveniment</div>
+                <h3 className="text-xl font-black text-text-primary leading-tight uppercase tracking-tight">{selectedEvent.title}</h3>
               </div>
 
               <div className="space-y-4 mb-8">
-                <div className="flex items-center gap-3 text-gray-600">
-                  <svg className="w-4 h-4 text-[#00426B]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="flex items-center gap-3 text-text-secondary">
+                  <svg className="w-4 h-4 text-consorci-darkBlue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   <span className="text-xs font-bold">
@@ -191,8 +191,8 @@ export default function CalendarPage() {
                 </div>
                 
                 {selectedEvent.metadata?.hora && (
-                  <div className="flex items-center gap-3 text-gray-600">
-                    <svg className="w-4 h-4 text-[#00426B]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="flex items-center gap-3 text-text-secondary">
+                    <svg className="w-4 h-4 text-consorci-darkBlue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="text-xs font-bold">{selectedEvent.metadata.hora}</span>
@@ -200,8 +200,8 @@ export default function CalendarPage() {
                 )}
 
                 {selectedEvent.metadata?.centre && (
-                  <div className="flex items-center gap-3 text-gray-600">
-                    <svg className="w-4 h-4 text-[#00426B]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="flex items-center gap-3 text-text-secondary">
+                    <svg className="w-4 h-4 text-consorci-darkBlue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                     <span className="text-xs font-bold">{selectedEvent.metadata.centre}</span>
@@ -209,8 +209,8 @@ export default function CalendarPage() {
                 )}
 
                 {selectedEvent.description && (
-                  <div className="p-4 bg-gray-50 border-l-4 border-[#00426B]">
-                    <p className="text-xs text-gray-600 font-medium leading-relaxed italic">
+                  <div className="p-4 bg-background-subtle border-l-4 border-consorci-darkBlue">
+                    <p className="text-xs text-text-secondary font-medium leading-relaxed italic">
                       "{selectedEvent.description}"
                     </p>
                   </div>
@@ -220,7 +220,7 @@ export default function CalendarPage() {
               <div className="flex gap-4">
                 <button 
                   onClick={() => setSelectedEvent(null)}
-                  className="flex-1 py-3 border border-gray-200 text-gray-400 text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-3 border border-border-subtle text-text-muted text-[10px] font-black uppercase tracking-widest hover:bg-background-subtle transition-colors"
                 >
                   Tancar
                 </button>
@@ -230,7 +230,7 @@ export default function CalendarPage() {
                       const baseUrl = user?.rol.nom_rol === 'ADMIN' ? '/admin/assignacions' : '/centro/assignacions';
                       window.location.href = `${baseUrl}/${selectedEvent.metadata.id_assignacio}`;
                     }}
-                    className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-colors"
+                    className="flex-1 py-3 bg-consorci-darkBlue text-white text-[10px] font-black uppercase tracking-widest hover:bg-consorci-actionBlue transition-colors"
                   >
                     Veure Detalls
                   </button>
@@ -238,7 +238,7 @@ export default function CalendarPage() {
                 {!selectedEvent.metadata?.id_assignacio && (
                   <button 
                     onClick={() => setSelectedEvent(null)}
-                    className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-colors"
+                    className="flex-1 py-3 bg-consorci-darkBlue text-white text-[10px] font-black uppercase tracking-widest hover:bg-consorci-actionBlue transition-colors"
                   >
                     D'acord
                   </button>

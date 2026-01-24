@@ -11,9 +11,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        action: "var(--action)",
+        // Semantic Tokens
+        background: {
+          page: "var(--bg-page)",
+          surface: "var(--bg-surface)",
+          subtle: "var(--bg-subtle)",
+        },
+        text: {
+          primary: "var(--text-primary)",
+          secondary: "var(--text-secondary)",
+          muted: "var(--text-muted)",
+          inverse: "var(--text-inverse)",
+        },
+        border: {
+          subtle: "var(--border-subtle)",
+        },
+        // Institutional / Brand
         consorci: {
           darkBlue: THEME.colors.primary,
           lightBlue: THEME.colors.secondary,

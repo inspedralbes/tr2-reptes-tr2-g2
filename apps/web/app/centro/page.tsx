@@ -54,8 +54,8 @@ export default function CentroDashboard() {
 
   if (authLoading || !user) {
     return (
-      <div className="flex min-h-screen justify-center items-center" style={{ backgroundColor: THEME.colors.background }}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: THEME.colors.primary }}></div>
+      <div className="flex min-h-screen justify-center items-center bg-background-page">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-consorci-darkBlue mx-auto"></div>
       </div>
     );
   }
@@ -66,7 +66,7 @@ export default function CentroDashboard() {
       subtitle="Procés de gestió de tallers d'Iter."
     >
       {/* Timeline Secció Institucional */}
-      <section className="bg-white border-2 border-gray-100 p-12 mb-12 relative overflow-hidden">
+      <section className="bg-background-surface border-2 border-border-subtle p-12 mb-12 relative overflow-hidden">
         
         <h3 className="header-label">
           Estat del Programa Iter 25-26
@@ -85,8 +85,8 @@ export default function CentroDashboard() {
                   {/* Square with number */}
                   <div
                     className={`w-12 h-12 flex items-center justify-center mb-6 z-10 border-2 transition-all ${fase.activa
-                      ? 'bg-[#00426B] text-white border-[#00426B]'
-                      : 'bg-white text-gray-200 border-gray-100'
+                      ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue'
+                      : 'bg-background-surface text-text-muted border-border-subtle'
                       }`}
                   >
                     <span className="text-base font-bold">
@@ -95,11 +95,11 @@ export default function CentroDashboard() {
                   </div>
                   
                   {/* Name and Date */}
-                  <h4 className={`font-black text-[10px] uppercase tracking-[0.1em] mb-4 min-h-[3em] flex items-center justify-center ${fase.activa ? 'text-[#00426B]' : 'text-gray-300'}`}>
+                  <h4 className={`font-black text-[10px] uppercase tracking-[0.1em] mb-4 min-h-[3em] flex items-center justify-center ${fase.activa ? 'text-consorci-darkBlue' : 'text-text-muted'}`}>
                     {fase.nom}
                   </h4>
                   
-                  <div className={`text-[10px] font-bold px-4 py-2 border-2 ${fase.activa ? 'bg-[#00426B] text-white border-[#00426B]' : 'bg-white text-gray-200 border-gray-100'}`}>
+                  <div className={`text-[10px] font-bold px-4 py-2 border-2 ${fase.activa ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}>
                     {new Date(fase.data_inici).toLocaleDateString('ca-ES', { day: 'numeric', month: 'short' }).replace('.', '').toUpperCase()}
                   </div>
                 </div>
@@ -157,20 +157,20 @@ export default function CentroDashboard() {
             <div
               key={idx}
               onClick={() => item.active && router.push(item.path)}
-              className={`group bg-white p-8 md:p-10 border transition-all duration-300 relative overflow-hidden ${
+              className={`group bg-background-surface p-8 md:p-10 border transition-all duration-300 relative overflow-hidden ${
                 item.active
-                  ? 'border-gray-200 cursor-pointer hover:border-[#0775AB] hover:shadow-xl'
-                  : 'border-gray-100 opacity-60 cursor-not-allowed'
+                  ? 'border-border-subtle cursor-pointer hover:border-consorci-actionBlue hover:shadow-xl'
+                  : 'border-border-subtle opacity-60 cursor-not-allowed'
               }`}
             >
-              <div className={`absolute top-0 right-0 w-16 h-16 bg-[#F2F2F3] -mr-8 -mt-8 rotate-45 transition-colors duration-300 ${
-                item.active ? 'group-hover:bg-[#0775AB]' : ''
+              <div className={`absolute top-0 right-0 w-16 h-16 bg-background-subtle -mr-8 -mt-8 rotate-45 transition-colors duration-300 ${
+                item.active ? 'group-hover:bg-consorci-actionBlue' : ''
               }`}></div>
 
-              <div className={`w-16 h-16 flex items-center justify-center mb-8 border border-gray-100 transition-all duration-300 ${
+              <div className={`w-16 h-16 flex items-center justify-center mb-8 border border-border-subtle transition-all duration-300 ${
                 item.active 
-                  ? 'bg-[#EAEFF2] text-[#00426B] group-hover:bg-[#00426B] group-hover:text-white' 
-                  : 'bg-gray-100 text-gray-200'
+                  ? 'bg-background-subtle text-consorci-darkBlue group-hover:bg-consorci-darkBlue group-hover:text-white' 
+                  : 'bg-background-subtle text-text-muted'
               }`}>
                 <div className={item.active ? 'group-hover:text-white' : ''}>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -180,18 +180,18 @@ export default function CentroDashboard() {
               </div>
               
               <h3 className={`text-xl font-medium mb-3 uppercase tracking-tight ${
-                item.active ? 'text-[#00426B]' : 'text-gray-400'
+                item.active ? 'text-consorci-darkBlue' : 'text-text-muted'
               }`}>
                 {item.title}
               </h3>
               
-              <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">
+              <p className="text-xs text-text-muted font-medium leading-relaxed uppercase tracking-wider">
                 {item.text}
               </p>
 
               <div className="mt-8 flex items-center">
                 <div className={`flex items-center font-bold text-[10px] uppercase tracking-[0.2em] transition-transform ${
-                  item.active ? 'text-[#0775AB] group-hover:translate-x-2' : 'text-gray-300'
+                  item.active ? 'text-consorci-actionBlue group-hover:translate-x-2' : 'text-text-muted'
                 }`}>
                   {item.active ? item.phase : "Mòdul tancat"}
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

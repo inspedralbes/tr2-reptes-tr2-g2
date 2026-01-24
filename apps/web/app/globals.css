@@ -3,22 +3,47 @@
 @tailwind utilities;
 
 :root {
-  --background: #f7f8f9;
-  --foreground: #00426b;
-  --action: #0775ab;
-  --secondary-bg: #eaeff2;
+  /* Light Mode (Institutional) */
+  --bg-page: #f7f8f9;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f2f2f3;
+  
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --text-inverse: #ffffff;
+  
+  --border-subtle: #e5e7eb;
+
+  /* Brand Colors (Keep fixed for now as primitives) */
   --consorci-dark-blue: #00426b;
   --consorci-light-blue: #4197cb;
   --consorci-light-gray: #cfd2d3;
   --consorci-pink-red: #f26178;
   --consorci-beige: #e0c5ac;
   --consorci-yellow: #f9c311;
-  --card-bg: #ffffff;
 }
 
+.dark {
+  /* Dark Mode (High Contrast Slate) */
+  --bg-page: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-subtle: #334155;
+  
+  --text-primary: #f3f4f6;
+  --text-secondary: #e5e7eb;
+  --text-muted: #9ca3af;
+  --text-inverse: #ffffff;
+  
+  --border-subtle: #334155;
+
+  /* Adjust brand colors for dark mode if necessary, but prompt says "prioriza el uso de variables semánticas" */
+}
+
+
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg-page);
+  color: var(--text-primary);
   font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -31,7 +56,7 @@ h4,
 h5,
 h6 {
   font-weight: 700;
-  color: var(--consorci-dark-blue);
+  color: var(--text-primary); /* Changed from dark blue to primary text for better visibility in dark mode */
   letter-spacing: -0.01em;
   text-transform: uppercase;
 }
@@ -43,34 +68,35 @@ h6 {
 }
 
 .btn-primary {
-  @apply bg-[#00426B] hover:bg-black text-white font-bold uppercase text-[11px] tracking-[0.2em] py-4 px-10 transition-colors;
+  @apply bg-consorci-darkBlue hover:bg-consorci-actionBlue text-white font-bold uppercase text-[11px] tracking-[0.2em] py-4 px-10 transition-colors;
 }
 
 .btn-secondary {
-  @apply bg-white border-2 border-[#00426B] hover:bg-[#F2F2F3] text-[#00426B] font-bold uppercase text-[11px] tracking-[0.2em] py-4 px-10 transition-colors;
+  @apply bg-background-surface border-2 border-consorci-darkBlue hover:bg-background-subtle text-consorci-darkBlue font-bold uppercase text-[11px] tracking-[0.2em] py-4 px-10 transition-colors;
 }
 
 .card-institutional {
-  @apply bg-white border-2 border-gray-200 p-8 transition-colors hover:border-[#4197CB];
+  @apply bg-background-surface border-2 border-border-subtle p-8 transition-colors hover:border-consorci-lightBlue;
 }
 
 .header-label {
-  @apply text-[11px] font-bold uppercase tracking-[0.3em] text-[#00426B] mb-8 flex items-center gap-4;
+  @apply text-[11px] font-bold uppercase tracking-[0.3em] text-text-primary mb-8 flex items-center gap-4;
 }
 
 .header-label::before {
   content: '';
-  @apply w-12 h-1.5 bg-[#0775AB];
+  @apply w-12 h-1.5 bg-consorci-actionBlue;
 }
 
 /* Sidebar Specifics */
 .sidebar-card-dark {
-  @apply bg-[#00426B] p-10 text-white;
+  @apply bg-consorci-darkBlue p-10 text-white;
 }
 
 .sidebar-card-light {
-  @apply bg-white border-2 border-gray-100 p-10;
+  @apply bg-background-surface border-2 border-border-subtle p-10;
 }
+
 
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {

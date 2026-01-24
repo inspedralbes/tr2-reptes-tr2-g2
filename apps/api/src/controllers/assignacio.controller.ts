@@ -104,9 +104,21 @@ export const getAssignacionsByCentre = async (req: Request, res: Response) => {
         taller: true,
         centre: true,
         checklist: true,
+        prof1: {
+          include: { usuari: { select: { nom_complet: true } } }
+        },
+        prof2: {
+          include: { usuari: { select: { nom_complet: true } } }
+        },
         sessions: {
           orderBy: { data_sessio: 'asc' },
-          take: 1
+          include: {
+            staff: {
+              include: {
+                usuari: true
+              }
+            }
+          }
         },
         inscripcions: {
           include: {
@@ -607,12 +619,7 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
                                 id_assignacio: assignacio.id_assignacio,
                                 data_sessio: sessionDate,
                                 hora_inici: slot.startTime,
-                                hora_fi: slot.endTime,
-                                staff: {
-                                    create: referentUserIds.map(idUsuari => ({
-                                        id_usuari: idUsuari
-                                    }))
-                                }
+                                hora_fi: slot.endTime
                             }
                         });
                     }
@@ -845,8 +852,17 @@ export const addTeachingStaff = async (req: Request, res: Response) => {
   const { idUsuari, esPrincipal } = req.body;
 
   try {
-    const relation = await prisma.assignacioProfessor.create({
-      data: {
+    const relation = await prisma.assignacioProfessor.upsert({
+      where: {
+        id_assignacio_id_usuari: {
+          id_assignacio: parseInt(idAssignacio),
+          id_usuari: parseInt(idUsuari)
+        }
+      },
+      update: {
+        es_principal: esPrincipal || false
+      },
+      create: {
         id_assignacio: parseInt(idAssignacio),
         id_usuari: parseInt(idUsuari),
         es_principal: esPrincipal || false
@@ -883,8 +899,15 @@ export const addSessionProfessor = async (req: Request, res: Response) => {
   const { idUsuari } = req.body;
 
   try {
-    const relation = await prisma.sessioProfessor.create({
-      data: {
+    const relation = await prisma.sessioProfessor.upsert({
+      where: {
+        id_sessio_id_usuari: {
+          id_sessio: parseInt(idSessio as string),
+          id_usuari: parseInt(idUsuari)
+        }
+      },
+      update: {}, // No update needed if exists
+      create: {
         id_sessio: parseInt(idSessio as string),
         id_usuari: parseInt(idUsuari)
       }

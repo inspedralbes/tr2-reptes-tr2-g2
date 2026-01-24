@@ -21,15 +21,30 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          DEFAULT: THEME.colors.primary, 
+        // Semantic Tokens
+        background: {
+          page: "var(--bg-page)",
+          surface: "var(--bg-surface)",
+          subtle: "var(--bg-subtle)",
         },
-        // Colores Complementarios
-        'light-blue': THEME.colors.secondary,
-        'light-gray': THEME.colors.gray,
-        'pink-red': THEME.colors.accent,
-        beige: THEME.colors.beige,
-        yellow: THEME.colors.yellow,
+        text: {
+          primary: "var(--text-primary)",
+          secondary: "var(--text-secondary)",
+          muted: "var(--text-muted)",
+          inverse: "var(--text-inverse)",
+        },
+        border: {
+          subtle: "var(--border-subtle)",
+        },
+        // Institutional / Brand
+        primary: {
+          DEFAULT: "var(--consorci-dark-blue)", 
+        },
+        'light-blue': "var(--consorci-light-blue)",
+        'light-gray': "var(--consorci-light-gray)",
+        'pink-red': "var(--consorci-pink-red)",
+        beige: "var(--consorci-beige)",
+        yellow: "var(--consorci-yellow)",
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'], 

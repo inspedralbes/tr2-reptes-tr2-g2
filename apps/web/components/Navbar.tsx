@@ -82,7 +82,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
   ];
 
   return (
-    <div className="sticky top-0 z-50 bg-white border-t-4 border-t-[#00426B] border-b border-b-[#CFD2D3]">
+    <div className="sticky top-0 z-50 bg-background-surface border-t-4 border-t-consorci-darkBlue border-b border-b-border-subtle">
       <div className="max-w-[1440px] mx-auto container-responsive">
         <div className="flex justify-between h-16">
           {/* Logo & Brand Section */}
@@ -91,7 +91,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
               <img 
                 src="/logo.png" 
                 alt="Iter Logo" 
-                className="w-10 h-10 object-contain" 
+                className="w-10 h-10 object-contain dark:invert" 
               />
             </Link>
           </div>
@@ -106,15 +106,15 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
                   href={link.path}
                   className={`h-full flex items-center px-4 text-[11px] font-bold uppercase tracking-widest transition-all border-b-2 ${
                     pathname === link.path 
-                      ? 'border-[#00426B] text-[#00426B]' 
-                      : 'border-transparent text-[#00426B]/40 hover:text-[#00426B] hover:bg-[#F2F4F7]'
+                      ? 'border-consorci-darkBlue text-text-primary' 
+                      : 'border-transparent text-text-muted hover:text-text-primary hover:bg-background-subtle'
                   }`}
                 >
                   <span className="relative">
                     {link.label}
                     {link.isAvisos && unreadCount > 0 && (
                       <span className="absolute -top-3 -right-4 flex h-4 w-4">
-                        <span className="relative inline-flex h-4 w-4 bg-[#F26178] text-[8px] font-bold items-center justify-center text-white">
+                        <span className="relative inline-flex h-4 w-4 bg-consorci-pinkRed text-[8px] font-bold items-center justify-center text-white">
                           {unreadCount > 9 ? '9+' : unreadCount}
                         </span>
                       </span>
@@ -125,18 +125,18 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
             </nav>
 
             {/* User Info & Logout */}
-            <div className="flex items-center border-l border-[#CFD2D3] pl-8 h-8 my-auto gap-6">
+            <div className="flex items-center border-l border-border-subtle pl-8 h-8 my-auto gap-6">
               <div className="flex flex-col items-end">
-                <span className="text-[#00426B] text-[10px] font-bold uppercase tracking-widest">
+                <span className="text-text-primary text-[10px] font-bold uppercase tracking-widest">
                   {user.nom_complet}
                 </span>
-                <span className="text-[#4197CB] text-[8px] font-bold uppercase tracking-widest">
+                <span className="text-text-secondary text-[8px] font-bold uppercase tracking-widest">
                   {user.rol.nom_rol} {user.centre?.nom ? `• ${user.centre.nom}` : ''}
                 </span>
               </div>
               <button
                 onClick={logout}
-                className="bg-[#00426B] hover:bg-[#0775AB] text-white text-[10px] font-bold uppercase tracking-widest px-5 py-2 transition-all"
+                className="bg-consorci-darkBlue hover:bg-consorci-actionBlue text-white text-[10px] font-bold uppercase tracking-widest px-5 py-2 transition-all"
               >
                 Sortir
               </button>
@@ -146,6 +146,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
       </div>
     </div>
   );
+
 };
 
 export default Navbar;

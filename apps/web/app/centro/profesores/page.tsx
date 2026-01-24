@@ -253,115 +253,124 @@ export default function ProfesoresCRUD() {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-10 max-w-md w-full shadow-2xl relative border border-gray-100">
-            <button 
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-6 right-6 text-gray-300 hover:text-gray-600 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
+          <div className="bg-white shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-gray-100">
+            {/* Header */}
+            <div className="bg-gray-50 px-8 py-5 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
+              <div>
+                <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tight">
+                  {editingProf ? 'Editar Professor' : 'Nou Professor'}
+                </h3>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                  {editingProf ? 'Modifica les dades del docent' : 'Introdueix les dades del nou professor'}
+                </p>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-300 hover:text-[#00426B] transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
 
-            <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tight mb-8">
-              {editingProf ? 'Editar Professor' : 'Nou Professor'}
-            </h3>
-
-            {editingProf && (
-              <div className="mb-8 flex flex-col items-center gap-4 p-6 bg-gray-50 border border-gray-100">
-                <Avatar 
-                  url={editingProf.usuari?.url_foto} 
-                  name={editingProf.nom} 
-                  id={editingProf.usuari?.id_usuari || editingProf.id_professor} 
-                  type="usuari" 
-                  size="xl"
-                  className="shadow-xl ring-4 ring-white"
-                />
-                <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#00426B] hover:text-white transition-all shadow-sm">
-                  Canviar Foto
-                  <input 
-                    type="file" 
-                    className="hidden" 
-                    accept="image/*"
-                    onChange={async (e) => {
-                      if (e.target.files?.[0] && editingProf.usuari?.id_usuari) {
-                        const file = e.target.files[0];
-                        const formData = new FormData();
-                        formData.append('foto', file);
-                        try {
-                          const api = getApi();
-                          const res = await api.post(`/upload/perfil/usuari/${editingProf.usuari.id_usuari}`, formData, {
-                            headers: { 'Content-Type': 'multipart/form-data' }
-                          });
-                          toast.success("Foto actualitzada.");
-                          loadProfessors();
-                          // Update local state for immediate feedback
-                          setEditingProf({ 
-                            ...editingProf, 
-                            usuari: { ...editingProf.usuari, url_foto: res.data.url_foto } 
-                          });
-                        } catch (err) {
-                          toast.error("Error al pujar la foto.");
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+              {editingProf && (
+                <div className="p-8 bg-gray-50/50 border-b border-gray-50 flex flex-col items-center gap-4">
+                  <Avatar 
+                    url={editingProf.usuari?.url_foto} 
+                    name={editingProf.nom} 
+                    id={editingProf.usuari?.id_usuari || editingProf.id_professor} 
+                    type="usuari" 
+                    size="xl"
+                    className="shadow-xl ring-4 ring-white"
+                  />
+                  <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#00426B] hover:text-white transition-all shadow-sm active:scale-95">
+                    Canviar Foto
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={async (e) => {
+                        if (e.target.files?.[0] && editingProf.usuari?.id_usuari) {
+                          const file = e.target.files[0];
+                          const formData = new FormData();
+                          formData.append('foto', file);
+                          try {
+                            const api = getApi();
+                            const res = await api.post(`/upload/perfil/usuari/${editingProf.usuari.id_usuari}`, formData, {
+                              headers: { 'Content-Type': 'multipart/form-data' }
+                            });
+                            toast.success("Foto actualitzada.");
+                            loadProfessors();
+                            // Update local state for immediate feedback
+                            setEditingProf({ 
+                              ...editingProf, 
+                              usuari: { ...editingProf.usuari, url_foto: res.data.url_foto } 
+                            });
+                          } catch (err) {
+                            toast.error("Error al pujar la foto.");
+                          }
+                        } else if (!editingProf.usuari?.id_usuari) {
+                          toast.error("No se puede subir foto a un profesor sin usuario vinculado.");
                         }
-                      } else if (!editingProf.usuari?.id_usuari) {
-                        toast.error("No se puede subir foto a un profesor sin usuario vinculado.");
-                      }
-                    }}
-                  />
-                </label>
-              </div>
-            )}
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Nom complet</label>
-                <input 
-                  type="text" value={formData.nom} 
-                  onChange={e => setFormData({...formData, nom: e.target.value})}
-                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Dades de contacte (Email principal)</label>
-                <input 
-                  type="email" value={formData.contacte} 
-                  onChange={e => setFormData({...formData, contacte: e.target.value})}
-                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" 
-                  placeholder="ejemplo@centro.cat"
-                  required
-                />
-              </div>
-
-              {!editingProf && (
-                <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 flex justify-between">
-                    Contrasenya (Accés App)
-                    <button 
-                      type="button" 
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="text-[#0775AB] hover:underline"
-                    >
-                      {showPassword ? 'Amagar' : 'Veure'}
-                    </button>
+                      }}
+                    />
                   </label>
-                  <input 
-                    type={showPassword ? "text" : "password"} 
-                    value={formData.password} 
-                    onChange={e => setFormData({...formData, password: e.target.value})}
-                    placeholder="Contrasenya per a l'App mòbil"
-                    className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" 
-                    required={!editingProf}
-                  />
-                  <p className="mt-2 text-[9px] text-gray-400 font-bold uppercase leading-tight">
-                    Aquesta serà la contrasenya que el professor usarà per entrar a l'App.
-                  </p>
                 </div>
               )}
+              
+              <form onSubmit={handleSubmit} id="professor-form" className="p-8 space-y-6">
+                <div>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Nom complet</label>
+                  <input 
+                    type="text" value={formData.nom} 
+                    onChange={e => setFormData({...formData, nom: e.target.value})}
+                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Dades de contacte (Email principal)</label>
+                  <input 
+                    type="email" value={formData.contacte} 
+                    onChange={e => setFormData({...formData, contacte: e.target.value})}
+                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" 
+                    placeholder="ejemplo@centro.cat"
+                    required
+                  />
+                </div>
 
-              <div className="flex gap-4 pt-6">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 font-black text-[10px] uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">Cancel·lar</button>
-                <button type="submit" className="flex-1 py-3 bg-[#00426B] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#0775AB] transition-all shadow-lg">Guardar</button>
-              </div>
-            </form>
+                {!editingProf && (
+                  <div>
+                    <label className="text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2 flex justify-between">
+                      Contrasenya (Accés App)
+                      <button 
+                        type="button" 
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-[#0775AB] hover:underline normal-case font-bold"
+                      >
+                        {showPassword ? 'Amagar' : 'Veure'}
+                      </button>
+                    </label>
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      value={formData.password} 
+                      onChange={e => setFormData({...formData, password: e.target.value})}
+                      placeholder="Contrasenya per a l'App mòbil"
+                      className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" 
+                      required={!editingProf}
+                    />
+                    <p className="mt-2 text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-tight">
+                      Aquesta serà la contrasenya que el professor usarà per entrar a l'App.
+                    </p>
+                  </div>
+                )}
+              </form>
+            </div>
+
+            <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 flex gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">Cancel·lar</button>
+              <button type="submit" form="professor-form" className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-all shadow-lg active:scale-95">Guardar Professor</button>
+            </div>
           </div>
         </div>
       )}

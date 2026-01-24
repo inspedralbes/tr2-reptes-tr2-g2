@@ -79,18 +79,18 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
   const isSameDay = (d1: string, d2: string) => d1.split('T')[0] === d2.split('T')[0];
 
   return (
-    <div className="bg-white border border-gray-200 overflow-hidden font-sans">
+    <div className="bg-background-surface border border-border-subtle overflow-hidden font-sans">
       {/* Header */}
-      <div className="flex items-center justify-between p-12 bg-white sticky top-0 z-30 border-b border-gray-200">
+      <div className="flex items-center justify-between p-12 bg-background-surface sticky top-0 z-30 border-b border-border-subtle">
         <div className="flex items-center gap-4">
-          <h2 className="text-5xl font-bold tracking-tight capitalize text-consorci-darkBlue flex items-baseline gap-3">
-            {monthName} <span className="text-gray-200 font-bold tracking-tight">{year}</span>
+          <h2 className="text-5xl font-bold tracking-tight capitalize text-text-primary flex items-baseline gap-3">
+            {monthName} <span className="text-text-muted font-bold tracking-tight">{year}</span>
           </h2>
         </div>
-        <div className="flex bg-gray-50 p-2 gap-2 border border-gray-200">
+        <div className="flex bg-background-subtle p-2 gap-2 border border-border-subtle">
           <button 
             onClick={prevMonth}
-            className="w-12 h-12 flex items-center justify-center hover:bg-gray-200 transition-colors text-consorci-darkBlue/40 hover:text-consorci-darkBlue"
+            className="w-12 h-12 flex items-center justify-center hover:bg-background-surface transition-colors text-text-muted hover:text-text-primary"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
@@ -98,13 +98,13 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
           </button>
           <button 
             onClick={() => setCurrentDate(new Date())}
-            className="px-10 h-12 bg-white border border-gray-200 text-[11px] font-bold uppercase tracking-widest text-consorci-darkBlue hover:bg-gray-50 transition-colors"
+            className="px-10 h-12 bg-background-surface border border-border-subtle text-[11px] font-bold uppercase tracking-widest text-text-primary hover:bg-background-subtle transition-colors"
           >
             Avui
           </button>
           <button 
             onClick={nextMonth}
-            className="w-12 h-12 flex items-center justify-center hover:bg-gray-200 transition-colors text-consorci-darkBlue/40 hover:text-consorci-darkBlue"
+            className="w-12 h-12 flex items-center justify-center hover:bg-background-surface transition-colors text-text-muted hover:text-text-primary"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
@@ -114,10 +114,10 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
       </div>
 
       {/* Weekdays Labels */}
-      <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+      <div className="grid grid-cols-7 border-b border-border-subtle bg-background-subtle">
         {['dl', 'dt', 'dc', 'dj', 'dv', 'ds', 'dg'].map(d => (
           <div key={d} className="py-6 text-center">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-gray-400">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-text-muted">
               {d}
             </span>
           </div>
@@ -125,7 +125,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
       </div>
 
       {/* Grid */}
-      <div className="flex flex-col bg-white">
+      <div className="flex flex-col bg-background-surface">
         {calendarWeeks.map((week, weekIdx) => {
           const firstDayOfWeek = week[0].date;
           const lastDayOfWeek = week[6].date;
@@ -170,20 +170,20 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
           });
 
           return (
-            <div key={weekIdx} className="grid grid-cols-7 relative border-b border-gray-50 last:border-b-0 min-h-[160px]">
+            <div key={weekIdx} className="grid grid-cols-7 relative border-b border-border-subtle last:border-b-0 min-h-[160px]">
               {/* Background Days */}
               {week.map((dateObj, dayIdx) => (
                 <div 
                   key={dayIdx} 
-                  className={`relative p-5 border-r border-gray-100 last:border-r-0 ${
-                    dayIdx === 5 || dayIdx === 6 ? 'bg-gray-50' : ''
+                  className={`relative p-5 border-r border-border-subtle last:border-r-0 ${
+                    dayIdx === 5 || dayIdx === 6 ? 'bg-background-subtle/50' : ''
                   }`}
                 >
                   {dateObj.day && (
                     <span className={`text-[13px] font-black tracking-tight ${
                       isSameDay(new Date().toISOString(), dateObj.date!) 
-                        ? 'text-blue-600' 
-                        : 'text-[#CFD2D3]'
+                        ? 'text-consorci-lightBlue' 
+                        : 'text-text-muted/60'
                     }`}>
                       {dateObj.day}
                     </span>
