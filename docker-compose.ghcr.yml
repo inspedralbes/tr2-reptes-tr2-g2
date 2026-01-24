@@ -1,9 +1,6 @@
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: runner-web
+    image: ghcr.io/inspedralbes/tr2-reptes-tr2-g2-web:latest
     restart: always
     ports:
       - "8002:8002"
@@ -18,10 +15,7 @@ services:
       - iter-uploads:/app/uploads
 
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: runner-api
+    image: ghcr.io/inspedralbes/tr2-reptes-tr2-g2-api:latest
     restart: always
     ports:
       - "3000:3000"
