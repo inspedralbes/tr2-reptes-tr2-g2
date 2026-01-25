@@ -63,8 +63,8 @@ h6 {
 
 /* Institutional Design System */
 * {
-  border-radius: 0 !important;
-  box-shadow: none !important; /* Remove all shadows for a serious look */
+  border-radius: 0;
+  box-shadow: none; /* Remove all shadows for a serious look */
 }
 
 .btn-primary {

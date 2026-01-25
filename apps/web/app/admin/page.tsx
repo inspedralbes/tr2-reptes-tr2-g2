@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useEffect } from 'react';
+import Loading from '@/components/Loading';
 
 export default function AdminDashboardPage() {
   const { user, loading: authLoading } = useAuth();
@@ -18,9 +19,7 @@ export default function AdminDashboardPage() {
 
   if (authLoading || !user) {
     return (
-      <div className="flex min-h-screen justify-center items-center bg-background-page">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-consorci-darkBlue mx-auto"></div>
-      </div>
+      <Loading fullScreen message="Autenticant administrador..." />
     );
   }
 
