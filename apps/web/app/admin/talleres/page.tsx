@@ -9,6 +9,7 @@ import CreateWorkshopModal from "../../../components/CreateWorkshopModal";
 import Loading from "@/components/Loading";
 import { toast } from "sonner";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import Pagination from "@/components/Pagination";
 
 const SVG_ICONS: Record<string, React.ReactNode> = {
   PUZZLE: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />,
@@ -299,36 +300,14 @@ export default function TallerScreen() {
           </div>
 
           {/* Paginació */}
-          {totalPages > 1 && (
-            <div className="mt-0 flex flex-col sm:flex-row justify-between items-center gap-4 bg-background-subtle border-t border-border-subtle p-6">
-              <div className="text-[10px] font-bold uppercase text-text-muted tracking-widest">
-                Mostrant <span className="text-text-primary">{paginatedTalleres.length}</span> de <span className="text-text-primary">{filteredTalleres.length}</span> tallers
-              </div>
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                  className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${currentPage === 1 
-                    ? 'text-text-muted border-border-subtle cursor-not-allowed' 
-                    : 'text-consorci-darkBlue border-border-subtle hover:bg-background-subtle'}`}
-                >
-                  Anterior
-                </button>
-                <div className="px-4 py-2 bg-background-surface border border-border-subtle text-[10px] font-bold text-consorci-darkBlue tracking-[0.2em]">
-                  Pàgina {currentPage} de {totalPages}
-                </div>
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                  className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${currentPage === totalPages 
-                    ? 'text-text-muted border-border-subtle cursor-not-allowed' 
-                    : 'text-consorci-darkBlue border-border-subtle hover:bg-background-subtle'}`}
-                >
-                  Següent
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalItems={filteredTalleres.length}
+            currentItemsCount={paginatedTalleres.length}
+            itemName="tallers"
+          />
         </div>
       ) : (
         <div className="text-center py-32 bg-background-surface border border-dashed border-border-subtle">

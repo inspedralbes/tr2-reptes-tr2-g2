@@ -56,32 +56,32 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-      className="flex-1 bg-white"
+      className="flex-1 bg-background-surface"
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 px-8 pt-24 pb-12">
           {/* Logo / Header Area */}
           <View className="mb-16">
-            <View className="w-16 h-2 bg-accent mb-6" />
-            <Text className="text-4xl font-bold text-[#00426B] leading-[45px] tracking-tight">
+            <View className="w-16 h-2 bg-pink-red mb-6" />
+            <Text className="text-4xl font-bold text-primary leading-[45px] tracking-tight">
               Inici de{"\n"}Sessió
             </Text>
             <View className="flex-row items-center mt-4">
-              <Text className="text-gray-400 font-bold text-xs uppercase tracking-widest">Plataforma Iter</Text>
-              <View className="h-[1px] flex-1 bg-gray-100 ml-4" />
+              <Text className="text-text-muted font-bold text-xs uppercase tracking-widest">Plataforma Iter</Text>
+              <View className="h-[1px] flex-1 bg-border-subtle ml-4" />
             </View>
           </View>
 
           {/* Form */}
           <View className="space-y-6">
             <View>
-              <Text className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Correu Electrònic</Text>
-              <View className="flex-row items-center border border-gray-200 p-4 bg-gray-50">
-                <Ionicons name="mail-outline" size={20} color="#64748B" />
+              <Text className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2 ml-1">Correu Electrònic</Text>
+              <View className="flex-row items-center border border-border-subtle p-4 bg-background-subtle">
+                <Ionicons name="mail-outline" size={20} color={THEME.colors.primary} />
                 <TextInput
-                  className="flex-1 ml-4 font-bold text-gray-900"
+                  className="flex-1 ml-4 font-bold text-text-primary"
                   placeholder="exemple@email.cat"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={THEME.colors.gray}
                   autoCapitalize="none"
                   keyboardType="email-address"
                   value={email}
@@ -91,38 +91,38 @@ export default function LoginScreen() {
             </View>
 
             <View className="mt-6">
-              <Text className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Contrasenya</Text>
-              <View className="flex-row items-center border border-gray-200 p-4 bg-gray-50">
-                <Ionicons name="lock-closed-outline" size={20} color="#64748B" />
+              <Text className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2 ml-1">Contrasenya</Text>
+              <View className="flex-row items-center border border-border-subtle p-4 bg-background-subtle">
+                <Ionicons name="lock-closed-outline" size={20} color={THEME.colors.primary} />
                 <TextInput
-                  className="flex-1 ml-4 font-bold text-gray-900"
+                  className="flex-1 ml-4 font-bold text-text-primary"
                   placeholder="••••••••"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={THEME.colors.gray}
                   secureTextEntry={!showPassword}
                   value={password}
                   onChangeText={setPassword}
                 />
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#9CA3AF" />
+                  <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color={THEME.colors.gray} />
                 </TouchableOpacity>
               </View>
             </View>
           </View>
 
           {roleError && (
-            <View className="my-6 p-5 bg-[#F26178]/10 border-l-4 border-[#F26178]">
+            <View className="my-6 p-5 bg-pink-red/10 border-l-4 border-pink-red">
               <View className="flex-row items-center mb-2">
                 <Ionicons name="warning-outline" size={18} color="#F26178" />
-                <Text className="ml-2 font-black text-[10px] text-[#F26178] uppercase tracking-widest">Accés Restringit</Text>
+                <Text className="ml-2 font-black text-[10px] text-pink-red uppercase tracking-widest">Accés Restringit</Text>
               </View>
-              <Text className="text-xs font-bold text-gray-600 leading-relaxed mb-4">
+              <Text className="text-xs font-bold text-text-secondary leading-relaxed mb-4">
                 {roleError}
               </Text>
               <TouchableOpacity 
                 onPress={() => Linking.openURL('https://iter.consorci.cat')}
-                className="flex-row items-center border-b border-[#F26178] self-start pb-0.5"
+                className="flex-row items-center border-b border-pink-red self-start pb-0.5"
               >
-                <Text className="text-[#F26178] font-black text-[10px] uppercase tracking-widest">Anar a la Plataforma Web</Text>
+                <Text className="text-pink-red font-black text-[10px] uppercase tracking-widest">Anar a la Plataforma Web</Text>
                 <Ionicons name="arrow-forward" size={12} color="#F26178" className="ml-2" />
               </TouchableOpacity>
             </View>
@@ -142,13 +142,13 @@ export default function LoginScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity className="mt-8 items-center">
-              <Text className="text-gray-400 font-bold text-xs uppercase tracking-widest">He oblidat la contrasenya</Text>
+              <Text className="text-text-muted font-bold text-xs uppercase tracking-widest">He oblidat la contrasenya</Text>
             </TouchableOpacity>
           </View>
 
           {/* Footer Branding */}
           <View className="mt-auto items-center">
-            <Text className="text-[9px] font-black text-gray-300 uppercase tracking-[4px]">
+            <Text className="text-[9px] font-black text-text-muted opacity-40 uppercase tracking-[4px]">
               Consorci d'Educació de Barcelona
             </Text>
           </View>

@@ -7,6 +7,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import assignacioService, { Assignacio } from '@/services/assignacioService';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
+import Pagination from "@/components/Pagination";
 
 export default function DocumentVerificationPage() {
   const { user, loading: authLoading } = useAuth();
@@ -20,6 +21,8 @@ export default function DocumentVerificationPage() {
     greeting: 'Hola bona tarda'
   });
   const [sendingNotif, setSendingNotif] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   const router = useRouter();
 
@@ -106,6 +109,12 @@ export default function DocumentVerificationPage() {
     }
   };
 
+  const totalPages = Math.ceil(assignacions.length / itemsPerPage);
+  const paginatedAssignacions = assignacions.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+  );
+
   if (authLoading || !user) {
     return <Loading fullScreen message="Verificant permisos d'administrador..." />;
   }
@@ -134,7 +143,7 @@ export default function DocumentVerificationPage() {
                   </td>
                 </tr>
               ) : assignacions.length > 0 ? (
-                assignacions.map((assig) => (
+                paginatedAssignacions.map((assig) => (
                   <tr key={assig.id_assignacio} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-bold text-gray-800 text-sm">{assig.centre?.nom}</div>
@@ -241,6 +250,15 @@ export default function DocumentVerificationPage() {
             </tbody>
           </table>
         </div>
+        
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          totalItems={assignacions.length}
+          currentItemsCount={paginatedAssignacions.length}
+          itemName="assignacions"
+        />
       </div>
 
       {/* Notification Modal */}

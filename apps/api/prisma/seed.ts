@@ -103,44 +103,75 @@ async function seedUsers(roles: any, passDefault: string) {
   const profesBrossa = [];
   const profesClaris = [];
 
-  for (let i = 1; i <= 4; i++) {
-    const emailB = `prof.b${i}@brossa.cat`;
+  const brossaProfsNames = ['Laura Martínez', 'Jordi Soler', 'Marta Vila', 'Pere Gomis'];
+  const clarisProfsNames = ['Anna Ferrer', 'Marc Dalmau', 'Laia Puig', 'Sergi Vidal'];
+
+  for (let i = 0; i < 4; i++) {
+    const name = brossaProfsNames[i];
+    const email = `${name.toLowerCase().replace(' ', '.').normalize("NFD").replace(/[\u0300-\u036f]/g, "")}@brossa.cat`;
     const userB = await prisma.usuari.create({
       data: {
-        nom_complet: `Professor Brossa ${i}`,
-        email: emailB,
+        nom_complet: name,
+        email: email,
         password_hash: passDefault,
         id_rol: roles.rolProfe.id_rol,
         id_centre: centroBrossa.id_centre
       }
     });
     const pb = await prisma.professor.create({
-      data: { nom: `Professor Brossa ${i}`, contacte: emailB, id_centre: centroBrossa.id_centre, id_usuari: userB.id_usuari }
+      data: { nom: name, contacte: email, id_centre: centroBrossa.id_centre, id_usuari: userB.id_usuari }
     });
     profesBrossa.push(pb);
 
-    const emailP = `prof.p${i}@pauclaris.cat`;
+    const nameClaris = clarisProfsNames[i];
+    const emailC = `${nameClaris.toLowerCase().replace(' ', '.').normalize("NFD").replace(/[\u0300-\u036f]/g, "")}@pauclaris.cat`;
     const userP = await prisma.usuari.create({
       data: {
-        nom_complet: `Professor Claris ${i}`,
-        email: emailP,
+        nom_complet: nameClaris,
+        email: emailC,
         password_hash: passDefault,
         id_rol: roles.rolProfe.id_rol,
         id_centre: centroPauClaris.id_centre
       }
     });
     const pc = await prisma.professor.create({
-      data: { nom: `Professor Claris ${i}`, contacte: emailP, id_centre: centroPauClaris.id_centre, id_usuari: userP.id_usuari }
+      data: { nom: nameClaris, contacte: emailC, id_centre: centroPauClaris.id_centre, id_usuari: userP.id_usuari }
     });
     profesClaris.push(pc);
   }
 
-  for (let i = 1; i <= 10; i++) {
+  const brossaStudents = [
+    { n: 'Pol', c: 'Garcia' }, { n: 'Nuria', c: 'Roca' }, { n: 'Arnau', c: 'Font' }, 
+    { n: 'Julia', c: 'Serra' }, { n: 'Oriol', c: 'Mas' }, { n: 'Clara', c: 'Pons' }, 
+    { n: 'Nil', c: 'Bosch' }, { n: 'Emma', c: 'Sala' }, { n: 'Aleix', c: 'Camps' }, 
+    { n: 'Ona', c: 'Valls' }
+  ];
+
+  const clarisStudents = [
+    { n: 'Paula', c: 'Martí' }, { n: 'Eric', c: 'Torres' }, { n: 'Marina', c: 'Gil' }, 
+    { n: 'Jan', c: 'Costa' }, { n: 'Aina', c: 'Ramos' }, { n: 'Biel', c: 'Rovira' }, 
+    { n: 'Carla', c: 'Mola' }, { n: 'David', c: 'Romeu' }, { n: 'Sara', c: 'Canals' }, 
+    { n: 'Roger', c: 'Sants' }
+  ];
+
+  for (let i = 0; i < 10; i++) {
     await prisma.alumne.create({
-      data: { nom: `Alumne Brossa ${i}`, cognoms: 'Simulació', idalu: `B${100+i}`, curs: '4t ESO', id_centre_procedencia: centroBrossa.id_centre }
+      data: { 
+        nom: brossaStudents[i].n, 
+        cognoms: brossaStudents[i].c, 
+        idalu: `B${100+i}`, 
+        curs: '4t ESO', 
+        id_centre_procedencia: centroBrossa.id_centre 
+      }
     });
     await prisma.alumne.create({
-      data: { nom: `Alumne Claris ${i}`, cognoms: 'Simulació', idalu: `P${100+i}`, curs: '3r ESO', id_centre_procedencia: centroPauClaris.id_centre }
+      data: { 
+        nom: clarisStudents[i].n, 
+        cognoms: clarisStudents[i].c, 
+        idalu: `P${100+i}`, 
+        curs: '3r ESO', 
+        id_centre_procedencia: centroPauClaris.id_centre 
+      }
     });
   }
 
@@ -157,8 +188,8 @@ async function seedTallers(sectors: any) {
       cap: 10, 
       icona: 'ROBOT',
       schedule: [
-        { dayOfWeek: 1, startTime: "09:00", endTime: "11:00" }, // Dilluns
-        { dayOfWeek: 3, startTime: "09:00", endTime: "11:00" }  // Dimecres
+        { dayOfWeek: 1, startTime: "09:00", endTime: "11:00" }, 
+        { dayOfWeek: 3, startTime: "09:00", endTime: "11:00" }  
       ]
     },
     { 
@@ -168,8 +199,8 @@ async function seedTallers(sectors: any) {
       cap: 8, 
       icona: 'FILM',
       schedule: [
-        { dayOfWeek: 2, startTime: "15:00", endTime: "18:00" }, // Dimarts
-        { dayOfWeek: 4, startTime: "15:00", endTime: "18:00" }  // Dijous
+        { dayOfWeek: 2, startTime: "15:00", endTime: "18:00" },
+        { dayOfWeek: 4, startTime: "15:00", endTime: "18:00" } 
       ]
     },
     { 
@@ -179,7 +210,7 @@ async function seedTallers(sectors: any) {
       cap: 7, 
       icona: 'TOOLS',
       schedule: [
-        { dayOfWeek: 5, startTime: "08:00", endTime: "12:00" }  // Divendres
+        { dayOfWeek: 5, startTime: "08:00", endTime: "12:00" } 
       ]
     },
     { 

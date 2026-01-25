@@ -12,6 +12,7 @@ import centroService, { Centre } from "../../../services/centroService";
 import Loading from "@/components/Loading";
 import { toast } from "sonner";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import Pagination from "@/components/Pagination";
 
 export default function CentrosScreen() {
   const { user, loading: authLoading } = useAuth();
@@ -261,36 +262,14 @@ export default function CentrosScreen() {
           </div>
 
           {/* Paginació */}
-          {totalPages > 1 && (
-            <div className="mt-0 flex flex-col sm:flex-row justify-between items-center gap-4 bg-background-subtle border-t border-border-subtle p-6">
-              <div className="text-[10px] font-black uppercase text-text-muted tracking-widest">
-                Mostrant <span className="text-consorci-darkBlue">{paginatedCentros.length}</span> de <span className="text-consorci-darkBlue">{filteredCentros.length}</span> centres
-              </div>
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === 1 
-                    ? 'text-text-muted border-border-subtle cursor-not-allowed' 
-                    : 'text-consorci-darkBlue border-border-subtle hover:bg-background-subtle'}`}
-                >
-                  Anterior
-                </button>
-                <div className="px-4 py-2 bg-background-surface border border-border-subtle text-[10px] font-black text-consorci-darkBlue tracking-[0.2em]">
-                  Pàgina {currentPage} de {totalPages}
-                </div>
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === totalPages 
-                    ? 'text-text-muted border-border-subtle cursor-not-allowed' 
-                    : 'text-consorci-darkBlue border-border-subtle hover:bg-background-subtle'}`}
-                >
-                  Següent
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalItems={filteredCentros.length}
+            currentItemsCount={paginatedCentros.length}
+            itemName="centres"
+          />
         </div>
       ) : (
         <div className="text-center py-32 bg-background-surface border border-dashed border-border-subtle">

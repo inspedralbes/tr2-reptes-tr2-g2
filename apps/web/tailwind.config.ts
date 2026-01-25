@@ -8,6 +8,7 @@ const config: Config = {
     "../../packages/ui/src/**/*.tsx",
     "../../packages/shared/index.ts",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {

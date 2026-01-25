@@ -30,7 +30,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ visible, onClose, e
       case 'milestone': return THEME.colors.primary;
       case 'deadline': return THEME.colors.accent;
       case 'assignment': return THEME.colors.secondary;
-      default: return THEME.colors.neutral;
+      default: return THEME.colors.gray;
     }
   };
 

@@ -133,29 +133,29 @@ export default function AdminStatsPage() {
       <div className="space-y-8 animate-in fade-in duration-700">
 
         {/* Header Ribbon */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#00426B] p-6 text-white shadow-lg border-l-8 border-[#0775AB]">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-background-surface p-6 text-text-primary shadow-sm border-l-8 border-consorci-darkBlue">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Activity className="w-5 h-5 text-[#97C9E3] animate-pulse" />
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#97C9E3]">
+              <Activity className="w-5 h-5 text-consorci-lightBlue animate-pulse" />
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-consorci-lightBlue">
                 DATA SYNC ACTIVE
               </div>
             </div>
-            <h2 className="text-xl font-black uppercase tracking-tight">Estadístiques de Gestió</h2>
+            <h2 className="text-xl font-black uppercase tracking-tight text-consorci-darkBlue">Estadístiques de Gestió</h2>
           </div>
           <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
             <div className="text-right hidden sm:block">
-              <div className="text-[10px] font-black text-[#97C9E3] uppercase mb-0.5 tracking-tighter">Global Requests</div>
-              <div className="text-3xl font-black leading-none">
+              <div className="text-[10px] font-black text-text-muted uppercase mb-0.5 tracking-tighter">Global Requests</div>
+              <div className="text-3xl font-black leading-none text-consorci-darkBlue">
                 {statusStats.reduce((acc, s) => acc + s.total, 0)}
               </div>
             </div>
             <button
               onClick={handleCleanup}
-              className="group relative flex items-center gap-2 bg-white/10 backdrop-blur-md px-6 py-3 border border-white/20 hover:bg-red-600 hover:border-red-600 transition-all duration-300"
+              className="group relative flex items-center gap-2 bg-background-subtle hover:bg-red-50 px-6 py-3 border border-border-subtle hover:border-red-200 transition-all duration-300"
             >
-              <Trash2 className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-white">Netejar Històric</span>
+              <Trash2 className="w-4 h-4 text-text-secondary group-hover:text-red-600 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary group-hover:text-red-700">Netejar Històric</span>
             </button>
           </div>
         </div>
@@ -164,11 +164,11 @@ export default function AdminStatsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* Status Distribution (Pie) */}
-          <div className="lg:col-span-1 flex flex-col bg-white border border-gray-100 shadow-sm transition-all hover:shadow-md hover:border-gray-200 group">
-            <div className="p-6 border-b border-gray-50 flex items-center justify-between">
+          <div className="lg:col-span-1 flex flex-col bg-background-surface border border-border-subtle shadow-sm transition-all hover:shadow-md hover:border-consorci-lightBlue/30 group">
+            <div className="p-6 border-b border-border-subtle flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <PieChartIcon className="w-4 h-4 text-[#0775AB]" />
-                <h3 className="text-[10px] font-black text-[#00426B] uppercase tracking-widest">Estat de Peticions</h3>
+                <PieChartIcon className="w-4 h-4 text-consorci-actionBlue" />
+                <h3 className="text-[10px] font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Estat de Peticions</h3>
               </div>
               <TrendingUp className="w-4 h-4 text-green-500 opacity-50 group-hover:opacity-100 transition-opacity" />
             </div>
@@ -176,9 +176,9 @@ export default function AdminStatsPage() {
               <StatusDistribution data={statusStats} />
               <div className="mt-4 grid grid-cols-2 gap-2">
                 {statusStats.map((s, idx) => (
-                  <div key={idx} className="flex items-center justify-between bg-gray-50 p-2 border-l-2 border-[#00426B]">
-                    <span className="text-[9px] font-bold text-gray-500 uppercase">{s.estat}</span>
-                    <span className="text-xs font-black text-[#00426B]">{s.total}</span>
+                  <div key={idx} className="flex items-center justify-between bg-background-subtle p-2 border-l-2 border-consorci-darkBlue dark:border-consorci-lightBlue">
+                    <span className="text-[9px] font-bold text-text-secondary uppercase">{s.estat}</span>
+                    <span className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue">{s.total}</span>
                   </div>
                 ))}
               </div>
@@ -186,10 +186,10 @@ export default function AdminStatsPage() {
           </div>
 
           {/* Workshop Popularity (Bar) */}
-          <div className="lg:col-span-2 flex flex-col bg-white border border-gray-100 shadow-sm transition-all hover:shadow-md hover:border-gray-200">
-            <div className="p-6 border-b border-gray-50 flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-[#0775AB]" />
-              <h3 className="text-[10px] font-black text-[#00426B] uppercase tracking-widest">Demanda Global de Tallers</h3>
+          <div className="lg:col-span-2 flex flex-col bg-background-surface border border-border-subtle shadow-sm transition-all hover:shadow-md hover:border-consorci-lightBlue/30">
+            <div className="p-6 border-b border-border-subtle flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-consorci-actionBlue" />
+              <h3 className="text-[10px] font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Demanda Global de Tallers</h3>
             </div>
             <div className="p-6 flex-1">
               <WorkshopPopularity data={popularStats} />
@@ -199,13 +199,13 @@ export default function AdminStatsPage() {
 
 
         {/* MongoDB Management (Checklists) */}
-        <div className="bg-white border border-[#CFD2D3] shadow-lg">
-          <div className="p-6 border-b border-[#CFD2D3] bg-[#F2F4F7] flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="bg-background-surface border border-border-subtle shadow-lg">
+          <div className="p-6 border-b border-border-subtle bg-background-subtle flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <Search className="w-5 h-5 text-[#00426B]" />
+              <Search className="w-5 h-5 text-consorci-darkBlue dark:text-consorci-lightBlue" />
               <div>
-                <h3 className="text-xs font-black text-[#00426B] uppercase tracking-widest">Gestió Dinàmica de Checklists</h3>
-                <p className="text-[9px] font-bold text-gray-500 uppercase mt-0.5">Consulta de documents a col·lecció 'request_checklists'</p>
+                <h3 className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Gestió Dinàmica de Checklists</h3>
+                <p className="text-[9px] font-bold text-text-muted uppercase mt-0.5">Consulta de documents a col·lecció 'request_checklists'</p>
               </div>
             </div>
             <div className="flex w-full md:w-auto">
@@ -215,11 +215,11 @@ export default function AdminStatsPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="bg-white border-2 border-r-0 border-[#CFD2D3] px-6 py-3 text-xs focus:outline-none focus:border-[#00426B] w-full md:w-80 transition-all font-bold placeholder:text-gray-300 placeholder:italic"
+                className="bg-background-surface border-2 border-r-0 border-border-subtle px-6 py-3 text-xs focus:outline-none focus:border-consorci-darkBlue dark:focus:border-consorci-lightBlue w-full md:w-80 transition-all font-bold placeholder:text-text-muted placeholder:italic text-text-primary"
               />
               <button
                 onClick={handleSearch}
-                className="bg-[#00426B] text-white px-8 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-colors whitespace-nowrap"
+                className="bg-consorci-darkBlue text-white px-8 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-consorci-actionBlue transition-colors whitespace-nowrap"
               >
                 Cercar Docs
               </button>
@@ -229,13 +229,13 @@ export default function AdminStatsPage() {
           <div className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {searchResults.length > 0 ? searchResults.map((result) => (
-                <div key={result._id} className="group border border-gray-100 bg-gray-50/30 hover:bg-white hover:border-[#00426B] hover:shadow-xl transition-all duration-300 p-6 flex flex-col">
+                <div key={result._id} className="group border border-border-subtle bg-background-subtle/30 hover:bg-background-surface hover:border-consorci-darkBlue dark:hover:border-consorci-lightBlue hover:shadow-xl transition-all duration-300 p-6 flex flex-col">
                   <div className="flex justify-between items-start mb-6">
                     <div>
-                      <h4 className="text-sm font-black text-[#00426B] uppercase tracking-tight leading-none mb-2">{result.workshop_title}</h4>
+                      <h4 className="text-sm font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-tight leading-none mb-2">{result.workshop_title}</h4>
                       <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                        <span className="text-[9px] font-black text-green-600 uppercase tracking-tighter">{result.status}</span>
+                        <span className="text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-tighter">{result.status}</span>
                       </div>
                     </div>
                   </div>
@@ -243,8 +243,8 @@ export default function AdminStatsPage() {
                   <div className="space-y-2 mb-6 flex-1">
                     {result.passos.map((p: any, idx: number) => (
                       <div key={idx} className="flex items-center gap-2">
-                        <div className={`w-3 h-3 border rounded-full ${p.completat ? 'bg-[#00426B] border-[#00426B]' : 'bg-white border-gray-200'}`}></div>
-                        <span className={`text-[10px] font-bold ${p.completat ? 'text-[#00426B]' : 'text-gray-400 italic font-medium line-through'}`}>
+                        <div className={`w-3 h-3 border rounded-full ${p.completat ? 'bg-consorci-darkBlue border-consorci-darkBlue dark:bg-consorci-lightBlue dark:border-consorci-lightBlue' : 'bg-background-surface border-border-subtle'}`}></div>
+                        <span className={`text-[10px] font-bold ${p.completat ? 'text-consorci-darkBlue dark:text-consorci-lightBlue' : 'text-text-muted italic font-medium line-through'}`}>
                           {p.pas}
                         </span>
                       </div>
@@ -253,16 +253,16 @@ export default function AdminStatsPage() {
 
                   <button
                     onClick={() => handleAddStep(result.id_peticio)}
-                    className="flex items-center justify-center gap-2 w-full py-3 border border-[#00426B] text-[#00426B] hover:bg-[#00426B] hover:text-white transition-all text-[9px] font-black uppercase tracking-widest"
+                    className="flex items-center justify-center gap-2 w-full py-3 border border-consorci-darkBlue dark:border-consorci-lightBlue text-consorci-darkBlue dark:text-consorci-lightBlue hover:bg-consorci-darkBlue dark:hover:bg-consorci-lightBlue hover:text-white transition-all text-[9px] font-black uppercase tracking-widest"
                   >
                     <PlusCircle className="w-3 h-3" />
                     Nou Pas Checklist
                   </button>
                 </div>
               )) : (
-                <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-100 bg-gray-50/20">
-                  <Search className="w-10 h-10 text-gray-200 mx-auto mb-4" />
-                  <p className="text-gray-300 text-[10px] font-black uppercase tracking-widest">Inicia una cerca per visualitzar llistats nominals</p>
+                <div className="col-span-full py-20 text-center border-2 border-dashed border-border-subtle bg-background-subtle/20">
+                  <Search className="w-10 h-10 text-text-muted mx-auto mb-4" />
+                  <p className="text-text-muted text-[10px] font-black uppercase tracking-widest">Inicia una cerca per visualitzar llistats nominals</p>
                 </div>
               )}
             </div>
@@ -270,39 +270,39 @@ export default function AdminStatsPage() {
         </div>
 
         {/* Audit Log (Activity) */}
-        <div className="bg-white border border-[#CFD2D3] overflow-hidden">
-          <div className="p-6 border-b border-[#CFD2D3] bg-[#F2F4F7] flex items-center justify-between">
+        <div className="bg-background-surface border border-border-subtle overflow-hidden">
+          <div className="p-6 border-b border-border-subtle bg-background-subtle flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <History className="w-5 h-5 text-[#00426B]" />
-              <h3 className="text-xs font-black text-[#00426B] uppercase tracking-widest">Registre Logístic d'Activitat</h3>
+              <History className="w-5 h-5 text-consorci-darkBlue dark:text-consorci-lightBlue" />
+              <h3 className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Registre Logístic d'Activitat</h3>
             </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-[11px] border-collapse">
               <thead>
-                <tr className="bg-white text-[#00426B] border-b border-[#CFD2D3]">
+                <tr className="bg-background-surface text-consorci-darkBlue dark:text-consorci-lightBlue border-b border-border-subtle">
                   <th className="px-6 py-5 font-black uppercase tracking-tighter w-48">Timestamp</th>
                   <th className="px-6 py-5 font-black uppercase tracking-tighter w-48">Mètode Execució</th>
                   <th className="px-6 py-5 font-black uppercase tracking-tighter">Payload Documental (Metadata)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border-subtle">
                 {activityLogs.length > 0 ? activityLogs.map((log) => (
-                  <tr key={log._id} className="hover:bg-gray-50/80 transition-colors">
-                    <td className="px-6 py-4 font-black text-gray-400 italic">
+                  <tr key={log._id} className="hover:bg-background-subtle/80 transition-colors">
+                    <td className="px-6 py-4 font-black text-text-muted italic">
                       {new Date(log.timestamp).toLocaleTimeString()} · {new Date(log.timestamp).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
-                        <span className="font-black text-[#00426B] uppercase text-[10px]">
+                        <span className="font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase text-[10px]">
                           {log.tipus_accio}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="bg-[#00426B]/5 p-3 font-mono text-[9px] text-[#00426B]/60 leading-relaxed border-l-2 border-[#00426B]/20">
+                      <div className="bg-consorci-darkBlue/5 dark:bg-consorci-lightBlue/10 p-3 font-mono text-[9px] text-consorci-darkBlue/80 dark:text-consorci-lightBlue/80 leading-relaxed border-l-2 border-consorci-darkBlue/20 dark:border-consorci-lightBlue/20">
                         {JSON.stringify(log.detalls)}
                       </div>
                     </td>
@@ -310,7 +310,7 @@ export default function AdminStatsPage() {
                 )) : (
                   <tr key="no-activity">
                     <td colSpan={3} className="px-6 py-20 text-center">
-                      <p className="text-gray-300 text-xs font-bold uppercase tracking-widest italic tracking-widest">Sincronitzant historial de logs...</p>
+                      <p className="text-text-muted text-xs font-bold uppercase tracking-widest italic tracking-widest">Sincronitzant historial de logs...</p>
                     </td>
                   </tr>
                 )}
@@ -320,19 +320,19 @@ export default function AdminStatsPage() {
         </div>
 
         {/* Sync Atlas (Full Width) */}
-        <div className="bg-white border border-[#CFD2D3] p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="bg-background-surface border border-border-subtle p-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-50">
-              <Database className="w-5 h-5 text-purple-600" />
+            <div className="p-3 bg-purple-50 dark:bg-purple-900/20">
+              <Database className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <h3 className="text-xs font-black text-[#00426B] uppercase tracking-widest">MongoDB Atlas Data Sync</h3>
-              <p className="text-[9px] font-bold text-gray-400 uppercase mt-1">
-                Cluster: <span className="text-[#0775AB]">iter-main</span> · Node: <span className="text-[#0775AB]">GCP-Brussels</span> · Status: <span className="text-green-500 font-black">Connected</span>
+              <h3 className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">MongoDB Atlas Data Sync</h3>
+              <p className="text-[9px] font-bold text-text-muted uppercase mt-1">
+                Cluster: <span className="text-consorci-actionBlue">iter-main</span> · Node: <span className="text-consorci-actionBlue">GCP-Brussels</span> · Status: <span className="text-green-500 font-black">Connected</span>
               </p>
             </div>
           </div>
-          <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight text-center md:text-right max-w-md hidden sm:block">
+          <div className="text-[10px] text-text-muted font-bold uppercase tracking-tight text-center md:text-right max-w-md hidden sm:block">
             Sincronització de dades documentals activa. Qualsevol canvi en les peticions es reflecteix en temps real en els gràfics analítics superiors mitjançant pipelines d'agregació.
           </div>
         </div>

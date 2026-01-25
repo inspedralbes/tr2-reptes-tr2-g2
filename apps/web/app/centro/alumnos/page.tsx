@@ -11,6 +11,7 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import Avatar from '@/components/Avatar';
+import Pagination from '@/components/Pagination';
 
 export default function AlumnesCRUD() {
   const { user, loading: authLoading } = useAuth();
@@ -244,36 +245,14 @@ export default function AlumnesCRUD() {
           )}
 
           {/* Paginació */}
-          {totalPages > 1 && (
-            <div className="mt-0 flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#F8FAFC] border-t border-gray-200 p-6">
-              <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
-                Mostrant <span className="text-[#00426B]">{paginatedAlumnes.length}</span> de <span className="text-[#00426B]">{filteredAlumnes.length}</span> alumnes
-              </div>
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === 1 
-                    ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-                    : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
-                >
-                  Anterior
-                </button>
-                <div className="px-4 py-2 bg-white border border-gray-200 text-[10px] font-black text-[#00426B] tracking-[0.2em]">
-                  Pàgina {currentPage} de {totalPages}
-                </div>
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === totalPages 
-                    ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-                    : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
-                >
-                  Següent
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalItems={filteredAlumnes.length}
+            currentItemsCount={paginatedAlumnes.length}
+            itemName="alumnes"
+          />
         </div>
       )}
 

@@ -7,6 +7,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
+import Pagination from '@/components/Pagination';
 
 type AssignmentMode = 'single' | 'whole';
 
@@ -165,8 +166,21 @@ export default function SessionsListPage() {
       setSelectedSessioId("");
       setSelectedProfessorId("");
       
+      
     } catch (error) {
       toast.error('Error al realitzar l\'assignació');
+    }
+  };
+
+  const handleRemoveStaff = async (idSessio: number, idUsuari: number) => {
+    try {
+      const api = getApi();
+      await api.delete(`/assignacions/sessions/${idSessio}/staff/${idUsuari}`);
+      await fetchData(); // Refresh list
+      toast.success('Docent eliminat correctament');
+    } catch (error) {
+      console.error(error);
+      toast.error('Error al eliminar docent');
     }
   };
 
@@ -285,23 +299,43 @@ export default function SessionsListPage() {
                     </div>
 
                     {/* Assigned Staff */}
-                    <div className="md:min-w-[150px]">
-                      <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest block mb-1">
-                        Docents Assignats
-                      </span>
-                      {sessio.isPending ? (
-                        <span className="text-[10px] italic text-gray-400">
-                          Confirmació requerida
+                    <div className="md:min-w-[150px] flex justify-end">
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest block mb-1">
+                          Docents Assignats
                         </span>
-                      ) : staffNames ? (
-                        <span className="text-xs font-black text-[#4197CB] uppercase">
-                          {staffNames}
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-bold text-red-400 uppercase">
-                          Sense professor assignat
-                        </span>
-                      )}
+                        {sessio.isPending ? (
+                          <span className="text-[10px] italic text-gray-400">
+                            Confirmació requerida
+                          </span>
+                        ) : sessio.staff && sessio.staff.length > 0 ? (
+                          <div className="flex flex-wrap justify-end gap-2 max-w-[300px]">
+                            {sessio.staff.map((staffMember: any) => (
+                              <div key={staffMember.id_usuari || staffMember.id} className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-2 py-1 rounded group/chip hover:border-red-200 transition-colors">
+                                <span className="text-[10px] font-black text-[#4197CB] uppercase group-hover/chip:text-red-400 transition-colors">
+                                  {staffMember.usuari?.nom_complet || staffMember.nom}
+                                </span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRemoveStaff(sessio.id_sessio, staffMember.id_usuari || staffMember.id);
+                                  }}
+                                  className="text-blue-300 hover:text-red-500 focus:outline-none transition-colors"
+                                  title="Eliminar docent"
+                                >
+                                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-[10px] font-bold text-red-400 uppercase">
+                            Sense professor assignat
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -310,36 +344,14 @@ export default function SessionsListPage() {
             </div>
 
             {/* Pagination UI */}
-            {totalPages > 1 && (
-              <div className="bg-[#F8FAFC] border-t border-gray-100 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
-                  Mostrant <span className="text-[#00426B]">{paginatedSessions.length}</span> de <span className="text-[#00426B]">{filteredSessions.length}</span> sessions
-                </div>
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                    disabled={currentPage === 1}
-                    className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${currentPage === 1 
-                      ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-                      : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
-                  >
-                    Anterior
-                  </button>
-                  <div className="px-4 py-2 bg-white border border-gray-200 text-[10px] font-bold text-[#00426B] tracking-[0.2em]">
-                    Pàgina {currentPage} de {totalPages}
-                  </div>
-                  <button 
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                    disabled={currentPage === totalPages}
-                    className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${currentPage === totalPages 
-                      ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-                      : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
-                  >
-                    Següent
-                  </button>
-                </div>
-              </div>
-            )}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              totalItems={filteredSessions.length}
+              currentItemsCount={paginatedSessions.length}
+              itemName="sessions"
+            />
           </>
         )}
       </div>

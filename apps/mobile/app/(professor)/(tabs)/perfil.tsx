@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME, ROLES } from '@iter/shared';
 import * as SecureStore from 'expo-secure-store';
@@ -142,7 +142,7 @@ export default function PerfilScreen() {
                  ].map((t) => {
                    const isActive = colorScheme === t.id;
                    return (
-                     <TouchableOpacity 
+                     <Pressable 
                        key={t.id}
                        onPress={() => setColorScheme(t.id)}
                        className={`flex-1 py-2 items-center justify-center rounded-lg flex-row gap-1.5 ${
@@ -159,7 +159,7 @@ export default function PerfilScreen() {
                        }`}>
                          {t.label}
                        </Text>
-                     </TouchableOpacity>
+                     </Pressable>
                    );
                  })}
                </View>
