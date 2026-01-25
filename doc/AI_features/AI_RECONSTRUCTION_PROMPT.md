@@ -1,28 +1,28 @@
-# PROMPT MAESTRO PARA RECONSTRUCCIÓN / MERGE
+# PROMPT MESTRE PER A RECONSTRUCCIÓ / MERGE
 
-**Instrucción para el Usuario**:
-Si encuentras conflictos graves al hacer merge con la rama principal, copia y pega el contenido de abajo en un chat con un Agente AI (como yo). Este prompt contiene todo el código fuente y las instrucciones precisas para volver a implementar las 4 funcionalidades IA desde cero en cualquier rama limpia.
+**Instrucció per a l'Usuari**:
+Si trobes conflictes greus en fer merge amb la branca principal, copia i enganxa el contingut de sota en un xat amb un Agent AI (com jo). Aquest prompt conté tot el codi font i les instruccions precises per tornar a implementar les 4 funcionalitats IA des de zero en qualsevol branca neta.
 
 ---
-**[INICIO DEL PROMPT PARA LA IA]**
+**[INICI DEL PROMPT PER A LA IA]**
 
-Actúa como un Ingeniero Senior de Software. Necesito que integres 4 funcionalidades de Inteligencia Artificial en mi proyecto Node.js/Typescript (Monorepo NX, Prisma, Express).
+Actua com un Enginyer Senior de Software. Necessito que integris 4 funcionalitats d'Intel·ligència Artificial en el meu projecte Node.js/Typescript (Monorepo NX, Prisma, Express).
 
-A continuación te doy los archivos exactos que debes crear o modificar. Si encuentras código existente, intégralo con cuidado.
+A continuació et dono els arxius exactes que has de crear o modificar. Si trobes codi existent, integra'l amb cura.
 
-## 1. Configuración Previa (Dependencias)
-Asegúrate de que `package.json` en la raíz tenga `"expo": "~54.0.29"` si hay errores de Typescript relacionados con `tsconfig base`.
+## 1. Configuració Prèvia (Dependències)
+Assegura't que `package.json` a l'arrel tingui `"expo": "~54.0.29"` si hi ha errors de Typescript relacionats amb `tsconfig base`.
 
-## 2. MODIFICACIONES DE BASE DE DATOS (Prisma)
+## 2. MODIFICACIONS DE BASE DE DADES (Prisma)
 Edita `apps/api/prisma/schema.prisma`:
-1.  En el modelo `Assignacio`, añade el campo: `grup Int @default(1)`.
-2.  En el modelo `Assignacio`, elimina `@unique` del campo `id_peticio`.
-3.  En el modelo `Peticio`, cambia la relación `assignacions` para que sea un array: `Assignacio[]`.
+1.  En el model `Assignacio`, afegeix el camp: `grup Int @default(1)`.
+2.  En el model `Assignacio`, elimina `@unique` del camp `id_peticio`.
+3.  En el model `Peticio`, canvia la relació `assignacions` perquè sigui un array: `Assignacio[]`.
 
-*Luego recuerda que tendré que ejecutar `npx prisma db push`.*
+*Després recorda que hauré d'executar `npx prisma db push`.*
 
-## 3. IDEA 1: MOTOR DE ASIGNACIÓN
-Crea/Sobrescribe `apps/api/src/services/assignment.solver.ts`:
+## 3. IDEA 1: MOTOR D'ASSIGNACIÓ
+Crea/Sobreescriu `apps/api/src/services/assignment.solver.ts`:
 ```typescript
 export interface Student { id: number; centerId: number; }
 export interface WorkshopSlot { workshopId: number; groupId: number; capacity: number; }
@@ -36,10 +36,10 @@ export class AssignmentSolver {
     const unassigned: Student[] = [];
 
     for (const student of shuffled) {
-       // Buscar slots válidos (capacidad < max Y centro_count < 4)
+       // Cercar slots vàlids (capacitat < max I center_count < 4)
        const valid = slotsState.filter(s => s.assigned.length < s.capacity && (s.centerCounts[student.centerId] || 0) < 4);
        if (valid.length > 0) {
-           // Ordenar para balancear (el que tenga menos de este centro)
+           // Ordenar per balancejar (el que tingui menys d'aquest centre)
            valid.sort((a, b) => (a.centerCounts[student.centerId]||0) - (b.centerCounts[student.centerId]||0));
            const best = valid[0];
            best.assigned.push(student);
@@ -54,7 +54,7 @@ export class AssignmentSolver {
 }
 ```
 
-Crea/Sobrescribe `apps/api/src/services/auto-assignment.service.ts`:
+Crea/Sobreescriu `apps/api/src/services/auto-assignment.service.ts`:
 ```typescript
 import prisma from '../lib/prisma';
 import { AssignmentSolver, WorkshopSlot } from './assignment.solver';
@@ -63,14 +63,14 @@ export class AutoAssignmentService {
     private solver = new AssignmentSolver();
 
     async generateAssignments() {
-        // 1. Buscar Peticiones Aprovadas Modalidad C sin asignar
+        // 1. Buscar Peticions Aprovades Modalitat C sense assignar
         const petitions = await prisma.peticio.findMany({
             where: { estat: 'Aprovada', modalitat: 'C', assignacions: { none: {} } },
             include: { alumnes: true }
         });
         if (petitions.length === 0) return { message: 'No petitions' };
 
-        // 2. Agrupar por Taller
+        // 2. Agrupar per Taller
         const studentsByTaller = new Map<number, any[]>();
         const studentToPetMap = new Map<number, number>();
         petitions.forEach(p => {
@@ -81,7 +81,7 @@ export class AutoAssignmentService {
              });
         });
 
-        // 3. Resolver cada taller
+        // 3. Resoldre cada taller
         const results = [];
         for (const [tallerId, students] of studentsByTaller.entries()) {
              const groupsNeeded = Math.ceil(students.length / 16);
@@ -90,10 +90,10 @@ export class AutoAssignmentService {
              
              const assignments = this.solver.solve(students, slots);
              
-             // Guardar en DB (Crear Assignacio + Inscripcio)
+             // Guardar a BD (Crear Assignacio + Inscripcio)
              for (const text of assignments) {
                  const petId = studentToPetMap.get(text.studentId);
-                 // Lógica simplificada de upsert assignacio + create inscripcio
+                 // Lògica simplificada d'upsert assignacio + create inscripcio
                  let assignacio = await prisma.assignacio.findFirst({ where: { id_peticio: petId, grup: text.groupId } });
                  if (!assignacio) {
                      assignacio = await prisma.assignacio.create({ data: { id_peticio: petId, grup: text.groupId, id_taller: tallerId, id_centre: students.find(s=>s.id===text.studentId).centerId } });
@@ -107,7 +107,7 @@ export class AutoAssignmentService {
 }
 ```
 
-## 4. IDEA 2: ASISTENTE DE VOZ
+## 4. IDEA 2: ASSISTENT DE VEU
 Crea `apps/api/src/services/nlp.service.ts`:
 ```typescript
 export class NLPService {
@@ -153,14 +153,14 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
 };
 ```
 
-## 5. IDEA 3 y 4 (Resumido para copiar)
-*Copia los archivos `vision.service.ts` y `risk-analysis.service.ts` que se encuentran en la carpeta `doc/AI_features/guias/` de este repositorio si los necesitas completos.*
+## 5. IDEA 3 i 4 (Resumit per copiar)
+*Copia els arxius `vision.service.ts` i `risk-analysis.service.ts` que es troben a la carpeta `doc/AI_features/guias/` d'aquest repositori si els necessites complets.*
 
-## 6. RUTAS (Endpoints)
-Asegúrate de exponer estos controladores en Express:
+## 6. RUTES (Endpoints)
+Assegura't d'exposar aquests controladors a Express:
 1.  POST `/api/assignacions/auto-generate` -> `AutoAssignmentService`.
 2.  POST `/api/evaluation/voice-process` -> `EvaluationController`.
-3.  POST `/api/stats/risk-analysis` -> `StatsController` (invocando `RiskAnalysisService`).
-4.  POST `/api/assignacions/upload/validate` -> `AssignacioController` (invocando `VisionService`).
+3.  POST `/api/stats/risk-analysis` -> `StatsController` (invocant `RiskAnalysisService`).
+4.  POST `/api/assignacions/upload/validate` -> `AssignacioController` (invocant `VisionService`).
 
-**[FIN DEL PROMPT]**
+**[FI DEL PROMPT]**

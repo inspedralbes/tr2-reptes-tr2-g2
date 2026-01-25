@@ -55,6 +55,7 @@ Crear la classe `AssignmentSolver` que conté la lògica matemàtica.
 -   **Rep**: Llista d'estudiants i "Slots" (buits de taller amb capacitat i ID de grup).
 -   **Restriccions**: Màxim 16 alumnes per Slot i màxim 4 alumnes d'un mateix centre per Slot.
 -   **Estratègia**: Algorisme Greedy Aleatori (ordena estudiants a l'atzar i busca el millor slot disponible per maximitzar barreja).
+-   **Selecció Equitativa ("Round Robin")**: En cas que la demanda superi l'oferta de places, el sistema activa automàticament un mode de selecció just que assigna places rotativament entre centres (Ex: 1r del Centre A, 1r del Centre B, etc.) per evitar que un centre copin totes les places per "arribar primer".
 
 ## 3. Crear Servei d'Orquestració
 **Arxiu**: `apps/api/src/services/auto-assignment.service.ts`
