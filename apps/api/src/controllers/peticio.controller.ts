@@ -54,7 +54,7 @@ export const getPeticions = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error en peticioController.getPeticions:", error);
-    res.status(500).json({ error: 'Error al obtener peticiones' });
+    return res.status(500).json({ error: 'Error al obtenir peticions' });
   }
 };
 
@@ -71,17 +71,17 @@ export const createPeticio = async (req: Request, res: Response) => {
   const { centreId } = (req as any).user;
 
   if (!id_taller || !centreId || !prof1_id || !prof2_id) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios (id_taller, centreId, prof1_id, prof2_id)' });
+    return res.status(400).json({ error: 'Falten camps obligatoris (id_taller, centreId, prof1_id, prof2_id)' });
   }
 
   // --- VERIFICACIÓN DE FASE ---
   const phaseStatus = await isPhaseActive(PHASES.SOLICITUD);
   if (!phaseStatus.isActive) {
-    let errorMessage = 'El período de solicitud de talleres no está activo.';
+    let errorMessage = 'El període de sol·licitud de tallers no està actiu.';
     if (!phaseStatus.phaseActiveFlag) {
-      errorMessage = 'La fase de solicitud ha sido desactivada por el administrador.';
+      errorMessage = 'La fase de sol·licitud ha estat desactivada per l\'administrador.';
     } else if (!phaseStatus.isWithinDates) {
-      errorMessage = 'El plazo para solicitar talleres ha finalizado.';
+      errorMessage = 'El termini per sol·licitar tallers ha finalitzat.';
     }
     return res.status(403).json({ error: errorMessage });
   }
@@ -89,7 +89,7 @@ export const createPeticio = async (req: Request, res: Response) => {
   // --- VALIDACIONES DE MODALIDAD C (REGLAS DEL PROGRAMA) ---
   if (modalitat === 'C') {
     if (alumnes_aprox > 4) {
-      return res.status(400).json({ error: 'En la Modalidad C, el máximo es de 4 alumnos de un mismo instituto por proyecto.' });
+      return res.status(400).json({ error: 'En la Modalitat C, el màxim és de 4 alumnes d\'un mateix institut per projecte.' });
     }
 
     // Comprobar límite total de 12 alumnos para el centro en Modalidad C
@@ -103,7 +103,7 @@ export const createPeticio = async (req: Request, res: Response) => {
     const totalAlumnesC = peticionsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
     if (totalAlumnesC + alumnes_aprox > 12) {
       return res.status(400).json({
-        error: `Límite excedido. El instituto ya tiene ${totalAlumnesC} alumnos en proyectos de Modalidad C. El máximo total permitido es 12.`
+        error: `Límit superat. L'institut ja té ${totalAlumnesC} alumnes en projectes de Modalitat C. El màxim total permès és 12.`
       });
     }
   }
@@ -117,7 +117,7 @@ export const createPeticio = async (req: Request, res: Response) => {
     });
 
     if (existingPeticio) {
-      return res.status(400).json({ error: 'Este centro ya ha realizado una solicitud para este taller.' });
+      return res.status(400).json({ error: 'Aquest centre ja ha realitzat una sol·licitud per a aquest taller.' });
     }
 
     const nuevaPeticio = await prisma.peticio.create({
@@ -180,7 +180,7 @@ export const createPeticio = async (req: Request, res: Response) => {
     res.json(nuevaPeticio);
   } catch (error) {
     console.error("Error en peticioController.createPeticio:", error);
-    res.status(500).json({ error: 'Error al crear petición' });
+    res.status(500).json({ error: 'Error al crear la petició' });
   }
 };
 
@@ -202,17 +202,17 @@ export const updatePeticio = async (req: Request, res: Response) => {
     });
 
     if (!existingPeticio) {
-      return res.status(404).json({ error: 'Petición no encontrada.' });
+      return res.status(404).json({ error: 'Petició no trobada.' });
     }
 
     // Verificar permisos: Coordinador solo edita las suyas
     if (role !== 'ADMIN' && existingPeticio.id_centre !== parseInt(centreId)) {
-      return res.status(403).json({ error: 'No tienes permiso para editar esta petición.' });
+      return res.status(403).json({ error: 'No tens permís per editar aquesta petició.' });
     }
 
     // Verificar estado: Solo se pueden editar las pendientes
     if (existingPeticio.estat !== 'Pendent') {
-      return res.status(400).json({ error: 'Solo se pueden editar peticiones pendientes.' });
+      return res.status(400).json({ error: 'Només es poden editar peticions pendents.' });
     }
 
     // --- VERIFICACIÓN DE FASE ---
@@ -220,11 +220,11 @@ export const updatePeticio = async (req: Request, res: Response) => {
     if (role !== 'ADMIN') {
       const phaseStatus = await isPhaseActive(PHASES.SOLICITUD);
       if (!phaseStatus.isActive) {
-        let errorMessage = 'El período de solicitud de talleres no está activo.';
+        let errorMessage = 'El període de sol·licitud de tallers no està actiu.';
         if (!phaseStatus.phaseActiveFlag) {
-          errorMessage = 'La fase de solicitud ha sido desactivada por el administrador.';
+          errorMessage = 'La fase de sol·licitud ha estat desactivada per l\'administrador.';
         } else if (!phaseStatus.isWithinDates) {
-          errorMessage = 'El plazo para solicitar talleres ha finalizado.';
+          errorMessage = 'El termini per sol·licitar tallers ha finalitzat.';
         }
         return res.status(403).json({ error: errorMessage });
       }
@@ -234,7 +234,7 @@ export const updatePeticio = async (req: Request, res: Response) => {
     if (existingPeticio.modalitat === 'C' && alumnes_aprox !== undefined) {
       const nuevosAlumnes = parseInt(alumnes_aprox);
       if (nuevosAlumnes > 4) {
-        return res.status(400).json({ error: 'En la Modalidad C, el máximo es de 4 alumnos de un mismo instituto por proyecto.' });
+        return res.status(400).json({ error: 'En la Modalitat C, el màxim és de 4 alumnes d\'un mateix institut per projecte.' });
       }
 
       // Comprobar límite total de 12 alumnos (excluyendo la cantidad actual de esta petición)
@@ -249,7 +249,7 @@ export const updatePeticio = async (req: Request, res: Response) => {
       const totalAlumnesC = peticionsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
       if (totalAlumnesC + nuevosAlumnes > 12) {
         return res.status(400).json({
-          error: `Límite excedido. El instituto ya tiene ${totalAlumnesC} alumnos en otros proyectos de Modalidad C. Con este cambio (${nuevosAlumnes}) superaría el máximo de 12.`
+          error: `Límit superat. L'institut ja té ${totalAlumnesC} alumnes en altres projectes de Modalitat C. Amb aquest canvi (${nuevosAlumnes}) superaria el màxim de 12.`
         });
       }
     }
@@ -288,7 +288,7 @@ export const updatePeticio = async (req: Request, res: Response) => {
     res.json(updatedPeticio);
   } catch (error) {
     console.error("Error en peticioController.updatePeticio:", error);
-    res.status(500).json({ error: 'Error al actualizar petición' });
+    res.status(500).json({ error: 'Error al actualitzar la petició' });
   }
 };
 
@@ -333,6 +333,6 @@ export const updatePeticioStatus = async (req: Request, res: Response) => {
     res.json(updated);
   } catch (error) {
     console.error("Error en updatePeticioStatus:", error);
-    res.status(500).json({ error: 'Error al actualizar estado' });
+    res.status(500).json({ error: 'Error al actualitzar l\'estat' });
   }
 };

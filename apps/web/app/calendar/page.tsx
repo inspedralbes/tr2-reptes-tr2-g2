@@ -134,19 +134,19 @@ export default function CalendarPage() {
                    <div className="space-y-3">
                       <div className="flex items-center gap-3">
                         <div className="w-3 h-3 bg-consorci-darkBlue"></div>
-                        <span className="text-[10px] font-bold text-text-secondary uppercase">Solicitud e Inscripción</span>
+                        <span className="text-[10px] font-bold text-text-secondary uppercase">Sol·licitud i Inscripció</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="w-3 h-3 bg-consorci-actionBlue"></div>
-                        <span className="text-[10px] font-bold text-text-secondary uppercase">Planificación y Asignación</span>
+                        <span className="text-[10px] font-bold text-text-secondary uppercase">Planificació i Assignació</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="w-3 h-3 bg-consorci-pinkRed"></div>
-                        <span className="text-[10px] font-bold text-text-secondary uppercase">Ejecución y Seguimiento</span>
+                        <span className="text-[10px] font-bold text-text-secondary uppercase">Execució i Seguiment</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="w-3 h-3 bg-consorci-beige"></div>
-                        <span className="text-[10px] font-bold text-text-secondary uppercase">Cierre y Evaluación</span>
+                        <span className="text-[10px] font-bold text-text-secondary uppercase">Tancament i Avaluació</span>
                       </div>
                    </div>
                 </div>

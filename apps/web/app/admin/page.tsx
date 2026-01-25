@@ -26,7 +26,7 @@ export default function AdminDashboardPage() {
 
   const sections = [
     {
-      title: 'Gestió de Talleres',
+      title: 'Gestió de Tallers',
       description: 'Crea, modifica o elimina els tallers per els centres.',
       path: '/admin/talleres',
       phase: 'General',
@@ -63,7 +63,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: 'Estadísticas',
-      description: "Analítica avançada de l'ús del sistema, talleres més demandats i activitat del sistema.",
+      description: "Analítica avançada de l'ús del sistema, tallers més demandats i activitat del sistema.",
       path: '/admin/stats',
       phase: 'Global',
       icon: (
@@ -75,7 +75,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: 'Solicitudes de Centres',
-      description: 'Consulta les peticions de les centres i assigna talleres.',
+      description: 'Consulta les peticions de les centres i assigna tallers.',
       path: '/admin/solicitudes',
       phase: 'Fase 1',
       icon: (
@@ -101,8 +101,8 @@ export default function AdminDashboardPage() {
 
   return (
     <DashboardLayout
-      title="Panel de Administración"
-      subtitle="Bienvenido al centro de control del programa Iter. Gestiona talleres, centros y solicitudes desde este panel."
+      title="Panell d'Administració"
+      subtitle="Benvingut al centre de control del programa Iter. Gestiona tallers, centres i sol·licituds des d'aquest panell."
     >
       <div className="flex justify-center w-full pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">

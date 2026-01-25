@@ -152,6 +152,11 @@ export const getProfessorAssignments = async (req: Request, res: Response) => {
               }
             }
           }
+        },
+        enviaments: {
+            include: {
+                model: true
+            }
         }
       }
     });

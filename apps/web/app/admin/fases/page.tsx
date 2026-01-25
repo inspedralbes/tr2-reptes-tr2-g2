@@ -87,7 +87,7 @@ export default function PhaseManagementPage() {
               <h3 className="font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase text-[10px] tracking-widest mb-1">Panell de Control Temporal</h3>
               <p className="text-sm text-text-secondary font-medium leading-relaxed">
                 Cada fase habilita funcionalitats específiques per als coordinadors de centre.
-                Pots activar una fase per forçar la transició de l'aplicació i provar els flujos de treball.
+                Pots activar una fase per forçar la transició de l'aplicació i provar els fluxos de treball.
               </p>
             </div>
           </div>

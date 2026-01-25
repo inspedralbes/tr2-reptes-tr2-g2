@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, TextInput } from 'react-native';
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { THEME } from '@iter/shared';
@@ -13,14 +13,13 @@ export default function SessionScreen() {
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false); // New state to track if already submitted
   const [students, setStudents] = useState<any[]>([]);
   const [attendance, setAttendance] = useState<{[key: string]: string}>({}); // 'PRESENT', 'ABSENT', 'RETARD'
   const [observations, setObservations] = useState('');
   const [sessionData, setSessionData] = useState<any>(null); // To store taller info if needed
 
-  useEffect(() => {
-    fetchData();
-  }, [id]);
+
 
   const fetchData = async () => {
     setLoading(true);
@@ -47,6 +46,7 @@ export default function SessionScreen() {
             if(existingRes.data[0].observacions) {
                 setObservations(existingRes.data[0].observacions);
             }
+            setIsSubmitted(true); // Mark as submitted if data exists
         }
       } catch (err) {
         // No existing attendance, continue with defaults
@@ -62,7 +62,14 @@ export default function SessionScreen() {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [id])
+  );
+
   const toggleStatus = (studentId: string) => {
+    if (isSubmitted) return; // Prevent changes if submitted
     setAttendance(prev => {
         const current = prev[studentId];
         let next = 'PRESENT';
@@ -118,8 +125,6 @@ export default function SessionScreen() {
           title: "Llista d'alumnes",
           headerBackTitle: "Tornar",
           headerShadowVisible: false,
-          headerStyle: { backgroundColor: 'transparent' },
-          headerTitleStyle: { fontWeight: 'bold', fontSize: 18, color: THEME.colors.primary }
         }} 
       />
       
@@ -144,31 +149,54 @@ export default function SessionScreen() {
              }
 
              return (
-                 <TouchableOpacity 
-                    key={student.id_alumne} 
-                    onPress={() => toggleStatus(String(student.id_alumne))}
-                    activeOpacity={0.7}
-                    className="bg-background-subtle p-5 rounded-3xl mb-3 flex-row items-center justify-between"
-                 >
-                    <View className="flex-row items-center flex-1">
-                        <View className="w-12 h-12 bg-background-surface rounded-full items-center justify-center mr-4">
-                            <Text className="font-bold text-text-muted text-lg">{student.nom.charAt(0)}</Text>
+                 <View key={student.id_alumne} className="bg-background-subtle rounded-3xl mb-3 overflow-hidden border border-border-subtle">
+                     {/* Attendance Row */}
+                     <TouchableOpacity 
+                        onPress={() => toggleStatus(String(student.id_alumne))}
+                        activeOpacity={0.7}
+                        className="p-5 flex-row items-center justify-between"
+                     >
+                        <View className="flex-row items-center flex-1">
+                            <View className="w-12 h-12 bg-background-surface rounded-full items-center justify-center mr-4">
+                                <Text className="font-bold text-text-muted text-lg">{student.nom.charAt(0)}</Text>
+                            </View>
+                            <View className="flex-1 mr-2">
+                                <Text className="font-bold text-text-primary text-base mb-0.5" numberOfLines={1} ellipsizeMode="tail">
+                                    {student.nom} {student.cognoms}
+                                </Text>
+                                <Text className="text-text-muted text-xs font-medium tracking-wide">ID: {student.idalu}</Text>
+                            </View>
                         </View>
-                        <View className="flex-1 mr-2">
-                            <Text className="font-bold text-text-primary text-base mb-0.5" numberOfLines={1} ellipsizeMode="tail">
-                                {student.nom} {student.cognoms}
-                            </Text>
-                            <Text className="text-text-muted text-xs font-medium tracking-wide">ID: {student.idalu}</Text>
-                        </View>
-                    </View>
 
-                    <View className={`px-3 py-1.5 rounded-full border flex-row items-center ${statusColor.split(' ')[0]} ${statusColor.split(' ')[2]}`}>
-                        <Ionicons name={statusIcon as any} size={14} color={status === 'ABSENT' ? '#BE123C' : status === 'RETARD' ? '#B45309' : '#047857'} />
-                        <Text className={`font-bold text-[10px] ml-1.5 uppercase tracking-wider ${statusColor.split(' ')[1]}`}>
-                            {status}
-                        </Text>
-                    </View>
-                 </TouchableOpacity>
+                        <View className={`px-3 py-1.5 rounded-full border flex-row items-center ${statusColor.split(' ')[0]} ${statusColor.split(' ')[2]}`}>
+                            <Ionicons name={statusIcon as any} size={14} color={status === 'ABSENT' ? '#BE123C' : status === 'RETARD' ? '#B45309' : '#047857'} />
+                            <Text className={`font-bold text-[10px] ml-1.5 uppercase tracking-wider ${statusColor.split(' ')[1]}`}>
+                                {status}
+                            </Text>
+                        </View>
+                     </TouchableOpacity>
+
+                     {/* Evaluation Divider & Action */}
+                     <View className="h-[1px] w-full bg-border-subtle" />
+                     {student.evaluated ? (
+                         <View className="flex-row items-center justify-center py-4 bg-background-subtle opacity-60">
+                             <Ionicons name="checkmark-done-circle" size={16} color={THEME.colors.success} />
+                             <Text className="ml-2 font-bold text-xs text-text-muted uppercase tracking-wider">
+                                 Avaluat
+                             </Text>
+                         </View>
+                     ) : (
+                        <TouchableOpacity
+                            onPress={() => router.push(`/(professor)/evaluacion/${student.id_alumne}?id_assignacio=${id}`)}
+                            className="flex-row items-center justify-center py-4 bg-background-surface active:bg-background-subtle"
+                        >
+                            <Ionicons name="ribbon-outline" size={16} color={THEME.colors.primary} />
+                            <Text className="ml-2 font-bold text-xs text-primary uppercase tracking-wider">
+                                Avaluar Competències
+                            </Text>
+                        </TouchableOpacity>
+                     )}
+                 </View>
              );
          })}
 
@@ -190,16 +218,23 @@ export default function SessionScreen() {
 
       {/* Footer Action */}
       <View className="absolute bottom-0 left-0 right-0 p-6 bg-background-surface border-t border-border-subtle">
+
+
          <TouchableOpacity 
             onPress={submitAttendance}
-            disabled={submitting}
-            className={`w-full h-14 rounded-2xl items-center justify-center shadow-lg ${submitting ? 'bg-background-subtle' : 'bg-primary shadow-slate-200'}`}
-         >
-             {submitting ? (
-                 <ActivityIndicator color="white" />
-             ) : (
-                 <Text className="text-white text-lg font-bold tracking-wide uppercase">Finalitzar i Enviar</Text>
-             )}
+             disabled={submitting || isSubmitted}
+             className={`w-full h-14 rounded-2xl items-center justify-center shadow-lg ${submitting || isSubmitted ? 'bg-background-subtle' : 'bg-primary shadow-slate-200'}`}
+          >
+              {submitting ? (
+                  <ActivityIndicator color="white" />
+              ) : isSubmitted ? (
+                  <View className="flex-row items-center">
+                    <Ionicons name="checkmark-circle" size={20} color={THEME.colors.success} style={{ marginRight: 8 }} />
+                    <Text className="text-text-muted text-lg font-bold tracking-wide uppercase">Assistència Registrada</Text>
+                  </View>
+              ) : (
+                  <Text className="text-white text-lg font-bold tracking-wide uppercase">Finalitzar i Enviar</Text>
+              )}
          </TouchableOpacity>
       </View>
 

@@ -68,7 +68,7 @@ export default function SessionsListPage() {
             });
           } else if (a.estat !== 'PUBLISHED' && a.estat !== 'CANCELLED') {
               // Si no tiene sesiones pero está en una fase donde debería tenerlas pronto
-              // Lo añadimos como un item "placeholder" para que el usuario sepa que está ahí
+              // L'afegim com un item "placeholder" perquè l'usuari sàpiga que hi és
               flatSessions.push({
                   id_sessio: `pending-${a.id_assignacio}`,
                   isPending: true,

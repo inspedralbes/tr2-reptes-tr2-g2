@@ -47,7 +47,7 @@ const CreateCentroModal = ({
 
   const handleSubmit = async () => {
     if (!codiCentre || !nom) {
-      setError("El código y el nombre del centro son obligatorios.");
+      setError("El codi i el nom del centre són obligatoris.");
       return;
     }
     setLoading(true);
@@ -73,7 +73,7 @@ const CreateCentroModal = ({
     } catch (err: any) {
       setError(
         err.message ||
-        (initialData ? "No se pudo actualizar el centro." : "No se pudo crear el centro.")
+        (initialData ? "No s'ha pogut actualitzar el centre." : "No s'ha pogut crear el centre.")
       );
       console.error(err);
     } finally {
@@ -89,7 +89,7 @@ const CreateCentroModal = ({
         <div className="bg-gray-50 px-8 py-5 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
           <div>
             <h2 className="text-xl font-black text-[#00426B] uppercase tracking-tight">
-              {initialData ? "Editar Centro" : "Crear Nuevo Centro"}
+              {initialData ? "Editar Centre" : "Crear Nou Centre"}
             </h2>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
               {initialData ? "Modifica els detalls del centre educatiu" : "Introdueix els detalls per registrar un nou centre."}

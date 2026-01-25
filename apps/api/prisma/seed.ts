@@ -4,14 +4,14 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 const PHASES = {
-  SOLICITUD: 'Solicitud e Inscripción',
-  PLANIFICACION: 'Planificación y Asignación',
-  EJECUCION: 'Ejecución y Seguimiento',
-  CIERRE: 'Cierre y Evaluación'
+  SOLICITUD: 'Sol·licitud i Inscripció',
+  PLANIFICACION: 'Planificació i Assignació',
+  EJECUCION: 'Execució i Seguiment',
+  CIERRE: 'Tancament i Avaluació'
 } as const;
 
 async function cleanDatabase() {
-  console.log('🧹 Limpiando base de datos...');
+  console.log('🧹 Netejant base de dades...');
   const tables = [
     'respostes_questionari', 'enviaments_questionaris', 'preguntes', 'model_questionaris',
     'autoconsultes_alumnes', 'avaluacio_competencial', 'avaluacions_docents',
@@ -31,7 +31,7 @@ async function cleanDatabase() {
 }
 
 async function seedInfrastructure() {
-  console.log('🏗️ Generando roles y sectores...');
+  console.log('🏗️ Generant rols i sectors...');
   const rolAdmin = await prisma.rol.create({ data: { nom_rol: 'ADMIN' } });
   const rolCoord = await prisma.rol.create({ data: { nom_rol: 'COORDINADOR' } });
   const rolProfe = await prisma.rol.create({ data: { nom_rol: 'PROFESSOR' } });
@@ -47,7 +47,7 @@ async function seedInfrastructure() {
 }
 
 async function seedUsers(roles: any, passDefault: string) {
-  console.log('👥 Generando usuarios y centros...');
+  console.log('👥 Generant usuaris i centres...');
   
   // 1. Admin Global
   await prisma.usuari.create({
@@ -179,7 +179,7 @@ async function seedUsers(roles: any, passDefault: string) {
 }
 
 async function seedTallers(sectors: any) {
-  console.log('📚 Generando catálogo de talleres...');
+  console.log('📚 Generant catàleg de tallers...');
   const tallers = [
     { 
       titol: 'Robòtica i IoT', 
@@ -279,7 +279,7 @@ async function seedTallers(sectors: any) {
 
 
 async function seedFases() {
-  console.log('🗓️ Creando fases del programa...');
+  console.log('🗓️ Creant fases del programa...');
   const now = new Date();
   const currentYear = now.getFullYear();
   const prevYear = currentYear - 1;
@@ -324,9 +324,50 @@ async function seedFases() {
   }
 }
 
+async function seedCompetencies() {
+  console.log('🧠 Generant competències...');
+  const tecniques = [
+    "Capacitat de resoldre situacions independentment",
+    "Reconeixement d'eines",
+    "Responsabilitat en l'execució"
+  ];
+  const transversals = [
+    "Autoconfiança",
+    "Treball en equip",
+    "Disposició a l'aprenentatge",
+    "Actitud responsable",
+    "Iniciativa",
+    "Comunicació amb el responsable"
+  ];
 
+  for (const c of tecniques) {
+    await prisma.competencia.create({ data: { nom: c, tipus: 'Tecnica' } });
+  }
+  for (const c of transversals) {
+    await prisma.competencia.create({ data: { nom: c, tipus: 'Transversal' } });
+  }
+}
+
+async function seedQuestionnaires() {
+  console.log('📝 Generant qüestionaris...');
+  
+  // Qüestionari de Qualitat del Taller (Professor)
+  const qTaller = await prisma.modelQuestionari.create({
+    data: {
+      titol: "Qüestionari de Qualitat del Taller",
+      destinatari: "PROFESSOR",
+      preguntes: {
+        create: [
+          { enunciat: "Satisfacció general amb el taller", tipus_resposta: "Likert_1_5" },
+          { enunciat: "Valoració de l'organització i recursos", tipus_resposta: "Likert_1_5" },
+          { enunciat: "Observacions i suggeriments", tipus_resposta: "Oberta" }
+        ]
+      }
+    }
+  });
+}
 async function main() {
-  console.log('🌱 Iniciando Seed final para el programa Iter...');
+  console.log('🌱 Iniciant Seed final per al programa Iter...');
   
   await cleanDatabase();
   
@@ -339,9 +380,11 @@ async function main() {
   const tallers = await seedTallers(infra.sectors);
   
   await seedFases();
+  await seedCompetencies();
+  await seedQuestionnaires();
   // await seedAssignments(centrosData, tallers);
 
-  console.log('✅ Seed finalizado con éxito (Con datos de prueba y sesiones).');
+  console.log('✅ Seed finalitzat amb èxit (Amb dades de prova i sessions).');
 }
 
 // function seedAssignments has been removed

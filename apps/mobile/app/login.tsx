@@ -63,7 +63,7 @@ export default function LoginScreen() {
           {/* Logo / Header Area */}
           <View className="mb-16">
             <View className="w-16 h-2 bg-pink-red mb-6" />
-            <Text className="text-4xl font-bold text-primary leading-[45px] tracking-tight">
+            <Text className="text-4xl font-bold text-primary dark:text-white leading-[45px] tracking-tight">
               Inici de{"\n"}Sessió
             </Text>
             <View className="flex-row items-center mt-4">
@@ -76,10 +76,10 @@ export default function LoginScreen() {
           <View className="space-y-6">
             <View>
               <Text className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2 ml-1">Correu Electrònic</Text>
-              <View className="flex-row items-center border border-border-subtle p-4 bg-background-subtle">
+              <View className="flex-row items-center border border-border-subtle p-4 bg-background-subtle dark:bg-background-surface">
                 <Ionicons name="mail-outline" size={20} color={THEME.colors.primary} />
                 <TextInput
-                  className="flex-1 ml-4 font-bold text-text-primary"
+                  className="flex-1 ml-4 font-bold text-text-primary dark:text-white"
                   placeholder="exemple@email.cat"
                   placeholderTextColor={THEME.colors.gray}
                   autoCapitalize="none"
@@ -92,10 +92,10 @@ export default function LoginScreen() {
 
             <View className="mt-6">
               <Text className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2 ml-1">Contrasenya</Text>
-              <View className="flex-row items-center border border-border-subtle p-4 bg-background-subtle">
+              <View className="flex-row items-center border border-border-subtle p-4 bg-background-subtle dark:bg-background-surface">
                 <Ionicons name="lock-closed-outline" size={20} color={THEME.colors.primary} />
                 <TextInput
-                  className="flex-1 ml-4 font-bold text-text-primary"
+                  className="flex-1 ml-4 font-bold text-text-primary dark:text-white"
                   placeholder="••••••••"
                   placeholderTextColor={THEME.colors.gray}
                   secureTextEntry={!showPassword}

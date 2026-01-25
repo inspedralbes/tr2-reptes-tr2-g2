@@ -100,7 +100,7 @@ export default function LoginPage() {
             <a
               href="#"
               className="group relative flex items-center justify-center w-full py-4 bg-consorci-darkBlue text-white text-xs font-bold uppercase tracking-widest transition-all hover:bg-consorci-actionBlue active:scale-95"
-              onClick={(e) => { e.preventDefault(); toast.info('Enllaç de descàrrega próximament (Expo Go / TestFlight)'); }}
+              onClick={(e) => { e.preventDefault(); toast.info('Enllaç de descàrrega pròximament (Expo Go / TestFlight)'); }}
             >
               <span>Descarregar App Iter</span>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">

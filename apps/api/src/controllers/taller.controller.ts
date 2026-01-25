@@ -42,7 +42,7 @@ export const getTallerById = async (req: Request, res: Response) => {
     },
   });
 
-  if (!taller) return res.status(404).json({ error: 'Taller no encontrado' });
+  if (!taller) return res.status(404).json({ error: 'Taller no trobat' });
   res.json(taller);
 };
 
@@ -93,7 +93,7 @@ export const updateTaller = async (req: Request, res: Response) => {
     res.json(tallerActualizado);
   } catch (error) {
     console.error("Error en updateTaller:", error);
-    res.status(500).json({ error: 'Error al actualizar el taller' });
+    res.status(500).json({ error: 'Error al actualitzar el taller' });
   }
 };
 
@@ -103,5 +103,5 @@ export const deleteTaller = async (req: Request, res: Response) => {
   await prisma.taller.delete({
     where: { id_taller: parseInt(id as string) },
   });
-  res.json({ message: 'Taller eliminado correctamente' });
+  res.json({ message: 'Taller eliminat correctament' });
 };

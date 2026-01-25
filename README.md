@@ -1,7 +1,7 @@
 <div align="center">
   <h1 style="font-size: 3rem; font-weight: bold; margin-top: 20px;">ITER ECOSYSTEM</h1>
   
-  **Infraestructura Monorepo Escalable para Centros Educativos**
+  **Infraestructura Monorepo Escalable per a Centres Educatius**
 
   [![Turborepo](https://img.shields.io/badge/Orchestration-Turborepo-ef4444?style=flat-square&logo=turborepo)](https://turbo.build/)
   [![Next.js](https://img.shields.io/badge/Frontend-Next.js_16-black?style=flat-square&logo=next.js)](https://nextjs.org/)
@@ -9,7 +9,7 @@
   [![Docker](https://img.shields.io/badge/Deploy-Docker_Compose-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
   [![Prisma](https://img.shields.io/badge/ORM-Prisma-2d3748?style=flat-square&logo=prisma)](https://www.prisma.io/)
 
-  [Demo en Vivo](https://iter.kore29.com) • [Documentación](./doc/DOCS.md) • [Reportar Bug](https://github.com/tu-repo/issues)
+  [Demo en Viu](https://iter.kore29.com) • [Documentació](./doc/DOCS.md) • [Informar d'un Bug](https://github.com/tu-repo/issues)
 </div>
 
 ---
@@ -17,7 +17,7 @@
 Benvingut al nucli de l'ecosistema **Iter**. Aquesta és una infraestructura moderna basada en un **Monorepo** gestionat amb **Turborepo**, dissenyada per ser escalable, ràpida i fàcil de desplegar.
 
 > [!IMPORTANT]
-> **ACTUALIZACIÓ ARQUITECTÒNICA (Gener 2026):**
+> **ACTUALITZACIÓ ARQUITECTÒNICA (Gener 2026):**
 > Hem implementat un nou flux d'arrencada seqüencial amb un servei de `setup` dedicat per garantir la màxima estabilitat i evitar conflictes de dependències en l'entorn Docker.
 
 ## 🌐 Entorn de Producció

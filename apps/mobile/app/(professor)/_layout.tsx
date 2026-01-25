@@ -9,9 +9,9 @@ export default function ProfessorStackLayout() {
   return (
     <Stack screenOptions={{
       headerStyle: {
-        backgroundColor: isDark ? '#1e293b' : '#ffffff',
+        backgroundColor: isDark ? '#0f172a' : '#ffffff',
       },
-      headerTintColor: isDark ? '#4197cb' : '#00426B',
+      headerTintColor: isDark ? '#E0C5AC' : '#00426B',
       headerTitleStyle: {
         fontWeight: 'bold',
         fontFamily: 'Inter',
@@ -21,6 +21,7 @@ export default function ProfessorStackLayout() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="sesion/[id]" options={{ title: 'Sesión' }} />
       <Stack.Screen name="evaluacion/[id]" options={{ title: 'Evaluación' }} />
+      <Stack.Screen name="questionari/[id]" options={{ title: 'Valoració Taller' }} />
     </Stack>
   );
 }
