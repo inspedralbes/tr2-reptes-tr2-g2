@@ -19,18 +19,16 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-
     "// --- SCOPED DEV (Run individual apps) ---": "",
     "dev:web": "turbo run dev --filter=web",
     "dev:api": "turbo run dev --filter=api",
     "dev:mobile": "turbo run dev --filter=mobile",
-
+    "dev:electron": "concurrently \"npm run dev:web\" \"wait-on http://localhost:3001 && cross-env VITE_DEV_SERVER_URL=http://localhost:3001 npm run dev --workspace=electron\"",
     "// --- DATABASE (Managed via API) ---": "",
     "db:push": "turbo run db:push --filter=api",
     "db:seed": "turbo run db:seed --filter=api",
     "db:studio": "turbo run studio --filter=api",
     "db:generate": "turbo run db:generate --filter=api",
-
     "// --- MOBILE SPECIFIC (Expo wrappers) ---": "",
     "mobile": "npm run start --workspace=mobile",
     "mobile:android": "npm run android --workspace=mobile",
@@ -38,7 +36,7 @@
     "mobile:web": "npm run web --workspace=mobile",
     "mobile:clear": "npm run start --workspace=mobile -- --clear",
     "mobile:tunnel": "npm run dev:tunnel --workspace=mobile",
-
+    "build:electron": "cross-env IS_ELECTRON_BUILD=true npm run build --workspace=web && npm run build --workspace=electron",
     "// --- MAINTENANCE ---": "",
     "clean": "rm -rf node_modules package-lock.json apps/*/node_modules apps/*/package-lock.json packages/*/node_modules packages/*/package-lock.json .turbo"
   },
@@ -67,6 +65,8 @@
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
     "expo": "~54.0.29",
     "nodemon": "3.1.0",
     "postcss": "^8.4.49",
@@ -76,7 +76,8 @@
     "ts-node": "10.9.2",
     "tsx": "4.19.2",
     "turbo": "2.7.4",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "wait-on": "^9.0.3"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",

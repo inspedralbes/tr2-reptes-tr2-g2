@@ -7,57 +7,59 @@ import logger from '../lib/logger';
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
+  logger.info(`Intento de login para: ${email}`);
 
   try {
-    // 1. Buscar usuario por email (findUnique es optimizado para campos @unique)
+    logger.info('1. Consultando base de datos...');
     const usuari = await prisma.usuari.findUnique({
       where: { email },
       include: {
-        rol: true,   // Traemos el nombre del rol
-        centre: true // Traemos datos del centro si los tiene
+        rol: true,
+        centre: true
       }
     });
 
     if (!usuari) {
+      logger.info('Usuario no encontrado');
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    // 2. Comparar contraseña (suponiendo que las guardas hasheadas)
+    logger.info('2. Comparando contraseña...');
     const validPassword = await bcrypt.compare(password, usuari.password_hash);
     if (!validPassword) {
+      logger.info('Contraseña inválida');
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    const secret = process.env.JWT_SECRET;
-    
-    if (!secret) {
-      if (process.env.NODE_ENV === 'production') {
-        throw new Error('JWT_SECRET no está configurada en producción.');
-      }
-      logger.warn('⚠️ JWT_SECRET no configurada. Usando fallback inseguro para desarrollo.');
-    }
-
+    logger.info('3. Firmando token...');
+    const secret = process.env.JWT_SECRET || 'secreto_super_seguro_dev';
     const token = jwt.sign(
       {
         userId: usuari.id_usuari,
         role: usuari.rol.nom_rol,
         centreId: usuari.id_centre
       },
-      secret || 'secreto_super_seguro_dev',
+      secret,
       { expiresIn: '8h' }
     );
 
-    // 4. Responder (Sin enviar el password_hash de vuelta)
+    logger.info('4. Preparando respuesta...');
     const { password_hash, ...userWithoutPass } = usuari;
 
+    logger.info('5. Enviando JSON...');
     res.json({
       token,
       user: userWithoutPass
     });
+    logger.info('Login exitoso');
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error en el servidor' });
+    logger.error('Login error CRITICAL:', error);
+    res.status(500).json({
+      error: 'Error en el servidor',
+      details: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
   }
 };
 
