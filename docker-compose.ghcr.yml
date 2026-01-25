@@ -4,6 +4,7 @@ services:
     restart: always
     ports:
       - "80:80"
+      - "8002:80" # Permitir acceso directo por 8002 si el tunnel apunta ahí
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
@@ -15,7 +16,6 @@ services:
   web:
     image: ghcr.io/inspedralbes/tr2-reptes-tr2-g2-web:latest
     restart: always
-    # Los puertos ahora se gestionan vía Nginx, pero los dejamos abiertos internamente
     expose:
       - "8002"
     env_file:
