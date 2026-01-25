@@ -53,16 +53,12 @@ if [ ! -f "apps/web/.env" ]; then
   echo "NEXT_PUBLIC_API_URL=https://iter.kore29.com/api" > apps/web/.env
 fi
 
-# 5. Despliegue con imágenes de GHCR
-log_info "🐳 Actualizando imágenes desde Container Registry..."
-if ! docker compose -f docker-compose.ghcr.yml pull; then
-  log_error "❌ Error: No autorizado para descargar imágines de GHCR."
-  log_info "👉 Por favor, ejecuta: echo TU_TOKEN | docker login ghcr.io -u TU_USUARIO --password-stdin"
-  exit 1
-fi
+# 5. Despliegue con construcción local (para asegurar variables de entorno)
+log_info "🐳 Construyendo imágenes localmente..."
+docker compose -f docker-compose.ghcr.yml build
 
 log_info "🚀 Levantando servicios..."
-docker compose -f docker-compose.ghcr.yml up -d --remove-orphans
+docker compose -f docker-compose.ghcr.yml up -d --remove-orphans --build
 
 # 6. Verificación de salud
 if [ $? -eq 0 ]; then
