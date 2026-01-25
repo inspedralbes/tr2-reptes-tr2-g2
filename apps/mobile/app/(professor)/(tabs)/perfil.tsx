@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert, Pressable } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME, ROLES } from '@iter/shared';
 import * as SecureStore from 'expo-secure-store';
@@ -142,12 +142,20 @@ export default function PerfilScreen() {
                  ].map((t) => {
                    const isActive = colorScheme === t.id;
                    return (
-                     <Pressable 
+                     <TouchableOpacity 
                        key={t.id}
                        onPress={() => setColorScheme(t.id)}
-                       className={`flex-1 py-2 items-center justify-center rounded-lg flex-row gap-1.5 ${
-                         isActive ? 'bg-primary shadow-sm' : ''
-                       }`}
+                       activeOpacity={0.7}
+                       style={{
+                          flex: 1,
+                          paddingVertical: 8,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 8,
+                          flexDirection: 'row',
+                          gap: 6,
+                          backgroundColor: isActive ? '#00426B' : 'transparent', // using literal for test
+                       }}
                      >
                        <Ionicons 
                          name={t.icon as any} 
@@ -159,7 +167,7 @@ export default function PerfilScreen() {
                        }`}>
                          {t.label}
                        </Text>
-                     </Pressable>
+                     </TouchableOpacity>
                    );
                  })}
                </View>
