@@ -143,12 +143,16 @@ export const getStudents = async (req: Request, res: Response) => {
     const inscripcions = await prisma.inscripcio.findMany({
       where: { id_assignacio: parseInt(idAssignacio as string) },
       include: {
-        alumne: true
+        alumne: true,
+        avaluacio_docent: { select: { id_avaluacio_docent: true } } // include evaluation check
       }
     });
 
-    // Flatten structure to return just students with relevant info
-    const students = inscripcions.map((i: any) => i.alumne);
+    // Flatten structure to return just students with relevant info + evaluated status
+    const students = inscripcions.map((i: any) => ({
+      ...i.alumne,
+      evaluated: !!i.avaluacio_docent // true if exists, false otherwise
+    }));
     res.json(students);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtenir alumnes' });

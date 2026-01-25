@@ -119,15 +119,34 @@ const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onCl
            {/* FIXED BOTTOM ACTION */}
            {event.type === 'assignment' && event.metadata?.id_assignacio && (
                <View className="absolute bottom-0 left-0 right-0 p-6 bg-background-surface border-t border-border-subtle">
-                    <TouchableOpacity 
-                       onPress={() => {
-                         onClose();
-                         router.push(`/(professor)/sesion/${event.metadata.id_assignacio}`);
-                       }}
-                       className="w-full bg-slate-900 dark:bg-primary h-14 rounded-2xl items-center justify-center shadow-lg shadow-slate-200"
-                    >
-                        <Text className="text-white text-lg font-bold tracking-wide uppercase">Gestionar Sessió / Assistència</Text>
-                    </TouchableOpacity>
+                     <TouchableOpacity 
+                        onPress={() => {
+                          if (event.metadata.isEvaluated) return; // Prevent action if evaluated
+                          onClose();
+                          if (event.metadata.isEvaluation) {
+                              router.push(`/(professor)/questionari/${event.metadata.id_assignacio}`);
+                          } else {
+                              router.push(`/(professor)/sesion/${event.metadata.id_assignacio}`);
+                          }
+                        }}
+                        className={`w-full h-14 rounded-2xl items-center justify-center shadow-lg shadow-slate-200 ${
+                            event.metadata.isEvaluation 
+                                ? (event.metadata.isEvaluated ? 'bg-green-600' : 'bg-orange-500') 
+                                : 'bg-slate-900 dark:bg-primary'
+                        }`}
+                        disabled={event.metadata.isEvaluated}
+                     >
+                         {event.metadata.isEvaluated ? (
+                             <View className="flex-row items-center">
+                                 <Ionicons name="checkmark-circle" size={24} color="white" style={{ marginRight: 8 }} />
+                                 <Text className="text-white text-lg font-bold tracking-wide uppercase">Taller Valorat</Text>
+                             </View>
+                         ) : (
+                             <Text className="text-white text-lg font-bold tracking-wide uppercase">
+                                 {event.metadata.isEvaluation ? 'Valorar Taller' : 'Gestionar Sessió / Assistència'}
+                             </Text>
+                         )}
+                     </TouchableOpacity>
                </View>
            )}
       </View>

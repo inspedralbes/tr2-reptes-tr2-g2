@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Linking, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Linking, Platform, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { THEME, PHASES } from '@iter/shared';
@@ -15,14 +15,21 @@ export default function DashboardScreen() {
   const insets = useSafeAreaInsets();
   const [fases, setFases] = useState<any[]>([]);
   const [assignments, setAssignments] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedWorkshop, setSelectedWorkshop] = useState<CalendarEvent | null>(null);
   const [userName, setUserName] = useState('Professor');
+  
+  // 1. Helpers
+  const isPhaseActive = (nomFase: string) => {
+    const fase = fases.find(f => f.nom === nomFase);
+    return fase ? fase.activa : false;
+  };
 
-  useEffect(() => {
-    const checkRoleAndFetchData = async () => {
+  const checkRoleAndFetchData = async (isRefresh = false) => {
       try {
+        if (isRefresh) setRefreshing(true);
         let userData = null;
         try {
           userData = Platform.OS === 'web' 
@@ -38,7 +45,6 @@ export default function DashboardScreen() {
           const user = JSON.parse(userData);
           if (user.nom) setUserName(user.nom);
           if (user.rol?.nom_rol !== 'PROFESSOR') {
-            console.warn("[Dashboard] Accés no autoritzat per a aquest rol");
             router.replace('/login');
             return;
           }
@@ -57,21 +63,13 @@ export default function DashboardScreen() {
         console.error("Error fetching dashboard data:", error);
       } finally {
         setLoading(false);
+        setRefreshing(false);
       }
-    };
-    checkRoleAndFetchData();
-  }, []);
-
-  const isPhaseActive = (nomFase: string) => {
-    const fase = fases.find(f => f.nom === nomFase);
-    return fase ? fase.activa : false;
   };
 
   const getNextSession = () => {
     if (assignments.length === 0) return null;
     const now = new Date();
-    
-    // Flatten sessions from all assignments
     const allSessions: any[] = [];
     assignments.forEach(assign => {
         if (assign.sessions && assign.sessions.length > 0) {
@@ -83,33 +81,60 @@ export default function DashboardScreen() {
                     data_inici: sess.data_sessio, 
                     hora_inici: sess.hora_inici,
                     hora_fi: sess.hora_fi,
-                    isSession: true
+                    isSession: true,
+                    enviaments: assign.enviaments // Pass enviaments
                 });
             });
         } else {
-             // Fallback for assignments without sessions loaded
              allSessions.push({
                 id_assignacio: assign.id_assignacio,
                 taller: assign.taller,
                 centre: assign.centre,
                 data_inici: assign.data_inici,
                 hora_inici: null,
-                isSession: false
+                isSession: false,
+                enviaments: assign.enviaments
              });
         }
     });
-
-    // Sort sessions by date
     allSessions.sort((a, b) => new Date(a.data_inici).getTime() - new Date(b.data_inici).getTime());
-
-    // Find next upcoming session (today or future)
-    // We look back ~20h to ensuring 'today's' sessions are shown even if technically started a few hours ago
     return allSessions.find(s => new Date(s.data_inici).getTime() >= now.getTime() - 72000000) || allSessions[allSessions.length - 1];
   };
 
+  const isEvaluated = (assignment: any) => {
+      if (!assignment.enviaments) return false;
+      return assignment.enviaments.some((e: any) => 
+          e.estat === 'Respost' && e.model?.destinatari === 'PROFESSOR'
+      );
+  };
+
+  // 2. Effects
+  useFocusEffect(
+    React.useCallback(() => {
+      checkRoleAndFetchData();
+    }, [])
+  );
+
+  const onRefresh = React.useCallback(() => {
+    checkRoleAndFetchData(true);
+  }, []);
+
+  // 3. Derived State
   const nextWorkshop = getNextSession();
+  const activePhase = fases.find(f => f.activa);
+  const activePhaseName = activePhase ? activePhase.nom : '';
+  const isEvalPhase = activePhaseName.includes('Avaluació') || activePhaseName.includes('Tancament') || activePhaseName.includes('Fase 4');
 
   const handleWorkshopClick = (workshop: any) => {
+    // If we are clicking 'nextWorkshop' (which might be a session object), we need to ensure it has enviaments
+    // However, sessions object created in getNextSession carries enviaments now.
+    
+    // Check if evaluated using the assignment data (workshop)
+    // If workshop is just a session, we might need to find the original assignment or ensure enviaments is passed. 
+    // In getNextSession above I added enviaments to the flattened object.
+    
+    const evaluated = isEvaluated(workshop);
+
     const formattedEvent: CalendarEvent = {
         id: workshop.id_assignacio,
         title: workshop.taller.titol,
@@ -117,10 +142,12 @@ export default function DashboardScreen() {
         type: 'assignment',
         description: workshop.taller.descripcio || 'Sense descripció',
         metadata: {
-            hora: new Date(workshop.data_inici).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date(new Date(workshop.data_inici).getTime() + 2 * 60 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), // Fake duration if not provided
+            hora: new Date(workshop.data_inici).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date(new Date(workshop.data_inici).getTime() + 2 * 60 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
             centre: workshop.centre.nom,
             adreca: workshop.centre.adreca,
-            id_assignacio: workshop.id_assignacio
+            id_assignacio: workshop.id_assignacio,
+            isEvaluation: isEvalPhase,
+            isEvaluated: evaluated
         }
     };
     setSelectedWorkshop(formattedEvent);
@@ -135,14 +162,26 @@ export default function DashboardScreen() {
     );
   }
 
-
+  // Filter assignments for pending tasks
+  const pendingAssignments = assignments.filter(a => !isEvaluated(a));
 
   return (
 
     <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        className="flex-1" 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            tintColor={THEME.colors.primary} 
+            colors={[THEME.colors.primary]} 
+          />
+        }
+      >
         
-        {/* Professional Header - Matches Agenda Aesthetic */}
+        {/* Professional Header */}
         <View className="px-6 pb-6 pt-4 bg-background-surface border-b border-border-subtle mb-6">
           <View className="flex-row items-baseline">
             <Text className="text-text-muted text-xs font-bold uppercase tracking-widest mr-2">
@@ -159,7 +198,7 @@ export default function DashboardScreen() {
 
         <View className="px-6">
           
-          {/* Section: Project Status - Apple Style - KEPT */}
+          {/* Phase Status */}
           <View className="w-full bg-background-subtle rounded-2xl p-4 flex-row items-center justify-between mb-8">
              <View>
                  <Text className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-1">Fase Actual</Text>
@@ -173,7 +212,29 @@ export default function DashboardScreen() {
              </View>
           </View>
 
-          {/* Section: Next Session - Hero Card Style */}
+           {/* Workshop Evaluation - Only in Phase 4 */}
+           {(isEvalPhase) && pendingAssignments.length > 0 && (
+             <View className="mb-8">
+               <Text className="text-text-primary text-lg font-bold mb-4">Tasques Pendents</Text>
+               {pendingAssignments.map(assign => (
+                 <TouchableOpacity
+                    key={assign.id_assignacio}
+                    onPress={() => router.push(`/(professor)/questionari/${assign.id_assignacio}`)}
+                    className="w-full bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-5 border border-orange-200 dark:border-orange-800 mb-3 flex-row items-center justify-between"
+                 >
+                    <View className="flex-1 mr-4">
+                      <Text className="text-text-primary dark:text-orange-100 font-bold text-base mb-1">{assign.taller.titol}</Text>
+                      <Text className="text-text-secondary dark:text-orange-200/70 text-xs font-medium">Avaluar taller finalitzat</Text>
+                    </View>
+                    <View className="w-10 h-10 bg-orange-100 dark:bg-orange-800 rounded-full items-center justify-center">
+                       <Ionicons name="star" size={20} color="#F97316" />
+                    </View>
+                 </TouchableOpacity>
+               ))}
+             </View>
+           )}
+
+          {/* Next Session */}
           <Text className="text-text-primary text-lg font-bold mb-4">Propera Sessió</Text>
 
           {nextWorkshop ? (
@@ -220,10 +281,17 @@ export default function DashboardScreen() {
                     {/* Action Footer */}
                     <View className="flex-row justify-between items-center pt-4 border-t border-slate-800 dark:border-border-subtle">
                         <Text className="text-slate-400 dark:text-text-muted text-xs font-bold uppercase tracking-widest">
-                           {isPhaseActive(PHASES.EJECUCION) ? 'Gestionar Sessió' : 'Veure Detalls'}
+                           {isEvalPhase 
+                             ? (isEvaluated(nextWorkshop) ? 'Taller Valorat' : 'Avaluar Taller')
+                             : (isPhaseActive(PHASES.EJECUCION) ? 'Gestionar Sessió' : 'Veure Detalls')
+                           }
                         </Text>
                         <View className="w-10 h-10 rounded-full bg-white/10 dark:bg-background-surface items-center justify-center">
-                            <Ionicons name="arrow-forward" size={18} color="white" />
+                            {isEvaluated(nextWorkshop) ? (
+                                <Ionicons name="checkmark" size={18} color="white" />
+                            ) : (
+                                <Ionicons name="arrow-forward" size={18} color="white" />
+                            )}
                         </View>
                     </View>
                 </View>
@@ -233,10 +301,6 @@ export default function DashboardScreen() {
                <Text className="text-text-muted font-medium text-sm">No tens tallers propers</Text>
             </View>
           )}
-
-
-
-
 
           <View className="h-6" /> 
 

@@ -324,7 +324,48 @@ async function seedFases() {
   }
 }
 
+async function seedCompetencies() {
+  console.log('🧠 Generant competències...');
+  const tecniques = [
+    "Capacitat de resoldre situacions independentment",
+    "Reconeixement d'eines",
+    "Responsabilitat en l'execució"
+  ];
+  const transversals = [
+    "Autoconfiança",
+    "Treball en equip",
+    "Disposició a l'aprenentatge",
+    "Actitud responsable",
+    "Iniciativa",
+    "Comunicació amb el responsable"
+  ];
 
+  for (const c of tecniques) {
+    await prisma.competencia.create({ data: { nom: c, tipus: 'Tecnica' } });
+  }
+  for (const c of transversals) {
+    await prisma.competencia.create({ data: { nom: c, tipus: 'Transversal' } });
+  }
+}
+
+async function seedQuestionnaires() {
+  console.log('📝 Generant qüestionaris...');
+  
+  // Qüestionari de Qualitat del Taller (Professor)
+  const qTaller = await prisma.modelQuestionari.create({
+    data: {
+      titol: "Qüestionari de Qualitat del Taller",
+      destinatari: "PROFESSOR",
+      preguntes: {
+        create: [
+          { enunciat: "Satisfacció general amb el taller", tipus_resposta: "Likert_1_5" },
+          { enunciat: "Valoració de l'organització i recursos", tipus_resposta: "Likert_1_5" },
+          { enunciat: "Observacions i suggeriments", tipus_resposta: "Oberta" }
+        ]
+      }
+    }
+  });
+}
 async function main() {
   console.log('🌱 Iniciant Seed final per al programa Iter...');
   
@@ -339,6 +380,8 @@ async function main() {
   const tallers = await seedTallers(infra.sectors);
   
   await seedFases();
+  await seedCompetencies();
+  await seedQuestionnaires();
   // await seedAssignments(centrosData, tallers);
 
   console.log('✅ Seed finalitzat amb èxit (Amb dades de prova i sessions).');

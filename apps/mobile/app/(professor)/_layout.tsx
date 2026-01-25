@@ -21,6 +21,7 @@ export default function ProfessorStackLayout() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="sesion/[id]" options={{ title: 'Sesión' }} />
       <Stack.Screen name="evaluacion/[id]" options={{ title: 'Evaluación' }} />
+      <Stack.Screen name="questionari/[id]" options={{ title: 'Valoració Taller' }} />
     </Stack>
   );
 }
