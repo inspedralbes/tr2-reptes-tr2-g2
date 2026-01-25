@@ -57,6 +57,17 @@ L'aplicació mòbil no corre dins de Docker per facilitar la connexió amb el te
 > [!TIP]
 > Si no pots connectar amb l'API des del mòbil, revisa que el fitxer `apps/mobile/.env` tingui la teva IP local real (ex: `192.168.1.XX`) i no `localhost`.
 
+## ✨ Funcionalitats Intel·ligents
+
+L'aplicació incorpora funcionalitats avançades potenciades per IA que es poden provar des del panell d'administració o l'App mòbil:
+
+*   **Motor d'Assignació Automàtica**: Generació optimitzada de grups de tallers.
+*   **Assistent de Veu**: Avaluació docent mitjançant dictat natural (accessible des de la fitxa d'alumne a l'App).
+*   **Predicció de Risc**: Anàlisi automàtica de patrons d'assistència i notes.
+*   **Validació Documental**: Verificació d'Acords Pedagògics al pujar PDFs.
+
+Per a detalls d'implementació i guies específiques, consulta la [Documentació Completa d'IA](./AI_features/DOCUMENTACION_IA_COMPLETA.md).
+
 ## 🔍 Solució de Problemes Freqüents
 
 *   **L'API diu "Database not ready"**: Espera uns segons més, PostgreSQL triga una mica a acceptar connexions després del primer arrencament.

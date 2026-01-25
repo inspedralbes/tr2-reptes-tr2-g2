@@ -46,6 +46,10 @@ Utilitzem una arquitectura d'**espais de treball (workspaces)** per compartir co
 | **Orquestrador** | **Turborepo** | Gestió de Monorepo |
 | **Admin BBDD** | **Adminer** | Docker (Port 8080) |
 
+> [!NOTE]
+> Per a un llistat exhaustiu de versions i justificacions (Frontend, Mobile i Backend), consulta el document: **[Stack Tecnològic Detallat](./doc/TECH_STACK.md)**.
+
+
 ## ⚡ Configuració Inicial (Quick Start)
 
 Gràcies a la nostra **Optimització Premium**, l'arrencada és totalment automatitzada.
@@ -112,10 +116,10 @@ Per evitar conflictes de lectura/escriptura de fitxers, hem implementat un flux 
 * [x] Migració a **PostgreSQL + Prisma**.
 * [x] Arrencada Seqüencial Premium.
 * [x] Optimització amb **tsx** i **Turbopack**.
-* [ ] **Motor d'Assignació (AI Constraint Satisfaction):** Algorisme d'optimització per garantir l'heterogeneïtat de grups i respectar límits complexos de places per centre.
+* [x] **Motor d'Assignació (AI Constraint Satisfaction):** Algorisme d'optimització per garantir la heterogeneïtat de grups. Inclou sistema **Round Robin** per a selecció equitativa en cas d'excés de demanda.
 * [x] **Assistent d'Avaluació per Veu (NLP):** Sistema *Speech-to-Text* que omple automàticament rúbriques i observacions analitzant el dictat del professor.
-* [ ] **Predicció de Risc d'Abandonament:** Sistema *Early Warning* que alerta als tutors de possibles abandonaments basant-se en patrons d'assistència i baixada de rendiment.
-* [ ] **Validació Documental (Computer Vision):** Verificació automàtica de signatures i estructura de documents (ex: Acords Pedagògics) al pujar-los.
+* [x] **Predicció de Risc d'Abandonament:** Sistema *Early Warning* que alerta als tutors de possibles abandonaments basant-se en patrons d'assistència i baixada de rendiment.
+* [x] **Validació Documental (Computer Vision):** Verificació automàtica de signatures i estructura de documents (ex: Acords Pedagògics) al pujar-los.
 
 ### 📖 Documentació Tècnica Detallada
 
