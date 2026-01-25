@@ -91,7 +91,12 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
               <img 
                 src="/logo.png" 
                 alt="Iter Logo" 
-                className="w-10 h-10 object-contain dark:invert" 
+                className="w-10 h-10 object-contain block dark:hidden" 
+              />
+              <img 
+                src="/logo-invers.png" 
+                alt="Iter Logo" 
+                className="w-10 h-10 object-contain hidden dark:block" 
               />
             </Link>
           </div>

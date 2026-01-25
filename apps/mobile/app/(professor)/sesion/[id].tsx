@@ -105,41 +105,41 @@ export default function SessionScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-[#F9FAFB]">
+      <View className="flex-1 justify-center items-center bg-background-page">
         <ActivityIndicator size="large" color={THEME.colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#F9FAFB]">
+    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
       <Stack.Screen 
         options={{ 
           title: "Llista d'alumnes",
           headerBackTitle: "Tornar",
           headerShadowVisible: false,
-          headerStyle: { backgroundColor: '#F9FAFB' },
-          headerTitleStyle: { fontWeight: 'bold', fontSize: 18 }
+          headerStyle: { backgroundColor: 'transparent' },
+          headerTitleStyle: { fontWeight: 'bold', fontSize: 18, color: THEME.colors.primary }
         }} 
       />
       
       <ScrollView className="flex-1 px-6 pt-6" showsVerticalScrollIndicator={false}>
          
-         <Text className="text-gray-500 text-sm mb-6 font-medium">
+         <Text className="text-text-secondary text-sm mb-6 font-medium">
             Marca l'assistència dels alumnes. Prem sobre l'estat per canviar-lo.
          </Text>
 
          {students.map((student) => {
              const status = attendance[student.id_alumne];
              // Using simpler colors for "line of the app" - cleaner look
-             let statusColor = "bg-white text-emerald-700 border-emerald-100";  // Badge on gray bg
+             let statusColor = "bg-background-surface text-emerald-700 border-emerald-100";  // Badge on gray bg
              let statusIcon = "checkmark-circle";
              
              if (status === 'ABSENT') {
-                 statusColor = "bg-white text-rose-700 border-rose-100";
+                 statusColor = "bg-background-surface text-rose-700 border-rose-100";
                  statusIcon = "close-circle";
              } else if (status === 'RETARD') {
-                 statusColor = "bg-white text-amber-700 border-amber-100";
+                 statusColor = "bg-background-surface text-amber-700 border-amber-100";
                  statusIcon = "time";
              }
 
@@ -148,17 +148,17 @@ export default function SessionScreen() {
                     key={student.id_alumne} 
                     onPress={() => toggleStatus(String(student.id_alumne))}
                     activeOpacity={0.7}
-                    className="bg-gray-100 p-5 rounded-3xl mb-3 flex-row items-center justify-between"
+                    className="bg-background-subtle p-5 rounded-3xl mb-3 flex-row items-center justify-between"
                  >
                     <View className="flex-row items-center flex-1">
-                        <View className="w-12 h-12 bg-white rounded-full items-center justify-center mr-4">
-                            <Text className="font-bold text-slate-500 text-lg">{student.nom.charAt(0)}</Text>
+                        <View className="w-12 h-12 bg-background-surface rounded-full items-center justify-center mr-4">
+                            <Text className="font-bold text-text-muted text-lg">{student.nom.charAt(0)}</Text>
                         </View>
                         <View className="flex-1 mr-2">
-                            <Text className="font-bold text-slate-900 text-base mb-0.5" numberOfLines={1} ellipsizeMode="tail">
+                            <Text className="font-bold text-text-primary text-base mb-0.5" numberOfLines={1} ellipsizeMode="tail">
                                 {student.nom} {student.cognoms}
                             </Text>
-                            <Text className="text-gray-400 text-xs font-medium tracking-wide">ID: {student.idalu}</Text>
+                            <Text className="text-text-muted text-xs font-medium tracking-wide">ID: {student.idalu}</Text>
                         </View>
                     </View>
 
@@ -174,13 +174,13 @@ export default function SessionScreen() {
 
          {/* Observations */}
          <View className="mt-6 mb-24">
-            <Text className="text-slate-900 font-bold mb-3 ml-1">Observacions Generals</Text>
+            <Text className="text-text-primary font-bold mb-3 ml-1">Observacions Generals</Text>
             <TextInput 
-                className="bg-gray-100 p-5 rounded-3xl text-slate-700 h-32 leading-6"
+                className="bg-background-subtle p-5 rounded-3xl text-text-primary h-32 leading-6 border border-border-subtle"
                 multiline
                 textAlignVertical="top"
                 placeholder="Escriu aquí qualsevol incidència o comentari sobre la sessió..."
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={THEME.colors.gray}
                 value={observations}
                 onChangeText={setObservations}
             />
@@ -189,11 +189,11 @@ export default function SessionScreen() {
       </ScrollView>
 
       {/* Footer Action */}
-      <View className="absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-gray-100">
+      <View className="absolute bottom-0 left-0 right-0 p-6 bg-background-surface border-t border-border-subtle">
          <TouchableOpacity 
             onPress={submitAttendance}
             disabled={submitting}
-            className={`w-full h-14 rounded-2xl items-center justify-center shadow-lg ${submitting ? 'bg-gray-300' : 'bg-slate-900 shadow-slate-200'}`}
+            className={`w-full h-14 rounded-2xl items-center justify-center shadow-lg ${submitting ? 'bg-background-subtle' : 'bg-primary shadow-slate-200'}`}
          >
              {submitting ? (
                  <ActivityIndicator color="white" />

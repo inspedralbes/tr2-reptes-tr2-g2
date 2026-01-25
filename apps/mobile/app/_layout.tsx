@@ -2,8 +2,16 @@ import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { useFonts, Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
+import { 
+  useFonts, 
+  Inter_400Regular, 
+  Inter_500Medium,
+  Inter_700Bold, 
+  Inter_800ExtraBold,
+  Inter_900Black 
+} from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
+import { useColorScheme } from 'nativewind';
 
 import "../global.css";
 
@@ -11,11 +19,18 @@ import "../global.css";
 SplashScreen.preventAutoHideAsync();
 
 function RootLayout() {
+  const { colorScheme } = useColorScheme();
   const [loaded, error] = useFonts({
     Inter_400Regular,
+    Inter_500Medium,
     Inter_700Bold,
-    // Map 'Inter' family name if needed, though NativeWind often uses the font file name or a mapping
-    'Inter': Inter_400Regular, 
+    Inter_800ExtraBold,
+    Inter_900Black,
+    'Inter': Inter_400Regular,
+    'Inter-Medium': Inter_500Medium,
+    'Inter-Bold': Inter_700Bold,
+    'Inter-ExtraBold': Inter_800ExtraBold,
+    'Inter-Black': Inter_900Black,
   });
 
   useEffect(() => {
@@ -36,7 +51,7 @@ function RootLayout() {
         <Stack.Screen name="(professor)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
     </SafeAreaProvider>
   );
 }

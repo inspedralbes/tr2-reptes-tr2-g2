@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  * {
+    font-family: Inter;
+  }
+  
   :root {
     --bg-page: #f7f8f9;
     --bg-surface: #ffffff;

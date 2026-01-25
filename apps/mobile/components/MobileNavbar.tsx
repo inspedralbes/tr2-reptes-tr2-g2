@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { THEME } from '@iter/shared';
 
 interface MobileNavbarProps {
@@ -9,7 +9,7 @@ interface MobileNavbarProps {
 
 const MobileNavbar: React.FC<MobileNavbarProps> = ({ title = 'Iter' }) => {
   return (
-    <SafeAreaView style={{ backgroundColor: THEME.colors.primary }}>
+    <SafeAreaView edges={['top']} style={{ backgroundColor: THEME.colors.primary }}>
       <View className="flex-row justify-between items-center h-16 px-6 border-b-2 border-primary">
         <View className="flex-row items-center">
           {/* Logo - Linear Style */}

@@ -139,20 +139,20 @@ export default function DashboardScreen() {
 
   return (
 
-    <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#F9FAFB]">
+    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         
         {/* Professional Header - Matches Agenda Aesthetic */}
-        <View className="px-6 pb-6 pt-4 bg-white border-b border-gray-100 mb-6">
+        <View className="px-6 pb-6 pt-4 bg-background-surface border-b border-border-subtle mb-6">
           <View className="flex-row items-baseline">
-            <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest mr-2">
+            <Text className="text-text-muted text-xs font-bold uppercase tracking-widest mr-2">
               {new Date().toLocaleDateString('ca-ES', { weekday: 'long' })}
             </Text>
-            <Text className="text-gray-300 text-xs font-bold uppercase tracking-widest">
+            <Text className="text-text-muted opacity-60 text-xs font-bold uppercase tracking-widest">
               {new Date().toLocaleDateString('ca-ES', { day: 'numeric', month: 'long' })}
             </Text>
           </View>
-          <Text className="text-3xl font-extrabold text-slate-900 leading-tight mt-1">
+          <Text className="text-3xl font-extrabold text-text-primary leading-tight mt-1">
             Hola, {userName}
           </Text>
         </View>
@@ -160,37 +160,37 @@ export default function DashboardScreen() {
         <View className="px-6">
           
           {/* Section: Project Status - Apple Style - KEPT */}
-          <View className="w-full bg-gray-100 rounded-2xl p-4 flex-row items-center justify-between mb-8">
+          <View className="w-full bg-background-subtle rounded-2xl p-4 flex-row items-center justify-between mb-8">
              <View>
-                 <Text className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Fase Actual</Text>
-                 <Text className="text-xl font-bold text-slate-900 tracking-tight">
+                 <Text className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-1">Fase Actual</Text>
+                 <Text className="text-xl font-bold text-text-primary tracking-tight">
                     {fases.find(f => f.activa)?.nom || 'Càrrega de dades'}
                  </Text>
              </View>
-             <View className="flex-row items-center bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+             <View className="flex-row items-center bg-background-surface px-3 py-1.5 rounded-full border border-border-subtle">
                 <View className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                <Text className="text-xs font-semibold text-gray-600">Actiu</Text>
+                <Text className="text-xs font-semibold text-text-secondary">Actiu</Text>
              </View>
           </View>
 
           {/* Section: Next Session - Hero Card Style */}
-          <Text className="text-slate-900 text-lg font-bold mb-4">Propera Sessió</Text>
+          <Text className="text-text-primary text-lg font-bold mb-4">Propera Sessió</Text>
 
           {nextWorkshop ? (
              <TouchableOpacity 
                onPress={() => handleWorkshopClick(nextWorkshop)}
                activeOpacity={0.9}
-               className="w-full bg-slate-900 rounded-3xl p-6 shadow-lg shadow-slate-200 relative overflow-hidden mb-8"
+               className="w-full bg-slate-900 dark:bg-background-subtle rounded-3xl p-6 shadow-lg shadow-slate-200 relative overflow-hidden mb-8"
              >
                 {/* Decorative circle */}
-                <View className="absolute -right-6 -top-6 w-32 h-32 bg-slate-800 rounded-full opacity-50" />
+                <View className="absolute -right-6 -top-6 w-32 h-32 bg-slate-800 dark:bg-background-surface rounded-full opacity-50" />
                 
                 <View>
                     {/* Top Row: Time & Status */}
                     <View className="flex-row justify-between items-center mb-4">
-                        <View className="flex-row items-center bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+                        <View className="flex-row items-center bg-slate-800 dark:bg-background-surface px-3 py-1.5 rounded-full border border-slate-700 dark:border-border-subtle">
                            <Ionicons name="time" size={14} color="#94A3B8" />
-                           <Text className="text-gray-200 text-xs font-bold ml-2">
+                           <Text className="text-gray-200 dark:text-text-primary text-xs font-bold ml-2">
                               {nextWorkshop.hora_inici 
                                 ? `${nextWorkshop.hora_inici}${nextWorkshop.hora_fi ? ' - ' + nextWorkshop.hora_fi : ''}`
                                 : new Date(nextWorkshop.data_inici).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -205,32 +205,32 @@ export default function DashboardScreen() {
                     </View>
 
                     {/* Title */}
-                    <Text className="text-2xl font-black text-white mb-2 leading-tight" numberOfLines={2}>
+                    <Text className="text-2xl font-black text-white dark:text-text-primary mb-2 leading-tight" numberOfLines={2}>
                         {nextWorkshop.taller.titol}
                     </Text>
 
                     {/* Location */}
                     <View className="flex-row items-center mb-6">
                         <Ionicons name="location" size={16} color="#94A3B8" />
-                        <Text className="text-slate-400 text-sm font-medium ml-1.5" numberOfLines={1}>
+                        <Text className="text-slate-400 dark:text-text-secondary text-sm font-medium ml-1.5" numberOfLines={1}>
                             {nextWorkshop.centre.nom}
                         </Text>
                     </View>
 
                     {/* Action Footer */}
-                    <View className="flex-row justify-between items-center pt-4 border-t border-slate-800">
-                        <Text className="text-slate-400 text-xs font-bold uppercase tracking-widest">
+                    <View className="flex-row justify-between items-center pt-4 border-t border-slate-800 dark:border-border-subtle">
+                        <Text className="text-slate-400 dark:text-text-muted text-xs font-bold uppercase tracking-widest">
                            {isPhaseActive(PHASES.EJECUCION) ? 'Gestionar Sessió' : 'Veure Detalls'}
                         </Text>
-                        <View className="w-10 h-10 rounded-full bg-white/10 items-center justify-center">
+                        <View className="w-10 h-10 rounded-full bg-white/10 dark:bg-background-surface items-center justify-center">
                             <Ionicons name="arrow-forward" size={18} color="white" />
                         </View>
                     </View>
                 </View>
              </TouchableOpacity>
           ) : (
-            <View className="w-full items-center justify-center py-10 rounded-2xl border-2 border-dashed border-gray-300 mb-8">
-               <Text className="text-gray-400 font-medium text-sm">No tens tallers propers</Text>
+            <View className="w-full items-center justify-center py-10 rounded-2xl border-2 border-dashed border-border-subtle mb-8">
+               <Text className="text-text-muted font-medium text-sm">No tens tallers propers</Text>
             </View>
           )}
 

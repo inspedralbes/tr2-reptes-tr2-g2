@@ -78,7 +78,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
       case 'milestone': return THEME.colors.primary;
       case 'deadline': return THEME.colors.accent;
       case 'assignment': return THEME.colors.secondary;
-      default: return THEME.colors.neutral;
+      default: return THEME.colors.gray;
     }
   };
 
@@ -99,7 +99,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
   };
 
   return (
-    <View className="flex-1 bg-[#F9FAFB]">
+    <View className="flex-1 bg-background-page">
       
       {/* Calendar Grid (Seamless) */}
       <View className="px-6 pb-4 pt-2">
@@ -108,19 +108,19 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
           {/* Header */}
           <View className="flex-row items-center justify-between mb-4">
             <View className="flex-row items-baseline">
-              <Text className="text-2xl font-extrabold text-slate-900 mr-2 capitalize">
+              <Text className="text-2xl font-extrabold text-text-primary mr-2 capitalize">
                 {monthName}
               </Text>
-              <Text className="text-lg font-bold text-blue-600">
+              <Text className="text-lg font-bold text-primary">
                 {year}
               </Text>
             </View>
             <View className="flex-row space-x-2">
-              <TouchableOpacity onPress={prevMonth} className="w-8 h-8 rounded-full bg-blue-50 items-center justify-center">
-                <Ionicons name="chevron-back" size={18} color="#3B82F6" />
+              <TouchableOpacity onPress={prevMonth} className="w-8 h-8 rounded-full bg-background-subtle items-center justify-center">
+                <Ionicons name="chevron-back" size={18} color={THEME.colors.primary} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={nextMonth} className="w-8 h-8 rounded-full bg-blue-50 items-center justify-center">
-                <Ionicons name="chevron-forward" size={18} color="#3B82F6" />
+              <TouchableOpacity onPress={nextMonth} className="w-8 h-8 rounded-full bg-background-subtle items-center justify-center">
+                <Ionicons name="chevron-forward" size={18} color={THEME.colors.primary} />
               </TouchableOpacity>
             </View>
           </View>
@@ -129,7 +129,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
           <View className="flex-row mb-2">
             {['DL', 'DT', 'DC', 'DJ', 'DV', 'DS', 'DG'].map(d => (
               <View key={d} className="flex-1 items-center">
-                <Text className="text-[10px] font-bold text-gray-400">{d}</Text>
+                <Text className="text-[10px] font-bold text-text-muted">{d}</Text>
               </View>
             ))}
           </View>
@@ -151,10 +151,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
                   {dateObj.day && (
                     <View className="items-center">
                       <View className={`w-8 h-8 items-center justify-center rounded-full mb-1 ${
-                        isSelected ? 'bg-slate-900' : isToday ? 'bg-blue-500' : ''
+                        isSelected ? 'bg-primary' : isToday ? 'bg-primary/20 border border-primary/40' : ''
                       }`}>
                         <Text className={`text-sm font-bold ${
-                          isSelected || isToday ? 'text-white' : 'text-slate-700'
+                          isSelected ? 'text-white' : isToday ? 'text-primary' : 'text-text-primary'
                         }`}>
                           {dateObj.day}
                         </Text>
@@ -169,7 +169,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
                             style={{ 
                               backgroundColor: e.type === 'milestone' ? '#6366F1' : 
                                              e.type === 'deadline' ? '#EF4444' : 
-                                             e.type === 'assignment' ? '#3B82F6' : '#9CA3AF'
+                                             e.type === 'assignment' ? THEME.colors.primary : THEME.colors.gray
                             }} 
                           />
                         ))}
@@ -186,30 +186,30 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
       {/* Events List / Agenda (Scrollable) */}
       <View className="flex-1 px-4">
         <View className="py-3">
-          <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest pl-2">
+          <Text className="text-text-muted text-xs font-bold uppercase tracking-widest pl-2">
              {new Date(selectedDate).toLocaleDateString('ca-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
           </Text>
         </View>
 
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
           {dayEvents.length === 0 ? (
-            <View className="items-center justify-center py-10 rounded-2xl border-2 border-dashed border-gray-300">
-              <Text className="text-gray-400 font-medium text-sm">No hi ha esdeveniments</Text>
+            <View className="items-center justify-center py-10 rounded-2xl border-2 border-dashed border-border-subtle">
+              <Text className="text-text-muted font-medium text-sm">No hi ha esdeveniments</Text>
             </View>
           ) : (
             dayEvents.map(event => (
               <TouchableOpacity 
                 key={event.id}
                 onPress={() => handleEventClick(event)}
-                className="bg-white rounded-2xl p-4 mb-3 shadow-sm border border-gray-100 flex-row"
+                className="bg-background-surface rounded-2xl p-4 mb-3 shadow-sm border border-border-subtle flex-row"
               >
                 {/* Time Column */}
-                <View className="w-16 border-r border-gray-100 mr-4 justify-center">
-                  <Text className="text-slate-900 font-bold text-sm">
+                <View className="w-16 border-r border-border-subtle mr-4 justify-center">
+                  <Text className="text-text-primary font-bold text-sm">
                     {event.metadata?.hora ? event.metadata.hora.split(' - ')[0] : 'Tot el dia'}
                   </Text>
                   {event.metadata?.hora && (
-                    <Text className="text-gray-400 text-[10px] font-bold">
+                    <Text className="text-text-muted text-[10px] font-bold">
                       {event.metadata.hora.split(' - ')[1]}
                     </Text>
                   )}
@@ -219,13 +219,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
                 <View className="flex-1 justify-center">
                    <View className="flex-row items-center mb-1">
                       <View className={`w-2 h-2 rounded-full mr-2`} style={{ backgroundColor: getEventColor(event.type) }} />
-                      <Text className="text-slate-900 font-bold text-base flex-1" numberOfLines={1}>{event.title}</Text>
+                      <Text className="text-text-primary font-bold text-base flex-1" numberOfLines={1}>{event.title}</Text>
                    </View>
                   
                   {event.metadata?.adreca && (
                     <View className="flex-row items-center">
-                        <Ionicons name="location" size={12} color="#94A3B8" className="mr-1" />
-                        <Text className="text-gray-500 text-xs font-medium" numberOfLines={1}>
+                        <Ionicons name="location" size={12} color={THEME.colors.gray} className="mr-1" />
+                        <Text className="text-text-secondary text-xs font-medium" numberOfLines={1}>
                         {event.metadata.adreca}
                         </Text>
                     </View>
@@ -234,7 +234,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
 
                 {/* Arrow */}
                 <View className="justify-center pl-2">
-                    <Ionicons name="chevron-forward" size={16} color="#CBD5E1" />
+                    <Ionicons name="chevron-forward" size={16} color={THEME.colors.gray} />
                 </View>
               </TouchableOpacity>
             ))

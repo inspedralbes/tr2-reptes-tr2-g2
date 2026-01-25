@@ -37,6 +37,10 @@ api.interceptors.request.use(
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+      
+      // @ts-ignore
+      config.metadata = { startTime: new Date() };
+      console.log(`📡 [API] Request: ${config.method?.toUpperCase()} ${config.url}`);
     } catch (error) {
       console.warn('⚠️ [API] No se pudo leer el token del almacenamiento seguro:', error);
       // No lanzamos el error para permitir que la petición se envíe (fallará con 401 si es necesaria la auth)
@@ -49,8 +53,22 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // @ts-ignore
+    const startTime = response.config.metadata?.startTime;
+    if (startTime) {
+      const duration = new Date().getTime() - startTime.getTime();
+      console.log(`✅ [API] Response: ${response.config.method?.toUpperCase()} ${response.config.url} - ${response.status} (${duration}ms)`);
+    }
+    return response;
+  },
   async (error) => {
+    // @ts-ignore
+    const startTime = error.config?.metadata?.startTime;
+    if (startTime) {
+      const duration = new Date().getTime() - startTime.getTime();
+      console.log(`❌ [API] Error: ${error.config?.method?.toUpperCase()} ${error.config?.url} - ${error.response?.status || 'Network Error'} (${duration}ms)`);
+    }
     if (error.response?.status === 401) {
       console.warn('📡 [API] Sesión expirada o inválida (401). Redirigiendo a login...');
       await logout();

@@ -145,9 +145,17 @@ export default function PerfilScreen() {
                      <TouchableOpacity 
                        key={t.id}
                        onPress={() => setColorScheme(t.id)}
-                       className={`flex-1 py-2 items-center justify-center rounded-lg flex-row gap-1.5 ${
-                         isActive ? 'bg-primary shadow-sm' : ''
-                       }`}
+                       activeOpacity={0.7}
+                       style={{
+                          flex: 1,
+                          paddingVertical: 8,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 8,
+                          flexDirection: 'row',
+                          gap: 6,
+                          backgroundColor: isActive ? '#00426B' : 'transparent', // using literal for test
+                       }}
                      >
                        <Ionicons 
                          name={t.icon as any} 

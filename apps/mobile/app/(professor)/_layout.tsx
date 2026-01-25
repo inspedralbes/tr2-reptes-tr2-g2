@@ -1,15 +1,22 @@
 import { Stack } from 'expo-router';
+import { useColorScheme } from 'nativewind';
+import { THEME } from '@iter/shared';
 
 export default function ProfessorStackLayout() {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
   return (
     <Stack screenOptions={{
       headerStyle: {
-        backgroundColor: 'white',
+        backgroundColor: isDark ? '#1e293b' : '#ffffff',
       },
-      headerTintColor: '#00426B',
+      headerTintColor: isDark ? '#4197cb' : '#00426B',
       headerTitleStyle: {
         fontWeight: 'bold',
+        fontFamily: 'Inter',
       },
+      headerShadowVisible: false,
     }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="sesion/[id]" options={{ title: 'Sesión' }} />

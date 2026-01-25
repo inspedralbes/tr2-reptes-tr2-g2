@@ -9,6 +9,7 @@ import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import Pagination from "@/components/Pagination";
 
 export default function AssignacionsPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -70,6 +71,19 @@ export default function AssignacionsPage() {
     
     return matchesSearch && matchesStatus;
   });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter]);
+
+  const totalPages = Math.ceil(filteredAssignacions.length / itemsPerPage);
+  const paginatedAssignacions = filteredAssignacions.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+  );
 
   if (!user) return null;
 
@@ -134,7 +148,7 @@ export default function AssignacionsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredAssignacions.map(a => (
+                {paginatedAssignacions.map(a => (
                   <tr key={a.id_assignacio} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
                     <td className="px-10 py-10">
                       <div className="flex flex-col">
@@ -169,6 +183,15 @@ export default function AssignacionsPage() {
                 <p className="text-[9px] font-bold text-gray-300 uppercase mt-2">Prova d'ajustar els filtres de cerca.</p>
               </div>
             )}
+            
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              totalItems={filteredAssignacions.length}
+              currentItemsCount={paginatedAssignacions.length}
+              itemName="assignacions"
+            />
           </div>
         )}
 
