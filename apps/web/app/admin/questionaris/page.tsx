@@ -6,6 +6,7 @@ import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import { avaluacioService } from '@/services/avaluacioService';
 import Pagination from "@/components/Pagination";
+import Loading from '@/components/Loading';
 
 export default function AdminQuestionnairesPage() {
     const [models, setModels] = useState<any[]>([]);
@@ -36,9 +37,7 @@ export default function AdminQuestionnairesPage() {
 
     if (loading) {
         return (
-            <div className="flex min-h-screen justify-center items-center">
-                <div className="animate-spin h-10 w-10 border-b-2 border-primary"></div>
-            </div>
+            <Loading fullScreen message="Carregant qüestionaris..." />
         );
     }
 
@@ -89,14 +88,14 @@ export default function AdminQuestionnairesPage() {
                         ))
                     )}
                 </div>
-                
+
                 <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                  totalItems={models.length}
-                  currentItemsCount={paginatedModels.length}
-                  itemName="qüestionaris"
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    totalItems={models.length}
+                    currentItemsCount={paginatedModels.length}
+                    itemName="qüestionaris"
                 />
 
                 {/* Sección de ayuda */}

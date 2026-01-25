@@ -162,13 +162,13 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-consorci-darkBlue hover:bg-black text-white text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50 active:scale-[0.98] shadow-lg shadow-blue-900/10"
+              className="w-full py-4 bg-consorci-darkBlue hover:bg-black text-white text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50 active:scale-[0.98] shadow-lg shadow-blue-900/10 flex items-center justify-center gap-4"
             >
               {loading ? (
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <>
+                  <Loading size="sm" white message="" />
                   <span>Accedint...</span>
-                </div>
+                </>
               ) : 'Entrar al Programa'}
             </button>
           </form>

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { THEME } from '@iter/shared';
+import Loading from '@/components/Loading';
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -24,8 +25,6 @@ export default function Home() {
   }, [user, loading, router]);
 
   return (
-    <div className="flex min-h-screen justify-center items-center" style={{ backgroundColor: THEME.colors.background }}>
-      <div className="animate-spin h-12 w-12 border-b-2 mx-auto" style={{ borderColor: THEME.colors.primary }}></div>
-    </div>
+    <Loading fullScreen message="Carregant plataforma..." />
   );
 }
