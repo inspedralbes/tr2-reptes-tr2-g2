@@ -25,16 +25,18 @@ export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
-      }
+      },
+      connectTimeoutMS: 5000, // 5 segundos para conectar
+      serverSelectionTimeoutMS: 5000 // 5 segundos para seleccionar servidor
     });
 
     await client.connect();
     db = client.db(dbName);
     console.log('✅ Conectado a MongoDB Atlas (Stable API v1)');
     return { client, db };
-  } catch (error) {
-    console.error('❌ Error conectando a MongoDB Atlas:', error);
-    throw error;
+  } catch (error: any) {
+    console.error('❌ Error conectando a MongoDB Atlas:', error.message);
+    throw new Error(`MongoDB No Respon: ${error.message}. Verifica les credencials a .env o la connexió a internet.`);
   }
 }
 

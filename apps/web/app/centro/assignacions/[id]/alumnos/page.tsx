@@ -65,8 +65,8 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
         }
 
         // Fetch assignment with inscriptions
-        const resAssig = await api.get(`/assignacions/centre/${currentUser.id_centre}`);
-        const found = resAssig.data.find((a: any) => a.id_assignacio === parseInt(id));
+        const resAssig = await api.get(`/assignacions/${id}`);
+        const found = resAssig.data;
 
         if (!found) {
           toast.error('Assignació no trobada o no autoritzada.');
@@ -96,10 +96,10 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
   const toggleAlumne = (idAlumne: number) => {
     setSelectedIds(prev => {
       const isSelected = prev.includes(idAlumne);
-      const plazasMax = assignacio?.peticio?.alumnes_aprox || 0;
+      const plazasMax = assignacio?.peticio?.alumnes_aprox || assignacio?.taller?.places_maximes || 20;
 
       if (!isSelected && prev.length >= plazasMax) {
-        toast.warning(`Has arribat al límit de ${plazasMax} places sol·licitades.`);
+        toast.warning(`Has arribat al límit de ${plazasMax} places.`);
         return prev;
       }
 
@@ -111,11 +111,11 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const plazasMax = assignacio?.peticio?.alumnes_aprox || 0;
+      const plazasMax = assignacio?.peticio?.alumnes_aprox || assignacio?.taller?.places_maximes || 20;
       const available = plazasMax - selectedIds.length;
       
       if (available <= 0) {
-        toast.error(`Has arribat al límit de ${plazasMax} places sol·licitades.`);
+        toast.error(`Has arribat al límit de ${plazasMax} places.`);
         return;
       }
 
@@ -177,7 +177,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
   if (loading && !assignacio) return <Loading fullScreen message="Carregant dades de l'assignació..." />;
 
-  const plazasAsignadas = assignacio?.peticio?.alumnes_aprox || 0;
+  const plazasAsignadas = assignacio?.peticio?.alumnes_aprox || assignacio?.taller?.places_maximes || 20;
   const isFull = selectedIds.length === plazasAsignadas;
 
   const headerActions = (

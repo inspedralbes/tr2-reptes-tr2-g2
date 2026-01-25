@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { connectToDatabase } from '../lib/mongodb';
+import prisma from '../lib/prisma';
+import { RiskAnalysisService } from '../services/risk-analysis.service';
 
 /**
  * GET /stats/peticions-by-status
@@ -19,15 +21,25 @@ export const getStatsByStatus = async (req: Request, res: Response) => {
         }
       },
       {
-        $sort: { total: -1 }
-      },
-      {
         $project: {
-          estat: "$_id",
+          estat: {
+            $switch: {
+              branches: [
+                { case: { $eq: [{ $toLower: "$_id" }, "initializing"] }, then: "pendent" },
+                { case: { $eq: [{ $toLower: "$_id" }, "pendent"] }, then: "pendent" },
+                { case: { $eq: [{ $toLower: "$_id" }, "aprovada"] }, then: "aprovada" },
+                { case: { $eq: [{ $toLower: "$_id" }, "rebutjada"] }, then: "rebutjada" }
+              ],
+              default: { $toLower: "$_id" }
+            }
+          },
           total: 1,
           last_update: 1,
           _id: 0
         }
+      },
+      {
+        $sort: { total: -1 }
       }
     ]).toArray();
 
@@ -51,7 +63,7 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
       },
       {
         $group: {
-          _id: "$taller_id",
+          _id: { $ifNull: ["$workshop_title", { $concat: ["Taller ", { $toString: "$taller_id" }] }] },
           total_solicitudes: { $sum: 1 },
           alumnes_totals: { $sum: "$detalls.alumnes_aprox" }
         }
@@ -60,7 +72,10 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
         $sort: { total_solicitudes: -1 }
       },
       {
-        $limit: 5
+        $limit: 10
+      },
+      {
+        $sort: { _id: 1 } // Sort alphabetically by name for stability
       }
     ]).toArray();
 
@@ -267,9 +282,6 @@ export const getOccupancyByZone = async (req: Request, res: Response) => {
 };
 
 // POST: Ejecutar análisis de riesgo de abandono
-import { RiskAnalysisService } from '../services/risk-analysis.service';
-import prisma from '../lib/prisma'; // Import prisma for this function
-
 export const runRiskAnalysis = async (req: Request, res: Response) => {
   try {
     const { studentId } = req.body;
@@ -300,5 +312,47 @@ export const runRiskAnalysis = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error in risk analysis:", error);
     res.status(500).json({ error: 'Error al ejecutar análisis de riesgo' });
+  }
+};
+// GET: Estadístiques de monitorització de la Fase 2
+export const getPhase2MonitoringStats = async (req: Request, res: Response) => {
+  try {
+    const assignacions = await prisma.assignacio.findMany({
+      where: {
+        estat: { in: ['PUBLISHED', 'DATA_ENTRY', 'DATA_SUBMITTED', 'VALIDATED'] }
+      },
+      include: {
+        centre: true,
+        checklist: true,
+        inscripcions: true,
+        prof1: true,
+        prof2: true
+      }
+    });
+
+    const monitoring = assignacions.map((a: any) => {
+      const hasProfessors = !!(a.prof1_id && a.prof2_id);
+      const hasStudents = a.inscripcions.length > 0;
+      const allDocsOk = a.inscripcions.every((i: any) => i.acord_pedagogic && i.autoritzacio_mobilitat && i.registre_ceb_confirmat);
+      const isComplete = hasProfessors && hasStudents && allDocsOk;
+
+      return {
+        id_assignacio: a.id_assignacio,
+        centre: a.centre.nom,
+        taller_id: a.id_taller,
+        estat: a.estat,
+        completat: isComplete,
+        detalls: {
+          professors: hasProfessors,
+          alumnes: hasStudents,
+          documentacio: allDocsOk
+        }
+      };
+    });
+
+    res.json(monitoring);
+  } catch (error) {
+    console.error("Error monitoring Phase 2:", error);
+    res.status(500).json({ error: 'Error al obtenir estadístiques de monitorització.' });
   }
 };

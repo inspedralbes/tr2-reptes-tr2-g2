@@ -18,6 +18,7 @@ import notificacioRoutes from './notificacio.routes';
 import evaluationRoutes from './evaluation.routes'; // Rutas de IA (Voz)
 import avaluacioRoutes from './avaluacio.routes';
 import questionariRoutes from './questionari.routes';
+import uploadRoutes from './upload.routes';
 
 // --- Definir las rutas base ---
 
@@ -50,6 +51,9 @@ router.use('/stats', statsRoutes);
 // Rutas de Evaluación y Cuestionarios
 router.use('/evaluacions', avaluacioRoutes);
 router.use('/questionaris', questionariRoutes);
+
+// Rutas de Carga de Archivos
+router.use('/upload', uploadRoutes);
 
 // Health Check (Para ver si la API respira)
 router.get('/health', (req, res) => {

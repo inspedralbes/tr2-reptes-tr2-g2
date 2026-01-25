@@ -1,9 +1,6 @@
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
-      target: runner-web
+    image: ghcr.io/inspedralbes/tr2-reptes-tr2-g2-web:latest
     restart: always
     env_file:
       - path: .env
@@ -12,35 +9,28 @@ services:
         required: false
     networks:
       - iter-network-prod
+    volumes:
+      - iter-uploads:/app/uploads
 
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
-      target: runner-api
+    image: ghcr.io/inspedralbes/tr2-reptes-tr2-g2-api:latest
     restart: always
     env_file:
       - path: .env
         required: true
       - path: ./apps/api/.env
         required: false
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - iter-network-prod
-
-  nginx:
-    image: nginx:alpine
-    container_name: iter_nginx
-    restart: always
-    ports:
-      - "8002:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - web
-      - api
-    networks:
-      - iter-network-prod
+      - iter-uploads:/app/uploads
 
 networks:
   iter-network-prod:
     driver: bridge
+
+volumes:
+  iter-uploads:
+    driver: local

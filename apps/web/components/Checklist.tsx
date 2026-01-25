@@ -30,20 +30,18 @@ export default function Checklist({ items, onUpdate }: ChecklistProps) {
   return (
     <div className="space-y-4">
       {items.map((item) => (
-        <div 
+        <div
           key={item.id_checklist}
-          className={`flex items-start gap-4 p-4 border transition ${
-            item.completat ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-300'
-          }`}
+          className={`flex items-start gap-4 p-4 border transition ${item.completat ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-300'
+            }`}
         >
           <button
             onClick={() => handleToggle(item)}
             disabled={loading === item.id_checklist}
-            className={`mt-1 w-6 h-6 flex items-center justify-center border-2 transition ${
-              item.completat 
-              ? 'bg-green-600 border-green-600 text-white' 
-              : 'bg-white border-gray-300 hover:border-consorci-lightBlue'
-            }`}
+            className={`mt-1 w-6 h-6 flex items-center justify-center border-2 transition rounded-full ${item.completat
+                ? 'bg-green-600 border-green-600 text-white'
+                : 'bg-white border-gray-300 hover:border-consorci-lightBlue'
+              }`}
           >
             {item.completat && (
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -57,14 +55,14 @@ export default function Checklist({ items, onUpdate }: ChecklistProps) {
               </svg>
             )}
           </button>
-          
+
           <div className="flex-1">
             <h4 className={`text-sm font-bold ${item.completat ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
               {item.pas_nom}
             </h4>
             {!item.completat && item.pas_nom.toLowerCase().includes('evidencia') && (
               <div className="mt-2">
-                <input 
+                <input
                   type="text"
                   placeholder="URL de la evidencia (Google Drive, etc.)"
                   className="text-xs w-full p-2 border border-gray-300 focus:border-consorci-lightBlue outline-none"

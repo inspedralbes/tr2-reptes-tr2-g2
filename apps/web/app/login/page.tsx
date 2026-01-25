@@ -67,19 +67,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-[#F2F2F3]">
-      <div className="w-full max-w-md bg-white p-12 border border-gray-200 shadow-xl">
+    <div className="flex min-h-screen items-center justify-center p-4 bg-background-page">
+      <div className="w-full max-w-md bg-background-surface p-12 border border-border-subtle shadow-xl">
         <div className="text-center mb-12">
-          <div className="w-32 h-32 bg-white flex items-center justify-center mx-auto mb-6">
+          <div className="w-32 h-32 bg-background-surface flex items-center justify-center mx-auto mb-6">
             <img
               src="/logo.png"
               alt="Iter Logo"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain dark:invert"
             />
           </div>
-          <h2 className="text-4xl font-black tracking-tighter text-[#00426B] uppercase leading-none">Iter</h2>
-          <div className="h-1 w-12 bg-[#00426B] mx-auto mt-2"></div>
-          <p className="text-[#00426B] text-[10px] font-black uppercase tracking-[0.3em] mt-4 opacity-70">Gestió d'Aprenentatge</p>
+          <h2 className="text-4xl font-black tracking-tighter text-text-primary uppercase leading-none">Iter</h2>
+          <div className="h-1 w-12 bg-consorci-darkBlue mx-auto mt-2"></div>
+          <p className="text-text-primary text-[10px] font-black uppercase tracking-[0.3em] mt-4 opacity-70">Gestió d'Aprenentatge</p>
         </div>
 
         {error && (
@@ -92,14 +92,14 @@ export default function LoginPage() {
         )}
 
         {showProfessorLink ? (
-          <div className="bg-[#EAEFF2] p-10 text-center animate-in fade-in zoom-in duration-300">
-            <h3 className="text-xl font-black text-[#00426B] uppercase mb-4 tracking-tight">Accés via App Mòbil</h3>
-            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-8 leading-relaxed">
+          <div className="bg-background-subtle p-10 text-center animate-in fade-in zoom-in duration-300">
+            <h3 className="text-xl font-black text-consorci-darkBlue uppercase mb-4 tracking-tight">Accés via App Mòbil</h3>
+            <p className="text-xs text-text-muted font-bold uppercase tracking-wider mb-8 leading-relaxed">
               Com a professor, has d'utilitzar l'aplicació mòbil d'Iter per gestionar les teves sessions.
             </p>
             <a
               href="#"
-              className="group relative flex items-center justify-center w-full py-4 bg-[#00426B] text-white text-xs font-bold uppercase tracking-widest transition-all hover:bg-[#0775AB] active:scale-95"
+              className="group relative flex items-center justify-center w-full py-4 bg-consorci-darkBlue text-white text-xs font-bold uppercase tracking-widest transition-all hover:bg-consorci-actionBlue active:scale-95"
               onClick={(e) => { e.preventDefault(); toast.info('Enllaç de descàrrega próximament (Expo Go / TestFlight)'); }}
             >
               <span>Descarregar App Iter</span>
@@ -109,7 +109,7 @@ export default function LoginPage() {
             </a>
             <button
               onClick={() => setShowProfessorLink(false)}
-              className="mt-8 text-[10px] font-black text-[#0775AB] hover:text-[#00426B] tracking-[0.2em] uppercase transition-colors"
+              className="mt-8 text-[10px] font-black text-consorci-lightBlue hover:text-consorci-darkBlue tracking-[0.2em] uppercase transition-colors"
             >
               ← Tornar al login
             </button>
@@ -117,32 +117,32 @@ export default function LoginPage() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-2">
-              <label className="block text-[#00426B] text-[10px] font-black uppercase tracking-widest px-1">Correu Electrònic</label>
+              <label className="block text-text-primary text-[10px] font-black uppercase tracking-widest px-1">Correu Electrònic</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-5 py-4 bg-gray-50 border border-gray-200 focus:border-[#00426B] focus:bg-white transition-all font-bold text-sm text-gray-900 placeholder:text-gray-300 outline-none"
+                className="w-full px-5 py-4 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:bg-background-surface transition-all font-bold text-sm text-text-primary placeholder:text-text-muted outline-none"
                 placeholder="coordinador@centre.cat"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-[#00426B] text-[10px] font-black uppercase tracking-widest px-1">Contrasenya</label>
+              <label className="block text-text-primary text-[10px] font-black uppercase tracking-widest px-1">Contrasenya</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-5 py-4 bg-gray-50 border border-gray-200 focus:border-[#00426B] focus:bg-white transition-all font-bold text-sm text-gray-900 placeholder:text-gray-300 pr-12 outline-none"
+                  className="w-full px-5 py-4 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:bg-background-surface transition-all font-bold text-sm text-text-primary placeholder:text-text-muted pr-12 outline-none"
                   placeholder="••••••••"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-[#00426B] transition-colors p-1"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-consorci-darkBlue transition-colors p-1"
                 >
                   {showPassword ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -162,7 +162,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-[#00426B] hover:bg-black text-white text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50 active:scale-[0.98] shadow-lg shadow-blue-900/10"
+              className="w-full py-4 bg-consorci-darkBlue hover:bg-black text-white text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50 active:scale-[0.98] shadow-lg shadow-blue-900/10"
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-3">

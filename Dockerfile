@@ -22,6 +22,7 @@ RUN npx turbo run build --filter=web
 # --- RUNNER WEB (PRODUCCIÓN) ---
 FROM base AS runner-web
 ENV NODE_ENV=production
+ENV PORT=8002
 WORKDIR /app
 COPY --from=builder-web /app/apps/web/.next/standalone ./
 COPY --from=builder-web /app/apps/web/.next/static ./apps/web/.next/static
@@ -44,12 +45,16 @@ RUN npx turbo run build --filter=api
 FROM base AS runner-api
 ENV NODE_ENV=production
 WORKDIR /app
+COPY --from=builder-api /app/packages ./packages
 COPY --from=builder-api /app/node_modules ./node_modules
-COPY --from=builder-api /app/apps/api/package.json ./package.json
-COPY --from=builder-api /app/apps/api/src ./src
+COPY --from=builder-api /app/apps/api/package.json ./apps/api/package.json
+COPY --from=builder-api /app/apps/api/dist ./apps/api/dist
 COPY --from=builder-api /app/apps/api/prisma ./prisma
-COPY --from=builder-api /app/apps/api/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder-api /app/apps/api/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder-api /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder-api /app/node_modules/@prisma ./node_modules/@prisma
+
+# Crear la carpeta d'uploads per garantir que existeixi
+RUN mkdir -p /app/uploads/perfil /app/uploads/documents
 
 EXPOSE 3000
-CMD ["node", "src/index.js"]
+CMD ["node", "apps/api/dist/apps/api/src/index.js"]

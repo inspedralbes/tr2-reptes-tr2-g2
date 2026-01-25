@@ -3,12 +3,19 @@
 import React, { useState, useEffect } from "react";
 import tallerService, { Taller } from "../services/tallerService";
 import sectorService, { Sector } from "../services/sectorService";
+import WorkshopIcon, { SVG_ICONS } from "./WorkshopIcon";
 
 type CreateWorkshopModalProps = {
   visible: boolean;
   onClose: () => void;
   onWorkshopCreated: (newWorkshop: Taller) => void;
   initialData?: Taller | null;
+};
+
+type ScheduleSlot = {
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
 };
 
 const CreateWorkshopModal = ({
@@ -26,20 +33,19 @@ const CreateWorkshopModal = ({
   const [duradaHores, setDuradaHores] = useState("");
   const [placesMaximes, setPlacesMaximes] = useState("");
   const [ubicacioDefecte, setUbicacioDefecte] = useState("");
-  const [diesExecucio, setDiesExecucio] = useState("");
   const [icona, setIcona] = useState("PUZZLE");
+  const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
+  
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const SVG_ICONS = {
-    PUZZLE: <path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />,
-    ROBOT: <path d="M12 2a2 2 0 012 2v1h2a2 2 0 012 2v2h1a2 2 0 012 2v4a2 2 0 01-2 2h-1v2a2 2 0 01-2 2H7a2 2 0 01-2-2v-2H4a2 2 0 01-2-2v-4a2 2 0 012-2h1V7a2 2 0 012-2h2V4a2 2 0 012-2zM9 9H7v2h2V9zm8 0h-2v2h2V9z" />,
-    CODE: <path d="M10 20l-7-7 7-7m4 0l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor" />,
-    PAINT: <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10c1 0 1.8-.8 1.8-1.8 0-.46-.17-.9-.47-1.24-.3-.33-.47-.78-.47-1.26 0-.96.79-1.75 1.75-1.75H17c2.76 0 5-2.24 5-5 0-4.42-4.48-8-10-8z" />,
-    FILM: <path d="M7 4V20M17 4V20M3 8H7M17 8H21M3 12H21M3 16H7M17 16H21M3 4H21V20H3V4Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" stroke="currentColor" />,
-    TOOLS: <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6-3.8 3.8L11 11.6a1 1 0 00-1.4 0L3.3 18a1 1 0 000 1.4l1.3 1.3a1 1 0 001.4 0l6.4-6.4 1.5 1.5a1 1 0 001.4 0l3.8-3.8 1.6 1.6a1 1 0 001.4 0l1.3-1.3a1 1 0 000-1.4L14.7 6.3z" />,
-    LEAF: <path d="M12 2a10 10 0 00-10 10c0 5.52 4.48 10 10 10s10-4.48 10-10A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16z" />,
-    GEAR: <path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z" />
+  // Helper form state
+  const [tempDay, setTempDay] = useState(1);
+  const [tempStart, setTempStart] = useState("09:00");
+  const [tempEnd, setTempEnd] = useState("11:00");
+
+  const daysMap: Record<number, string> = {
+      1: 'Dilluns', 2: 'Dimarts', 3: 'Dimecres', 4: 'Dijous', 5: 'Divendres'
   };
 
   useEffect(() => {
@@ -55,38 +61,50 @@ const CreateWorkshopModal = ({
   }, []);
 
   React.useEffect(() => {
-    if (visible) {
-      if (initialData) {
-        setTitol(initialData.titol);
-        setIdSector(initialData.id_sector || "");
-        setModalitat(initialData.modalitat);
-        setTrimestre(initialData.trimestre);
-        setIcona(initialData.icona || "🧩");
-        setDescripcio(initialData.detalls_tecnics?.descripcio || "");
-        setDuradaHores(initialData.detalls_tecnics?.durada_hores?.toString() || "");
-        setPlacesMaximes(initialData.detalls_tecnics?.places_maximes?.toString() || "");
-        setUbicacioDefecte(initialData.detalls_tecnics?.ubicacio_defecte || "");
-        setDiesExecucio(initialData.dies_execucio.join(", "));
+    if (visible && initialData) {
+      setTitol(initialData.titol);
+      setIdSector(initialData.id_sector || "");
+      setModalitat(initialData.modalitat);
+      setTrimestre(initialData.trimestre);
+      setIcona(initialData.icona || "PUZZLE");
+      setDescripcio(initialData.detalls_tecnics?.descripcio || "");
+      setDuradaHores(initialData.detalls_tecnics?.durada_hores?.toString() || "");
+      setPlacesMaximes(initialData.detalls_tecnics?.places_maximes?.toString() || "");
+      setUbicacioDefecte(initialData.detalls_tecnics?.ubicacio_defecte || "");
+      
+      if (Array.isArray(initialData.dies_execucio) && initialData.dies_execucio.length > 0 && typeof initialData.dies_execucio[0] === 'object') {
+          setSchedule(initialData.dies_execucio as any);
       } else {
-        // Reset form
-        setTitol("");
-        setIdSector("");
-        setModalitat("A");
-        setTrimestre("1r");
-        setIcona("🧩");
-        setDescripcio("");
-        setDuradaHores("");
-        setPlacesMaximes("");
-        setUbicacioDefecte("");
-        setDiesExecucio("");
+           setSchedule([]);
       }
-      setError(null);
+    } else if (visible) {
+      setTitol("");
+      setIdSector("");
+      setModalitat("A");
+      setTrimestre("1r");
+      setIcona("PUZZLE");
+      setDescripcio("");
+      setDuradaHores("");
+      setPlacesMaximes("");
+      setUbicacioDefecte("");
+      setSchedule([]);
     }
+    setError(null);
   }, [visible, initialData]);
+
+  const addScheduleSlot = () => {
+      setSchedule([...schedule, { dayOfWeek: tempDay, startTime: tempStart, endTime: tempEnd }]);
+  };
+
+  const removeScheduleSlot = (index: number) => {
+      const newSchedule = [...schedule];
+      newSchedule.splice(index, 1);
+      setSchedule(newSchedule);
+  };
 
   const handleSubmit = async () => {
     if (!titol || !modalitat) {
-      setError("El título y la modalidad son obligatorios.");
+      setError("Els camps marcats amb * són obligatoris.");
       return;
     }
     setLoading(true);
@@ -105,7 +123,7 @@ const CreateWorkshopModal = ({
         places_maximes: parseInt(placesMaximes, 10) || 0,
         ubicacio_defecte: ubicacioDefecte,
       },
-      dies_execucio: diesExecucio.split(",").map((d) => d.trim()),
+      dies_execucio: schedule,
       referents_assignats: [],
     };
 
@@ -120,10 +138,8 @@ const CreateWorkshopModal = ({
       onClose();
     } catch (err: any) {
       setError(
-        err.message ||
-        (initialData ? "No se pudo actualizar el taller." : "No se pudo crear el taller.")
+         "Error al guardar el taller. Comprova les dades."
       );
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -132,285 +148,215 @@ const CreateWorkshopModal = ({
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
-      <div className="bg-white border-l border-r shadow-none w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="bg-gray-50 px-6 py-4 border-b border-gray-300 flex justify-between items-center sticky top-0 z-10">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-sans transition-all duration-300">
+      <div className="bg-white w-full max-w-5xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200">
+        {/* Header */}
+        <div className="bg-gray-50 px-8 py-5 flex justify-between items-center shrink-0 border-b border-gray-100">
           <div>
-            <h2 className="text-xl font-bold text-gray-800">
-              {initialData ? "Editar Taller" : "Crear Nuevo Taller"}
+            <h2 className="text-xl font-black text-[#00426B] uppercase tracking-tight">
+              {initialData ? "Editar Taller" : "Nou Taller"}
             </h2>
-            <p className="text-sm text-gray-500 mt-0.5">
-              {initialData ? "Modifica los detalles del taller" : "Introduce los detalles para registrar un nuevo taller en el catálogo."}
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+              Configuració del Taller i Horaris Setmanals
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 transition-colors focus:outline-none focus:ring-1 focus:ring-consorci-darkBlue"
-            aria-label="Cerrar"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+          <button onClick={onClose} className="text-gray-300 hover:text-[#00426B] transition-colors">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto custom-scrollbar">
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-red-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-              </div>
-            </div>
-          )}
+        {/* Content */}
+        <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
+            
+            {/* Esquerra: Dades */}
+            <div className="md:w-7/12 p-8 overflow-y-auto border-r border-gray-100 custom-scrollbar">
+                <section className="mb-8">
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 border-b border-gray-50 pb-3">Informació General</h3>
+                    
+                    <div className="space-y-6">
+                        <div className="group">
+                            <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Títol del Taller <span className="text-red-400">*</span></label>
+                            <input
+                                type="text"
+                                value={titol}
+                                onChange={(e) => setTitol(e.target.value)}
+                                className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all placeholder:text-gray-300 outline-none"
+                                placeholder="Introdueix el nom del taller..."
+                            />
+                        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
-              <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">
-                Icona del Taller
-              </label>
-              <div className="flex flex-wrap gap-2 p-4 bg-gray-50 border border-gray-100">
-                {Object.entries(SVG_ICONS).map(([key, path]) => (
-                  <button
-                    key={key}
-                    onClick={() => setIcona(key)}
-                    className={`w-12 h-12 flex items-center justify-center transition-all border ${
-                      icona === key 
-                        ? 'bg-[#00426B] border-[#00426B] scale-105 shadow-md text-white' 
-                        : 'bg-white border-gray-200 text-[#00426B] hover:border-[#0775AB] hover:bg-gray-50'
-                    }`}
-                  >
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                      {path}
-                    </svg>
-                  </button>
-                ))}
-              </div>
-            </div>
+                        <div className="grid grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Sector Professional</label>
+                                <select
+                                    value={idSector}
+                                    onChange={(e) => setIdSector(Number(e.target.value))}
+                                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none appearance-none"
+                                >
+                                    <option value="">Selecciona un sector...</option>
+                                    {sectors.map((sector) => (
+                                    <option key={sector.id_sector} value={sector.id_sector}>
+                                        {sector.nom}
+                                    </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Modalitat <span className="text-red-400">*</span></label>
+                                <select
+                                    value={modalitat}
+                                    onChange={(e) => setModalitat(e.target.value)}
+                                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none appearance-none"
+                                >
+                                    <option value="A">Modalitat A (3 Trim.)</option>
+                                    <option value="B">Modalitat B (2 Trim.)</option>
+                                    <option value="C">Modalitat C (1 Trim.)</option>
+                                </select>
+                            </div>
+                        </div>
 
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Título del Taller <span className="text-red-500">*</span>
-              </label>
-              <input
-                className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none text-black font-bold uppercase tracking-tight"
-                placeholder="Ej: Robótica Avanzada"
-                value={titol}
-                onChange={(e) => setTitol(e.target.value)}
-              />
-            </div>
+                        <div>
+                            <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Descripció</label>
+                            <textarea
+                                value={descripcio}
+                                onChange={(e) => setDescripcio(e.target.value)}
+                                rows={3}
+                                className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all placeholder:text-gray-300 outline-none custom-scrollbar"
+                                placeholder="Breu explicació del contingut..."
+                            />
+                        </div>
+                    </div>
+                </section>
 
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Descripción
-              </label>
-              <textarea
-                className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none h-28 resize-y text-black font-medium"
-                placeholder="Describe los objetivos y contenido del taller..."
-                value={descripcio}
-                onChange={(e) => setDescripcio(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Sector
-              </label>
-              <select
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none bg-white text-black"
-                value={idSector}
-                onChange={(e) => setIdSector(e.target.value === "" ? "" : Number(e.target.value))}
-              >
-                <option value="">Selecciona un sector</option>
-                {sectors.map((s) => (
-                  <option key={s.id_sector} value={s.id_sector}>
-                    {s.nom}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Modalidad <span className="text-red-500">*</span>
-              </label>
-              <select
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none bg-white text-black"
-                value={modalitat}
-                onChange={(e) => setModalitat(e.target.value)}
-              >
-                <option value="A">Modalitat A</option>
-                <option value="B">Modalitat B</option>
-                <option value="C">Modalitat C</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Trimestre
-              </label>
-              <select
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none bg-white text-black"
-                value={trimestre}
-                onChange={(e) => setTrimestre(e.target.value)}
-              >
-                <option value="1r">1r Trimestre</option>
-                <option value="2n">2n Trimestre</option>
-                <option value="3r">3r Trimestre</option>
-              </select>
+                <section>
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 border-b border-gray-50 pb-3">Detalls Tècnics</h3>
+                    <div className="grid grid-cols-3 gap-6">
+                         <div>
+                            <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Durada (h)</label>
+                            <input
+                                type="number"
+                                value={duradaHores}
+                                onChange={(e) => setDuradaHores(e.target.value)}
+                                className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none md:appearance-none"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Places</label>
+                            <input
+                                type="number"
+                                value={placesMaximes}
+                                onChange={(e) => setPlacesMaximes(e.target.value)}
+                                className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none md:appearance-none"
+                            />
+                        </div>
+                        <div>
+                             <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Icona</label>
+                             <div className="relative group/icon">
+                                <button className="w-full flex items-center justify-between px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] group-hover/icon:border-[#0775AB] transition-all">
+                                    <span className="flex items-center gap-2">
+                                        <WorkshopIcon iconName={icona} className="w-5 h-5" />
+                                        <span className="text-[9px] font-black uppercase tracking-widest">{icona}</span>
+                                    </span>
+                                </button>
+                                <div className="absolute top-full left-0 w-full bg-white border border-gray-200 shadow-xl hidden group-hover/icon:grid grid-cols-4 gap-1 p-3 z-20 animate-in fade-in slide-in-from-top-1 duration-150">
+                                    {Object.keys(SVG_ICONS).map((key) => (
+                                        <button key={key} onClick={() => setIcona(key)} className="p-3 hover:bg-[#EAEFF2] flex justify-center text-[#00426B] transition-colors relative group/item">
+                                            <WorkshopIcon iconName={key} className="w-5 h-5" />
+                                            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[6px] font-black uppercase opacity-0 group-hover/item:opacity-100 transition-opacity bg-[#00426B] text-white px-1">{key}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                </section>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Duración (h)
-                </label>
-                <div className="relative">
-                  <input
-                    className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none text-black"
-                    type="number"
-                    min="0"
-                    value={duradaHores}
-                    onChange={(e) => setDuradaHores(e.target.value)}
-                  />
-                  <span className="absolute right-3 top-2 text-gray-400 text-sm">
-                    hrs
-                  </span>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Plazas Max.
-                </label>
-                <input
-                  className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none text-black"
-                  type="number"
-                  min="0"
-                  value={placesMaximes}
-                  onChange={(e) => setPlacesMaximes(e.target.value)}
-                />
-              </div>
-            </div>
+            {/* Dreta: Horaris */}
+            <div className="md:w-5/12 bg-[#F8FAFC] p-8 overflow-y-auto">
+                <section>
+                    <h3 className="text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        Horari Setmanal
+                    </h3>
+                    
+                    <div className="bg-white p-6 shadow-sm border border-gray-100 mb-8 relative">
+                        <div className="absolute top-0 left-0 w-1.5 h-full bg-[#00426B]"></div>
+                        <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">Afegir Franja</h4>
+                        <div className="space-y-4">
+                            <div>
+                                <select 
+                                    value={tempDay} onChange={(e) => setTempDay(parseInt(e.target.value))}
+                                    className="w-full px-4 py-2.5 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
+                                >
+                                    <option value={1}>Dilluns</option>
+                                    <option value={2}>Dimarts</option>
+                                    <option value={3}>Dimecres</option>
+                                    <option value={4}>Dijous</option>
+                                    <option value={5}>Divendres</option>
+                                </select>
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <input type="time" value={tempStart} onChange={(e) => setTempStart(e.target.value)} className="w-full px-3 py-2 text-sm font-bold text-[#00426B] border border-gray-100 bg-[#F8FAFC] focus:border-[#0775AB] outline-none" />
+                                </div>
+                                <span className="flex items-center text-gray-300">-</span>
+                                <div className="flex-1">
+                                    <input type="time" value={tempEnd} onChange={(e) => setTempEnd(e.target.value)} className="w-full px-3 py-2 text-sm font-bold text-[#00426B] border border-gray-100 bg-[#F8FAFC] focus:border-[#0775AB] outline-none" />
+                                </div>
+                            </div>
+                            <button 
+                                onClick={addScheduleSlot}
+                                className="w-full py-3 bg-[#EAEFF2] text-[#00426B] text-[9px] font-black uppercase tracking-[0.2em] hover:bg-[#00426B] hover:text-white transition-all shadow-sm active:scale-95"
+                            >
+                                + Afegir Dia
+                            </button>
+                        </div>
+                    </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Ubicación
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-2.5 text-gray-400">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                </span>
-                <input
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none text-black"
-                  placeholder="Aula o laboratorio"
-                  value={ubicacioDefecte}
-                  onChange={(e) => setUbicacioDefecte(e.target.value)}
-                />
-              </div>
+                    <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 px-1">Dies Configurats</h4>
+                    <div className="space-y-3">
+                        {schedule.map((slot, idx) => (
+                            <div key={idx} className="flex justify-between items-center bg-white border border-gray-100 p-4 shadow-sm hover:border-[#0775AB] transition-colors group">
+                                <div className="flex flex-col">
+                                    <span className="text-[11px] font-black text-[#00426B] uppercase tracking-tight">{daysMap[slot.dayOfWeek]}</span>
+                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{slot.startTime} - {slot.endTime}</span>
+                                </div>
+                                <button onClick={() => removeScheduleSlot(idx)} className="text-gray-300 hover:text-[#F26178] transition-colors p-2 hover:bg-red-50 rounded-full">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                            </div>
+                        ))}
+                        {schedule.length === 0 && (
+                            <div className="text-center py-10 border border-dashed border-gray-200 text-gray-300 text-[10px] font-bold uppercase tracking-widest bg-white">
+                                Cap dia configurat encara
+                            </div>
+                        )}
+                    </div>
+                </section>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Días de ejecución
-              </label>
-              <input
-                className="w-full px-4 py-2 border border-gray-300 focus:border-consorci-darkBlue transition-shadow outline-none text-black"
-                placeholder="Ej: Lunes, Miércoles"
-                value={diesExecucio}
-                onChange={(e) => setDiesExecucio(e.target.value)}
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Separados por comas
-              </p>
-            </div>
-          </div>
         </div>
 
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end space-x-3">
-          <button
-            onClick={onClose}
-            className="px-6 py-2.5 border border-gray-300 text-gray-700 font-medium hover:bg-gray-100 focus:outline-none transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            className={`px-6 py-2.5 text-white font-bold transition-colors focus:outline-none ${loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-consorci-darkBlue hover:bg-consorci-lightBlue"
-              }`}
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? (
-              <span className="flex items-center">
-                <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Procesando...
-              </span>
-            ) : (
-              initialData ? "Guardar Cambios" : "Crear Taller"
-            )}
-          </button>
+        {/* Footer */}
+        <div className="bg-gray-50 border-t border-gray-100 px-8 py-5 flex justify-between items-center shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+             {error ? (
+                 <div className="text-[#F26178] text-[10px] font-black uppercase tracking-widest">{error}</div>
+             ) : (
+                 <div className="text-gray-400 text-[9px] font-bold uppercase tracking-widest">Revisa les dades abans de guardar.</div>
+             )}
+             
+             <div className="flex gap-4">
+                 <button onClick={onClose} className="px-6 py-3 text-[10px] font-black text-gray-400 hover:text-gray-600 uppercase tracking-widest transition-colors">
+                     Cancel·lar
+                 </button>
+                 <button 
+                    onClick={handleSubmit} 
+                    disabled={loading}
+                    className="px-10 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#0775AB] shadow-xl disabled:opacity-50 disabled:shadow-none transition-all active:scale-95"
+                 >
+                     {loading ? 'Guardant...' : 'Guardar Taller'}
+                 </button>
+             </div>
         </div>
       </div>
     </div>

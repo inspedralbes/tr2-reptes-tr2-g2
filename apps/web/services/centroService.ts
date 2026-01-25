@@ -7,7 +7,6 @@ export interface Centre {
   adreca?: string;
   telefon_contacte?: string;
   email_contacte?: string;
-  asistencia_reunion: boolean;
 }
 
 const centroService = {

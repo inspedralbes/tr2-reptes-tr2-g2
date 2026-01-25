@@ -15,7 +15,7 @@ export const getPeticions = async (req: Request, res: Response) => {
 
   try {
     const where: any = {};
-    
+
     // Scoping: Admin sees all, others only their center
     if (role !== 'ADMIN') {
       if (!centreId) {
@@ -70,8 +70,8 @@ export const createPeticio = async (req: Request, res: Response) => {
   } = req.body;
   const { centreId } = (req as any).user;
 
-  if (!id_taller || !centreId) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios (id_taller, centreId)' });
+  if (!id_taller || !centreId || !prof1_id || !prof2_id) {
+    return res.status(400).json({ error: 'Faltan campos obligatorios (id_taller, centreId, prof1_id, prof2_id)' });
   }
 
   // --- VERIFICACIÓN DE FASE ---
@@ -128,8 +128,8 @@ export const createPeticio = async (req: Request, res: Response) => {
         comentaris,
         estat: 'Pendent',
         modalitat,
-        prof1_id: prof1_id ? parseInt(prof1_id) : null,
-        prof2_id: prof2_id ? parseInt(prof2_id) : null,
+        prof1_id: parseInt(prof1_id),
+        prof2_id: parseInt(prof2_id),
       },
       include: {
         taller: true
@@ -144,8 +144,9 @@ export const createPeticio = async (req: Request, res: Response) => {
       await db.collection('request_checklists').insertOne({
         id_peticio: nuevaPeticio.id_peticio,
         id_centre: nuevaPeticio.id_centre,
+        id_taller: nuevaPeticio.id_taller,
         workshop_title: nuevaPeticio.taller.titol,
-        status: 'initializing',
+        status: 'pendent',
         passos: [
           { pas: 'Revisió de coordinació', completat: false, data: new Date() },
           { pas: 'Assignació de material', completat: false, data: new Date() },
@@ -163,6 +164,7 @@ export const createPeticio = async (req: Request, res: Response) => {
         tipus_accio: 'CREATE_PETICIO',
         centre_id: nuevaPeticio.id_centre,
         taller_id: nuevaPeticio.id_taller,
+        workshop_title: nuevaPeticio.taller.titol,
         timestamp: new Date(),
         detalls: {
           modalitat: nuevaPeticio.modalitat,
@@ -179,6 +181,114 @@ export const createPeticio = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error en peticioController.createPeticio:", error);
     res.status(500).json({ error: 'Error al crear petición' });
+  }
+};
+
+// PUT: Actualizar solicitud existente (solo campos permitidos y si está Pendent)
+export const updatePeticio = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const {
+    alumnes_aprox,
+    comentaris,
+    prof1_id,
+    prof2_id,
+  } = req.body;
+  const { centreId, role } = (req as any).user;
+
+  try {
+    const peticioId = parseInt(id as string);
+    const existingPeticio = await prisma.peticio.findUnique({
+      where: { id_peticio: peticioId }
+    });
+
+    if (!existingPeticio) {
+      return res.status(404).json({ error: 'Petición no encontrada.' });
+    }
+
+    // Verificar permisos: Coordinador solo edita las suyas
+    if (role !== 'ADMIN' && existingPeticio.id_centre !== parseInt(centreId)) {
+      return res.status(403).json({ error: 'No tienes permiso para editar esta petición.' });
+    }
+
+    // Verificar estado: Solo se pueden editar las pendientes
+    if (existingPeticio.estat !== 'Pendent') {
+      return res.status(400).json({ error: 'Solo se pueden editar peticiones pendientes.' });
+    }
+
+    // --- VERIFICACIÓN DE FASE ---
+    // Si NO es admin, verificamos la fase. Los admins pueden editar siempre.
+    if (role !== 'ADMIN') {
+      const phaseStatus = await isPhaseActive(PHASES.SOLICITUD);
+      if (!phaseStatus.isActive) {
+        let errorMessage = 'El período de solicitud de talleres no está activo.';
+        if (!phaseStatus.phaseActiveFlag) {
+          errorMessage = 'La fase de solicitud ha sido desactivada por el administrador.';
+        } else if (!phaseStatus.isWithinDates) {
+          errorMessage = 'El plazo para solicitar talleres ha finalizado.';
+        }
+        return res.status(403).json({ error: errorMessage });
+      }
+    }
+
+    // --- VALIDACIONES DE MODALIDAD C (REGLAS DEL PROGRAMA) ---
+    if (existingPeticio.modalitat === 'C' && alumnes_aprox !== undefined) {
+      const nuevosAlumnes = parseInt(alumnes_aprox);
+      if (nuevosAlumnes > 4) {
+        return res.status(400).json({ error: 'En la Modalidad C, el máximo es de 4 alumnos de un mismo instituto por proyecto.' });
+      }
+
+      // Comprobar límite total de 12 alumnos (excluyendo la cantidad actual de esta petición)
+      const peticionsC = await prisma.peticio.findMany({
+        where: {
+          id_centre: existingPeticio.id_centre,
+          modalitat: 'C',
+          id_peticio: { not: peticioId } // Excluir la actual
+        }
+      });
+
+      const totalAlumnesC = peticionsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
+      if (totalAlumnesC + nuevosAlumnes > 12) {
+        return res.status(400).json({
+          error: `Límite excedido. El instituto ya tiene ${totalAlumnesC} alumnos en otros proyectos de Modalidad C. Con este cambio (${nuevosAlumnes}) superaría el máximo de 12.`
+        });
+      }
+    }
+
+    const updatedPeticio = await prisma.peticio.update({
+      where: { id_peticio: peticioId },
+      data: {
+        alumnes_aprox: alumnes_aprox ? parseInt(alumnes_aprox) : undefined,
+        comentaris,
+        prof1_id: parseInt(prof1_id),
+        prof2_id: parseInt(prof2_id),
+      },
+      include: {
+        taller: true
+      }
+    });
+
+    // Log de actividad
+    try {
+      const { db } = await connectToDatabase();
+      await db.collection('activity_logs').insertOne({
+        tipus_accio: 'UPDATE_PETICIO',
+        centre_id: existingPeticio.id_centre,
+        taller_id: existingPeticio.id_taller,
+        peticio_id: existingPeticio.id_peticio,
+        timestamp: new Date(),
+        detalls: {
+          previous_alumnes: existingPeticio.alumnes_aprox,
+          new_alumnes: alumnes_aprox
+        }
+      });
+    } catch (e) {
+      console.warn('Could not log activity', e);
+    }
+
+    res.json(updatedPeticio);
+  } catch (error) {
+    console.error("Error en peticioController.updatePeticio:", error);
+    res.status(500).json({ error: 'Error al actualizar petición' });
   }
 };
 
@@ -202,8 +312,27 @@ export const updatePeticioStatus = async (req: Request, res: Response) => {
       importancia: updated.estat === 'Aprovada' ? 'INFO' : 'WARNING'
     });
 
+    // --- INTEGRACIÓN MONGODB ---
+    try {
+      const { db } = await connectToDatabase();
+      await db.collection('request_checklists').updateOne(
+        { id_peticio: updated.id_peticio },
+        { $set: { status: updated.estat.toLowerCase() } }
+      );
+      await db.collection('activity_logs').insertOne({
+        tipus_accio: updated.estat === 'Aprovada' ? 'APPROVE_PETICIO' : 'REJECT_PETICIO',
+        centre_id: updated.id_centre,
+        taller_id: updated.id_taller,
+        timestamp: new Date(),
+        detalls: { estat_anterior: 'Pendent', estat_nou: updated.estat }
+      });
+    } catch (mongoError) {
+      console.warn('⚠️ MongoDB Sync Error:', mongoError);
+    }
+
     res.json(updated);
   } catch (error) {
+    console.error("Error en updatePeticioStatus:", error);
     res.status(500).json({ error: 'Error al actualizar estado' });
   }
 };

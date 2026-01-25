@@ -3,12 +3,26 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import statsService, { StatusStat, PopularStat, ActivityLog } from '@/services/statsService';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import {
+  BarChart3,
+  PieChart as PieChartIcon,
+  Search,
+  History,
+  Trash2,
+  PlusCircle,
+  Database,
+  TrendingUp,
+  Activity
+} from 'lucide-react';
+import {
+  StatusDistribution,
+  WorkshopPopularity
+} from '@/components/ChartComponents';
 
 export default function AdminStatsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -18,7 +32,7 @@ export default function AdminStatsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  
+
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -30,7 +44,7 @@ export default function AdminStatsPage() {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const router = useRouter();
@@ -47,6 +61,7 @@ export default function AdminStatsPage() {
       setActivityLogs(activityData);
     } catch (err) {
       console.error("Error fetching stats:", err);
+      toast.error('Error al carregar les estadístiques.');
     } finally {
       setLoading(false);
     }
@@ -83,11 +98,13 @@ export default function AdminStatsPage() {
   };
 
   const handleSearch = async () => {
+    if (!searchTerm.trim()) return;
     try {
       const res = await statsService.search(searchTerm);
       setSearchResults(res);
+      if (res.length === 0) toast.info('No s\'han trobat resultats.');
     } catch (err) {
-      console.error("Error searching:", err);
+      toast.error('Error en la cerca.');
     }
   };
 
@@ -104,185 +121,196 @@ export default function AdminStatsPage() {
     }
   };
 
-  if (authLoading || !user) {
-    return <Loading fullScreen message="Carregant analítica..." />;
+  if (authLoading || !user || loading) {
+    return <Loading fullScreen message="Generant analítica professional..." />;
   }
 
   return (
-    <DashboardLayout 
-      title="Gestió de Dades" 
-      subtitle="Analítica professional i administració de registres d'activitat"
+    <DashboardLayout
+      title="Dashboard Analític"
+      subtitle="Visualització de dades generades en temps real des de MongoDB Atlas"
     >
-      <div className="space-y-8">
-        {/* Header Actions */}
-        <div className="flex justify-between items-center border-b border-gray-200 pb-4">
-          <div className="text-[10px] font-black text-[#00426B] uppercase tracking-widest">
-            PANEL D'ADMINISTRACIÓ AVANÇAT
+      <div className="space-y-8 animate-in fade-in duration-700">
+
+        {/* Header Ribbon */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-background-surface p-6 text-text-primary shadow-sm border-l-8 border-consorci-darkBlue">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Activity className="w-5 h-5 text-consorci-lightBlue animate-pulse" />
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-consorci-lightBlue">
+                DATA SYNC ACTIVE
+              </div>
+            </div>
+            <h2 className="text-xl font-black uppercase tracking-tight text-consorci-darkBlue">Estadístiques de Gestió</h2>
           </div>
-          <button 
-            onClick={handleCleanup}
-            className="bg-white text-red-600 px-4 py-2 rounded-none text-[10px] font-black uppercase tracking-widest hover:bg-red-50 transition-all border border-red-200"
-          >
-            Netejar Logs Antics
-          </button>
+          <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
+            <div className="text-right hidden sm:block">
+              <div className="text-[10px] font-black text-text-muted uppercase mb-0.5 tracking-tighter">Global Requests</div>
+              <div className="text-3xl font-black leading-none text-consorci-darkBlue">
+                {statusStats.reduce((acc, s) => acc + s.total, 0)}
+              </div>
+            </div>
+            <button
+              onClick={handleCleanup}
+              className="group relative flex items-center gap-2 bg-background-subtle hover:bg-red-50 px-6 py-3 border border-border-subtle hover:border-red-200 transition-all duration-300"
+            >
+              <Trash2 className="w-4 h-4 text-text-secondary group-hover:text-red-600 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary group-hover:text-red-700">Netejar Històric</span>
+            </button>
+          </div>
         </div>
 
-        {/* Top Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Status Stats Section */}
-          <div className="bg-white border border-gray-200 rounded-none shadow-none overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center gap-3">
-              <div className="w-2 h-6 bg-[#00426B]"></div>
-              <h3 className="text-xs font-black text-[#00426B] uppercase tracking-widest">Peticions per Estat</h3>
+        {/* Main Grid: Charts & Stats */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          {/* Status Distribution (Pie) */}
+          <div className="lg:col-span-1 flex flex-col bg-background-surface border border-border-subtle shadow-sm transition-all hover:shadow-md hover:border-consorci-lightBlue/30 group">
+            <div className="p-6 border-b border-border-subtle flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <PieChartIcon className="w-4 h-4 text-consorci-actionBlue" />
+                <h3 className="text-[10px] font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Estat de Peticions</h3>
+              </div>
+              <TrendingUp className="w-4 h-4 text-green-500 opacity-50 group-hover:opacity-100 transition-opacity" />
             </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {statusStats.length > 0 ? statusStats.map((stat, i) => (
-                  <div key={i} className="border border-gray-100 p-4 bg-gray-50/50 flex flex-col justify-center">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight mb-1">{stat.estat}</span>
-                    <span className="text-2xl font-black text-[#00426B]">{stat.total}</span>
+            <div className="p-6 flex-1 flex flex-col justify-center">
+              <StatusDistribution data={statusStats} />
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                {statusStats.map((s, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-background-subtle p-2 border-l-2 border-consorci-darkBlue dark:border-consorci-lightBlue">
+                    <span className="text-[9px] font-bold text-text-secondary uppercase">{s.estat}</span>
+                    <span className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue">{s.total}</span>
                   </div>
-                )) : (
-                  <div className="col-span-2 py-4 text-center border border-dashed border-gray-100 italic text-xs text-gray-400">
-                    No hi ha dades disponibles
-                  </div>
-                )}
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Popular Workshops Section */}
-          <div className="bg-white border border-gray-200 rounded-none shadow-none overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center gap-3">
-              <div className="w-2 h-6 bg-[#0775AB]"></div>
-              <h3 className="text-xs font-black text-[#00426B] uppercase tracking-widest">Tallers més Sol·licitats</h3>
+          {/* Workshop Popularity (Bar) */}
+          <div className="lg:col-span-2 flex flex-col bg-background-surface border border-border-subtle shadow-sm transition-all hover:shadow-md hover:border-consorci-lightBlue/30">
+            <div className="p-6 border-b border-border-subtle flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-consorci-actionBlue" />
+              <h3 className="text-[10px] font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Demanda Global de Tallers</h3>
             </div>
-            <div className="p-0">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="bg-gray-50/50 text-gray-400 border-b border-gray-100">
-                    <th className="px-6 py-3 font-black uppercase tracking-tighter">Pos</th>
-                    <th className="px-6 py-3 font-black uppercase tracking-tighter">ID Taller</th>
-                    <th className="px-6 py-3 font-black uppercase tracking-tighter text-right">Alumnes</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {popularStats.length > 0 ? popularStats.map((stat, i) => (
-                    <tr key={i} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-3 font-black text-gray-400">#0{i + 1}</td>
-                      <td className="px-6 py-3 font-bold text-gray-800">{stat._id}</td>
-                      <td className="px-6 py-3 text-right">
-                        <span className="bg-[#0775AB] text-white px-2 py-0.5 font-bold">{stat.alumnes_totals}</span>
-                      </td>
-                    </tr>
-                  )) : (
-                    <tr>
-                      <td colSpan={3} className="px-6 py-8 text-center text-gray-300 italic">No hi ha rànquing disponible</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="p-6 flex-1">
+              <WorkshopPopularity data={popularStats} />
             </div>
           </div>
         </div>
 
-        {/* Checklist Management Section */}
-        <div className="bg-white border border-gray-200 rounded-none shadow-none">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+
+        {/* MongoDB Management (Checklists) */}
+        <div className="bg-background-surface border border-border-subtle shadow-lg">
+          <div className="p-6 border-b border-border-subtle bg-background-subtle flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-6 bg-green-600"></div>
-              <h3 className="text-xs font-black text-[#00426B] uppercase tracking-widest">Gestió de Checklists (MongoDB)</h3>
+              <Search className="w-5 h-5 text-consorci-darkBlue dark:text-consorci-lightBlue" />
+              <div>
+                <h3 className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Gestió Dinàmica de Checklists</h3>
+                <p className="text-[9px] font-bold text-text-muted uppercase mt-0.5">Consulta de documents a col·lecció 'request_checklists'</p>
+              </div>
             </div>
-            <div className="flex gap-0">
-              <input 
-                type="text" 
-                placeholder="Cercar per títol o estat..."
+            <div className="flex w-full md:w-auto">
+              <input
+                type="text"
+                placeholder="Ex: Robòtica, Aprovada..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-white border border-gray-200 px-4 py-2 rounded-none text-xs focus:outline-none focus:border-[#00426B] border-r-0 w-64"
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="bg-background-surface border-2 border-r-0 border-border-subtle px-6 py-3 text-xs focus:outline-none focus:border-consorci-darkBlue dark:focus:border-consorci-lightBlue w-full md:w-80 transition-all font-bold placeholder:text-text-muted placeholder:italic text-text-primary"
               />
-              <button 
+              <button
                 onClick={handleSearch}
-                className="bg-[#00426B] text-white px-6 py-2 rounded-none text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB]"
+                className="bg-consorci-darkBlue text-white px-8 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-consorci-actionBlue transition-colors whitespace-nowrap"
               >
-                Cercar
+                Cercar Docs
               </button>
             </div>
           </div>
 
-          <div className="p-6">
-            <div className="grid grid-cols-1 gap-4">
+          <div className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {searchResults.length > 0 ? searchResults.map((result) => (
-                <div key={result._id} className="border border-gray-200 p-4 bg-gray-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="text-sm font-black text-[#00426B]">{result.workshop_title}</h4>
-                      <span className="text-[9px] font-black border border-green-600 text-green-600 px-1.5 py-0.5 uppercase">{result.status}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {result.passos.map((p: any, idx: number) => (
-                        <div key={idx} className={`px-2 py-0.5 text-[9px] font-bold border rounded-none ${p.completat ? 'bg-green-100 border-green-200 text-green-800' : 'bg-white border-gray-300 text-gray-400'}`}>
-                          {p.pas}
-                        </div>
-                      ))}
+                <div key={result._id} className="group border border-border-subtle bg-background-subtle/30 hover:bg-background-surface hover:border-consorci-darkBlue dark:hover:border-consorci-lightBlue hover:shadow-xl transition-all duration-300 p-6 flex flex-col">
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <h4 className="text-sm font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-tight leading-none mb-2">{result.workshop_title}</h4>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                        <span className="text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-tighter">{result.status}</span>
+                      </div>
                     </div>
                   </div>
-                  <button 
+
+                  <div className="space-y-2 mb-6 flex-1">
+                    {result.passos.map((p: any, idx: number) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <div className={`w-3 h-3 border rounded-full ${p.completat ? 'bg-consorci-darkBlue border-consorci-darkBlue dark:bg-consorci-lightBlue dark:border-consorci-lightBlue' : 'bg-background-surface border-border-subtle'}`}></div>
+                        <span className={`text-[10px] font-bold ${p.completat ? 'text-consorci-darkBlue dark:text-consorci-lightBlue' : 'text-text-muted italic font-medium line-through'}`}>
+                          {p.pas}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
                     onClick={() => handleAddStep(result.id_peticio)}
-                    className="bg-white border border-gray-200 text-[10px] font-black uppercase px-4 py-2 hover:bg-gray-100 transition-all text-[#00426B] whitespace-nowrap"
+                    className="flex items-center justify-center gap-2 w-full py-3 border border-consorci-darkBlue dark:border-consorci-lightBlue text-consorci-darkBlue dark:text-consorci-lightBlue hover:bg-consorci-darkBlue dark:hover:bg-consorci-lightBlue hover:text-white transition-all text-[9px] font-black uppercase tracking-widest"
                   >
-                    + Afegir Pas
+                    <PlusCircle className="w-3 h-3" />
+                    Nou Pas Checklist
                   </button>
                 </div>
               )) : (
-                <div className="text-center py-12 border border-dashed border-gray-100">
-                  <p className="text-gray-300 text-xs font-bold uppercase tracking-widest">Utilitza el cercador per trobar llistats nominals</p>
+                <div className="col-span-full py-20 text-center border-2 border-dashed border-border-subtle bg-background-subtle/20">
+                  <Search className="w-10 h-10 text-text-muted mx-auto mb-4" />
+                  <p className="text-text-muted text-[10px] font-black uppercase tracking-widest">Inicia una cerca per visualitzar llistats nominals</p>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Activity Logs Table */}
-        <div className="bg-white border border-gray-200 rounded-none shadow-none overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+        {/* Audit Log (Activity) */}
+        <div className="bg-background-surface border border-border-subtle overflow-hidden">
+          <div className="p-6 border-b border-border-subtle bg-background-subtle flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-6 bg-purple-600"></div>
-              <h3 className="text-xs font-black text-[#00426B] uppercase tracking-widest">Registre d'activitat (Últims 10)</h3>
+              <History className="w-5 h-5 text-consorci-darkBlue dark:text-consorci-lightBlue" />
+              <h3 className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Registre Logístic d'Activitat</h3>
             </div>
-            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tight">PostgreSQL & MongoDB Sync</span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+            <table className="w-full text-left text-[11px] border-collapse">
               <thead>
-                <tr className="bg-gray-50/30 text-gray-400 border-b border-gray-100">
-                  <th className="px-6 py-4 font-black uppercase w-48">Timestamp</th>
-                  <th className="px-6 py-4 font-black uppercase w-40">Acció</th>
-                  <th className="px-6 py-4 font-black uppercase">Detalls Documentals</th>
+                <tr className="bg-background-surface text-consorci-darkBlue dark:text-consorci-lightBlue border-b border-border-subtle">
+                  <th className="px-6 py-5 font-black uppercase tracking-tighter w-48">Timestamp</th>
+                  <th className="px-6 py-5 font-black uppercase tracking-tighter w-48">Mètode Execució</th>
+                  <th className="px-6 py-5 font-black uppercase tracking-tighter">Payload Documental (Metadata)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border-subtle">
                 {activityLogs.length > 0 ? activityLogs.map((log) => (
-                  <tr key={log._id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-4 font-mono text-[10px] text-gray-500 whitespace-nowrap">
-                      {new Date(log.timestamp).toLocaleString()}
+                  <tr key={log._id} className="hover:bg-background-subtle/80 transition-colors">
+                    <td className="px-6 py-4 font-black text-text-muted italic">
+                      {new Date(log.timestamp).toLocaleTimeString()} · {new Date(log.timestamp).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-2 py-0.5 border border-purple-200 text-purple-700 bg-purple-50 font-black uppercase tracking-tight text-[9px]">
-                        {log.tipus_accio}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
+                        <span className="font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase text-[10px]">
+                          {log.tipus_accio}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-mono text-[10px] text-gray-400 bg-gray-50 p-2 border border-gray-100 max-h-24 overflow-y-auto break-all">
+                      <div className="bg-consorci-darkBlue/5 dark:bg-consorci-lightBlue/10 p-3 font-mono text-[9px] text-consorci-darkBlue/80 dark:text-consorci-lightBlue/80 leading-relaxed border-l-2 border-consorci-darkBlue/20 dark:border-consorci-lightBlue/20">
                         {JSON.stringify(log.detalls)}
                       </div>
                     </td>
                   </tr>
                 )) : (
-                  <tr>
+                  <tr key="no-activity">
                     <td colSpan={3} className="px-6 py-20 text-center">
-                      <p className="text-gray-300 text-xs font-bold uppercase tracking-widest">No hi ha activitat registrada</p>
+                      <p className="text-text-muted text-xs font-bold uppercase tracking-widest italic tracking-widest">Sincronitzant historial de logs...</p>
                     </td>
                   </tr>
                 )}
@@ -290,8 +318,27 @@ export default function AdminStatsPage() {
             </table>
           </div>
         </div>
+
+        {/* Sync Atlas (Full Width) */}
+        <div className="bg-background-surface border border-border-subtle p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-purple-50 dark:bg-purple-900/20">
+              <Database className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div>
+              <h3 className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">MongoDB Atlas Data Sync</h3>
+              <p className="text-[9px] font-bold text-text-muted uppercase mt-1">
+                Cluster: <span className="text-consorci-actionBlue">iter-main</span> · Node: <span className="text-consorci-actionBlue">GCP-Brussels</span> · Status: <span className="text-green-500 font-black">Connected</span>
+              </p>
+            </div>
+          </div>
+          <div className="text-[10px] text-text-muted font-bold uppercase tracking-tight text-center md:text-right max-w-md hidden sm:block">
+            Sincronització de dades documentals activa. Qualsevol canvi en les peticions es reflecteix en temps real en els gràfics analítics superiors mitjançant pipelines d'agregació.
+          </div>
+        </div>
       </div>
-      <ConfirmDialog 
+
+      <ConfirmDialog
         isOpen={confirmConfig.isOpen}
         title={confirmConfig.title}
         message={confirmConfig.message}

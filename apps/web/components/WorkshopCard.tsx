@@ -1,5 +1,6 @@
 import React from 'react';
 import { Taller } from '../services/tallerService';
+import WorkshopIcon from './WorkshopIcon';
 
 interface WorkshopCardProps {
   item: Taller;
@@ -14,7 +15,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ item, onPress }) => {
   return (
     <button
       onClick={onPress}
-      className="mb-6 border border-gray-300 overflow-hidden cursor-pointer transition-colors hover:border-consorci-lightBlue"
+      className="mb-6 border border-gray-300 overflow-hidden cursor-pointer transition-colors hover:border-consorci-lightBlue w-full text-left"
     >
       <div className="h-48 w-full bg-gray-200 relative">
         <img 
@@ -31,9 +32,12 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ item, onPress }) => {
 
       <div className="p-5">
         <div className="flex justify-between items-start mb-2">
-          <span className="text-blue-600 font-bold text-xl flex-1 mr-2 leading-6">
-            {item.titol}
-          </span>
+          <div className="flex items-center gap-2 flex-1 mr-2">
+            <WorkshopIcon iconName={item.icona} className="w-5 h-5 text-blue-600 shrink-0" />
+            <span className="text-blue-600 font-bold text-xl leading-6">
+              {item.titol}
+            </span>
+          </div>
         </div>
 
         <span className="text-gray-600 text-sm leading-5 mb-4">

@@ -23,13 +23,14 @@ model Sector {
 model Taller {
   id_taller      Int          @id @default(autoincrement())
   titol          String
-  descripcio     String
+  descripcio     String       @default("")
   durada_h       Int
   places_maximes Int          @default(25)
   modalitat      Modalitat
   icona          String       @default("🧩")
   id_sector      Int
   sector         Sector       @relation(fields: [id_sector], references: [id_sector])
+  dies_execucio  Json         @default("[]")
   peticions      Peticio[]
   assignacions   Assignacio[]
 
@@ -89,6 +90,7 @@ model Usuari {
   nom_complet   String
   email         String  @unique
   password_hash String
+  url_foto      String?
   id_rol        Int
   rol           Rol     @relation(fields: [id_rol], references: [id_rol])
   id_centre     Int?
@@ -98,6 +100,7 @@ model Usuari {
   logs                  LogAuditoria[]
   notificacions         Notificacio[]
   professor             Professor?
+  sessioProfessors      SessioProfessor[]
 
   @@map("usuaris")
 }
@@ -135,10 +138,10 @@ model Peticio {
   estat         EstatPeticio @default(Pendent)
   modalitat     Modalitat?
 
-  prof1_id Int?
-  prof1    Professor? @relation("Profesor1", fields: [prof1_id], references: [id_professor])
-  prof2_id Int?
-  prof2    Professor? @relation("Profesor2", fields: [prof2_id], references: [id_professor])
+  prof1_id Int
+  prof1    Professor @relation("Profesor1", fields: [prof1_id], references: [id_professor])
+  prof2_id Int
+  prof2    Professor @relation("Profesor2", fields: [prof2_id], references: [id_professor])
 
   alumnes Alumne[] @relation("AlumnesPeticio")
 
@@ -164,7 +167,7 @@ model Assignacio {
   taller        Taller          @relation(fields: [id_taller], references: [id_taller])
   data_inici    DateTime?       @db.Date
   data_fi       DateTime?       @db.Date
-  estat         EstatAssignacio @default(En_curs)
+  estat         EstatAssignacio @default(PUBLISHED)
   grup          Int             @default(1)
 
   prof1_id Int?
@@ -186,20 +189,38 @@ model Assignacio {
 }
 
 model Sessio {
-  id_sessio     Int        @id @default(autoincrement())
+  id_sessio     Int               @id @default(autoincrement())
   id_assignacio Int
-  assignacio    Assignacio @relation(fields: [id_assignacio], references: [id_assignacio], onDelete: Cascade)
+  assignacio    Assignacio        @relation(fields: [id_assignacio], references: [id_assignacio], onDelete: Cascade)
   data_sessio   DateTime
   hora_inici    String?
   hora_fi       String?
+  staff         SessioProfessor[]
 
   @@map("sessions")
 }
 
+model SessioProfessor {
+  id_sessio Int
+  sessio    Sessio @relation(fields: [id_sessio], references: [id_sessio], onDelete: Cascade)
+  id_usuari Int
+  usuari    Usuari @relation(fields: [id_usuari], references: [id_usuari], onDelete: Cascade)
+
+  @@id([id_sessio, id_usuari])
+  @@map("sessio_professors")
+}
+
 enum EstatAssignacio {
-  En_curs     @map("En curs")
-  Finalitzada
-  Cancellada  @map("Cancel·lada")
+  PROVISIONAL
+  PUBLISHED
+  DATA_ENTRY
+  DATA_SUBMITTED
+  VALIDATED
+  READY_TO_START
+  VACANT
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }
 
 model AssignacioProfessor {
@@ -235,6 +256,7 @@ model Alumne {
   nom                   String
   cognoms               String
   curs                  String?
+  url_foto              String?
   id_centre_procedencia Int?
   centre_procedencia    Centre? @relation("CentreProcedencia", fields: [id_centre_procedencia], references: [id_centre])
 
@@ -251,6 +273,22 @@ model Inscripcio {
   assignacio    Assignacio @relation(fields: [id_assignacio], references: [id_assignacio])
   id_alumne     Int
   alumne        Alumne     @relation(fields: [id_alumne], references: [id_alumne])
+
+  // Compliance (Solo Mod C)
+  acord_pedagogic        Boolean @default(false)
+  autoritzacio_mobilitat Boolean @default(false)
+  drets_imatge           Boolean @default(false)
+  registre_ceb_confirmat Boolean @default(false)
+
+  // Validation Flags (Admin)
+  validat_acord_pedagogic        Boolean @default(false)
+  validat_autoritzacio_mobilitat Boolean @default(false)
+  validat_drets_imatge           Boolean @default(false)
+
+  // Document URLs
+  url_acord_pedagogic        String?
+  url_autoritzacio_mobilitat String?
+  url_drets_imatge           String?
 
   assistencia      Assistencia[]
   avaluacio_docent AvaluacioDocent?

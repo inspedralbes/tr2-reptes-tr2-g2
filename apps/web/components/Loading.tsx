@@ -10,15 +10,36 @@ interface LoadingProps {
 const Loading: React.FC<LoadingProps> = ({ fullScreen = false, message = 'Carregant...' }) => {
   const content = (
     <div className="flex flex-col items-center justify-center gap-6">
-      <div className="relative">
-        {/* Outer Ring */}
-        <div className="w-16 h-16 border-4 border-[#00426B]/10 rounded-full"></div>
-        {/* Spinning Segment */}
-        <div className="absolute top-0 left-0 w-16 h-16 border-4 border-t-[#00426B] border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
-        {/* Central Pulse */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-[#00426B]/5 rounded-full animate-pulse"></div>
+      <div className="relative w-16 h-16">
+        {/* Outer Glow */}
+        <div className="absolute inset-0 bg-[#00426B]/5 rounded-full blur-xl animate-pulse"></div>
+
+        {/* Modern Circular Spinner */}
+        <svg className="w-full h-full animate-spin text-[#00426B]" viewBox="0 0 50 50">
+          <circle
+            className="opacity-10"
+            cx="25"
+            cy="25"
+            r="20"
+            stroke="currentColor"
+            strokeWidth="4"
+            fill="none"
+          />
+          <path
+            className="opacity-100"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="4"
+            strokeLinecap="round"
+            d="M25,5 A20,20 0 0,1 45,25"
+          />
+        </svg>
+
+        {/* Inner Pulsing Circle */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-[#0775AB] rounded-full shadow-lg animate-pulse" style={{ animationDuration: '2s' }}></div>
       </div>
-      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#00426B]/60 translate-x-[0.15em]">
+
+      <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#00426B]/80 drop-shadow-sm">
         {message}
       </p>
     </div>

@@ -14,6 +14,8 @@ export interface Peticio {
   ids_alumnes?: number[];
   taller?: {
     titol: string;
+    sector: string; // Added sector as it might be useful
+    modalitat: string; // Added modalitat
   };
   centre?: {
     nom: string;
@@ -38,9 +40,9 @@ const peticioService = {
   /**
    * Crea una nueva petición.
    */
-  create: async (data: { 
-    id_taller: number; 
-    alumnes_aprox: number; 
+  create: async (data: {
+    id_taller: number;
+    alumnes_aprox: number;
     comentaris?: string;
     prof1_id?: number;
     prof2_id?: number;
@@ -53,6 +55,26 @@ const peticioService = {
     } catch (error: any) {
       console.error("Error en peticioService.create:", error);
       const errorMessage = error.response?.data?.error || "No se pudo crear la solicitud";
+      throw new Error(errorMessage);
+    }
+  },
+
+  /**
+   * Actualiza una petición existente.
+   */
+  update: async (id: number, data: {
+    alumnes_aprox?: number;
+    comentaris?: string;
+    prof1_id?: number;
+    prof2_id?: number;
+  }): Promise<Peticio> => {
+    const api = getApi();
+    try {
+      const response = await api.put<Peticio>(`/peticions/${id}`, data);
+      return response.data;
+    } catch (error: any) {
+      console.error("Error en peticioService.update:", error);
+      const errorMessage = error.response?.data?.error || "No se pudo actualizar la solicitud";
       throw new Error(errorMessage);
     }
   },

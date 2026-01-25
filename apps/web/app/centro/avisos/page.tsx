@@ -113,11 +113,11 @@ export default function AvisosPage() {
         {loading ? (
           <Loading message="Carregant avisos oficials..." />
         ) : notificacions.length > 0 ? (
-          <div className="flex flex-col border border-gray-200 bg-gray-50/30">
+          <div className="flex flex-col border border-border-subtle bg-background-subtle/30">
             {notificacions.map((notif, index) => (
               <div
                 key={notif.id_notificacio}
-                className={`p-6 border-b border-gray-100 last:border-b-0 transition-colors hover:bg-white relative ${notif.llegida ? 'bg-transparent' : 'bg-white'}`}
+                className={`p-6 border-b border-border-subtle last:border-b-0 transition-colors hover:bg-background-surface relative ${notif.llegida ? 'bg-transparent' : 'bg-background-surface'}`}
               >
                 {!notif.llegida && (
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-consorci-darkBlue" />
@@ -125,7 +125,7 @@ export default function AvisosPage() {
 
                 <div className="flex justify-between items-start gap-6">
                   <div className="flex gap-6 flex-1">
-                    <div className={`shrink-0 w-12 h-12 flex items-center justify-center border border-gray-100 ${notif.llegida ? 'bg-gray-50 text-gray-400' : 'bg-white text-consorci-darkBlue ring-1 ring-gray-100'}`}>
+                    <div className={`shrink-0 w-12 h-12 flex items-center justify-center border border-border-subtle ${notif.llegida ? 'bg-background-subtle text-text-muted' : 'bg-background-surface text-consorci-darkBlue ring-1 ring-border-subtle'}`}>
                       {getTypeIcon(notif.tipus)}
                     </div>
 
@@ -134,16 +134,16 @@ export default function AvisosPage() {
                         <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-wider border ${getImportanceStyles(notif.importancia)}`}>
                           {notif.importancia}
                         </span>
-                        <h3 className={`font-black tracking-tight leading-tight ${notif.llegida ? 'text-gray-500' : 'text-consorci-darkBlue text-lg'}`}>
+                        <h3 className={`font-black tracking-tight leading-tight ${notif.llegida ? 'text-text-muted' : 'text-text-primary text-lg'}`}>
                           {notif.titol}
                         </h3>
                       </div>
 
-                      <p className={`text-sm leading-relaxed mb-4 ${notif.llegida ? 'text-gray-400' : 'text-gray-600'}`}>
+                      <p className={`text-sm leading-relaxed mb-4 ${notif.llegida ? 'text-text-muted' : 'text-text-secondary'}`}>
                         {notif.missatge}
                       </p>
 
-                      <div className="text-[10px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-2">
+                      <div className="text-[10px] font-black text-text-muted uppercase tracking-widest flex items-center gap-2">
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -156,7 +156,7 @@ export default function AvisosPage() {
                     {!notif.llegida && (
                       <button
                         onClick={() => markRead(notif.id_notificacio)}
-                        className="p-2 bg-gray-50 hover:bg-consorci-darkBlue hover:text-white border border-gray-100 transition-all active:scale-90"
+                        className="p-2 bg-background-subtle hover:bg-consorci-darkBlue hover:text-white border border-border-subtle transition-all active:scale-90"
                         title="Marcar com a llegit"
                       >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -166,7 +166,7 @@ export default function AvisosPage() {
                     )}
                     <button
                       onClick={() => deleteNotif(notif.id_notificacio)}
-                      className="p-2 bg-gray-50 hover:bg-red-50 hover:text-red-600 border border-gray-100 transition-all active:scale-90"
+                      className="p-2 bg-background-subtle hover:bg-red-50 hover:text-red-600 border border-border-subtle transition-all active:scale-90"
                       title="Eliminar"
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -179,17 +179,18 @@ export default function AvisosPage() {
             ))}
           </div>
         ) : (
-          <div className="p-20 text-center border-2 border-dashed border-gray-200 bg-gray-50/30">
-            <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mx-auto mb-6 text-gray-300">
+          <div className="p-20 text-center border-2 border-dashed border-border-subtle bg-background-subtle/30">
+            <div className="w-16 h-16 bg-background-subtle flex items-center justify-center mx-auto mb-6 text-text-muted">
               <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
               </svg>
             </div>
-            <h4 className="text-consorci-darkBlue font-black uppercase tracking-widest text-sm mb-2">No tens avisos pendents</h4>
-            <p className="text-gray-400 text-xs font-bold leading-relaxed max-w-xs mx-auto">Quan hi hagi canvis en les teves sol·licituds o dates clau, apareixeran aquí.</p>
+            <h4 className="text-text-primary font-black uppercase tracking-widest text-sm mb-2">No tens avisos pendents</h4>
+            <p className="text-text-muted text-xs font-bold leading-relaxed max-w-xs mx-auto">Quan hi hagi canvis en les teves sol·licituds o dates clau, apareixeran aquí.</p>
           </div>
         )}
       </div>
+
       <ConfirmDialog 
         isOpen={confirmConfig.isOpen}
         title={confirmConfig.title}

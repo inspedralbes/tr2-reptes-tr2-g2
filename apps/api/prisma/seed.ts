@@ -103,44 +103,75 @@ async function seedUsers(roles: any, passDefault: string) {
   const profesBrossa = [];
   const profesClaris = [];
 
-  for (let i = 1; i <= 4; i++) {
-    const emailB = `prof.b${i}@brossa.cat`;
+  const brossaProfsNames = ['Laura Martínez', 'Jordi Soler', 'Marta Vila', 'Pere Gomis'];
+  const clarisProfsNames = ['Anna Ferrer', 'Marc Dalmau', 'Laia Puig', 'Sergi Vidal'];
+
+  for (let i = 0; i < 4; i++) {
+    const name = brossaProfsNames[i];
+    const email = `${name.toLowerCase().replace(' ', '.').normalize("NFD").replace(/[\u0300-\u036f]/g, "")}@brossa.cat`;
     const userB = await prisma.usuari.create({
       data: {
-        nom_complet: `Professor Brossa ${i}`,
-        email: emailB,
+        nom_complet: name,
+        email: email,
         password_hash: passDefault,
         id_rol: roles.rolProfe.id_rol,
         id_centre: centroBrossa.id_centre
       }
     });
     const pb = await prisma.professor.create({
-      data: { nom: `Professor Brossa ${i}`, contacte: emailB, id_centre: centroBrossa.id_centre, id_usuari: userB.id_usuari }
+      data: { nom: name, contacte: email, id_centre: centroBrossa.id_centre, id_usuari: userB.id_usuari }
     });
     profesBrossa.push(pb);
 
-    const emailP = `prof.p${i}@pauclaris.cat`;
+    const nameClaris = clarisProfsNames[i];
+    const emailC = `${nameClaris.toLowerCase().replace(' ', '.').normalize("NFD").replace(/[\u0300-\u036f]/g, "")}@pauclaris.cat`;
     const userP = await prisma.usuari.create({
       data: {
-        nom_complet: `Professor Claris ${i}`,
-        email: emailP,
+        nom_complet: nameClaris,
+        email: emailC,
         password_hash: passDefault,
         id_rol: roles.rolProfe.id_rol,
         id_centre: centroPauClaris.id_centre
       }
     });
     const pc = await prisma.professor.create({
-      data: { nom: `Professor Claris ${i}`, contacte: emailP, id_centre: centroPauClaris.id_centre, id_usuari: userP.id_usuari }
+      data: { nom: nameClaris, contacte: emailC, id_centre: centroPauClaris.id_centre, id_usuari: userP.id_usuari }
     });
     profesClaris.push(pc);
   }
 
-  for (let i = 1; i <= 10; i++) {
+  const brossaStudents = [
+    { n: 'Pol', c: 'Garcia' }, { n: 'Nuria', c: 'Roca' }, { n: 'Arnau', c: 'Font' }, 
+    { n: 'Julia', c: 'Serra' }, { n: 'Oriol', c: 'Mas' }, { n: 'Clara', c: 'Pons' }, 
+    { n: 'Nil', c: 'Bosch' }, { n: 'Emma', c: 'Sala' }, { n: 'Aleix', c: 'Camps' }, 
+    { n: 'Ona', c: 'Valls' }
+  ];
+
+  const clarisStudents = [
+    { n: 'Paula', c: 'Martí' }, { n: 'Eric', c: 'Torres' }, { n: 'Marina', c: 'Gil' }, 
+    { n: 'Jan', c: 'Costa' }, { n: 'Aina', c: 'Ramos' }, { n: 'Biel', c: 'Rovira' }, 
+    { n: 'Carla', c: 'Mola' }, { n: 'David', c: 'Romeu' }, { n: 'Sara', c: 'Canals' }, 
+    { n: 'Roger', c: 'Sants' }
+  ];
+
+  for (let i = 0; i < 10; i++) {
     await prisma.alumne.create({
-      data: { nom: `Alumne Brossa ${i}`, cognoms: 'Simulació', idalu: `B${100+i}`, curs: '4t ESO', id_centre_procedencia: centroBrossa.id_centre }
+      data: { 
+        nom: brossaStudents[i].n, 
+        cognoms: brossaStudents[i].c, 
+        idalu: `B${100+i}`, 
+        curs: '4t ESO', 
+        id_centre_procedencia: centroBrossa.id_centre 
+      }
     });
     await prisma.alumne.create({
-      data: { nom: `Alumne Claris ${i}`, cognoms: 'Simulació', idalu: `P${100+i}`, curs: '3r ESO', id_centre_procedencia: centroPauClaris.id_centre }
+      data: { 
+        nom: clarisStudents[i].n, 
+        cognoms: clarisStudents[i].c, 
+        idalu: `P${100+i}`, 
+        curs: '3r ESO', 
+        id_centre_procedencia: centroPauClaris.id_centre 
+      }
     });
   }
 
@@ -150,13 +181,81 @@ async function seedUsers(roles: any, passDefault: string) {
 async function seedTallers(sectors: any) {
   console.log('📚 Generando catálogo de talleres...');
   const tallers = [
-    { titol: 'Robòtica i IoT', sector: sectors.sectorTecno.id_sector, modalitat: 'A', cap: 10, icona: 'ROBOT' },
-    { titol: 'Cinema Digital', sector: sectors.sectorCreacio.id_sector, modalitat: 'B', cap: 8, icona: 'FILM' },
-    { titol: 'Impressió 3D', sector: sectors.sectorIndus.id_sector, modalitat: 'A', cap: 7, icona: 'TOOLS' },
-    { titol: 'Desenvolupament Web', sector: sectors.sectorTecno.id_sector, modalitat: 'C', cap: 6, icona: 'CODE' },
-    { titol: 'Disseny Gràfic', sector: sectors.sectorCreacio.id_sector, modalitat: 'B', cap: 4, icona: 'PAINT' },
-    { titol: 'Realitat Virtual', sector: sectors.sectorTecno.id_sector, modalitat: 'A', cap: 8, icona: 'GEAR' }, 
-    { titol: 'Energies Renovables', sector: sectors.sectorIndus.id_sector, modalitat: 'B', cap: 10, icona: 'LEAF' }
+    { 
+      titol: 'Robòtica i IoT', 
+      sector: sectors.sectorTecno.id_sector, 
+      modalitat: 'A', 
+      cap: 10, 
+      icona: 'ROBOT',
+      schedule: [
+        { dayOfWeek: 1, startTime: "09:00", endTime: "11:00" }, 
+        { dayOfWeek: 3, startTime: "09:00", endTime: "11:00" }  
+      ]
+    },
+    { 
+      titol: 'Cinema Digital', 
+      sector: sectors.sectorCreacio.id_sector, 
+      modalitat: 'B', 
+      cap: 8, 
+      icona: 'FILM',
+      schedule: [
+        { dayOfWeek: 2, startTime: "15:00", endTime: "18:00" },
+        { dayOfWeek: 4, startTime: "15:00", endTime: "18:00" } 
+      ]
+    },
+    { 
+      titol: 'Impressió 3D', 
+      sector: sectors.sectorIndus.id_sector, 
+      modalitat: 'A', 
+      cap: 7, 
+      icona: 'TOOLS',
+      schedule: [
+        { dayOfWeek: 5, startTime: "08:00", endTime: "12:00" } 
+      ]
+    },
+    { 
+      titol: 'Desenvolupament Web', 
+      sector: sectors.sectorTecno.id_sector, 
+      modalitat: 'C', 
+      cap: 6, 
+      icona: 'CODE',
+      schedule: [
+         { dayOfWeek: 1, startTime: "10:00", endTime: "13:00" },
+         { dayOfWeek: 2, startTime: "10:00", endTime: "13:00" }
+      ]
+    },
+    { 
+      titol: 'Disseny Gràfic', 
+      sector: sectors.sectorCreacio.id_sector, 
+      modalitat: 'B', 
+      cap: 4, 
+      icona: 'PAINT',
+      schedule: [
+        { dayOfWeek: 3, startTime: "16:00", endTime: "19:00" }
+      ]
+    },
+    { 
+      titol: 'Realitat Virtual', 
+      sector: sectors.sectorTecno.id_sector, 
+      modalitat: 'A', 
+      cap: 8, 
+      icona: 'GEAR',
+      schedule: [
+        { dayOfWeek: 4, startTime: "09:00", endTime: "11:00" },
+        { dayOfWeek: 5, startTime: "09:00", endTime: "11:00" }
+      ]
+    }, 
+    { 
+      titol: 'Energies Renovables', 
+      sector: sectors.sectorIndus.id_sector, 
+      modalitat: 'B', 
+      cap: 10, 
+      icona: 'LEAF',
+      schedule: [
+        { dayOfWeek: 1, startTime: "12:00", endTime: "14:00" },
+        { dayOfWeek: 3, startTime: "12:00", endTime: "14:00" }
+      ]
+    }
   ];
 
   const creadosTallers = [];
@@ -169,7 +268,8 @@ async function seedTallers(sectors: any) {
         durada_h: 3,
         places_maximes: t.cap,
         icona: t.icona,
-        descripcio: `Exploració pràctica de ${t.titol}.`
+        descripcio: `Exploració pràctica de ${t.titol}.`,
+        dies_execucio: t.schedule
       }
     });
     creadosTallers.push(nuevo);
@@ -177,39 +277,6 @@ async function seedTallers(sectors: any) {
   return creadosTallers;
 }
 
-async function seedPeticions(centros: any, tallers: any, profes: any) {
-  console.log('📝 Generando peticiones de centros...');
-  
-  // Peticiones para Joan Brossa
-  for (let i = 0; i < 4; i++) {
-    await prisma.peticio.create({
-      data: {
-        id_centre: centros.centroBrossa.id_centre,
-        id_taller: tallers[i].id_taller,
-        alumnes_aprox: 10 + i,
-        estat: i === 0 ? 'Aprovada' : 'Pendent',
-        modalitat: tallers[i].modalitat,
-        prof1_id: profes.profesBrossa[i % profes.profesBrossa.length].id_professor,
-        comentaris: `Sol·licitud de prova ${i+1} per al centre Brossa.`
-      }
-    });
-  }
-
-  // Peticiones para Pau Claris
-  for (let i = 0; i < 4; i++) {
-    await prisma.peticio.create({
-      data: {
-        id_centre: centros.centroPauClaris.id_centre,
-        id_taller: tallers[tallers.length - 1 - i].id_taller,
-        alumnes_aprox: 8 + i,
-        estat: 'Pendent',
-        modalitat: tallers[tallers.length - 1 - i].modalitat,
-        prof1_id: profes.profesClaris[i % profes.profesClaris.length].id_professor,
-        comentaris: `Sol·licitud de prova ${i+1} per al centre Pau Claris.`
-      }
-    });
-  }
-}
 
 async function seedFases() {
   console.log('🗓️ Creando fases del programa...');
@@ -257,29 +324,6 @@ async function seedFases() {
   }
 }
 
-async function seedSessions(assignments: any[]) {
-  console.log('📅 Generando sesiones de talleres...');
-  const now = new Date();
-  
-  for (const a of assignments) {
-    if (a.data_inici) {
-      // Creamos 3 sesiones espaciadas una semana
-      for (let i = 0; i < 3; i++) {
-        const dataSessio = new Date(a.data_inici);
-        dataSessio.setDate(dataSessio.getDate() + (i * 7));
-        
-        await prisma.sessio.create({
-          data: {
-            id_assignacio: a.id_assignacio,
-            data_sessio: dataSessio,
-            hora_inici: '09:00',
-            hora_fi: '13:00'
-          }
-        });
-      }
-    }
-  }
-}
 
 async function main() {
   console.log('🌱 Iniciando Seed final para el programa Iter...');
@@ -294,38 +338,13 @@ async function main() {
   const centrosData = await seedUsers(infra.roles, passDefault);
   const tallers = await seedTallers(infra.sectors);
   
-  await seedPeticions(centrosData, tallers, centrosData);
   await seedFases();
+  // await seedAssignments(centrosData, tallers);
 
-  // Necesitamos crear algunas asignaciones reales para ver sesiones
-  console.log('🔗 Generando asignaciones de prueba...');
-  const assignacions = [];
-  const brossaTaller1 = await prisma.assignacio.create({
-    data: {
-      id_centre: centrosData.centroBrossa.id_centre,
-      id_taller: tallers[0].id_taller,
-      data_inici: new Date(),
-      data_fi: new Date(new Date().setDate(new Date().getDate() + 30)),
-      estat: 'En_curs'
-    }
-  });
-  assignacions.push(brossaTaller1);
-
-  const pauTaller1 = await prisma.assignacio.create({
-    data: {
-      id_centre: centrosData.centroPauClaris.id_centre,
-      id_taller: tallers[1].id_taller,
-      data_inici: new Date(),
-      data_fi: new Date(new Date().setDate(new Date().getDate() + 30)),
-      estat: 'En_curs'
-    }
-  });
-  assignacions.push(pauTaller1);
-
-  await seedSessions(assignacions);
-
-  console.log('✅ Seed finalizado con éxito.');
+  console.log('✅ Seed finalizado con éxito (Con datos de prueba y sesiones).');
 }
+
+// function seedAssignments has been removed
 
 main()
   .catch((e) => {
