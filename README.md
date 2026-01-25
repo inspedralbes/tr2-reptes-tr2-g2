@@ -1,4 +1,5 @@
 <div align="center">
+  ![Logo Iter](doc/assets/logo-advance.png)
   <h1 style="font-size: 3rem; font-weight: bold; margin-top: 20px;">ITER ECOSYSTEM</h1>
   
   **Infraestructura Monorepo Escalable per a Centres Educatius**
@@ -22,12 +23,27 @@ Benvingut al nucli de l'ecosistema **Iter**. Aquesta és una infraestructura mod
 
 ## 🌐 Entorn de Producció
 
-L'ecosistema està totalment automatitzat i exposat de forma segura a través de **Cloudflare Tunnels**:
+L'arquitectura de producció s'ha simplificat per utilitzar un **únic punt d'entrada** gestionat per un proxy invers:
 
-* **💻 Web UI (Client/Admin):** [iter.kore29.com](https://iter.kore29.com)
-* **🔌 API Gateway:** [api-iter.kore29.com](https://api-iter.kore29.com)
+*   **Domini Principal**: [iter.kore29.com](https://iter.kore29.com)
+    *   `/*` → **Client Web & Admin Panel** (Next.js)
+    *   `/api/*` → **API Backend** (Express)
+
+### 🚀 Infraestructura i Desplegament
+
+El sistema compta amb un pipeline CI/CD totalment automatitzat hosteat en un servidor propi (**Self-Hosted Runner**).
+****
+1.  **Github Runner**: Detecta canvis a la branca `main`.
+2.  **`deploy.sh`**: Script d'orquestració que executa el cicle de vida:
+    *   📥 **Sincronització**: `git pull` segur amb gestió de stashes.
+    *   ⚙️ **Configuració**: Generació automàtica d'arxius `.env` crítics.
+    *   🐳 **Construcció**: `docker compose build` per garantir la integritat.
+    *   🚀 **Desplegament**: `docker compose up -d` amb neteja d'imatges (`prune`).
+3.  **Nginx**: Gestiona SSL i l'enrutament intern entre els contenidors.
 
 ## 🏗️ Estructura del Projecte
+
+![Diagrama del Projecte](doc/assets/diagrama.png)
 
 Utilitzem una arquitectura d'**espais de treball (workspaces)** per compartir codi eficientment:
 
