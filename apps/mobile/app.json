@@ -9,12 +9,17 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "extra": {
-      "apiUrl": "${EXPO_PUBLIC_API_URL}"
+      "router": {},
+      "eas": {
+        "projectId": "2ed194b9-753c-4732-be60-0f1125089e84"
+      }
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.consorci.iter"
     },
     "android": {
+      "package": "com.consorci.iter",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png"
