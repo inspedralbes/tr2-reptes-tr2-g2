@@ -97,7 +97,7 @@ export default function PerfilScreen() {
                   {user?.nom_complet || 'Carregant...'}
                 </Text>
                 <View className="bg-background-subtle self-start px-2.5 py-1 rounded-md border border-border-subtle">
-                   <Text className="text-primary text-[10px] font-bold uppercase tracking-wide">
+                   <Text className="text-primary dark:text-white text-[10px] font-bold uppercase tracking-wide">
                      {user?.rol?.nom_rol === ROLES.PROFESOR ? 'Professorat' : 'Administrador'}
                    </Text>
                 </View>

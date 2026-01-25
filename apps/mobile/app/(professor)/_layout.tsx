@@ -9,9 +9,9 @@ export default function ProfessorStackLayout() {
   return (
     <Stack screenOptions={{
       headerStyle: {
-        backgroundColor: isDark ? '#1e293b' : '#ffffff',
+        backgroundColor: isDark ? '#0f172a' : '#ffffff',
       },
-      headerTintColor: isDark ? '#4197cb' : '#00426B',
+      headerTintColor: isDark ? '#E0C5AC' : '#00426B',
       headerTitleStyle: {
         fontWeight: 'bold',
         fontFamily: 'Inter',

@@ -118,8 +118,6 @@ export default function SessionScreen() {
           title: "Llista d'alumnes",
           headerBackTitle: "Tornar",
           headerShadowVisible: false,
-          headerStyle: { backgroundColor: 'transparent' },
-          headerTitleStyle: { fontWeight: 'bold', fontSize: 18, color: THEME.colors.primary }
         }} 
       />
       
