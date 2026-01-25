@@ -1,0 +1,2 @@
+# Ignorar todo por defecto si fuera necesario, pero lo importante es incluir lo de arriba
+!../../packages/shared

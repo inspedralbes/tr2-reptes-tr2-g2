@@ -1,0 +1,63 @@
+import express from 'express';
+const router = express.Router();
+
+// Importar archivos de rutas individuales
+import authRoutes from './auth.routes';
+import tallerRoutes from './taller.routes';
+import centroRoutes from './centro.routes';
+import peticioRoutes from './peticio.routes'; // Nueva ruta para el flujo de reservas
+import assignacioRoutes from './assignacio.routes';
+import alumneRoutes from './alumne.routes';
+import professorRoutes from './professor.routes';
+import calendarRoutes from './calendar.routes';
+import faseRoutes from './fase.routes';
+import statsRoutes from './stats.routes';
+import sectorRoutes from './sector.routes';
+import assistenciaRoutes from './assistencia.routes';
+import notificacioRoutes from './notificacio.routes';
+import evaluationRoutes from './evaluation.routes'; // Rutas de IA (Voz)
+import avaluacioRoutes from './avaluacio.routes';
+import questionariRoutes from './questionari.routes';
+import uploadRoutes from './upload.routes';
+
+// --- Definir las rutas base ---
+
+// Rutas de Autenticación (Login, Registro)
+router.use('/auth', authRoutes);
+
+// Rutas de Maestros
+router.use('/tallers', tallerRoutes);
+router.use('/centres', centroRoutes);
+router.use('/sectors', sectorRoutes);
+
+// Rutas del Flujo de Negocio (Solicitudes y Asignaciones)
+router.use('/peticions', peticioRoutes);
+router.use('/assignacions', assignacioRoutes);
+router.use('/notificacions', notificacioRoutes);
+router.use('/evaluation', evaluationRoutes); // Usar rutas de evaluación
+
+// Rutas de Alumnos y Profesores
+router.use('/alumnes', alumneRoutes);
+router.use('/professors', professorRoutes);
+router.use('/assistencia', assistenciaRoutes);
+
+// Rutas de Calendario
+router.use('/calendar', calendarRoutes);
+router.use('/fases', faseRoutes);
+
+// Rutas de Estadísticas (MongoDB)
+router.use('/stats', statsRoutes);
+
+// Rutas de Evaluación y Cuestionarios
+router.use('/evaluacions', avaluacioRoutes);
+router.use('/questionaris', questionariRoutes);
+
+// Rutas de Carga de Archivos
+router.use('/upload', uploadRoutes);
+
+// Health Check (Para ver si la API respira)
+router.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date() });
+});
+
+export default router;

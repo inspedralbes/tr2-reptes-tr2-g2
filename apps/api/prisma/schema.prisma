@@ -1,0 +1,558 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// 1. GESTIÓ DE TALLERS I CATÀLEG
+// ==========================================
+
+model Sector {
+  id_sector  Int      @id @default(autoincrement())
+  nom        String
+  descripcio String?  @db.Text
+  tallers    Taller[]
+
+  @@map("sectors")
+}
+
+model Taller {
+  id_taller      Int          @id @default(autoincrement())
+  titol          String
+  descripcio     String       @default("")
+  durada_h       Int
+  places_maximes Int          @default(25)
+  modalitat      Modalitat
+  icona          String       @default("🧩")
+  id_sector      Int
+  sector         Sector       @relation(fields: [id_sector], references: [id_sector])
+  dies_execucio  Json         @default("[]")
+  peticions      Peticio[]
+  assignacions   Assignacio[]
+
+  @@map("tallers")
+}
+
+enum Modalitat {
+  A
+  B
+  C
+}
+
+// ==========================================
+// 2. USUARIS I CENTRES
+// ==========================================
+
+model Centre {
+  id_centre        Int     @id @default(autoincrement())
+  codi_centre      String  @unique
+  nom              String
+  adreca           String?
+  telefon_contacte String?
+  email_contacte   String?
+
+  usuaris       Usuari[]
+  peticions     Peticio[]
+  assignacions  Assignacio[]
+  alumnes       Alumne[]      @relation("CentreProcedencia")
+  professors    Professor[]
+  incidencies   Incidencia[]
+  notificacions Notificacio[]
+
+  @@map("centres")
+}
+
+model Incidencia {
+  id_incidencia Int      @id @default(autoincrement())
+  id_centre     Int
+  centre        Centre   @relation(fields: [id_centre], references: [id_centre])
+  descripcio    String   @db.Text
+  estat         String   @default("Pendent")
+  data_creacio  DateTime @default(now())
+
+  @@map("incidencies")
+}
+
+model Rol {
+  id_rol  Int      @id @default(autoincrement())
+  nom_rol String
+  usuaris Usuari[]
+
+  @@map("rols")
+}
+
+model Usuari {
+  id_usuari     Int     @id @default(autoincrement())
+  nom_complet   String
+  email         String  @unique
+  password_hash String
+  url_foto      String?
+  id_rol        Int
+  rol           Rol     @relation(fields: [id_rol], references: [id_rol])
+  id_centre     Int?
+  centre        Centre? @relation(fields: [id_centre], references: [id_centre])
+
+  assignacio_professors AssignacioProfessor[]
+  logs                  LogAuditoria[]
+  notificacions         Notificacio[]
+  professor             Professor?
+  sessioProfessors      SessioProfessor[]
+
+  @@map("usuaris")
+}
+
+model Professor {
+  id_professor Int     @id @default(autoincrement())
+  nom          String
+  contacte     String?
+  id_centre    Int
+  centre       Centre  @relation(fields: [id_centre], references: [id_centre])
+  id_usuari    Int?    @unique
+  usuari       Usuari? @relation(fields: [id_usuari], references: [id_usuari], onDelete: Cascade)
+
+  peticions1 Peticio[]    @relation("Profesor1")
+  peticions2 Peticio[]    @relation("Profesor2")
+  assig1     Assignacio[] @relation("AssigProf1")
+  assig2     Assignacio[] @relation("AssigProf2")
+
+  @@map("professors")
+}
+
+// ==========================================
+// 3. PETICIONS I ASSIGNACIONS
+// ==========================================
+
+model Peticio {
+  id_peticio    Int          @id @default(autoincrement())
+  id_centre     Int
+  centre        Centre       @relation(fields: [id_centre], references: [id_centre])
+  id_taller     Int
+  taller        Taller       @relation(fields: [id_taller], references: [id_taller])
+  alumnes_aprox Int?
+  comentaris    String?      @db.Text
+  data_peticio  DateTime     @default(now())
+  estat         EstatPeticio @default(Pendent)
+  modalitat     Modalitat?
+
+  prof1_id Int
+  prof1    Professor @relation("Profesor1", fields: [prof1_id], references: [id_professor])
+  prof2_id Int
+  prof2    Professor @relation("Profesor2", fields: [prof2_id], references: [id_professor])
+
+  alumnes Alumne[] @relation("AlumnesPeticio")
+
+  assignacions Assignacio[]
+
+  @@index([estat])
+  @@map("peticions")
+}
+
+enum EstatPeticio {
+  Pendent
+  Aprovada
+  Rebutjada
+}
+
+model Assignacio {
+  id_assignacio Int             @id @default(autoincrement())
+  id_peticio    Int?
+  peticio       Peticio?        @relation(fields: [id_peticio], references: [id_peticio])
+  id_centre     Int
+  centre        Centre          @relation(fields: [id_centre], references: [id_centre])
+  id_taller     Int
+  taller        Taller          @relation(fields: [id_taller], references: [id_taller])
+  data_inici    DateTime?       @db.Date
+  data_fi       DateTime?       @db.Date
+  estat         EstatAssignacio @default(PUBLISHED)
+  grup          Int             @default(1)
+
+  prof1_id Int?
+  prof1    Professor? @relation("AssigProf1", fields: [prof1_id], references: [id_professor])
+  prof2_id Int?
+  prof2    Professor? @relation("AssigProf2", fields: [prof2_id], references: [id_professor])
+
+  professors   AssignacioProfessor[]
+  checklist    ChecklistAssignacio[]
+  inscripcions Inscripcio[]
+  respostes    RespostesQuestionari[]
+  enviaments   EnviamentQuestionari[]
+  enquestes    Enquesta[]
+  certificats  Certificat[]
+  sessions     Sessio[]
+
+  @@index([data_inici, data_fi])
+  @@map("assignacions")
+}
+
+model Sessio {
+  id_sessio     Int               @id @default(autoincrement())
+  id_assignacio Int
+  assignacio    Assignacio        @relation(fields: [id_assignacio], references: [id_assignacio], onDelete: Cascade)
+  data_sessio   DateTime
+  hora_inici    String?
+  hora_fi       String?
+  staff         SessioProfessor[]
+
+  @@map("sessions")
+}
+
+model SessioProfessor {
+  id_sessio Int
+  sessio    Sessio @relation(fields: [id_sessio], references: [id_sessio], onDelete: Cascade)
+  id_usuari Int
+  usuari    Usuari @relation(fields: [id_usuari], references: [id_usuari], onDelete: Cascade)
+
+  @@id([id_sessio, id_usuari])
+  @@map("sessio_professors")
+}
+
+enum EstatAssignacio {
+  PROVISIONAL
+  PUBLISHED
+  DATA_ENTRY
+  DATA_SUBMITTED
+  VALIDATED
+  READY_TO_START
+  VACANT
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model AssignacioProfessor {
+  id_assignacio Int
+  assignacio    Assignacio @relation(fields: [id_assignacio], references: [id_assignacio])
+  id_usuari     Int
+  usuari        Usuari     @relation(fields: [id_usuari], references: [id_usuari])
+  es_principal  Boolean    @default(false)
+
+  @@id([id_assignacio, id_usuari])
+  @@map("assignacio_professors")
+}
+
+model ChecklistAssignacio {
+  id_checklist   Int        @id @default(autoincrement())
+  id_assignacio  Int
+  assignacio     Assignacio @relation(fields: [id_assignacio], references: [id_assignacio])
+  pas_nom        String
+  completat      Boolean    @default(false)
+  url_evidencia  String?
+  data_completat DateTime?
+
+  @@map("checklist_assignacio")
+}
+
+// ==========================================
+// 4. ALUMNAT I SEGUIMENT
+// ==========================================
+
+model Alumne {
+  id_alumne             Int     @id @default(autoincrement())
+  idalu                 String  @unique
+  nom                   String
+  cognoms               String
+  curs                  String?
+  url_foto              String?
+  id_centre_procedencia Int?
+  centre_procedencia    Centre? @relation("CentreProcedencia", fields: [id_centre_procedencia], references: [id_centre])
+
+  inscripcions Inscripcio[]
+  peticions    Peticio[]    @relation("AlumnesPeticio")
+  certificats  Certificat[]
+
+  @@map("alumnes")
+}
+
+model Inscripcio {
+  id_inscripcio Int        @id @default(autoincrement())
+  id_assignacio Int
+  assignacio    Assignacio @relation(fields: [id_assignacio], references: [id_assignacio])
+  id_alumne     Int
+  alumne        Alumne     @relation(fields: [id_alumne], references: [id_alumne])
+
+  // Compliance (Solo Mod C)
+  acord_pedagogic        Boolean @default(false)
+  autoritzacio_mobilitat Boolean @default(false)
+  drets_imatge           Boolean @default(false)
+  registre_ceb_confirmat Boolean @default(false)
+
+  // Validation Flags (Admin)
+  validat_acord_pedagogic        Boolean @default(false)
+  validat_autoritzacio_mobilitat Boolean @default(false)
+  validat_drets_imatge           Boolean @default(false)
+
+  // Document URLs
+  url_acord_pedagogic        String?
+  url_autoritzacio_mobilitat String?
+  url_drets_imatge           String?
+
+  assistencia      Assistencia[]
+  avaluacio_docent AvaluacioDocent?
+  autoconsulta     AutoconsultaAlumne?
+
+  @@map("inscripcions")
+}
+
+model Assistencia {
+  id_assistencia Int              @id @default(autoincrement())
+  id_inscripcio  Int
+  inscripcio     Inscripcio       @relation(fields: [id_inscripcio], references: [id_inscripcio])
+  numero_sessio  Int
+  data_sessio    DateTime         @db.Date
+  estat          EstatAssistencia
+  observacions   String?
+
+  @@map("assistencia")
+}
+
+enum EstatAssistencia {
+  Present
+  Absencia_Justificada @map("Absència Justificada")
+  Absencia             @map("Absència")
+  Retard
+}
+
+// ==========================================
+// 5. AVALUACIÓ I QUALITAT
+// ==========================================
+
+model Competencia {
+  id_competencia Int              @id @default(autoincrement())
+  nom            String
+  tipus          TipusCompetencia
+
+  avaluacions AvaluacioCompetencial[]
+
+  @@map("competencies")
+}
+
+enum TipusCompetencia {
+  Tecnica     @map("Tècnica")
+  Transversal
+}
+
+model AvaluacioCompetencial {
+  id_avaluacio        Int             @id @default(autoincrement())
+  id_avaluacio_docent Int
+  avaluacio_docent    AvaluacioDocent @relation(fields: [id_avaluacio_docent], references: [id_avaluacio_docent])
+  id_competencia      Int
+  competencia         Competencia     @relation(fields: [id_competencia], references: [id_competencia])
+  puntuacio           Int // Escala 1-5 (1=Sense valoració, 2=Passiva, 3=Suficient, 4=Bona, 5=Molt bona)
+
+  @@unique([id_avaluacio_docent, id_competencia])
+  @@map("avaluacio_competencial")
+}
+
+model AvaluacioDocent {
+  id_avaluacio_docent    Int        @id @default(autoincrement())
+  id_inscripcio          Int        @unique
+  inscripcio             Inscripcio @relation(fields: [id_inscripcio], references: [id_inscripcio])
+  percentatge_asistencia Float
+  numero_retards         Int
+  observacions           String?    @db.Text
+  data_avaluacio         DateTime   @default(now())
+
+  competencies AvaluacioCompetencial[]
+
+  @@map("avaluacions_docents")
+}
+
+model AutoconsultaAlumne {
+  id_autoconsulta Int        @id @default(autoincrement())
+  id_inscripcio   Int        @unique
+  inscripcio      Inscripcio @relation(fields: [id_inscripcio], references: [id_inscripcio])
+
+  // Comportament (Frequència)
+  puntualitat_tasques  String // Escala: Sí sempre / A vegades / Quasi mai / Mai
+  respecte_material    String
+  interes_aprenentatge String
+  autonomia_resolucio  String
+
+  // Satisfacció
+  valoracio_experiencia Int // 1-10
+  valoracio_docent      Int // 1-10
+
+  // Impacte Vocacional
+  impacte_vocacional ImpacteVocacional
+
+  // Preguntes obertes
+  millores_personals String? @db.Text
+  aprenentatges_clau String? @db.Text
+
+  data_enviament DateTime @default(now())
+
+  @@map("autoconsultes_alumnes")
+}
+
+enum ImpacteVocacional {
+  SI          @map("Sí, m’ha aclarit les idees")
+  NO          @map("No, ja ho tenia clar o no és per a mi")
+  CONSIDERANT @map("Ho estic considerant ara mateix")
+}
+
+model ModelQuestionari {
+  id_model    Int                    @id @default(autoincrement())
+  titol       String
+  destinatari Destinatari
+  preguntes   Pregunta[]
+  enviaments  EnviamentQuestionari[]
+
+  @@map("model_questionaris")
+}
+
+enum Destinatari {
+  CENTRE
+  PROFESSOR
+  ALUMNE
+}
+
+model Pregunta {
+  id_pregunta    Int                    @id @default(autoincrement())
+  id_model       Int
+  model          ModelQuestionari       @relation(fields: [id_model], references: [id_model])
+  enunciat       String                 @db.Text
+  tipus_resposta TipusResposta
+  opcions        Json? // Per a respostes múltiples
+  respostes      RespostesQuestionari[]
+
+  @@map("preguntes")
+}
+
+enum TipusResposta {
+  Likert_1_5  @map("Likert 1-5")
+  Likert_1_10 @map("Likert 1-10")
+  Oberta
+  Si_No       @map("Si/No")
+  Multiple
+}
+
+model EnviamentQuestionari {
+  id_enviament   Int              @id @default(autoincrement())
+  id_model       Int
+  model          ModelQuestionari @relation(fields: [id_model], references: [id_model])
+  id_assignacio  Int
+  assignacio     Assignacio       @relation(fields: [id_assignacio], references: [id_assignacio])
+  estat          EstatEnviament   @default(Pendent)
+  data_enviament DateTime?
+  data_resposta  DateTime?
+
+  respostes RespostesQuestionari[]
+
+  @@map("enviaments_questionaris")
+}
+
+enum EstatEnviament {
+  Pendent
+  Enviat
+  Respost
+}
+
+model RespostesQuestionari {
+  id_resposta             Int                  @id @default(autoincrement())
+  id_enviament            Int
+  enviament               EnviamentQuestionari @relation(fields: [id_enviament], references: [id_enviament])
+  id_pregunta             Int
+  pregunta                Pregunta             @relation(fields: [id_pregunta], references: [id_pregunta])
+  valor                   String               @db.Text
+  es_anonim               Boolean              @default(false)
+  assignacio              Assignacio?          @relation(fields: [assignacioId_assignacio], references: [id_assignacio])
+  assignacioId_assignacio Int?
+
+  @@map("respostes_questionari")
+}
+
+// ==========================================
+// 6. NOTIFICACIONS I AVISOS
+// ==========================================
+
+model Notificacio {
+  id_notificacio Int      @id @default(autoincrement())
+  id_usuari      Int?
+  usuari         Usuari?  @relation(fields: [id_usuari], references: [id_usuari])
+  id_centre      Int?
+  centre         Centre?  @relation(fields: [id_centre], references: [id_centre])
+  titol          String
+  missatge       String   @db.Text
+  llegida        Boolean  @default(false)
+  data_creacio   DateTime @default(now())
+  tipus          String // PETICIO, FASE, SISTEMA
+  importancia    String   @default("NORMAL") // INFO, WARNING, URGENT
+
+  @@index([id_usuari, id_centre])
+  @@map("notificacions")
+}
+
+// ==========================================
+// 7. LOGS
+// ==========================================
+
+model LogAuditoria {
+  id_log    Int      @id @default(autoincrement())
+  id_usuari Int?
+  usuari    Usuari?  @relation(fields: [id_usuari], references: [id_usuari])
+  accio     String
+  detalls   Json?
+  data_hora DateTime @default(now())
+
+  @@index([data_hora])
+  @@map("logs_auditoria")
+}
+
+// ==========================================
+// 8. CONFIGURACIÓ DINÀMICA
+// ==========================================
+
+model Fase {
+  id_fase    Int              @id @default(autoincrement())
+  nom        String           @unique
+  descripcio String?
+  data_inici DateTime
+  data_fi    DateTime
+  activa     Boolean          @default(false)
+  ordre      Int              @default(0)
+  events     CalendariEvent[]
+
+  @@map("fases")
+}
+
+model CalendariEvent {
+  id_event   Int      @id @default(autoincrement())
+  id_fase    Int
+  fase       Fase     @relation(fields: [id_fase], references: [id_fase])
+  titol      String
+  descripcio String?
+  data       DateTime
+  tipus      String // milestone, deadline, assignment
+
+  @@map("calendari_events")
+}
+
+model Enquesta {
+  id_enquesta    String      @id @default(uuid())
+  id_assignacio  Int
+  assignacio     Assignacio  @relation(fields: [id_assignacio], references: [id_assignacio])
+  destinatari    Destinatari
+  token          String      @unique
+  completa       Boolean     @default(false)
+  data_creacio   DateTime    @default(now())
+  data_completat DateTime?
+
+  @@map("enquestes")
+}
+
+model Certificat {
+  id_certificat String     @id @default(uuid())
+  id_alumne     Int
+  alumne        Alumne     @relation(fields: [id_alumne], references: [id_alumne])
+  id_assignacio Int
+  assignacio    Assignacio @relation(fields: [id_assignacio], references: [id_assignacio])
+  data_emissio  DateTime   @default(now())
+  url_pdf       String?
+
+  @@unique([id_alumne, id_assignacio])
+  @@map("certificats")
+}

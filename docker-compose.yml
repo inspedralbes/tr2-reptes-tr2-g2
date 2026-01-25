@@ -1,0 +1,113 @@
+services:
+  # Base de Datos
+  db:
+    image: postgres:15-alpine
+    container_name: iter_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: iter_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - iter-network
+
+  # Adminer (Visualizador DB)
+  adminer:
+    image: adminer
+    container_name: iter_adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - iter-network
+
+  # Service de Instalación y Setup (Premium Optimization)
+  setup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    working_dir: /app
+    volumes:
+      - .:/app
+      - node_modules_cache:/app/node_modules
+    command: sh -c "npm install && npx turbo db:generate --filter=api && npx prisma db push --accept-data-loss --schema=apps/api/prisma/schema.prisma && npx turbo db:seed --filter=api"
+    env_file:
+      - ./apps/api/.env
+    depends_on:
+      - db
+    networks:
+      - iter-network
+
+  # Backend API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    working_dir: /app
+    # Usamos npx turbo directamente, dependiendo de que 'setup' haya terminado
+    command: npx turbo dev --filter=api
+    volumes:
+      - .:/app
+      - node_modules_cache:/app/node_modules
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./apps/api/.env
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    networks:
+      - iter-network
+
+  # Frontend Web
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    working_dir: /app
+    command: npx turbo dev --filter=web
+    volumes:
+      - .:/app
+      - node_modules_cache:/app/node_modules
+    ports:
+      - "8002:3000"
+    env_file:
+      - ./apps/web/.env
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    networks:
+      - iter-network
+
+  # Ngrok Tunnel for API
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: iter_ngrok
+    restart: always
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    command:
+      - http
+      - --host-header=rewrite
+      - api:3000
+    depends_on:
+      - api
+    ports:
+      - "4040:4040"
+    networks:
+      - iter-network
+
+networks:
+  iter-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  node_modules_cache:

@@ -1,0 +1,6 @@
+.env
+.env.prod
+apps/mobile/.env
+
+/node_modules
+/packages/shared/dist
