@@ -1,14 +1,14 @@
-# Documentación de Funcionalidades IA - Programa Enginy
+# Documentació de Funcionalitats IA - Programa Enginy
 
-Este directorio contiene la documentación técnica y funcional de las 4 características de Inteligencia Artificial implementadas en el proyecto.
+Aquest directori conté la documentació tècnica i funcional de les 4 característiques d'Intel·ligència Artificial implementades en el projecte.
 
-## Índice de Documentos
+## Índex de Documents
 
-1.  **[Documentación Completa (Todo en uno)](./DOCUMENTACION_IA_COMPLETA.md)**: Guía detallada de las 4 funcionalidades IA, sus workflows y detalles técnicos.
-2.  **[Resumen y Pruebas (Walkthrough)](./walkthrough.md)**: Visión global y cómo verificar que funcionan.
+1.  **[Documentació Completa (Tot en un)](./DOCUMENTACION_IA_COMPLETA.md)**: Guia detallada de les 4 funcionalitats IA, els seus workflows i detalls tècnics.
+2.  **[Resum i Proves (Walkthrough)](./walkthrough.md)**: Visió global i com verificar que funcionen.
 
-## Ubicación del Código
-El código fuente de estas funcionalidades se encuentra principalmente en `apps/api/src`:
+## Ubicació del Codi
+El codi font d'aquestes funcionalitats es troba principalment a `apps/api/src`:
 -   `services/assignment.solver.ts`
 -   `services/auto-assignment.service.ts`
 -   `services/nlp.service.ts`

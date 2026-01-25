@@ -104,7 +104,7 @@ const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onCl
              {/* ADDRESS CARD */}
              {event.metadata?.adreca && (
                  <View className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-24">
-                     <Text className="text-gray-900 font-bold text-lg mb-3">Direcció</Text>
+                     <Text className="text-gray-900 font-bold text-lg mb-3">Adreça</Text>
                      <View className="flex-row items-center">
                          <Ionicons name="map" size={20} color="#9CA3AF" className="mr-3" />
                          <Text className="text-gray-600 text-base flex-1">

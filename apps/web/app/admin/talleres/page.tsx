@@ -62,7 +62,7 @@ export default function TallerScreen() {
       setTalleres(listaTalleres);
       setError(null);
     } catch (err) {
-      setError("No se pudieron cargar los talleres.");
+      setError("No s'han pogut carregar els tallers.");
       console.error(err);
     }
   }, []);
@@ -132,7 +132,7 @@ export default function TallerScreen() {
           setTalleres((prev) => prev.filter((t) => t._id !== id));
           toast.success("Taller eliminat correctament.");
         } catch (err) {
-          toast.error("Error al eliminar el taller.");
+          toast.error("Error en eliminar el taller.");
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
@@ -155,14 +155,14 @@ export default function TallerScreen() {
       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
       </svg>
-      Nuevo Taller
+      Nou taller  
     </button>
   );
 
   return (
     <DashboardLayout 
-      title="Gestión de Talleres" 
-      subtitle="Creación, edición y supervisión del catálogo oficial de Iter."
+      title="Gestió de Tallers" 
+      subtitle="Creació, edició i supervisió del catàleg oficial de Iter."
       actions={headerActions}
     >
       {/* Panell de Filtres */}
@@ -186,7 +186,7 @@ export default function TallerScreen() {
 
         {/* Filtre Sector */}
         <div className="lg:w-64">
-          <label className="block text-[10px] font-bold text-text-primary uppercase tracking-[0.2em] mb-3">Filtra per sector</label>
+          <label className="block text-[10px] font-bold text-text-primary uppercase tracking-[0.2em] mb-3">Filtrar per sector</label>
           <select 
             value={selectedSector}
             onChange={(e) => setSelectedSector(e.target.value)}

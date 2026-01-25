@@ -1,32 +1,32 @@
 # Documentació Tècnica Backend - Programa Iter
 
-Este documento describe la arquitectura y las mejores prácticas implementadas en el backend para asegurar un sistema profesional, robusto y escalable.
+Aquest document descriu l'arquitectura i les millors pràctiques implementades al backend per assegurar un sistema professional, robust i escalable.
 
 ## Arquitectura del Servidor
 
-El backend está construido sobre **Node.js** utilizando el framework **Express** y **TypeScript**. Se ha seguido el patrón de diseño de **Controladores y Rutas** para separar la lógica de negocio de la definición de los endpoints.
+El backend està construït sobre **Node.js** utilitzant el framework **Express** i **TypeScript**. S'ha seguit el patró de disseny de **Controladors i Rutes** per separar la lògica de negoci de la definició dels endpoints.
 
-### 🚀 Características Profesionales Implementadas
+### 🚀 Característiques Professionals Implementades
 
-### 1. Gestión de Logs y Monitorización
-Se utiliza **Winston** como motor de logging estructurado. Esto permite separar los logs por niveles (info, error) y facilita la depuración en producción.
-- **Archivo**: `src/lib/logger.ts`
-- **Uso**: `logger.info(...)`, `logger.error(...)`
+### 1. Gestió de Logs i Monitorització
+S'utilitza **Winston** com a motor de logging estructurat. Això permet separar els logs per nivells (info, error) i facilita la depuració en producció.
+- **Arxiu**: `src/lib/logger.ts`
+- **Ús**: `logger.info(...)`, `logger.error(...)`
 
-### 2. Manejo Global de Errores y Excepciones
-Hemos implementado un middleware de captura de errores global. Gracias a la librería `express-async-errors`, no es necesario envolver cada controlador en bloques `try/catch`. 
-Cualquier error lanzado en la aplicación es capturado por el [ErrorHandler](src/middlewares/errorHandler.ts), que lo formatea de manera segura para el cliente (ocultando detalles sensibles en producción).
+### 2. Gestió Global d'Errors i Excepcions
+Hem implementat un middleware de captura d'errors global. Gràcies a la llibreria `express-async-errors`, no és necessari envolcallar cada controlador en blocs `try/catch`. 
+Qualsevol error llançat a l'aplicació és capturat pel [ErrorHandler](src/middlewares/errorHandler.ts), que el formateja de manera segura per al client (ocultant detalls sensibles en producció).
 
-### 3. Validación de Datos (Type Safety Extendida)
-Utilizamos **Zod** para validar todas las entradas del servidor (`body`, `params`, `query`). 
-- **Middlewares**: `validateData(schema)` intercepta la petición y asegura que los tipos y restricciones se cumplen antes de que la lógica de negocio se ejecute.
-- **Esquemas**: Definidos en `src/schemas/`, centralizan las reglas de validación (longitud de strings, rangos numéricos, enums, etc.).
+### 3. Validació de Dades (Type Safety Estesa)
+Utilitzem **Zod** per validar totes les entrades del servidor (`body`, `params`, `query`). 
+- **Middlewares**: `validateData(schema)` intercepta la petició i assegura que els tipus i restriccions es compleixen abans que la lògica de negoci s'executi.
+- **Esquemes**: Definits a `src/schemas/`, centralitzen les regles de validació (longitud de strings, rangs numèrics, enums, etc.).
 
-### 4. Capa de Datos y Rendimiento
-El acceso a la base de datos **PostgreSQL** se realiza a través de **Prisma ORM**.
-- **Indexación**: Se han añadido índices estratégicos en tablas de gran volumen como `assignacions` y `logs_auditoria` para acelerar las consultas de búsqueda y filtrado.
-- **Consultas Paralelas**: Se utiliza `Promise.all` para disparar múltiples peticiones a la base de datos simultáneamente, optimizando el tiempo de respuesta en endpoints complejos como el calendario.
-- **Paginación Estándar**: Todos los endpoints de listado (`/tallers`, `/centres`, `/peticions`, `/fases`) devuelven una estructura estandarizada:
+### 4. Capa de Dades i Rendiment
+L'accés a la base de dades **PostgreSQL** es realitza a través de **Prisma ORM**.
+- **Indexació**: S'han afegit índexs estratègics en taules de gran volum com `assignacions` i `logs_auditoria` per accelerar les consultes de cerca i filtratge.
+- **Consultes Paral·leles**: S'utilitza `Promise.all` per disparar múltiples peticions a la base de dades simultàniament, optimitzant el temps de resposta en endpoints complexos com el calendari.
+- **Paginació Estàndard**: Tots els endpoints de llistat (`/tallers`, `/centres`, `/peticions`, `/fases`) retornen una estructura estandaritzada:
   ```json
   {
     "data": [...],
@@ -39,15 +39,15 @@ El acceso a la base de datos **PostgreSQL** se realiza a través de **Prisma ORM
   }
   ```
 
-### 5. Seguridad Base
-- **JWT (JSON Web Tokens)**: Implementado para la autenticación de usuarios.
-- **RBAC (Role Based Access Control)**: Middlewares específicos (`isAdmin`, `isCoordinator`, `authenticateToken`) protegen las rutas según los privilegios del usuario.
+### 5. Seguretat Base
+- **JWT (JSON Web Tokens)**: Implementat per a l'autenticació d'usuaris.
+- **RBAC (Role Based Access Control)**: Middlewares específics (`isAdmin`, `isCoordinator`, `authenticateToken`) protegeixen les rutes segons els privilegis de l'usuari.
 
-## Estructura de Carpetas
+## Estructura de Carpetes
 
-- `src/controllers/`: Lógica de negocio y manejo de la base de datos.
-- `src/routes/`: Definición de endpoints y aplicación de middlewares.
-- `src/middlewares/`: Funciones de interceptación (Auth, Error, Validation).
-- `src/schemas/`: Definiciones de esquemas Zod para validación.
-- `src/lib/`: Singletons y utilidades (PrismaClient, Logger).
-- `prisma/`: Esquema de base de datos y migraciones.
+- `src/controllers/`: Lògica de negoci i gestió de la base de dades.
+- `src/routes/`: Definició d'endpoints i aplicació de middlewares.
+- `src/middlewares/`: Funcions d'intercepció (Auth, Error, Validation).
+- `src/schemas/`: Definicions d'esquemes Zod per validació.
+- `src/lib/`: Singletons i utilitats (PrismaClient, Logger).
+- `prisma/`: Esquema de base de dades i migracions.

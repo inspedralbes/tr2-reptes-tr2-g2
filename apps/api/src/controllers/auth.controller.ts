@@ -32,7 +32,7 @@ export const login = async (req: Request, res: Response) => {
     
     if (!secret) {
       if (process.env.NODE_ENV === 'production') {
-        throw new Error('JWT_SECRET no está configurada en producción.');
+        throw new Error('JWT_SECRET no està configurada en producció.');
       }
       logger.warn('⚠️ JWT_SECRET no configurada. Usando fallback inseguro para desarrollo.');
     }

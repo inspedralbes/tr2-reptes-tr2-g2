@@ -20,14 +20,14 @@ export declare const CALENDARI: {
     readonly GESTION_VACANTES: "2025-11-01";
 };
 export declare const PHASES: {
-    readonly SOLICITUD: "Solicitud e Inscripción";
-    readonly PLANIFICACION: "Planificación y Asignación";
-    readonly EJECUCION: "Ejecución y Seguimiento";
-    readonly CIERRE: "Cierre y Evaluación";
+    readonly SOLICITUD: "Sol·licitud i Inscripció";
+    readonly PLANIFICACION: "Planificació i Assignació";
+    readonly EJECUCION: "Execució i Seguiment";
+    readonly CIERRE: "Tancament i Avaluació";
 };
 export declare const FASES_TIMELINE: readonly [{
     readonly id: "PRESENTACIO";
-    readonly nom: "Solicitud e Inscripción";
+    readonly nom: "Sol·licitud i Inscripció";
     readonly data: "2025-09-30";
 }, {
     readonly id: "DEMANDA";
@@ -35,7 +35,7 @@ export declare const FASES_TIMELINE: readonly [{
     readonly data: "2025-10-10";
 }, {
     readonly id: "ASSIGNACIO";
-    readonly nom: "Planificación y Asignación";
+    readonly nom: "Planificació i Assignació";
     readonly data: "2025-10-20";
 }, {
     readonly id: "VACANTS";
@@ -43,7 +43,7 @@ export declare const FASES_TIMELINE: readonly [{
     readonly data: "2025-11-01";
 }, {
     readonly id: "VALIDACIO";
-    readonly nom: "Cierre y Evaluación";
+    readonly nom: "Tancament i Avaluació";
     readonly data: null;
 }];
 export declare const esEmailValido: (email: string) => boolean;

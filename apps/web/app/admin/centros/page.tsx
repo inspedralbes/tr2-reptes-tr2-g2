@@ -53,7 +53,7 @@ export default function CentrosScreen() {
       setCentros(lista);
       setError(null);
     } catch (err) {
-      setError("No se pudieron cargar los centros.");
+      setError("No s'han pogut carregar els centres.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -111,7 +111,7 @@ export default function CentrosScreen() {
           setCentros((prev) => prev.filter((c) => c.id_centre !== id));
           toast.success("Centre eliminat correctament.");
         } catch (err) {
-          toast.error("Error al eliminar el centre.");
+          toast.error("Error en eliminar el centre.");
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }

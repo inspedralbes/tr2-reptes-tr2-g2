@@ -48,12 +48,12 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ item, onPress }) => {
           <div className="flex items-center">
             <span className="text-blue-400 text-xs mr-1">👥</span>
             <span className="text-gray-600 text-xs font-medium">
-              {item.detalls_tecnics?.places_maximes ?? "-"} plazas
+              {item.detalls_tecnics?.places_maximes ?? "-"} places
             </span>
           </div>
 
           <div className="bg-blue-600 px-4 py-2 hover:bg-blue-700 transition-colors">
-            <span className="text-white text-xs font-bold">Ver Taller</span>
+            <span className="text-white text-xs font-bold">Veure Taller</span>
           </div>
         </div>
       </div>

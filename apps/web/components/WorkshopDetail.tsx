@@ -33,7 +33,7 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
   if (!visible || !selectedWorkshop) return null;
 
   const handleDelete = () => {
-    if (confirm("¿Estás seguro de que quieres eliminar este taller? Esta acción no se puede deshacer.")) {
+    if (confirm("Estàs segur que vols eliminar aquest taller? Aquesta acció no es pot desfer.")) {
       onDelete(selectedWorkshop._id);
     }
   };
@@ -132,7 +132,7 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
                 </div>
                 <div>
                   <span className="text-gray-400 font-black text-[10px] uppercase tracking-widest mb-1 block">Aforament</span>
-                  <p className="text-consorci-darkBlue font-bold">{selectedWorkshop.detalls_tecnics?.places_maximes ?? 0} Plazas disponibles</p>
+                  <p className="text-consorci-darkBlue font-bold">{selectedWorkshop.detalls_tecnics?.places_maximes ?? 0} Places disponibles</p>
                 </div>
               </div>
             </div>
@@ -141,7 +141,7 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
             <div className="bg-gray-50 border-l-4 border-consorci-darkBlue p-6 mb-8 flex-1">
               <span className="text-consorci-darkBlue font-black text-[10px] uppercase tracking-widest mb-2 block">Resum del Taller</span>
               <p className="text-gray-600 leading-relaxed text-sm">
-                {selectedWorkshop.detalls_tecnics?.descripcio ?? 'No hi ha descripció disponible per a este taller.'}
+                {selectedWorkshop.detalls_tecnics?.descripcio ?? 'No hi ha descripció disponible per a aquest taller.'}
               </p>
             </div>
 

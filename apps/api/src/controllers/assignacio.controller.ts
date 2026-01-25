@@ -130,7 +130,7 @@ export const getAssignacionsByCentre = async (req: Request, res: Response) => {
     });
     res.json(assignacions);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener asignaciones' });
+    res.status(500).json({ error: 'Error al obtenir assignacions' });
   }
 };
 
@@ -151,7 +151,7 @@ export const getStudents = async (req: Request, res: Response) => {
     const students = inscripcions.map((i: any) => i.alumne);
     res.json(students);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener alumnos' });
+    res.status(500).json({ error: 'Error al obtenir alumnes' });
   }
 };
 
@@ -164,7 +164,7 @@ export const getChecklist = async (req: Request, res: Response) => {
     });
     res.json(checklist);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener checklist' });
+    res.status(500).json({ error: 'Error al obtenir la llista de comprovació' });
   }
 };
 
@@ -174,7 +174,7 @@ export const updateChecklistItem = async (req: Request, res: Response) => {
   const result = AssignmentChecklistSchema.safeParse(req.body);
 
   if (!result.success) {
-    return res.status(400).json({ error: 'Datos de validación inválidos', details: result.error.format() });
+    return res.status(400).json({ error: 'Dades de validació invàlides', details: result.error.format() });
   }
 
   const { completat, url_evidencia } = result.data;
@@ -190,7 +190,7 @@ export const updateChecklistItem = async (req: Request, res: Response) => {
     });
     res.json(updated);
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar checklist' });
+    res.status(500).json({ error: 'Error al actualitzar la llista de comprovació' });
   }
 };
 
@@ -211,7 +211,7 @@ export const getIncidenciesByCentre = async (req: Request, res: Response) => {
     });
     res.json(incidencies);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener incidencias' });
+    res.status(500).json({ error: 'Error al obtenir les incidències' });
   }
 };
 
@@ -228,7 +228,7 @@ export const createIncidencia = async (req: Request, res: Response) => {
     res.status(201).json(nuevaIncidencia);
   } catch (error) {
     console.error("Error al crear incidencia:", error);
-    res.status(500).json({ error: 'Error al crear la incidencia y ejecutar análisis de riesgo' });
+    res.status(500).json({ error: 'Error al crear la incidència i executar l\'anàlisi de risc' });
   }
 };
 
@@ -238,7 +238,7 @@ import { VisionService } from '../services/vision.service';
 export const validateDocumentUpload = async (req: Request, res: Response) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ error: 'No se ha subido ningún archivo.' });
+      return res.status(400).json({ error: 'No s\'ha pujat cap fitxer.' });
     }
 
     const visionService = new VisionService();
@@ -265,7 +265,7 @@ export const validateDocumentUpload = async (req: Request, res: Response) => {
 
   } catch (error) {
     console.error("Error en validación de documento:", error);
-    res.status(500).json({ error: 'Error al procesar el documento.' });
+    res.status(500).json({ error: 'Error al processar el document.' });
   }
 };
 
@@ -275,7 +275,7 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
   const { role } = (req as any).user;
 
   if (role !== ROLES.ADMIN) {
-    return res.status(403).json({ error: 'Solo los administradores pueden realizar asignaciones.' });
+    return res.status(403).json({ error: 'Només els administradors poden realitzar assignacions.' });
   }
 
   try {
@@ -285,11 +285,11 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
     });
 
     if (!peticio) {
-      return res.status(404).json({ error: 'Petición no encontrada.' });
+      return res.status(404).json({ error: 'Petició no trobada.' });
     }
 
     if (peticio.estat !== 'Aprovada') {
-      return res.status(400).json({ error: 'La petición debe estar aprobada para crear una asignación.' });
+      return res.status(400).json({ error: 'La petició ha d\'estar aprovada per crear una assignació.' });
     }
 
     // Comprobar si ya existe una asignación para esta petición
@@ -298,7 +298,7 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
     });
 
     if (existing) {
-      return res.status(400).json({ error: 'Ya existe una asignación para esta petición.' });
+      return res.status(400).json({ error: 'Ja existeix una assignació per a aquesta petició.' });
     }
 
     const nuevaAssignacio = await prisma.assignacio.create({
@@ -324,14 +324,14 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
     res.status(201).json(nuevaAssignacio);
   } catch (error) {
     console.error("Error al crear asignación:", error);
-    res.status(500).json({ error: 'Error al crear la asignación.' });
+    res.status(500).json({ error: 'Error al crear l\'assignació.' });
   }
 };
 
 // POST: Publicar Asignaciones (Admin Only)
 export const publishAssignments = async (req: Request, res: Response) => {
   const { role } = (req as any).user;
-  if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
+  if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autoritzat' });
 
   try {
     const result = await prisma.assignacio.updateMany({
@@ -369,7 +369,7 @@ export const createInscripcions = async (req: Request, res: Response) => {
       });
 
       if (!assignacio) {
-        throw new Error('Asignación no encontrada.');
+        throw new Error('Assignació no trobada.');
       }
 
       // 2. Validación de Cupo (Máx 4 alumnos en Mod C)
@@ -468,7 +468,7 @@ export const designateProfessors = async (req: Request, res: Response) => {
     res.json(updated);
   } catch (error) {
     console.error("Error al designar profesores:", error);
-    res.status(500).json({ error: 'Error al designar profesores.' });
+    res.status(500).json({ error: 'Error al designar professors.' });
   }
 };
 
@@ -552,7 +552,7 @@ export const generateAutomaticAssignments = async (req: Request, res: Response) 
     res.json(result);
   } catch (error) {
     console.error("Error en asignación automática:", error);
-    res.status(500).json({ error: 'Error al ejecutar el motor de asignación.' });
+    res.status(500).json({ error: 'Error al executar el motor d\'assignació.' });
   }
 };
 
@@ -574,7 +574,7 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
     });
 
     if (!assignacio || !assignacio.taller) {
-        return res.status(404).json({ error: 'Asignación no encontrada' });
+        return res.status(404).json({ error: 'Assignació no trobada' });
     }
 
     // 3. Generar sesiones si no existen

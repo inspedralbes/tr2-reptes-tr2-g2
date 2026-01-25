@@ -14,7 +14,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Iter Web',
-  description: 'Aplicación web de Iter',
+  description: 'Aplicació web d\'Iter',
   icons: {
     icon: '/logo.png',
   },
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" suppressHydrationWarning className={inter.variable}>
+    <html lang="ca" suppressHydrationWarning className={inter.variable}>
       <body className="antialiased font-sans">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>

@@ -311,7 +311,7 @@ export default function ProfesoresCRUD() {
                             toast.error("Error al pujar la foto.");
                           }
                         } else if (!editingProf.usuari?.id_usuari) {
-                          toast.error("No se puede subir foto a un profesor sin usuario vinculado.");
+                          toast.error("No es pot pujar foto a un professor sense usuari vinculat.");
                         }
                       }}
                     />
@@ -334,7 +334,7 @@ export default function ProfesoresCRUD() {
                     type="email" value={formData.contacte} 
                     onChange={e => setFormData({...formData, contacte: e.target.value})}
                     className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" 
-                    placeholder="ejemplo@centro.cat"
+                    placeholder="exemple@centro.cat"
                     required
                   />
                 </div>

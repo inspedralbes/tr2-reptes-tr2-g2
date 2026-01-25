@@ -22,10 +22,10 @@ export const CALENDARI = {
 };
 // Nombres oficiales de las fases para consistencia en DB y UI
 export const PHASES = {
-    SOLICITUD: 'Solicitud e Inscripción',
-    PLANIFICACION: 'Planificación y Asignación',
-    EJECUCION: 'Ejecución y Seguimiento',
-    CIERRE: 'Cierre y Evaluación'
+    SOLICITUD: 'Sol·licitud i Inscripció',
+    PLANIFICACION: 'Planificació i Assignació',
+    EJECUCION: 'Execució i Seguiment',
+    CIERRE: 'Tancament i Avaluació'
 };
 export const FASES_TIMELINE = [
     { id: 'PRESENTACIO', nom: PHASES.SOLICITUD, data: CALENDARI.REUNION_PRESENTACION },
