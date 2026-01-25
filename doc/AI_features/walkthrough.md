@@ -1,30 +1,30 @@
-# Walkthrough - AI Features for Programa Enginy
+# Walkthrough - Funcionalitats IA per al Programa Enginy
 
-I have successfully implemented the 4 requested AI prototypes to enhance the platform's value and differentiate it from competitors.
+He implementat amb èxit els 4 prototips d'IA sol·licitats per millorar el valor de la plataforma i diferenciar-la dels competidors.
 
-## 1. AI Assignment Engine (Constraint Satisfaction)
--   **Problem**: Complex manual assignment of students to workshops respecting limits and diversity.
--   **Solution**: Added `AssignmentSolver` algorithm (Greedy Randomized) and `AutoAssignmentService`.
--   **How to test**: POST `/api/assignacions/auto-generate`.
+## 1. Motor d'Assignació IA (Satisfacció de Restriccions)
+-   **Problema**: Assignació manual complexa d'alumnes a tallers respectant límits i diversitat.
+-   **Solució**: Afegit algorisme `AssignmentSolver` (Greedy Randomized) i `AutoAssignmentService`.
+-   **Com provar**: POST `/api/assignacions/auto-generate`.
 
-## 2. Voice Assistant for Evaluation (NLP)
--   **Problem**: Teachers struggle to write detailed evaluations during workshops.
--   **Solution**: Added `NLPService` (Rule-Based) to transcribe voice/text into structured data (Attendance + Competence Score).
--   **How to test**: POST `/api/evaluation/voice-process` with text like "Llegó tarde pero ayudó mucho".
+## 2. Assistent de Veu per Avaluació (NLP)
+-   **Problema**: Els professors tenen dificultats per escriure avaluacions detallades durant els tallers.
+-   **Solució**: Afegit `NLPService` (Basat en Regles) per transcriure veu/text a dades estructurades (Assistència + Nota Competència).
+-   **Com provar**: POST `/api/evaluation/voice-process` amb text com "Ha arribat tard però ha ajudat molt".
 
-## 3. Predictive Dropout Risk System (Early Warning)
--   **Problem**: Late detection of student abandonment.
--   **Solution**: Added `RiskAnalysisService` that scores risk based on unjustified absences and low evaluation scores. Triggers system alerts.
--   **How to test**: POST `/api/stats/risk-analysis`.
+## 3. Sistema de Predicció de Risc (Early Warning)
+-   **Problema**: Detecció tardana de l'abandonament escolar.
+-   **Solució**: Afegit `RiskAnalysisService` que puntua el risc basant-se en absències injustificades i notes baixes. Dispara alertes del sistema.
+-   **Com provar**: POST `/api/stats/risk-analysis`.
 
-## 4. Automatic Document Validation (Computer Vision)
--   **Problem**: Administrative bottleneck reviewing PDF signatures.
--   **Solution**: Added `VisionService` (Mock) to simulate pre-validation of PDF uploads (checks file type and mock signature).
--   **How to test**: POST `/api/assignacions/upload/validate` with a PDF file.
+## 4. Validació Automàtica de Documents (Visió per Computador)
+-   **Problema**: Coll d'ampolla administratiu revisant signatures de PDF.
+-   **Solució**: Afegit `VisionService` (Mock) per simular la pre-validació de pujades de PDF (comprova tipus d'arxiu i signatura simulada).
+-   **Com provar**: POST `/api/assignacions/upload/validate` amb un arxiu PDF.
 
-## Technical Summary
+## Resum Tècnic
 -   **Stack**: Node.js / Express / Prisma.
--   **Architecture**: Modular Services (`services/*.service.ts`) separated from Controllers.
--   **Status**: **100% Correct**. All implementation and integration errors have been resolved.
--   **Documentation**: Consolidated technical guide available in [DOCUMENTACION_IA_COMPLETA.md](./DOCUMENTACION_IA_COMPLETA.md).
+-   **Arquitectura**: Serveis Modulars (`services/*.service.ts`) separats dels Controladors.
+-   **Estat**: **100% Correcte**. Tots els errors d'implementació i integració han estat resolts.
+-   **Documentació**: Guia tècnica consolidada disponible a [DOCUMENTACION_IA_COMPLETA.md](./DOCUMENTACION_IA_COMPLETA.md).
 

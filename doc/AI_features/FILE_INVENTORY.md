@@ -1,10 +1,10 @@
-# Inventario de Cambios - Implementación AI
+# Inventari de Canvis - Implementació IA
 
-Este documento lista todos los archivos y carpetas que han sido creados o modificados durante la implementación de las 4 ideas de Inteligencia Artificial.
+Aquest document llista tots els arxius i carpetes que han estat creats o modificats durant la implementació de les 4 idees d'Intel·ligència Artificial.
 
-## 📂 Archivos y Carpetas Creados
+## 📂 Arxius i Carpetes Creats
 
-### Backend (Lógica)
+### Backend (Lògica)
 *   `apps/api/src/services/assignment.solver.ts` (Idea 1)
 *   `apps/api/src/services/auto-assignment.service.ts` (Idea 1)
 *   `apps/api/src/services/nlp.service.ts` (Idea 2)
@@ -14,25 +14,25 @@ Este documento lista todos los archivos y carpetas que han sido creados o modifi
 *   `apps/api/src/routes/evaluation.routes.ts` (Idea 2)
 
 
-### Documentación
+### Documentació
 *   `doc/AI_features/README.md`
 *   `doc/AI_features/walkthrough.md`
-*   `doc/AI_features/FILE_INVENTORY.md` (Este archivo)
-*   `doc/AI_features/DOCUMENTACION_IA_COMPLETA.md` (Guía consolidada de las 4 ideas)
-*   `doc/AI_features/AI_RECONSTRUCTION_PROMPT.md` (Prompt maestro de recuperación)
+*   `doc/AI_features/FILE_INVENTORY.md` (Aquest arxiu)
+*   `doc/AI_features/DOCUMENTACION_IA_COMPLETA.md` (Guia consolidada de les 4 idees)
+*   `doc/AI_features/AI_RECONSTRUCTION_PROMPT.md` (Prompt mestre de recuperació)
 
 ---
 
-## 📝 Archivos Modificados
+## 📝 Arxius Modificats
 
-### Base de Datos y Configuración
-*   `apps/api/prisma/schema.prisma`: Añadidos campos para asignación de grupos (`grup`) y relaciones 1:N.
-*   `tsconfig.json`: Reparada configuración raíz.
-*   `package.json`: Añadida dependencia `expo` para resolver conflictos de tipos.
+### Base de Dades i Configuració
+*   `apps/api/prisma/schema.prisma`: Afegits camps per a assignació de grups (`grup`) i relacions 1:N.
+*   `tsconfig.json`: Reparada configuració arrel.
+*   `package.json`: Afegida dependència `expo` per resoldre conflictes de tipus.
 
-### Controladores y Rutas (Backend)
-*   `apps/api/src/controllers/assignacio.controller.ts`: Añadidos métodos `generateAutomaticAssignments` y `validateDocumentUpload`.
-*   `apps/api/src/controllers/stats.controller.ts`: Añadido método `runRiskAnalysis`.
-*   `apps/api/src/routes/assignacio.routes.ts`: Añadidos endpoints.
-*   `apps/api/src/routes/stats.routes.ts`: Añadidos endpoints.
-*   `apps/api/src/routes/index.ts`: Registrada ruta de evaluación.
+### Controladores i Rutes (Backend)
+*   `apps/api/src/controllers/assignacio.controller.ts`: Afegits mètodes `generateAutomaticAssignments` i `validateDocumentUpload`.
+*   `apps/api/src/controllers/stats.controller.ts`: Afegit mètode `runRiskAnalysis`.
+*   `apps/api/src/routes/assignacio.routes.ts`: Afegits endpoints.
+*   `apps/api/src/routes/stats.routes.ts`: Afegits endpoints.
+*   `apps/api/src/routes/index.ts`: Registrada ruta d'avaluació.

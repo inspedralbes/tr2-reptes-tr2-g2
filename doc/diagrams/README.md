@@ -1,4 +1,4 @@
-# Diagramas del Sistema ITER ECOSYSTEM
+# Diagrames del Sistema ITER ECOSYSTEM
 
 
 ## 🏗️ Arquitectura General del Sistema
@@ -6,7 +6,7 @@
 ```mermaid
 graph TB
     subgraph "Frontend Layer"
-        WEB["Web App<br/>Next.js 16<br/>Port: 8002"]
+        WEB["WebApp<br/>Next.js 16<br/>Port: 8002"]
         MOBILE["Mobile App<br/>Expo<br/>React Native"]
     end
     
@@ -36,7 +36,7 @@ graph TB
     NGROK -->|"Exposes"| API
 ```
 
-## 🐳 Flujo de Docker Compose
+## 🐳 Flux de Docker Compose
 
 ```mermaid
 graph TB
@@ -57,7 +57,7 @@ graph TB
     style SETUP fill:#e1f5ff
 ```
 
-## 🗄️ Esquema de Base de Datos Principal
+## 🗄️ Esquema de Base de Dades Principal
 
 ```mermaid
 erDiagram
@@ -124,32 +124,32 @@ erDiagram
     }
 ```
 
-## 🤖 Flujo de Funcionalidades de IA
+## 🤖 Flux de Funcionalitats d'IA
 
 ```mermaid
 graph TB
-    subgraph "Idea 1: Motor de Asignación"
-        ALGO["AssignmentSolver<br/>IA Simbólica<br/>Constraint Satisfaction"]
-        AUTO["Auto-Assignment Service<br/>Orquestación"]
-        ALGO -->|"Resultados"| AUTO
+    subgraph "Idea 1: Motor d'Assignació"
+        ALGO["AssignmentSolver<br/>IA Simbòlica<br/>Constraint Satisfaction"]
+        AUTO["Auto-Assignment Service<br/>Orquestració"]
+        ALGO -->|"Resultats"| AUTO
     end
     
-    subgraph "Idea 2: Asistente de Voz"
-        NLP["NLP Service<br/>Análisis de texto<br/>Palabras clave"]
-        EVAL["Evaluation Controller<br/>Procesamiento de voz"]
-        NLP -->|"Sugerencias"| EVAL
+    subgraph "Idea 2: Assistent de Veu"
+        NLP["NLP Service<br/>Anàlisi de text<br/>Paraules clau"]
+        EVAL["Evaluation Controller<br/>Processament de veu"]
+        NLP -->|"Suggeriments"| EVAL
     end
     
-    subgraph "Idea 3: Detección de Riesgo"
-        RISK["Risk Analysis Service<br/>Sistema Experto<br/>Basado en reglas"]
-        STATS["Stats Controller<br/>Análisis predictivo"]
-        RISK -->|"Alertas"| STATS
+    subgraph "Idea 3: Detecció de Risc"
+        RISK["Risk Analysis Service<br/>Sistema Expert<br/>Basat en regles"]
+        STATS["Stats Controller<br/>Anàlisi predictiva"]
+        RISK -->|"Alertes"| STATS
     end
     
-    subgraph "Idea 4: Validación Documental"
-        VISION["Vision Service<br/>Computer Vision<br/>Verificación"]
-        ASSIGN["Assignacio Controller<br/>Validación de docs"]
-        VISION -->|"Resultados"| ASSIGN
+    subgraph "Idea 4: Validació Documental"
+        VISION["Vision Service<br/>Computer Vision<br/>Verificació"]
+        ASSIGN["Assignacio Controller<br/>Validació de docs"]
+        VISION -->|"Resultats"| ASSIGN
     end
     
     API -->|"POST /api/assignacions/auto-generate"| ALGO
@@ -158,28 +158,28 @@ graph TB
     API -->|"POST /api/assignacions/validate-doc"| VISION
 ```
 
-## 🔄 Flujo de Datos Completo
+## 🔄 Flux de Dades Complet
 
 ```mermaid
 sequenceDiagram
-    participant U as Usuario
+    participant U as Usuari
     participant W as Web App
     participant A as API
     participant P as PostgreSQL
     participant M as MongoDB
     
-    U->>W: Login/Interacción
+    U->>W: Login/Interacció
     W->>A: HTTP Request (/api/*)
     A->>P: Prisma Query
-    P-->>A: Datos estructurados
+    P-->>A: Dades estructurades
     A->>M: Analytics Query
-    M-->>A: Datos de análisis
+    M-->>A: Dades d'anàlisi
     A-->>W: JSON Response
     W-->>U: UI Update
     
-    Note over A,M: Para funcionalidades IA:
-    A->>A: Procesamiento IA
-    A->>P: Guardar resultados
+    Note over A,M: Per a funcionalitats IA:
+    A->>A: Processament IA
+    A->>P: Guardar resultats
     A->>M: Guardar analytics
 ```
 
@@ -205,7 +205,7 @@ graph LR
     style NGROK_DEV fill:#fff5e1
 ```
 
-## 🔧 Configuración de Entorno
+## 🔧 Configuració d'Entorn
 
 ```mermaid
 graph TB
@@ -228,13 +228,13 @@ graph TB
 
 ---
 
-## Notas
+## Notes
 
-- **Arquitectura Monorepo**: El proyecto utiliza Turborepo para gestionar múltiples aplicaciones en un solo repositorio [1](#0-0) 
-- **Base de Datos Dual**: PostgreSQL para datos estructurados con Prisma ORM, MongoDB Atlas para analytics [2](#0-1) 
-- **Orquestación Docker**: Flujo secuencial con servicio setup dedicado para evitar conflictos [3](#0-2) 
-- **Funcionalidades IA**: Cuatro módulos integrados con diferentes enfoques (simbólico, NLP, expert system, computer vision) [4](#0-3) 
-- **Esquema de Datos**: Modelo relacional complejo con entidades principales como Centre, Usuari, Taller, Peticio, Assignacio [5](#0-4) 
+- **Arquitectura Monorepo**: El projecte utilitza Turborepo per gestionar múltiples aplicacions en un sol repositori [1](#0-0) 
+- **Base de Dades Dual**: PostgreSQL per a dades estructurades amb Prisma ORM, MongoDB Atlas per a analytics [2](#0-1) 
+- **Orquestració Docker**: Flux seqüencial amb servei setup dedicat per evitar conflictes [3](#0-2) 
+- **Funcionalitats IA**: Quatre mòduls integrats amb diferents enfocaments (simbòlic, NLP, expert system, computer vision) [4](#0-3) 
+- **Esquema de Dades**: Model relacional complex amb entitats principals com Centre, Usuari, Taller, Peticio, Assignacio [5](#0-4) 
 
 Wiki pages you might want to explore:
 - [Development Guide (inspedralbes/tr2-reptes-tr2-g2)](/wiki/inspedralbes/tr2-reptes-tr2-g2#9)
