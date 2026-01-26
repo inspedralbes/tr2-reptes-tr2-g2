@@ -7,6 +7,7 @@ import { THEME, PHASES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import ResourcesWidget from '@/components/ResourcesWidget';
 import getApi from '@/services/api';
+import AIChatWidget from '@/components/AIChatWidget';
 
 interface Fase {
   id_fase: number;
@@ -68,7 +69,7 @@ export default function CentroDashboard() {
     >
       {/* Timeline Secció Institucional */}
       <section className="bg-white border border-gray-200 p-6 md:p-12 mb-8 md:mb-12 relative overflow-hidden">
-        
+
         <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#00426B] mb-8 md:mb-12 flex items-center gap-4">
           <span className="w-12 h-1 bg-[#0775AB]"></span>
           Estat del Programa Iter 25-26
@@ -132,7 +133,7 @@ export default function CentroDashboard() {
             </svg>
           </div>
           <h3 className="text-xl font-black text-[#00426B] mb-3 uppercase tracking-tight">Solicitar Tallers</h3>
-          <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">Demana la participació del centre abans del <span className="text-[#0775AB] font-black">10 d'octubre</span>.</p>
+          <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">Demana la participació del centre abans del <span className="text-[#0775AB] font-black">10 d&apos;octubre</span>.</p>
           {!isPhaseActive(PHASES.SOLICITUD) && <span className="text-[9px] font-black uppercase text-red-600 mt-6 block tracking-widest px-2 py-1 bg-red-50 w-fit">Fase Finalitzada</span>}
         </div>
 
@@ -168,7 +169,7 @@ export default function CentroDashboard() {
             </svg>
           </div>
           <h3 className="text-xl font-black text-[#00426B] mb-3 uppercase tracking-tight">Professors</h3>
-          <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">Gestiona l'equip docent referent del projecte.</p>
+          <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">Gestiona l&apos;equip docent referent del projecte.</p>
         </div>
 
         <div
@@ -188,6 +189,7 @@ export default function CentroDashboard() {
           <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">Consulta la planificació i estat dels tallers adjudicats.</p>
         </div>
       </div >
+      <AIChatWidget />
     </DashboardLayout >
   );
 }
