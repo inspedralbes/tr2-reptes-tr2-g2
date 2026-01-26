@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, type FormEvent } from 'react';
+import getApi from '@/services/api';
 
 interface Message {
     id: string;
@@ -58,31 +59,31 @@ export default function AIChatWidget() {
         setInputValue('');
         setIsTyping(true);
 
-        // Mock AI response
-        setTimeout(() => {
-            let responseText = "Ho sento, no t'he entès. Pots reformular la pregunta?";
-            const lowerInput = userMessage.text.toLowerCase();
+        const api = getApi();
 
-            if (lowerInput.includes('hola') || lowerInput.includes('bon dia')) {
-                responseText = "Hola! Com puc ajudar-te a gestionar el centre avui?";
-            } else if (lowerInput.includes('on') || lowerInput.includes('anar') || lowerInput.includes('ruta')) {
-                responseText = "Per navegar, utilitza el menú principal o les targetes de l'escriptori. Si busques una secció específica, digues-m'ho.";
-            } else if (lowerInput.includes('alumne') || lowerInput.includes('estudiant')) {
-                responseText = "Pots gestionar els alumnes des de la secció 'Gestió Alumnat'. Vols que t'hi porti?";
-            } else if (lowerInput.includes('taller') || lowerInput.includes('activitat')) {
-                responseText = "Els tallers es gestionen des de la secció 'Solicitar Tallers' o 'Assignacions' depenent de la fase.";
-            }
+        try {
+            const response = await api.post('/chat', { message: userMessage.text });
 
             const aiMessage: Message = {
                 id: (Date.now() + 1).toString(),
-                text: responseText,
+                text: response.data.response,
                 sender: 'ai',
                 timestamp: new Date()
             };
 
             setMessages(prev => [...prev, aiMessage]);
+        } catch (error) {
+            console.error('Error sending message:', error);
+            const errorMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                text: "Ho sento, hi ha hagut un error en connectar amb el servidor.",
+                sender: 'ai',
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
             setIsTyping(false);
-        }, 1500);
+        }
     };
 
     return (
