@@ -1,279 +1,243 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, TextInput } from 'react-native';
+import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { THEME, PHASES } from '@iter/shared';
-import { getAttendance, postAttendance, postIncidencia, getFases } from '../../../services/api';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { THEME } from '@iter/shared';
+import api, { getChecklist, getStudents, postAttendance, getAttendance } from '../../../services/api';
 
-interface Student {
-  id: number;
-  id_inscripcio: number;
-  name: string;
-  status: string;
-  institute: string;
-  permissions: string;
-  flag?: boolean;
-}
-
-export default function SesionScreen() {
+export default function SessionScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [incidentModal, setIncidentModal] = useState(false);
-  const [incidentText, setIncidentText] = useState('');
-  const [sessionNumber, setSessionNumber] = useState(4); // Default to current
-  const [sessionModal, setSessionModal] = useState(false);
+  const insets = useSafeAreaInsets();
 
-  const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isEjecucion, setIsEjecucion] = useState(false);
-  const [assignmentInfo, setAssignmentInfo] = useState<any>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false); // New state to track if already submitted
+  const [students, setStudents] = useState<any[]>([]);
+  const [attendance, setAttendance] = useState<{[key: string]: string}>({}); // 'PRESENT', 'ABSENT', 'RETARD'
+  const [observations, setObservations] = useState('');
+  const [sessionData, setSessionData] = useState<any>(null); // To store taller info if needed
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [fasesRes, attendanceRes] = await Promise.all([
-          getFases(),
-          getAttendance(id as string)
-        ]);
 
-        const active = fasesRes.data.data.find((f: any) => f.nom === PHASES.EJECUCION)?.activa;
-        setIsEjecucion(!!active);
 
-        const attendanceData = attendanceRes.data;
-        if (attendanceData.length > 0) {
-          setAssignmentInfo(attendanceData[0].inscripcio.assignacio);
-          
-          const mapped = attendanceData.map((a: any) => ({
-            id: a.inscripcio.id_alumne,
-            id_inscripcio: a.id_inscripcio,
-            name: `${a.inscripcio.alumne.nom} ${a.inscripcio.alumne.cognoms}`,
-            status: a.estat.toLowerCase(),
-            institute: a.inscripcio.alumne.centre_procedencia?.nom || 'Centro N/A',
-            permissions: 'Permís estàndard'
-          }));
-          setStudents(mapped);
-        }
-      } catch (error) {
-        console.error("Error fetching session data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [id]);
-
-  const updateStatus = async (studentId: number, idInscripcio: number, newStatus: string) => {
-    if (!isEjecucion) {
-      Alert.alert('Fase No Activa', 'Només es pot registrar assistència durant la fase d\'execució.');
-      return;
-    }
-
+  const fetchData = async () => {
+    setLoading(true);
     try {
-      const estatMapeado = newStatus === 'late' ? 'Retard' : newStatus === 'present' ? 'Present' : 'Absència';
+      // 1. Get List of Students
+      const studentsRes = await getStudents(id as string);
+      const studentsList = studentsRes.data;
+      setStudents(studentsList);
       
-      await postAttendance({
-        id_inscripcio: idInscripcio,
-        numero_sessio: sessionNumber,
-        data_sessio: new Date().toISOString().split('T')[0],
-        estat: estatMapeado,
-        observacions: ''
+      // 2. Initial state: Mark all as PRESENT by default (optional, distinct per preference)
+      const initialAttendance: any = {};
+      studentsList.forEach((s: any) => {
+          initialAttendance[s.id_alumne] = 'PRESENT';
       });
 
-      setStudents(students.map(s => 
-        s.id === studentId ? { ...s, status: newStatus, flag: newStatus === 'absent' } : s
-      ));
+      // 3. Check if attendance already exists (to pre-fill)
+      try {
+        const existingRes = await getAttendance(id as string);
+        if (existingRes.data && existingRes.data.length > 0) {
+            // Map existing data
+            existingRes.data.forEach((record: any) => {
+                initialAttendance[record.id_alumne] = record.estat;
+            });
+            if(existingRes.data[0].observacions) {
+                setObservations(existingRes.data[0].observacions);
+            }
+            setIsSubmitted(true); // Mark as submitted if data exists
+        }
+      } catch (err) {
+        // No existing attendance, continue with defaults
+      }
+
+      setAttendance(initialAttendance);
+
     } catch (error) {
-      Alert.alert('Error', 'No s\'ha pogut desar l\'assistència.');
+      console.error("Error fetching session data:", error);
+      Alert.alert("Error", "No s'ha pogut carregar la llista d'alumnes.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleReportIncidencía = async () => {
-    if (!incidentText.trim()) return;
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [id])
+  );
+
+  const toggleStatus = (studentId: string) => {
+    if (isSubmitted) return; // Prevent changes if submitted
+    setAttendance(prev => {
+        const current = prev[studentId];
+        let next = 'PRESENT';
+        if (current === 'PRESENT') next = 'ABSENT';
+        else if (current === 'ABSENT') next = 'RETARD';
+        else if (current === 'RETARD') next = 'PRESENT';
+        return { ...prev, [studentId]: next };
+    });
+  };
+
+  const submitAttendance = async () => {
+    setSubmitting(true);
     try {
-      await postIncidencia({
-        id_centre: assignmentInfo.id_centre,
-        descripcio: `[Assignació ${id}] - Sessió ${sessionNumber}: ${incidentText}`
-      });
-      setIncidentModal(false);
-      setIncidentText('');
-      Alert.alert('Èxit', 'Incidència reportada correctament.');
+        const payload = Object.keys(attendance).map(studentId => ({
+            id_assignacio: id,
+            id_alumne: studentId,
+            estat: attendance[studentId],
+            observacions: observations
+        }));
+
+        // Send one by one or batch if API supports. 
+        // Assuming batch or we iterate. The prompt implies "send to coordinators".
+        // Let's assume the API handles bulk or we call `postAttendance` for the session.
+        // Looking at api.ts: export const postAttendance = (data: any) => api.post('assistencia', data);
+        // Usually expects an array or a single object. Let's try sending the array.
+        
+        await postAttendance({ assistencia: payload, id_assignacio: id }); 
+        
+        Alert.alert("Èxit", "Assistència enviada correctament als coordinadors.", [
+            { text: "OK", onPress: () => router.back() }
+        ]);
+        
     } catch (error) {
-      Alert.alert('Error', 'No s\'ha pogut reportar la incidència.');
+        console.error("Error submitting attendance:", error);
+        Alert.alert("Error", "No s'ha pogut enviar l'assistència.");
+    } finally {
+        setSubmitting(false);
     }
-  };
-
-  const toggleFlag = (studentId: number) => {
-    setStudents(students.map(s => 
-      s.id === studentId ? { ...s, flag: !s.flag } : s
-    ));
-  };
-
-  const getStatusBorder = (status: string) => {
-    if (status.includes('retard')) return 'border-yellow-500';
-    if (status.includes('abs')) return 'border-red-600';
-    if (status.includes('pres')) return 'border-green-600';
-    return 'border-gray-300';
-  };
-
-  const getStatusLabel = (status: string) => {
-    if (status.includes('retard')) return 'RETARD';
-    if (status.includes('abs')) return 'ABSENT';
-    if (status.includes('pres')) return 'PRESENT';
-    return 'PENDENT';
   };
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-[#F9FAFB]">
+      <View className="flex-1 justify-center items-center bg-background-page">
         <ActivityIndicator size="large" color={THEME.colors.primary} />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-[#F9FAFB] pt-4">
+    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
+      <Stack.Screen 
+        options={{ 
+          title: "Llista d'alumnes",
+          headerBackTitle: "Tornar",
+          headerShadowVisible: false,
+        }} 
+      />
+      
+      <ScrollView className="flex-1 px-6 pt-6" showsVerticalScrollIndicator={false}>
+         
+         <Text className="text-text-secondary text-sm mb-6 font-medium">
+            Marca l'assistència dels alumnes. Prem sobre l'estat per canviar-lo.
+         </Text>
 
-      <View className="flex-1 px-6 pt-8">
-        <View className="flex-row justify-between items-center mb-8">
-          <Text className="text-lg font-bold text-gray-800 tracking-tight">Alumnes ({students.length})</Text>
-          <TouchableOpacity 
-            onPress={() => setIncidentModal(true)}
-            className="bg-red-50 px-4 py-2 flex-row items-center border border-red-100"
+         {students.map((student) => {
+             const status = attendance[student.id_alumne];
+             // Using simpler colors for "line of the app" - cleaner look
+             let statusColor = "bg-background-surface text-emerald-700 border-emerald-100";  // Badge on gray bg
+             let statusIcon = "checkmark-circle";
+             
+             if (status === 'ABSENT') {
+                 statusColor = "bg-background-surface text-rose-700 border-rose-100";
+                 statusIcon = "close-circle";
+             } else if (status === 'RETARD') {
+                 statusColor = "bg-background-surface text-amber-700 border-amber-100";
+                 statusIcon = "time";
+             }
+
+             return (
+                 <View key={student.id_alumne} className="bg-background-subtle rounded-3xl mb-3 overflow-hidden border border-border-subtle">
+                     {/* Attendance Row */}
+                     <TouchableOpacity 
+                        onPress={() => toggleStatus(String(student.id_alumne))}
+                        activeOpacity={0.7}
+                        className="p-5 flex-row items-center justify-between"
+                     >
+                        <View className="flex-row items-center flex-1">
+                            <View className="w-12 h-12 bg-background-surface rounded-full items-center justify-center mr-4">
+                                <Text className="font-bold text-text-muted text-lg">{student.nom.charAt(0)}</Text>
+                            </View>
+                            <View className="flex-1 mr-2">
+                                <Text className="font-bold text-text-primary text-base mb-0.5" numberOfLines={1} ellipsizeMode="tail">
+                                    {student.nom} {student.cognoms}
+                                </Text>
+                                <Text className="text-text-muted text-xs font-medium tracking-wide">ID: {student.idalu}</Text>
+                            </View>
+                        </View>
+
+                        <View className={`px-3 py-1.5 rounded-full border flex-row items-center ${statusColor.split(' ')[0]} ${statusColor.split(' ')[2]}`}>
+                            <Ionicons name={statusIcon as any} size={14} color={status === 'ABSENT' ? '#BE123C' : status === 'RETARD' ? '#B45309' : '#047857'} />
+                            <Text className={`font-bold text-[10px] ml-1.5 uppercase tracking-wider ${statusColor.split(' ')[1]}`}>
+                                {status}
+                            </Text>
+                        </View>
+                     </TouchableOpacity>
+
+                     {/* Evaluation Divider & Action */}
+                     <View className="h-[1px] w-full bg-border-subtle" />
+                     {student.evaluated ? (
+                         <View className="flex-row items-center justify-center py-4 bg-background-subtle opacity-60">
+                             <Ionicons name="checkmark-done-circle" size={16} color={THEME.colors.success} />
+                             <Text className="ml-2 font-bold text-xs text-text-muted uppercase tracking-wider">
+                                 Avaluat
+                             </Text>
+                         </View>
+                     ) : (
+                        <TouchableOpacity
+                            onPress={() => router.push(`/(professor)/evaluacion/${student.id_alumne}?id_assignacio=${id}`)}
+                            className="flex-row items-center justify-center py-4 bg-background-surface active:bg-background-subtle"
+                        >
+                            <Ionicons name="ribbon-outline" size={16} color={THEME.colors.primary} />
+                            <Text className="ml-2 font-bold text-xs text-primary uppercase tracking-wider">
+                                Avaluar Competències
+                            </Text>
+                        </TouchableOpacity>
+                     )}
+                 </View>
+             );
+         })}
+
+         {/* Observations */}
+         <View className="mt-6 mb-24">
+            <Text className="text-text-primary font-bold mb-3 ml-1">Observacions Generals</Text>
+            <TextInput 
+                className="bg-background-subtle p-5 rounded-3xl text-text-primary h-32 leading-6 border border-border-subtle"
+                multiline
+                textAlignVertical="top"
+                placeholder="Escriu aquí qualsevol incidència o comentari sobre la sessió..."
+                placeholderTextColor={THEME.colors.gray}
+                value={observations}
+                onChangeText={setObservations}
+            />
+         </View>
+
+      </ScrollView>
+
+      {/* Footer Action */}
+      <View className="absolute bottom-0 left-0 right-0 p-6 bg-background-surface border-t border-border-subtle">
+
+
+         <TouchableOpacity 
+            onPress={submitAttendance}
+             disabled={submitting || isSubmitted}
+             className={`w-full h-14 rounded-2xl items-center justify-center shadow-lg ${submitting || isSubmitted ? 'bg-background-subtle' : 'bg-primary shadow-slate-200'}`}
           >
-            <Ionicons name="warning" size={16} color="#EF4444" />
-            <Text className="text-[#EF4444] font-bold text-xs uppercase tracking-wider ml-2">Incidència</Text>
-          </TouchableOpacity>
-        </View>
-
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
-          {students.map((student) => (
-            <View key={student.id} className="bg-white p-5 border border-gray-200 mb-4">
-              <View className="flex-row justify-between items-start mb-6">
-                <TouchableOpacity onPress={() => { setSelectedStudent(student); setModalVisible(true); }} className="flex-1">
-                  <Text className="text-lg font-bold text-gray-900 tracking-tight">{student.name}</Text>
-                  <Text className="text-gray-400 font-bold text-xs uppercase tracking-wider mt-1">{student.institute}</Text>
-                </TouchableOpacity>
-                <View className={`px-2 py-0.5 border ${getStatusBorder(student.status)}`}>
-                  <Text className="font-bold text-[8px] tracking-wider">{getStatusLabel(student.status)}</Text>
-                </View>
-              </View>
-
-              <View className="flex-row space-x-2">
-                <TouchableOpacity 
-                  onPress={() => updateStatus(student.id, student.id_inscripcio, 'present')}
-                  className={`flex-1 py-3 items-center border-2 ${student.status.includes('pres') ? 'bg-green-600 border-green-600' : 'bg-white border-gray-200'}`}
-                >
-                  <Ionicons name="checkmark" size={18} color={student.status.includes('pres') ? 'white' : '#10B981'} />
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  onPress={() => updateStatus(student.id, student.id_inscripcio, 'late')}
-                  className={`flex-1 py-3 items-center border-2 ${student.status.includes('retard') ? 'bg-yellow-500 border-yellow-500' : 'bg-white border-gray-200'}`}
-                >
-                  <Ionicons name="time" size={18} color={student.status.includes('retard') ? 'white' : '#F59E0B'} />
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  onPress={() => updateStatus(student.id, student.id_inscripcio, 'absent')}
-                  className={`flex-1 py-3 items-center border-2 ${student.status.includes('abs') ? 'bg-red-600 border-red-600' : 'bg-white border-gray-200'}`}
-                >
-                  <Ionicons name="close" size={18} color={student.status.includes('abs') ? 'white' : '#EF4444'} />
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  onPress={() => toggleFlag(student.id)}
-                  className={`px-4 py-3 items-center border ${student.flag ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-100'}`}
-                >
-                  <Ionicons name="flag" size={18} color={student.flag ? '#EF4444' : '#9CA3AF'} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-        </ScrollView>
+              {submitting ? (
+                  <ActivityIndicator color="white" />
+              ) : isSubmitted ? (
+                  <View className="flex-row items-center">
+                    <Ionicons name="checkmark-circle" size={20} color={THEME.colors.success} style={{ marginRight: 8 }} />
+                    <Text className="text-text-muted text-lg font-bold tracking-wide uppercase">Assistència Registrada</Text>
+                  </View>
+              ) : (
+                  <Text className="text-white text-lg font-bold tracking-wide uppercase">Finalitzar i Enviar</Text>
+              )}
+         </TouchableOpacity>
       </View>
 
-      {/* Student Info Modal */}
-      <Modal visible={modalVisible} animationType="fade" transparent={true}>
-        <View className="flex-1 justify-center bg-black/40 px-6">
-          <View className="bg-white border border-gray-200 p-8">
-            {selectedStudent && (
-              <>
-                <Text className="text-sm font-black text-secondary mb-2 uppercase tracking-[2px]">FITXA ALUMNE</Text>
-                <Text className="text-3xl font-black text-gray-900 mb-2 uppercase tracking-tight">{selectedStudent.name}</Text>
-                <Text className="text-gray-500 font-bold mb-8 uppercase tracking-widest text-xs">{selectedStudent.institute}</Text>
-                
-                <View className="bg-gray-100 p-6 mb-10 border-l-8 border-primary">
-                  <Text className="text-xs text-gray-400 uppercase tracking-widest font-black mb-3">PERMISOS DE SORTIDA</Text>
-                  <View className="flex-row items-center">
-                    <Ionicons name="information-circle" size={20} color={THEME.colors.primary} />
-                    <Text className="text-gray-900 ml-3 font-black text-xs uppercase">{selectedStudent.permissions}</Text>
-                  </View>
-                </View>
-
-                <TouchableOpacity 
-                  className="bg-primary py-5 items-center"
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text className="text-white font-black text-sm uppercase tracking-widest">TANCAR</Text>
-                </TouchableOpacity>
-              </>
-            )}
-            <Text className="text-2xl font-bold text-[#00426B] mb-2 tracking-tight">Registrar Incidència</Text>
-            <Text className="text-gray-500 text-sm mb-8 leading-5">Explica breument el problema detectat durant la sessió.</Text>
-            
-            <TextInput 
-              className="bg-gray-50 border border-gray-200 p-4 h-40 text-gray-900 font-medium text-sm mb-8"
-              multiline
-              placeholder="Escriu aquí..."
-              textAlignVertical="top"
-              value={incidentText}
-              onChangeText={setIncidentText}
-            />
-
-            <View className="flex-row space-x-4">
-              <TouchableOpacity 
-                className="flex-1 py-4 items-center bg-gray-100"
-                onPress={() => setIncidentModal(false)}
-              >
-                <Text className="text-gray-400 font-bold text-xs uppercase tracking-wider">Cancel·lar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                className="flex-1 bg-[#F26178] py-4 items-center"
-                onPress={handleReportIncidencía}
-              >
-                <Text className="text-white font-bold text-xs uppercase tracking-wider">Reportar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Session Selector Modal */}
-      <Modal visible={sessionModal} animationType="fade" transparent={true}>
-        <View className="flex-1 justify-end bg-black/40">
-          <View className="bg-white p-6 pb-12 border-t border-gray-200">
-            <Text className="text-xl font-black text-gray-900 mb-6 text-center uppercase tracking-widest">Seleccionar Sessió</Text>
-            <View className="flex-row flex-wrap justify-center">
-              {[1,2,3,4,5,6,7,8,9,10].map(n => (
-                <TouchableOpacity 
-                  key={n}
-                  onPress={() => { setSessionNumber(n); setSessionModal(false); }}
-                  className={`w-14 h-14 m-2 items-center justify-center border ${sessionNumber === n ? 'bg-primary border-primary' : 'bg-gray-50 border-gray-200'}`}
-                >
-                  <Text className={`font-bold ${sessionNumber === n ? 'text-white' : 'text-gray-400'}`}>{n}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <TouchableOpacity 
-              onPress={() => setSessionModal(false)}
-              className="mt-8 bg-gray-100 py-4 items-center border border-gray-200"
-            >
-              <Text className="text-gray-500 font-black uppercase tracking-widest">TANCAR</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }

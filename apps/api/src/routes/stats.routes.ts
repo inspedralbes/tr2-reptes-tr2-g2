@@ -1,5 +1,6 @@
 import express from 'express';
 import * as statsController from '../controllers/stats.controller';
+import { authenticateToken } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
@@ -10,6 +11,8 @@ router.get('/search', statsController.getAdvancedSearch);
 router.get('/query-step', statsController.queryByStep);
 router.patch('/checklist/:id/step', statsController.addChecklistStep);
 router.delete('/logs/cleanup', statsController.cleanupLogs);
+router.get('/monitor-phase2', authenticateToken, statsController.getPhase2MonitoringStats);
+router.get('/occupancy-by-zone', statsController.getOccupancyByZone);
 router.post('/risk-analysis', statsController.runRiskAnalysis);
 
 export default router;

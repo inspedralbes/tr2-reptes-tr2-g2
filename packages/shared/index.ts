@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { THEME } from './theme';
+
+export { THEME };
 
 // Definimos los roles exactos que espera la Base de Datos
 export const ROLES = {
@@ -18,27 +21,6 @@ export const ESTADOS_PETICION = {
 
 export type EstadoPeticion = typeof ESTADOS_PETICION[keyof typeof ESTADOS_PETICION];
 
-// Branding CEB
-export const THEME = {
-  colors: {
-    primary: '#00426B', // Blau fosc (Principal)
-    secondary: '#4197CB', // Blau clar
-    background: '#F9FAFB', // Gris molt clar
-    surface: '#FFFFFF',
-    text: {
-      primary: '#111827',
-      secondary: '#4B5563',
-      muted: '#9CA3AF'
-    },
-    accent: '#F26178', // Rosa/Vermell
-    neutral: '#CFD2D3', // Gris
-    beige: '#E0C5AC'
-  },
-  fonts: {
-    primary: 'Helvetica Neue, Arial, sans-serif'
-  }
-} as const;
-
 // Calendario Programa Iter (Curso 25-26 aprox)
 export const CALENDARI = {
   REUNION_PRESENTACION: '2025-09-30',
@@ -49,10 +31,10 @@ export const CALENDARI = {
 
 // Nombres oficiales de las fases para consistencia en DB y UI
 export const PHASES = {
-  SOLICITUD: 'Solicitud e Inscripción',
-  PLANIFICACION: 'Planificación y Asignación',
-  EJECUCION: 'Ejecución y Seguimiento',
-  CIERRE: 'Cierre y Evaluación'
+  SOLICITUD: 'Sol·licitud i Inscripció',
+  PLANIFICACION: 'Planificació i Assignació',
+  EJECUCION: 'Execució i Seguiment',
+  CIERRE: 'Tancament i Avaluació'
 } as const;
 
 export const FASES_TIMELINE = [

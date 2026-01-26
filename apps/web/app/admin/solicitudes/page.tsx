@@ -13,6 +13,7 @@ import api from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import Pagination from "@/components/Pagination";
 
 export default function AdminSolicitudesPage() {
   const { user, loading: authLoading } = useAuth();
@@ -27,6 +28,10 @@ export default function AdminSolicitudesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCenterId, setSelectedCenterId] = useState<string>('');
   const [selectedModality, setSelectedModality] = useState<string>('');
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -200,6 +205,16 @@ export default function AdminSolicitudesPage() {
     });
   }, [tallers, searchQuery, selectedModality, workshopRequests]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCenterId, selectedModality]);
+
+  const totalPages = Math.ceil(filteredTallers.length / itemsPerPage);
+  const paginatedTalleres = filteredTallers.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+  );
+
   if (authLoading || !user) {
     return <Loading fullScreen message="Verificant credencials d'administrador..." />;
   }
@@ -286,7 +301,7 @@ export default function AdminSolicitudesPage() {
         </div>
       ) : filteredTallers.length > 0 ? (
         <div className="space-y-12">
-          {filteredTallers.map(taller => {
+          {paginatedTalleres.map(taller => {
             const requests = workshopRequests[parseInt(taller._id)] || [];
             return (
               <section key={taller._id} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -378,6 +393,15 @@ export default function AdminSolicitudesPage() {
               </section>
             );
           })}
+          
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalItems={filteredTallers.length}
+            currentItemsCount={paginatedTalleres.length}
+            itemName="tallers"
+          />
         </div>
       ) : (
         <div className="bg-white border border-dashed border-gray-200 p-20 text-center">

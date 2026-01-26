@@ -34,9 +34,9 @@ export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db
     db = client.db(dbName);
     console.log('✅ Conectado a MongoDB Atlas (Stable API v1)');
     return { client, db };
-  } catch (error) {
-    console.error('❌ Error conectando a MongoDB Atlas:', error);
-    throw error;
+  } catch (error: any) {
+    console.error('❌ Error conectando a MongoDB Atlas:', error.message);
+    throw new Error(`MongoDB No Respon: ${error.message}. Verifica les credencials a .env o la connexió a internet.`);
   }
 }
 

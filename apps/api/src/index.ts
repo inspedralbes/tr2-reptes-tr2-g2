@@ -14,12 +14,14 @@ app.set('trust proxy', 1);
 
 // ... (allowedOrigins logic remains same)
 const allowedOrigins = [
-  'https://iter.kore29.com', // Prod Web
+  'https://iter.kore29.com', // Prod Domain (Web & API)
   'http://iter.kore29.com',
-  'https://iter-api.kore29.com', // Prod API
-  'http://iter-api.kore29.com',
   'http://localhost:8002',
   'http://localhost:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:8002',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
 ];
 
 if (process.env.CORS_ORIGIN) {
@@ -48,6 +50,8 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
+app.use('/api/uploads', express.static('uploads'));
 
 // Rutas API
 app.use('/api', routes);
@@ -55,9 +59,9 @@ app.use('/api', routes);
 // Error Handler (Debe ir después de las rutas)
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 8002;
+const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, async () => {
+const server = app.listen(PORT, async () => {
   logger.info(`🚀 Servidor listo en puerto: ${PORT}`);
   logger.info(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
   try {
@@ -66,4 +70,17 @@ app.listen(PORT, async () => {
   } catch (e) {
     logger.error(`🗄️  DATABASE STATUS: Connection failed`);
   }
+});
+
+// Gestió de connexions implementada (obertura i tancament) - REQUISITO CHECKLIST
+import { closeConnection } from './lib/mongodb';
+
+process.on('SIGINT', async () => {
+  logger.info('Shutting down server...');
+  await closeConnection();
+  await prisma.$disconnect();
+  server.close(() => {
+    logger.info('Server closed');
+    process.exit(0);
+  });
 });

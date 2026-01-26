@@ -1,8 +1,10 @@
 
 export interface User {
   id: number;
+  id_usuari: number;
   email: string;
   nom_complet: string;
+  url_foto?: string | null;
   id_centre?: number;
   centre?: {
     id_centre: number;

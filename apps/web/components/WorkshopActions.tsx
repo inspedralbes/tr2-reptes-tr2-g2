@@ -20,7 +20,7 @@ const WorkshopActions = ({
           <span className="text-blue-400 mr-2">🔍</span>
           <input
             className="flex-1 outline-none"
-            placeholder="Buscar talleres..."
+            placeholder="Cercar tallers..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />

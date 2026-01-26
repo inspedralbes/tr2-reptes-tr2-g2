@@ -15,7 +15,7 @@ export interface Taller {
     ubicacio_defecte: string;
   };
   referents_assignats?: string[];
-  dies_execucio: string[];
+  dies_execucio: { dayOfWeek: number; startTime: string; endTime: string }[];
 }
 
 const tallerService = {
@@ -43,7 +43,7 @@ const tallerService = {
           ubicacio_defecte: "Ca n'Olivella",
         },
         referents_assignats: [],
-        dies_execucio: [],
+        dies_execucio: t.dies_execucio || [],
       }));
     } catch (error) {
       console.error("Error en tallerService.getAll:", error);
@@ -51,9 +51,6 @@ const tallerService = {
     }
   },
 
-  /**
-   * Crea un nuevo taller en el backend.
-   */
   create: async (tallerData: Omit<Taller, '_id'>): Promise<Taller> => {
     const api = getApi();
     try {
@@ -63,8 +60,9 @@ const tallerService = {
         durada_h: tallerData.detalls_tecnics?.durada_hores,
         places_maximes: tallerData.detalls_tecnics?.places_maximes,
         modalitat: tallerData.modalitat,
-        icona: tallerData.icona || "🧩",
+        icona: tallerData.icona,
         id_sector: tallerData.id_sector || 1,
+        dies_execucio: tallerData.dies_execucio,
       };
 
       const response = await api.post("/tallers", payload);
@@ -76,6 +74,7 @@ const tallerService = {
         sector: t.sector?.nom || "General",
         id_sector: t.id_sector,
         modalitat: t.modalitat,
+        icona: t.icona || "🧩",
         trimestre: "1r",
         detalls_tecnics: {
           descripcio: t.descripcio || "",
@@ -84,7 +83,7 @@ const tallerService = {
           ubicacio_defecte: "Ca n'Olivella",
         },
         referents_assignats: [],
-        dies_execucio: [],
+        dies_execucio: t.dies_execucio || [],
       };
     } catch (error: any) {
       console.error("Error en tallerService.create:", error);
@@ -93,9 +92,6 @@ const tallerService = {
     }
   },
 
-  /**
-   * Actualiza un taller existente.
-   */
   update: async (id: string, tallerData: Partial<Taller>): Promise<Taller> => {
     const api = getApi();
     try {
@@ -104,6 +100,7 @@ const tallerService = {
       if (tallerData.modalitat) payload.modalitat = tallerData.modalitat;
       if (tallerData.id_sector) payload.id_sector = tallerData.id_sector;
       if (tallerData.icona) payload.icona = tallerData.icona;
+      if (tallerData.dies_execucio) payload.dies_execucio = tallerData.dies_execucio;
       if (tallerData.detalls_tecnics) {
         if (tallerData.detalls_tecnics.descripcio) payload.descripcio = tallerData.detalls_tecnics.descripcio;
         if (tallerData.detalls_tecnics.durada_hores) payload.durada_h = tallerData.detalls_tecnics.durada_hores;
@@ -128,7 +125,7 @@ const tallerService = {
           ubicacio_defecte: "Ca n'Olivella",
         },
         referents_assignats: [],
-        dies_execucio: [],
+        dies_execucio: t.dies_execucio || [],
       };
     } catch (error: any) {
       console.error("Error en tallerService.update:", error);

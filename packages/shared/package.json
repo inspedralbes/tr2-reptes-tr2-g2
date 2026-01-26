@@ -1,8 +1,13 @@
 {
   "name": "@iter/shared",
   "version": "0.0.0",
-  "main": "./index.ts",
-  "types": "./index.ts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./theme": "./dist/theme.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch"

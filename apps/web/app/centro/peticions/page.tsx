@@ -8,6 +8,8 @@ import tallerService, { Taller } from '@/services/tallerService';
 import peticioService, { Peticio } from '@/services/peticioService';
 import professorService, { Professor } from '@/services/professorService';
 import Loading from '@/components/Loading';
+import WorkshopIcon from '@/components/WorkshopIcon';
+import Pagination from "@/components/Pagination";
 
 export default function PeticionsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -27,6 +29,10 @@ export default function PeticionsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   const router = useRouter();
 
   useEffect(() => {
@@ -69,6 +75,16 @@ export default function PeticionsPage() {
     }
     return result;
   }, [tallers, searchQuery]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const totalPages = Math.ceil(filteredTallers.length / itemsPerPage);
+  const paginatedTallers = filteredTallers.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+  );
 
   const selectedTaller = tallers.find(t => t._id === selectedTallerId);
 
@@ -119,6 +135,18 @@ export default function PeticionsPage() {
 
     if (selectedTaller.modalitat === 'C' && alumnesCount !== '' && alumnesCount > 4) {
       setError('En la Modalitat C, el número màxim d\'alumnes és 4.');
+      setSubmitting(false);
+      return;
+    }
+
+    if (!prof1_id || !prof2_id) {
+      setError('Has de seleccionar dos professors referents.');
+      setSubmitting(false);
+      return;
+    }
+
+    if (prof1_id === prof2_id) {
+      setError('Els dos professors referents han de ser diferents.');
       setSubmitting(false);
       return;
     }
@@ -210,7 +238,7 @@ export default function PeticionsPage() {
                     </td>
                   </tr>
                 ) : filteredTallers.length > 0 ? (
-                  filteredTallers.map((taller) => {
+                  paginatedTallers.map((taller) => {
                     const existingPeticio = peticions.find(p => p.id_taller === parseInt(taller._id));
                     const isSelected = selectedTallerId === taller._id;
                     const isPending = existingPeticio?.estat === 'Pendent';
@@ -238,11 +266,14 @@ export default function PeticionsPage() {
                           }`}
                       >
                         <td className="px-6 py-4">
-                          <div className={`w-8 h-8 flex items-center justify-center font-bold text-xs ${taller.modalitat === 'A' ? 'bg-green-100 text-green-700' :
-                              taller.modalitat === 'B' ? 'bg-orange-100 text-orange-700' :
-                                'bg-purple-100 text-purple-700'
-                            }`}>
-                            {taller.modalitat}
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 flex items-center justify-center font-bold text-xs shrink-0 ${taller.modalitat === 'A' ? 'bg-green-100 text-green-700' :
+                                taller.modalitat === 'B' ? 'bg-orange-100 text-orange-700' :
+                                  'bg-purple-100 text-purple-700'
+                              }`}>
+                              {taller.modalitat}
+                            </div>
+                            <WorkshopIcon iconName={taller.icona} className="w-6 h-6 text-[#00426B]" />
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -290,6 +321,14 @@ export default function PeticionsPage() {
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalItems={filteredTallers.length}
+            currentItemsCount={paginatedTallers.length}
+            itemName="tallers"
+          />
         </div>
 
         {/* Right Section: Form Sidebar */}
@@ -314,7 +353,7 @@ export default function PeticionsPage() {
 
             <div className="p-6">
               {error && (
-                <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700">
+                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/10 border-l-4 border-red-500 text-red-700 dark:text-red-400">
                   <p className="text-[11px] font-bold uppercase tracking-wide mb-1 flex items-center gap-2">
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
                     Error en la sol·licitud
@@ -324,40 +363,40 @@ export default function PeticionsPage() {
               )}
 
               {!selectedTaller ? (
-                <div className="text-center py-12 border-2 border-dashed border-gray-100 bg-gray-50/30">
-                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="text-center py-12 border-2 border-dashed border-border-subtle bg-background-subtle/30">
+                  <div className="w-12 h-12 rounded-full bg-background-subtle flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
                   </div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-6">
+                  <p className="text-xs font-bold text-text-muted uppercase tracking-widest px-6">
                     Selecciona un taller de la llista per començar
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Selected Taller Info */}
-                  <div className="bg-[#00426B] p-4 rounded-none text-white shadow-md">
+                  <div className="bg-background-surface border-l-4 border-consorci-darkBlue p-4 rounded-none text-text-primary shadow-sm">
                     <div className="flex justify-between items-start mb-2">
-                      <span className="text-[9px] font-black bg-white/20 px-1.5 py-0.5 tracking-tighter uppercase">MOD {selectedTaller.modalitat}</span>
+                      <span className="text-[9px] font-black bg-consorci-darkBlue/10 text-consorci-darkBlue px-1.5 py-0.5 tracking-tighter uppercase">MOD {selectedTaller.modalitat}</span>
                       {!editingPeticioId && (
                         <button
                           type="button"
                           onClick={() => setSelectedTallerId(null)}
-                          className="text-white/50 hover:text-white transition-colors"
+                          className="text-text-muted hover:text-consorci-darkBlue transition-colors"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                       )}
                     </div>
-                    <h4 className="font-bold text-sm leading-tight">{selectedTaller.titol}</h4>
-                    <p className="text-[10px] font-bold text-white/60 uppercase mt-1">{selectedTaller.sector}</p>
+                    <h4 className="font-bold text-sm leading-tight text-consorci-darkBlue dark:text-consorci-lightBlue">{selectedTaller.titol}</h4>
+                    <p className="text-[10px] font-bold text-text-secondary uppercase mt-1">{selectedTaller.sector}</p>
                   </div>
 
                   {/* Form Fields */}
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Professorat Referent</label>
+                      <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">Professorat Referent</label>
                       <div className="space-y-2">
                         <select
                           value={prof1_id}
@@ -365,7 +404,7 @@ export default function PeticionsPage() {
                           className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700"
                           required
                         >
-                          <option value="">Referent Principal</option>
+                          <option value="">Selecciona el Referent Principal *</option>
                           {professors.map(p => (
                             <option key={p.id_professor} value={p.id_professor}>{p.nom}</option>
                           ))}
@@ -374,8 +413,9 @@ export default function PeticionsPage() {
                           value={prof2_id}
                           onChange={(e) => setProf2Id(e.target.value)}
                           className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700"
+                          required
                         >
-                          <option value="">Segon Referent (Opcional)</option>
+                          <option value="">Selecciona el Segon Referent *</option>
                           {professors.map(p => (
                             <option key={p.id_professor} value={p.id_professor}>{p.nom}</option>
                           ))}
@@ -403,13 +443,12 @@ export default function PeticionsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Motiu de la Sol·licitud</label>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Motiu de la Sol·licitud (Opcional)</label>
                       <textarea
                         value={comentaris}
                         onChange={(e) => setComentaris(e.target.value)}
                         placeholder="Breu explicació del perfil de l'alumnat..."
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700 min-h-[80px] resize-none"
-                        required
                       />
                     </div>
                   </div>

@@ -27,20 +27,20 @@ export default function AgendaScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-[#F9FAFB]">
+      <View className="flex-1 justify-center items-center bg-background-page">
         <ActivityIndicator size="large" color={THEME.colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#F9FAFB]">
+    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
       {/* Professional Header */}
-      <View className="px-6 pb-6 pt-4 bg-white border-b border-gray-100 mb-6">
-         <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
+      <View className="px-6 pb-6 pt-4 bg-background-surface border-b border-border-subtle mb-6">
+         <Text className="text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
            Agenda Acadèmica
          </Text>
-         <Text className="text-3xl font-extrabold text-slate-900 leading-tight">
+         <Text className="text-3xl font-extrabold text-text-primary leading-tight">
            Calendari
          </Text>
       </View>

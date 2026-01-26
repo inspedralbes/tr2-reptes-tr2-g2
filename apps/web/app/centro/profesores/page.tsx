@@ -9,6 +9,9 @@ import professorService, { Professor } from '@/services/professorService';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import Avatar from '@/components/Avatar';
+import getApi from '@/services/api';
+import Pagination from "@/components/Pagination";
 
 export default function ProfesoresCRUD() {
   const { user, loading: authLoading } = useAuth();
@@ -78,10 +81,10 @@ export default function ProfesoresCRUD() {
     try {
       if (editingProf) {
         await professorService.update(editingProf.id_professor, formData);
-        toast.success("Professor actualitzat correctly.");
+        toast.success("Professor actualitzat correctament.");
       } else {
         await professorService.create(formData);
-        toast.success("Professor creat correctly.");
+        toast.success("Professor creat correctament.");
       }
       setIsModalOpen(false);
       setEditingProf(null);
@@ -179,11 +182,14 @@ export default function ProfesoresCRUD() {
                     <tr key={p.id_professor} className="hover:bg-gray-50 transition-colors group">
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-[#EAEFF2] flex items-center justify-center text-[#00426B] group-hover:bg-[#00426B] group-hover:text-white transition-colors">
-                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </div>
+                          <Avatar 
+                            url={p.usuari?.url_foto} 
+                            name={p.nom} 
+                            id={p.usuari?.id_usuari || p.id_professor} 
+                            type="usuari" 
+                            size="md"
+                            email={p.usuari?.email}
+                          />
                           <div>
                             <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{p.nom}</div>
                           </div>
@@ -214,104 +220,136 @@ export default function ProfesoresCRUD() {
           </div>
 
           {/* Paginació */}
-          {totalPages > 1 && (
-            <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white border border-gray-200 p-6">
-              <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
-                Mostrant <span className="text-[#00426B]">{paginatedProfessors.length}</span> de <span className="text-[#00426B]">{filteredProfessors.length}</span> professors
-              </div>
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === 1 
-                    ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-                    : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
-                >
-                  Anterior
-                </button>
-                <div className="px-4 py-2 bg-[#F8FAFC] border border-gray-200 text-[10px] font-black text-[#00426B] tracking-[0.2em]">
-                  Pàgina {currentPage} de {totalPages}
-                </div>
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${currentPage === totalPages 
-                    ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-                    : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
-                >
-                  Següent
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalItems={filteredProfessors.length}
+            currentItemsCount={paginatedProfessors.length}
+            itemName="professors"
+          />
         </>
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-10 max-w-md w-full shadow-2xl relative border border-gray-100">
-            <button 
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-6 right-6 text-gray-300 hover:text-gray-600 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-
-            <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tight mb-8">
-              {editingProf ? 'Editar Professor' : 'Nou Professor'}
-            </h3>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
+          <div className="bg-white shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-gray-100">
+            {/* Header */}
+            <div className="bg-gray-50 px-8 py-5 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Nom complet</label>
-                <input 
-                  type="text" value={formData.nom} 
-                  onChange={e => setFormData({...formData, nom: e.target.value})}
-                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" required
-                />
+                <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tight">
+                  {editingProf ? 'Editar Professor' : 'Nou Professor'}
+                </h3>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                  {editingProf ? 'Modifica les dades del docent' : 'Introdueix les dades del nou professor'}
+                </p>
               </div>
-              <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Dades de contacte (Email principal)</label>
-                <input 
-                  type="email" value={formData.contacte} 
-                  onChange={e => setFormData({...formData, contacte: e.target.value})}
-                  className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" 
-                  placeholder="ejemplo@centro.cat"
-                  required
-                />
-              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-300 hover:text-[#00426B] transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
 
-              {!editingProf && (
-                <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 flex justify-between">
-                    Contrasenya (Accés App)
-                    <button 
-                      type="button" 
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="text-[#0775AB] hover:underline"
-                    >
-                      {showPassword ? 'Amagar' : 'Veure'}
-                    </button>
-                  </label>
-                  <input 
-                    type={showPassword ? "text" : "password"} 
-                    value={formData.password} 
-                    onChange={e => setFormData({...formData, password: e.target.value})}
-                    placeholder="Contrasenya per a l'App mòbil"
-                    className="w-full px-4 py-3 bg-[#F8FAFC] border-none focus:ring-2 focus:ring-[#0775AB] font-bold text-[#00426B]" 
-                    required={!editingProf}
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+              {editingProf && (
+                <div className="p-8 bg-gray-50/50 border-b border-gray-50 flex flex-col items-center gap-4">
+                  <Avatar 
+                    url={editingProf.usuari?.url_foto} 
+                    name={editingProf.nom} 
+                    id={editingProf.usuari?.id_usuari || editingProf.id_professor} 
+                    type="usuari" 
+                    size="xl"
+                    className="shadow-xl ring-4 ring-white"
                   />
-                  <p className="mt-2 text-[9px] text-gray-400 font-bold uppercase leading-tight">
-                    Aquesta serà la contrasenya que el professor usarà per entrar a l'App.
-                  </p>
+                  <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#00426B] hover:text-white transition-all shadow-sm active:scale-95">
+                    Canviar Foto
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={async (e) => {
+                        if (e.target.files?.[0] && editingProf.usuari?.id_usuari) {
+                          const file = e.target.files[0];
+                          const formData = new FormData();
+                          formData.append('foto', file);
+                          try {
+                            const api = getApi();
+                            const res = await api.post(`/upload/perfil/usuari/${editingProf.usuari.id_usuari}`, formData, {
+                              headers: { 'Content-Type': 'multipart/form-data' }
+                            });
+                            toast.success("Foto actualitzada.");
+                            loadProfessors();
+                            // Update local state for immediate feedback
+                            setEditingProf({ 
+                              ...editingProf, 
+                              usuari: { ...editingProf.usuari, url_foto: res.data.url_foto } 
+                            });
+                          } catch (err) {
+                            toast.error("Error al pujar la foto.");
+                          }
+                        } else if (!editingProf.usuari?.id_usuari) {
+                          toast.error("No es pot pujar foto a un professor sense usuari vinculat.");
+                        }
+                      }}
+                    />
+                  </label>
                 </div>
               )}
+              
+              <form onSubmit={handleSubmit} id="professor-form" className="p-8 space-y-6">
+                <div>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Nom complet</label>
+                  <input 
+                    type="text" value={formData.nom} 
+                    onChange={e => setFormData({...formData, nom: e.target.value})}
+                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Dades de contacte (Email principal)</label>
+                  <input 
+                    type="email" value={formData.contacte} 
+                    onChange={e => setFormData({...formData, contacte: e.target.value})}
+                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" 
+                    placeholder="exemple@centro.cat"
+                    required
+                  />
+                </div>
 
-              <div className="flex gap-4 pt-6">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 font-black text-[10px] uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">Cancel·lar</button>
-                <button type="submit" className="flex-1 py-3 bg-[#00426B] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#0775AB] transition-all shadow-lg">Guardar</button>
-              </div>
-            </form>
+                {!editingProf && (
+                  <div>
+                    <label className="text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2 flex justify-between">
+                      Contrasenya (Accés App)
+                      <button 
+                        type="button" 
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-[#0775AB] hover:underline normal-case font-bold"
+                      >
+                        {showPassword ? 'Amagar' : 'Veure'}
+                      </button>
+                    </label>
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      value={formData.password} 
+                      onChange={e => setFormData({...formData, password: e.target.value})}
+                      placeholder="Contrasenya per a l'App mòbil"
+                      className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" 
+                      required={!editingProf}
+                    />
+                    <p className="mt-2 text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-tight">
+                      Aquesta serà la contrasenya que el professor usarà per entrar a l'App.
+                    </p>
+                  </div>
+                )}
+              </form>
+            </div>
+
+            <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 flex gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">Cancel·lar</button>
+              <button type="submit" form="professor-form" className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-all shadow-lg active:scale-95">Guardar Professor</button>
+            </div>
           </div>
         </div>
       )}

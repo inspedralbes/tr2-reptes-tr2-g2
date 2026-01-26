@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import { avaluacioService } from '@/services/avaluacioService';
+import Pagination from "@/components/Pagination";
+import Loading from '@/components/Loading';
 
 export default function AdminQuestionnairesPage() {
     const [models, setModels] = useState<any[]>([]);
@@ -25,11 +27,17 @@ export default function AdminQuestionnairesPage() {
         fetchModels();
     }, []);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
+    const totalPages = Math.ceil(models.length / itemsPerPage);
+    const paginatedModels = models.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
     if (loading) {
         return (
-            <div className="flex min-h-screen justify-center items-center">
-                <div className="animate-spin h-10 w-10 border-b-2 border-primary"></div>
-            </div>
+            <Loading fullScreen message="Carregant qüestionaris..." />
         );
     }
 
@@ -57,7 +65,7 @@ export default function AdminQuestionnairesPage() {
                             <button onClick={() => router.push('/admin/questionaris/builder')} className="text-blue-900 font-black uppercase text-xs tracking-widest hover:underline">Començar ara</button>
                         </div>
                     ) : (
-                        models.map((m: any) => (
+                        paginatedModels.map((m: any) => (
                             <div key={m.id_model} className="bg-white p-8 border shadow-sm hover:shadow-xl transition-all group flex flex-col justify-between">
                                 <div>
                                     <div className="flex justify-between items-start mb-4">
@@ -80,6 +88,15 @@ export default function AdminQuestionnairesPage() {
                         ))
                     )}
                 </div>
+
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    totalItems={models.length}
+                    currentItemsCount={paginatedModels.length}
+                    itemName="qüestionaris"
+                />
 
                 {/* Sección de ayuda */}
                 <div className="mt-16 bg-blue-50 p-8 border-l-4 border-blue-900">

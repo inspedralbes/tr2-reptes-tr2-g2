@@ -1,23 +1,55 @@
 /** @type {import('tailwindcss').Config} */
+
+// Simulating import from shared/theme to avoid build issues in JS config
+const THEME = {
+  colors: {
+    primary: '#00426B',
+    secondary: '#4197CB',
+    tertiary: '#0775AB',
+    accent: '#F26178',
+    beige: '#E0C5AC',
+    yellow: '#F9C311',
+    gray: '#CFD2D3',
+    bgGray: '#F2F2F3',
+    secondaryBg: '#EAEFF2',
+  }
+};
+
 module.exports = {
   content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
+  // darkMode: "class",
   theme: {
     extend: {
       colors: {
-        primary: {
-          DEFAULT: '#00426B', // Pantone 7694 C / 541 U
+        // Semantic Tokens
+        background: {
+          page: "var(--bg-page)",
+          surface: "var(--bg-surface)",
+          subtle: "var(--bg-subtle)",
         },
-        // Colores Complementarios
-        'light-blue': '#4197CB', // Pantone 7688 C / 7688 U
-        'light-gray': '#CFD2D3', // Pantone 427 C / Cool Grey 1 U
-        'pink-red': '#F26178',   // Pantone 709 C / 709 U
-        beige: '#E0C5AC',        // Pantone 4685 C / 4685 U
-        yellow: '#F9C311',
+        text: {
+          primary: "var(--text-primary)",
+          secondary: "var(--text-secondary)",
+          muted: "var(--text-muted)",
+          inverse: "var(--text-inverse)",
+        },
+        border: {
+          subtle: "var(--border-subtle)",
+        },
+        // Institutional / Brand
+        primary: {
+          DEFAULT: "var(--consorci-dark-blue)", 
+        },
+        'light-blue': "var(--consorci-light-blue)",
+        'light-gray': "var(--consorci-light-gray)",
+        'pink-red': "var(--consorci-pink-red)",
+        beige: "var(--consorci-beige)",
+        yellow: "var(--consorci-yellow)",
       },
       fontFamily: {
-        sans: ['Arial', 'sans-serif'], // Para documentos editables
-        corporate: ['Helvetica Neue', 'sans-serif'], // Para uso corporativo
+        sans: ['Inter', 'sans-serif'], 
+        corporate: ['Inter', 'sans-serif'], 
       },
       fontSize: {
         'xs': '14px',

@@ -42,13 +42,13 @@ export const getTallerById = async (req: Request, res: Response) => {
     },
   });
 
-  if (!taller) return res.status(404).json({ error: 'Taller no encontrado' });
+  if (!taller) return res.status(404).json({ error: 'Taller no trobat' });
   res.json(taller);
 };
 
 // POST: Crear Taller
 export const createTaller = async (req: Request, res: Response) => {
-  const { titol, descripcio, durada_h, places_maximes, modalitat, id_sector } = req.body;
+  const { titol, descripcio, durada_h, places_maximes, modalitat, id_sector, dies_execucio, icona } = req.body;
 
   try {
     const nuevoTaller = await prisma.taller.create({
@@ -58,7 +58,9 @@ export const createTaller = async (req: Request, res: Response) => {
         durada_h: typeof durada_h === 'string' ? parseInt(durada_h) : (durada_h || 0),
         places_maximes: typeof places_maximes === 'string' ? parseInt(places_maximes) : (places_maximes || 25),
         modalitat: modalitat || 'A',
-        id_sector: id_sector ? (typeof id_sector === 'string' ? parseInt(id_sector) : id_sector) : 1
+        icona: icona || "🧩",
+        id_sector: id_sector ? (typeof id_sector === 'string' ? parseInt(id_sector) : id_sector) : 1,
+        dies_execucio: dies_execucio || []
       },
     });
     res.status(201).json(nuevoTaller);
@@ -71,7 +73,7 @@ export const createTaller = async (req: Request, res: Response) => {
 // PUT: Actualizar
 export const updateTaller = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { titol, descripcio, durada_h, places_maximes, modalitat, id_sector } = req.body;
+  const { titol, descripcio, durada_h, places_maximes, modalitat, id_sector, dies_execucio, icona } = req.body;
 
   try {
     const updateData: any = {};
@@ -80,7 +82,9 @@ export const updateTaller = async (req: Request, res: Response) => {
     if (durada_h !== undefined) updateData.durada_h = typeof durada_h === 'string' ? parseInt(durada_h) : durada_h;
     if (places_maximes !== undefined) updateData.places_maximes = typeof places_maximes === 'string' ? parseInt(places_maximes) : places_maximes;
     if (modalitat !== undefined) updateData.modalitat = modalitat;
+    if (icona !== undefined) updateData.icona = icona;
     if (id_sector !== undefined) updateData.id_sector = typeof id_sector === 'string' ? parseInt(id_sector) : id_sector;
+    if (dies_execucio !== undefined) updateData.dies_execucio = dies_execucio;
 
     const tallerActualizado = await prisma.taller.update({
       where: { id_taller: parseInt(id as string) },
@@ -89,7 +93,7 @@ export const updateTaller = async (req: Request, res: Response) => {
     res.json(tallerActualizado);
   } catch (error) {
     console.error("Error en updateTaller:", error);
-    res.status(500).json({ error: 'Error al actualizar el taller' });
+    res.status(500).json({ error: 'Error al actualitzar el taller' });
   }
 };
 
@@ -99,5 +103,5 @@ export const deleteTaller = async (req: Request, res: Response) => {
   await prisma.taller.delete({
     where: { id_taller: parseInt(id as string) },
   });
-  res.json({ message: 'Taller eliminado correctamente' });
+  res.json({ message: 'Taller eliminat correctament' });
 };

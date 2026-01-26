@@ -8,6 +8,11 @@ export const createTallerSchema = z.object({
     places_maximes: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().positive()),
     modalitat: z.enum(['A', 'B', 'C']),
     id_sector: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()),
+    dies_execucio: z.array(z.object({
+        dayOfWeek: z.number(),
+        startTime: z.string(),
+        endTime: z.string()
+    })).or(z.array(z.string())).optional(),
   }),
 });
 

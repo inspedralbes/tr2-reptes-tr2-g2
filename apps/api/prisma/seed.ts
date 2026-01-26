@@ -4,14 +4,14 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 const PHASES = {
-  SOLICITUD: 'Solicitud e Inscripción',
-  PLANIFICACION: 'Planificación y Asignación',
-  EJECUCION: 'Ejecución y Seguimiento',
-  CIERRE: 'Cierre y Evaluación'
+  SOLICITUD: 'Sol·licitud i Inscripció',
+  PLANIFICACION: 'Planificació i Assignació',
+  EJECUCION: 'Execució i Seguiment',
+  CIERRE: 'Tancament i Avaluació'
 } as const;
 
 async function cleanDatabase() {
-  console.log('🧹 Limpiando base de datos...');
+  console.log('🧹 Netejant base de dades...');
   const tables = [
     'respostes_questionari', 'enviaments_questionaris', 'preguntes', 'model_questionaris',
     'autoconsultes_alumnes', 'avaluacio_competencial', 'avaluacions_docents',
@@ -31,7 +31,7 @@ async function cleanDatabase() {
 }
 
 async function seedInfrastructure() {
-  console.log('🏗️ Generando roles y sectores...');
+  console.log('🏗️ Generant rols i sectors...');
   const rolAdmin = await prisma.rol.create({ data: { nom_rol: 'ADMIN' } });
   const rolCoord = await prisma.rol.create({ data: { nom_rol: 'COORDINADOR' } });
   const rolProfe = await prisma.rol.create({ data: { nom_rol: 'PROFESSOR' } });
@@ -47,7 +47,7 @@ async function seedInfrastructure() {
 }
 
 async function seedUsers(roles: any, passDefault: string) {
-  console.log('👥 Generando usuarios y centros...');
+  console.log('👥 Generant usuaris i centres...');
   
   // 1. Admin Global
   await prisma.usuari.create({
@@ -103,44 +103,75 @@ async function seedUsers(roles: any, passDefault: string) {
   const profesBrossa = [];
   const profesClaris = [];
 
-  for (let i = 1; i <= 4; i++) {
-    const emailB = `prof.b${i}@brossa.cat`;
+  const brossaProfsNames = ['Laura Martínez', 'Jordi Soler', 'Marta Vila', 'Pere Gomis'];
+  const clarisProfsNames = ['Anna Ferrer', 'Marc Dalmau', 'Laia Puig', 'Sergi Vidal'];
+
+  for (let i = 0; i < 4; i++) {
+    const name = brossaProfsNames[i];
+    const email = `${name.toLowerCase().replace(' ', '.').normalize("NFD").replace(/[\u0300-\u036f]/g, "")}@brossa.cat`;
     const userB = await prisma.usuari.create({
       data: {
-        nom_complet: `Professor Brossa ${i}`,
-        email: emailB,
+        nom_complet: name,
+        email: email,
         password_hash: passDefault,
         id_rol: roles.rolProfe.id_rol,
         id_centre: centroBrossa.id_centre
       }
     });
     const pb = await prisma.professor.create({
-      data: { nom: `Professor Brossa ${i}`, contacte: emailB, id_centre: centroBrossa.id_centre, id_usuari: userB.id_usuari }
+      data: { nom: name, contacte: email, id_centre: centroBrossa.id_centre, id_usuari: userB.id_usuari }
     });
     profesBrossa.push(pb);
 
-    const emailP = `prof.p${i}@pauclaris.cat`;
+    const nameClaris = clarisProfsNames[i];
+    const emailC = `${nameClaris.toLowerCase().replace(' ', '.').normalize("NFD").replace(/[\u0300-\u036f]/g, "")}@pauclaris.cat`;
     const userP = await prisma.usuari.create({
       data: {
-        nom_complet: `Professor Claris ${i}`,
-        email: emailP,
+        nom_complet: nameClaris,
+        email: emailC,
         password_hash: passDefault,
         id_rol: roles.rolProfe.id_rol,
         id_centre: centroPauClaris.id_centre
       }
     });
     const pc = await prisma.professor.create({
-      data: { nom: `Professor Claris ${i}`, contacte: emailP, id_centre: centroPauClaris.id_centre, id_usuari: userP.id_usuari }
+      data: { nom: nameClaris, contacte: emailC, id_centre: centroPauClaris.id_centre, id_usuari: userP.id_usuari }
     });
     profesClaris.push(pc);
   }
 
-  for (let i = 1; i <= 10; i++) {
+  const brossaStudents = [
+    { n: 'Pol', c: 'Garcia' }, { n: 'Nuria', c: 'Roca' }, { n: 'Arnau', c: 'Font' }, 
+    { n: 'Julia', c: 'Serra' }, { n: 'Oriol', c: 'Mas' }, { n: 'Clara', c: 'Pons' }, 
+    { n: 'Nil', c: 'Bosch' }, { n: 'Emma', c: 'Sala' }, { n: 'Aleix', c: 'Camps' }, 
+    { n: 'Ona', c: 'Valls' }
+  ];
+
+  const clarisStudents = [
+    { n: 'Paula', c: 'Martí' }, { n: 'Eric', c: 'Torres' }, { n: 'Marina', c: 'Gil' }, 
+    { n: 'Jan', c: 'Costa' }, { n: 'Aina', c: 'Ramos' }, { n: 'Biel', c: 'Rovira' }, 
+    { n: 'Carla', c: 'Mola' }, { n: 'David', c: 'Romeu' }, { n: 'Sara', c: 'Canals' }, 
+    { n: 'Roger', c: 'Sants' }
+  ];
+
+  for (let i = 0; i < 10; i++) {
     await prisma.alumne.create({
-      data: { nom: `Alumne Brossa ${i}`, cognoms: 'Simulació', idalu: `B${100+i}`, curs: '4t ESO', id_centre_procedencia: centroBrossa.id_centre }
+      data: { 
+        nom: brossaStudents[i].n, 
+        cognoms: brossaStudents[i].c, 
+        idalu: `B${100+i}`, 
+        curs: '4t ESO', 
+        id_centre_procedencia: centroBrossa.id_centre 
+      }
     });
     await prisma.alumne.create({
-      data: { nom: `Alumne Claris ${i}`, cognoms: 'Simulació', idalu: `P${100+i}`, curs: '3r ESO', id_centre_procedencia: centroPauClaris.id_centre }
+      data: { 
+        nom: clarisStudents[i].n, 
+        cognoms: clarisStudents[i].c, 
+        idalu: `P${100+i}`, 
+        curs: '3r ESO', 
+        id_centre_procedencia: centroPauClaris.id_centre 
+      }
     });
   }
 
@@ -148,15 +179,83 @@ async function seedUsers(roles: any, passDefault: string) {
 }
 
 async function seedTallers(sectors: any) {
-  console.log('📚 Generando catálogo de talleres...');
+  console.log('📚 Generant catàleg de tallers...');
   const tallers = [
-    { titol: 'Robòtica i IoT', sector: sectors.sectorTecno.id_sector, modalitat: 'A', cap: 10, icona: 'ROBOT' },
-    { titol: 'Cinema Digital', sector: sectors.sectorCreacio.id_sector, modalitat: 'B', cap: 8, icona: 'FILM' },
-    { titol: 'Impressió 3D', sector: sectors.sectorIndus.id_sector, modalitat: 'A', cap: 7, icona: 'TOOLS' },
-    { titol: 'Desenvolupament Web', sector: sectors.sectorTecno.id_sector, modalitat: 'C', cap: 6, icona: 'CODE' },
-    { titol: 'Disseny Gràfic', sector: sectors.sectorCreacio.id_sector, modalitat: 'B', cap: 4, icona: 'PAINT' },
-    { titol: 'Realitat Virtual', sector: sectors.sectorTecno.id_sector, modalitat: 'A', cap: 8, icona: 'GEAR' }, 
-    { titol: 'Energies Renovables', sector: sectors.sectorIndus.id_sector, modalitat: 'B', cap: 10, icona: 'LEAF' }
+    { 
+      titol: 'Robòtica i IoT', 
+      sector: sectors.sectorTecno.id_sector, 
+      modalitat: 'A', 
+      cap: 10, 
+      icona: 'ROBOT',
+      schedule: [
+        { dayOfWeek: 1, startTime: "09:00", endTime: "11:00" }, 
+        { dayOfWeek: 3, startTime: "09:00", endTime: "11:00" }  
+      ]
+    },
+    { 
+      titol: 'Cinema Digital', 
+      sector: sectors.sectorCreacio.id_sector, 
+      modalitat: 'B', 
+      cap: 8, 
+      icona: 'FILM',
+      schedule: [
+        { dayOfWeek: 2, startTime: "15:00", endTime: "18:00" },
+        { dayOfWeek: 4, startTime: "15:00", endTime: "18:00" } 
+      ]
+    },
+    { 
+      titol: 'Impressió 3D', 
+      sector: sectors.sectorIndus.id_sector, 
+      modalitat: 'A', 
+      cap: 7, 
+      icona: 'TOOLS',
+      schedule: [
+        { dayOfWeek: 5, startTime: "08:00", endTime: "12:00" } 
+      ]
+    },
+    { 
+      titol: 'Desenvolupament Web', 
+      sector: sectors.sectorTecno.id_sector, 
+      modalitat: 'C', 
+      cap: 6, 
+      icona: 'CODE',
+      schedule: [
+         { dayOfWeek: 1, startTime: "10:00", endTime: "13:00" },
+         { dayOfWeek: 2, startTime: "10:00", endTime: "13:00" }
+      ]
+    },
+    { 
+      titol: 'Disseny Gràfic', 
+      sector: sectors.sectorCreacio.id_sector, 
+      modalitat: 'B', 
+      cap: 4, 
+      icona: 'PAINT',
+      schedule: [
+        { dayOfWeek: 3, startTime: "16:00", endTime: "19:00" }
+      ]
+    },
+    { 
+      titol: 'Realitat Virtual', 
+      sector: sectors.sectorTecno.id_sector, 
+      modalitat: 'A', 
+      cap: 8, 
+      icona: 'GEAR',
+      schedule: [
+        { dayOfWeek: 4, startTime: "09:00", endTime: "11:00" },
+        { dayOfWeek: 5, startTime: "09:00", endTime: "11:00" }
+      ]
+    }, 
+    { 
+      titol: 'Energies Renovables', 
+      sector: sectors.sectorIndus.id_sector, 
+      modalitat: 'B', 
+      cap: 10, 
+      icona: 'LEAF',
+      schedule: [
+        { dayOfWeek: 1, startTime: "12:00", endTime: "14:00" },
+        { dayOfWeek: 3, startTime: "12:00", endTime: "14:00" }
+      ]
+    }
   ];
 
   const creadosTallers = [];
@@ -169,7 +268,8 @@ async function seedTallers(sectors: any) {
         durada_h: 3,
         places_maximes: t.cap,
         icona: t.icona,
-        descripcio: `Exploració pràctica de ${t.titol}.`
+        descripcio: `Exploració pràctica de ${t.titol}.`,
+        dies_execucio: t.schedule
       }
     });
     creadosTallers.push(nuevo);
@@ -179,7 +279,7 @@ async function seedTallers(sectors: any) {
 
 
 async function seedFases() {
-  console.log('🗓️ Creando fases del programa...');
+  console.log('🗓️ Creant fases del programa...');
   const now = new Date();
   const currentYear = now.getFullYear();
   const prevYear = currentYear - 1;
@@ -224,9 +324,50 @@ async function seedFases() {
   }
 }
 
+async function seedCompetencies() {
+  console.log('🧠 Generant competències...');
+  const tecniques = [
+    "Capacitat de resoldre situacions independentment",
+    "Reconeixement d'eines",
+    "Responsabilitat en l'execució"
+  ];
+  const transversals = [
+    "Autoconfiança",
+    "Treball en equip",
+    "Disposició a l'aprenentatge",
+    "Actitud responsable",
+    "Iniciativa",
+    "Comunicació amb el responsable"
+  ];
 
+  for (const c of tecniques) {
+    await prisma.competencia.create({ data: { nom: c, tipus: 'Tecnica' } });
+  }
+  for (const c of transversals) {
+    await prisma.competencia.create({ data: { nom: c, tipus: 'Transversal' } });
+  }
+}
+
+async function seedQuestionnaires() {
+  console.log('📝 Generant qüestionaris...');
+  
+  // Qüestionari de Qualitat del Taller (Professor)
+  const qTaller = await prisma.modelQuestionari.create({
+    data: {
+      titol: "Qüestionari de Qualitat del Taller",
+      destinatari: "PROFESSOR",
+      preguntes: {
+        create: [
+          { enunciat: "Satisfacció general amb el taller", tipus_resposta: "Likert_1_5" },
+          { enunciat: "Valoració de l'organització i recursos", tipus_resposta: "Likert_1_5" },
+          { enunciat: "Observacions i suggeriments", tipus_resposta: "Oberta" }
+        ]
+      }
+    }
+  });
+}
 async function main() {
-  console.log('🌱 Iniciando Seed final para el programa Iter...');
+  console.log('🌱 Iniciant Seed final per al programa Iter...');
   
   await cleanDatabase();
   
@@ -239,9 +380,14 @@ async function main() {
   const tallers = await seedTallers(infra.sectors);
   
   await seedFases();
+  await seedCompetencies();
+  await seedQuestionnaires();
+  // await seedAssignments(centrosData, tallers);
 
-  console.log('✅ Seed finalizado con éxito (Sin datos transaccionales).');
+  console.log('✅ Seed finalitzat amb èxit (Amb dades de prova i sessions).');
 }
+
+// function seedAssignments has been removed
 
 main()
   .catch((e) => {

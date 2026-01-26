@@ -1,35 +1,37 @@
 import React from 'react';
 import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';
+import { THEME } from '@iter/shared';
+import { useColorScheme } from 'nativewind';
 
 export default function ProfessorTabsLayout() {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
   return (
-    <NativeTabs
-      tintColor="#00426B"
-      backgroundColor="white"
-    >
-      <NativeTabs.Trigger name="index" options={{ title: 'Tauler' }}>
+    <NativeTabs>
+      <NativeTabs.Trigger name="index">
         <Label>Tauler</Label>
-        <Icon sf="square.grid.2x2.fill" />
+        <Icon sf="square.grid.2x2" md="dashboard" />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="avisos" options={{ title: 'Avisos' }}>
+      <NativeTabs.Trigger name="avisos">
         <Label>Avisos</Label>
-        <Icon sf="bell.fill" />
+        <Icon sf="bell" md="notifications" />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="talleres" options={{ title: 'Agenda' }}>
-        <Label>Agenda</Label>
-        <Icon sf="calendar" />
+      <NativeTabs.Trigger name="talleres">
+        <Label>Calendari</Label>
+        <Icon sf="calendar" md="calendar_today" />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="coordinacion" options={{ title: 'Col·laboració' }}>
+      <NativeTabs.Trigger name="coordinacion">
         <Label>Col·laboració</Label>
-        <Icon sf="person.2.fill" />
+        <Icon sf="person.2" md="people" />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="perfil" options={{ title: 'Perfil' }}>
+      <NativeTabs.Trigger name="perfil">
         <Label>Perfil</Label>
-        <Icon sf="person.circle.fill" />
+        <Icon sf="person.crop.circle" md="account_circle" />
       </NativeTabs.Trigger>
     </NativeTabs>
   );
